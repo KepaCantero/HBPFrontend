@@ -5875,6 +5875,7 @@ GZ3D.GZIface.prototype.createModelFromMsg = function(model)
   var modelObj = new THREE.Object3D();
   modelObj.name = model.name;
   modelObj.userData.id = model.id;
+  modelObj.userData.is_static = model.is_static;
   if (model.pose)
   {
     this.scene.setPose(modelObj, model.pose.position, model.pose.orientation);
@@ -5898,6 +5899,7 @@ GZ3D.GZIface.prototype.createModelFromMsg = function(model)
     var linkObj = new THREE.Object3D();
     linkObj.name = link.name;
     linkObj.userData.id = link.id;
+    linkObj.userData.gazeboType = 'link';
     linkObj.serverProperties =
         {
           self_collide: link.self_collide,

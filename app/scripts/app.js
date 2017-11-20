@@ -97,7 +97,8 @@
       'demoCarousel',
       'experimentExplorer',
       'experimentList',
-      'rosTerminalModule'
+      'rosTerminalModule',
+      'userInteractionModule'
     ])
     // Routes
     .config([

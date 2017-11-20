@@ -20,6 +20,31 @@
         .and.returnValue(true)
     };
 
+    var views = [
+      {
+        type: 'camera',
+        active: true,
+        container: document.createElement('div'), //{ style: { visibility: 'visible' } }
+        renderer: {
+          domElement: {}
+        },
+        camera: {
+          position: new THREE.Vector3()
+        }
+      },
+      {
+        type: 'camera',
+        active: false,
+        container: document.createElement('div'), //{ style: { visibility: 'hidden' } }
+        renderer: {
+          domElement: {}
+        },
+        camera: {
+          position: new THREE.Vector3()
+        }
+      }
+    ];
+
     this.scene = {
       render: jasmine.createSpy('render'),
       resetView: jasmine.createSpy('resetView'),
@@ -74,25 +99,16 @@
         shadowMapEnabled: false
       },
       viewManager: {
-        views: [
-          {
-            type: 'camera',
-            active: true,
-            container: { style: { visibility: 'visible' } }
-          },
-          {
-            type: 'camera',
-            active: false,
-            container: { style: { visibility: 'hidden' } }
-          }
-        ],
+        views: views,
+        mainUserView: views[0],
         setViewContainerElement: jasmine.createSpy('setViewContainerElement')
       },
       scene: new THREE.Scene(),
       selectEntity: jasmine.createSpy('selectEntity'),
       applyComposerSettings: jasmine.createSpy('applyComposerSettings'),
       getByName: jasmine.createSpy('getByName'),
-      toggleScreenChangeMenu: jasmine.createSpy('toggleScreenChangeMenu')
+      toggleScreenChangeMenu: jasmine.createSpy('toggleScreenChangeMenu'),
+      attachEventListeners: jasmine.createSpy('attachEventListeners')
     };
 
     this.iface = {

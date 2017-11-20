@@ -178,6 +178,7 @@
                 model = gz3d.scene.modelManipulator.object;
               }
             }
+
             return model;
           }
         };
