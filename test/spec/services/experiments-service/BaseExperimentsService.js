@@ -50,6 +50,6 @@ describe('Services: BaseExperimentsService', function() {
 
     experimentsService.updateMissingImages();
     catchCallback();
-    expect(experimentsService.experimentsArray[0].imageData).toBe(false);
+    expect(experimentsService.experimentsArray[0].imageUrl).toBe(false);
   });
 });

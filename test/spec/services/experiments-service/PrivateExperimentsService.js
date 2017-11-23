@@ -43,15 +43,13 @@ describe('Services: PrivateExperimentsService', function() {
   );
 
   it('should return data on getBase64Content', function(done) {
-    var response = { uuid: 'uuid', data: 'somedata' };
-
     spyOn(storageServer, 'getBase64Content').and.returnValue(
-      window.$q.when(response)
+      window.$q.when('somedata')
     );
     privateExperimentsService
       .getExperimentImage({ configuration: {} })
       .then(function(res) {
-        expect(res).toBe(response);
+        expect(res).toBe('data:image/png;base64,somedata');
         done();
       });
     $rootScope.$digest();

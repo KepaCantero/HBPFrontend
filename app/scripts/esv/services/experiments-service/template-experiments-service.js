@@ -19,9 +19,7 @@
     }
 
     getExperimentImage(exp) {
-      return this.experimentProxyService
-        .getImages([exp.id])
-        .then(images => images[exp.id]);
+      return this.experimentProxyService.getImage(exp.id);
     }
   }
 

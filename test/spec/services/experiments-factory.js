@@ -50,7 +50,7 @@ describe('Services: experimentsFactory', function() {
     spyOn(experimentProxyService, 'getExperiments').and.returnValue(
       $q.when(experiments)
     );
-    spyOn(experimentProxyService, 'getImages').and.returnValue($q.when(image));
+    spyOn(experimentProxyService, 'getImage').and.returnValue($q.when(image));
     spyOn(storageServer, 'getFileContent');
     var exp = experimentsFactory.createExperimentsService();
     exp.initialize();
@@ -98,7 +98,7 @@ describe('Services: experimentsFactory', function() {
     spyOn(experimentProxyService, 'getAvailableServers').and.returnValue(
       $q.when([])
     );
-    spyOn(experimentProxyService, 'getImages').and.returnValue($q.when(image));
+    spyOn(experimentProxyService, 'getImage').and.returnValue($q.when(image));
 
     spyOn(storageServer, 'getExperiments').and.returnValue($q.when([]));
 
@@ -121,7 +121,7 @@ describe('Services: experimentsFactory', function() {
     spyOn(experimentProxyService, 'getAvailableServers').and.returnValue(
       $q.when([])
     );
-    spyOn(experimentProxyService, 'getImages').and.returnValue($q.when(image));
+    spyOn(experimentProxyService, 'getImage').and.returnValue($q.when(image));
     spyOn(storageServer, 'getExperiments').and.returnValue($q.when([]));
 
     environmentService.setPrivateExperiment(true);
@@ -145,7 +145,7 @@ describe('Services: experimentsFactory', function() {
     spyOn(storageServer, 'getExperiments').and.returnValue(
       $q.when([{ uuid: 'folder_id' }])
     );
-    spyOn(experimentProxyService, 'getImages');
+    spyOn(experimentProxyService, 'getImage');
     var xml =
       '<?xml version="1.0" ?><ns1:ExD xmlns:ns1="http://schemas.humanbrainproject.eu/SP10/2014/ExDConfig"><ns1:name>newName</ns1:name><ns1:description>newDescription</ns1:description><ns1:timeout>100</ns1:timeout><thumbnail>fake.png</thumbnail></ns1:ExD>';
     spyOn(storageServer, 'getFileContent').and.returnValue(
@@ -179,7 +179,7 @@ describe('Services: experimentsFactory', function() {
     spyOn(storageServer, 'getExperiments').and.returnValue(
       $q.when([{ uuid: 'fakeUUID' }])
     );
-    spyOn(experimentProxyService, 'getImages');
+    spyOn(experimentProxyService, 'getImage');
     var xml =
       '<?xml version="1.0" ?><ns1:ExD xmlns:ns1="http://schemas.humanbrainproject.eu/SP10/2014/ExDConfig"><ns1:name>newName</ns1:name><ns1:description>newDescription</ns1:description><ns1:timeout>100</ns1:timeout><thumbnail>fake.png</thumbnail></ns1:ExD>';
     spyOn(storageServer, 'getFileContent').and.returnValue(
@@ -249,7 +249,7 @@ describe('Services: experimentsFactory', function() {
     spyOn(experimentProxyService, 'getExperiments').and.returnValue(
       $q.when(experiments)
     );
-    spyOn(experimentProxyService, 'getImages').and.returnValue(
+    spyOn(experimentProxyService, 'getImage').and.returnValue(
       $q.when({ '0': 'fakeImage' })
     );
     spyOn(experimentProxyService, 'getServerConfig').and.returnValue(

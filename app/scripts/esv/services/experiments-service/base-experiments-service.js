@@ -71,13 +71,12 @@
 
     updateMissingImages() {
       this.experimentsArray.forEach(exp => {
-        if (exp.imageData !== undefined) return;
+        if (exp.imageUrl !== undefined) return;
         this.getExperimentImage(exp)
-          .then(imageData => (exp.imageData = imageData))
-          .catch(() => (exp.imageData = false));
+          .then(imageUrl => (exp.imageUrl = imageUrl))
+          .catch(() => (exp.imageUrl = false));
       });
     }
-
     updateSimulations() {
       this.experimentsArray.forEach(exp =>
         exp.joinableServers.forEach(sim => {
