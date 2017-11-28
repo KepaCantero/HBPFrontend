@@ -93,10 +93,31 @@
           line-height: 31px;
           vertical-align: middle;
           border-left: 3px solid white;
+          flex-direction: row;
+          display: flex;
+          align-items: center;
+
+          .delete-exp-button {
+            display: none;
+            cursor: pointer;
+            position: relative;
+            opacity: 0.7;
+            margin-right: 10px;
+            margin-left: 5px;
+
+            &:hover {
+              opacity: 1;
+            }
+          }
 
           &.exp-selected {
             background-color: #ebebeb;
             border-left: 3px #39c solid;
+          }
+
+          &.exp-selected .delete-exp-button,
+          &:hover .delete-exp-button {
+            display: inline-block;
           }
 
           &:hover {
@@ -105,12 +126,18 @@
 
           .fa {
             font-size: 16px;
+          }
+
+          .fa-folder-o,
+          .fa-folder-open-o {
+            width: 17px;
             margin-left: 14px;
             color: #737373;
           }
 
           .experiment-label {
             margin-left: 4px;
+            flex-grow: 1;
           }
         }
 

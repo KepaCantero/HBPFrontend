@@ -57,6 +57,17 @@ describe('Services: PrivateExperimentsService', function() {
     $rootScope.$digest();
   });
 
+  it('should delete an experiment successfully', function(done) {
+    spyOn(storageServer, 'deleteExperiment').and.returnValue(
+      window.$q.when({})
+    );
+    privateExperimentsService.deleteExperiment({}).then(function(res) {
+      expect(res).toEqual({});
+      done();
+    });
+    $rootScope.$digest();
+  });
+
   it('should resolve to null if not file found', function(done) {
     spyOn(storageServer, 'getFileContent').and.returnValue(window.$q.when({}));
     privateExperimentsService.loadExperimentDetails({}).then(function(res) {

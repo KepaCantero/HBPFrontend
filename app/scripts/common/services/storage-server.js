@@ -103,6 +103,10 @@
             method: 'DELETE',
             url: `${this.STORAGE_BASE_URL}/:experimentId/:filename`
           }),
+          deleteExperiment: buildAction({
+            method: 'DELETE',
+            url: `${this.STORAGE_BASE_URL}/:experimentId`
+          }),
           setFile: buildAction({
             method: 'POST',
             headers: { 'Content-Type': 'text/plain' },
@@ -174,6 +178,10 @@
 
     deleteFolder(experimentId, folderName, byname = false) {
       return this.deleteEntity(experimentId, folderName, byname, 'folder');
+    }
+
+    deleteExperiment(experimentId) {
+      return this.proxyRsc.deleteExperiment({ experimentId }).$promise;
     }
 
     setFileContent(experimentId, filename, fileContent, byname = false) {

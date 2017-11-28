@@ -45,17 +45,21 @@
         $timeout(() => ($scope.showExperiments = true));
       };
 
-      if (environmentService.isPrivateExperiment()) {
-        storageServer
-          .getExperiments()
-          .then(response => $scope.reloadExperiments(!!response.length))
-          .catch(() =>
-            clbErrorDialog.open({
-              type: 'Private experiment error',
-              message: 'Failed to retrieve private experiments'
-            })
-          );
-      } else $scope.reloadExperiments(false);
+      $scope.reinit = () => {
+        if (environmentService.isPrivateExperiment()) {
+          storageServer
+            .getExperiments()
+            .then(response => $scope.reloadExperiments(!!response.length))
+            .catch(() =>
+              clbErrorDialog.open({
+                type: 'Private experiment error',
+                message: 'Failed to retrieve private experiments'
+              })
+            );
+        } else $scope.reloadExperiments(false);
+      };
+
+      $scope.reinit();
 
       $scope.cloneAnotherExperiment = () => {
         $scope.reloadExperiments(false);

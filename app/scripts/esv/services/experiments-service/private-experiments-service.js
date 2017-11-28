@@ -64,6 +64,10 @@
       );
     }
 
+    deleteExperiment(expName) {
+      return this.storageServer.deleteExperiment(expName);
+    }
+
     loadExperimentDetails(exp) {
       return this.storageServer
         .getFileContent(exp.id, 'experiment_configuration.exc', true)

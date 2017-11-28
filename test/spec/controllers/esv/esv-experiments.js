@@ -699,7 +699,7 @@
             .find('.experiment-box')
             .first()
             .click();
-          checkButtonsVisibility(page, { launch: 1, clone: 0 });
+          checkButtonsVisibility(page, { launch: 2, clone: 0 });
         });
       });
     });
