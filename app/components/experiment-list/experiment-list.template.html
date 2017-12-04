@@ -9,7 +9,7 @@
       ng-click="selectExperiment(exp);" editable-experiment experiment-details="exp">
       <div class="list-entry-container left-right" ng-class="{selected: (exp.id == pageState.selected) || isHovered}">
         <div class="list-entry-left" ng-class="{selected: exp.id == pageState.selected}">
-          <img ng-src="{{exp.imageData ? 'data:image/png;base64,'+exp.imageData:''}}" />
+          <img ng-src="{{exp.imageUrl || ''}}" />
         </div>
         <div class="list-entry-middle list-entry-container up-down">
           <div class="list-entry-container left-right title-line">

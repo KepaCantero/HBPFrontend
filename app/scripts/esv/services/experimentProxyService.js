@@ -41,7 +41,7 @@
 
         return {
           getExperiments: getExperiments,
-          getImages: getImages,
+          getImage: getImage,
           getServerConfig: _.memoize(getServerConfig),
           getJoinableServers: getJoinableServers,
           getAvailableServers: getAvailableServers
@@ -56,13 +56,8 @@
             .catch(serverError.displayHTTPError);
         }
 
-        function getImages(experimentIds) {
-          return $http
-            .get(getProxyUrl() + '/experimentImage/' + experimentIds.join(','))
-            .then(function(response) {
-              return response.data;
-            })
-            .catch(serverError.displayHTTPError);
+        function getImage(experimentId) {
+          return $q.when(getProxyUrl() + '/experimentImage/' + experimentId);
         }
 
         function getExperiments() {
