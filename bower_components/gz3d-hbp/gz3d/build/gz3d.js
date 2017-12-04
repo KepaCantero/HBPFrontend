@@ -1911,23 +1911,26 @@ GZ3D.Composer.prototype.applyUserCameraSettings = function ()
 
     for (i = 0; i < this.gz3dScene.viewManager.views.length; i++)
     {
-        var camera = this.gz3dScene.viewManager.views[i].camera;
-
-        camera.fov = cs.verticalFOV;
-        // These two are 'string' types when assigned from Angular.js, so force a conversion to 'float'
-        camera.near = 1.0 * cs.nearClippingDistance;
-        camera.far = 1.0 * cs.farClippingDistance;
-
-        camera.updateProjectionMatrix();
-
-        if (cs.showCameraHelper === true)
+        if (this.gz3dScene.viewManager.views[i].name==='main_view')
         {
-            camera.cameraHelper.visible = true;
-            camera.cameraHelper.update();
-        }
-        else
-        {
-            camera.cameraHelper.visible = false;
+            var camera = this.gz3dScene.viewManager.views[i].camera;
+
+            camera.fov = cs.verticalFOV;
+            // These two are 'string' types when assigned from Angular.js, so force a conversion to 'float'
+            camera.near = 1.0 * cs.nearClippingDistance;
+            camera.far = 1.0 * cs.farClippingDistance;
+
+            camera.updateProjectionMatrix();
+
+            if (cs.showCameraHelper === true)
+            {
+                camera.cameraHelper.visible = true;
+                camera.cameraHelper.update();
+            }
+            else
+            {
+                camera.cameraHelper.visible = false;
+            }
         }
     }
 };
