@@ -6315,7 +6315,6 @@ GZ3D.GZIface.prototype.createGeom = function(geom, material, parent, modelScale)
                       {
                         that.scene.setMaterial(allChildren[c],
                             that.entityMaterial[materialName]);
-                        break;
                       }
                     }
                   }
