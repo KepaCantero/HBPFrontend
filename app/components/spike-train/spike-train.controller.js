@@ -35,7 +35,7 @@
       return 2;
     } //s
     static get MIN_NEURON_HEIGHT() {
-      return 2;
+      return 1;
     } //px
 
     set drawingCanvas(value) {
@@ -139,10 +139,12 @@
         this.calculateCanvasSize() && this.redraw();
       }
 
-      let neuronHeight = Math.floor(
-        (this.canvas.height - this.SPIKE_TIMELABEL_SPACE * 2) /
-          msg.neuronCount -
-          1
+      let neuronHeight = Math.max(
+        Math.floor(
+          (this.canvas.height - this.SPIKE_TIMELABEL_SPACE * 2) /
+            msg.neuronCount
+        ),
+        SpikeTrainController.MIN_NEURON_HEIGHT
       );
 
       if (msg.simulationTime % SpikeTrainController.MARK_INTERVAL === 0)
