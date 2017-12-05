@@ -5875,7 +5875,6 @@ GZ3D.GZIface.prototype.createModelFromMsg = function(model)
   var modelObj = new THREE.Object3D();
   modelObj.name = model.name;
   modelObj.userData.id = model.id;
-  modelObj.userData.is_static = model.is_static;
   if (model.pose)
   {
     this.scene.setPose(modelObj, model.pose.position, model.pose.orientation);
@@ -5899,7 +5898,6 @@ GZ3D.GZIface.prototype.createModelFromMsg = function(model)
     var linkObj = new THREE.Object3D();
     linkObj.name = link.name;
     linkObj.userData.id = link.id;
-    linkObj.userData.gazeboType = 'link';
     linkObj.serverProperties =
         {
           self_collide: link.self_collide,
@@ -7945,41 +7943,15 @@ GZ3D.Manipulator = function(gz3dScene, mobile)
     {
       return;
     }
+
     if (moveHoverMesh)
     {
-      moveHoverMesh.traverse(function (obj)
-      {
-        if (obj.material && obj.material.emissive && obj.material._tempEmissive)
-        {
-          obj.material.emissive.r = obj.material._tempEmissive.r;
-          obj.material.emissive.g = obj.material._tempEmissive.g;
-          obj.material.emissive.b = obj.material._tempEmissive.b;
-          obj.material.color.r = obj.material._tempColor.r;
-          obj.material.color.g = obj.material._tempColor.g;
-          obj.material.color.b = obj.material._tempColor.b;
-          obj.material._tempEmissive = undefined;
-          obj.material._tempColor = undefined;
-        }
-      });
+      scope.gz3dScene.hideBoundingBox();
     }
-
 
     if (obj)
     {
-      obj.traverse(function (obj)
-      {
-        if (obj.material && obj.material.emissive)
-        {
-          obj.material._tempEmissive = obj.material.emissive.clone();
-          obj.material._tempColor= obj.material.color.clone();
-          obj.material.emissive.r = 0.1;
-          obj.material.emissive.g = 0.01;
-          obj.material.emissive.b = 0.08;
-          obj.material.color.r = 0.8;
-          obj.material.color.g = 0.8;
-          obj.material.color.b = 0.8;
-        }
-      });
+      scope.gz3dScene.showBoundingBox(obj);
     }
 
     moveHoverMesh = obj;
@@ -11363,6 +11335,7 @@ GZ3D.Scene.prototype.setMaterial = function(obj, material)
  */
 GZ3D.Scene.prototype.setManipulationMode = function(mode)
 {
+  var previousMode = this.manipulationMode;
   this.manipulationMode = mode;
 
   if (mode === 'view' || mode==='natural')
@@ -11371,18 +11344,25 @@ GZ3D.Scene.prototype.setManipulationMode = function(mode)
     {
       this.emitter.emit('entityChanged', this.modelManipulator.object);
     }
-    this.selectEntity(null);
+
+    if (mode==='view' && previousMode==='natural')
+    {
+      if (this.selectedEntity)
+      {
+        this.showBoundingBox(this.selectedEntity);
+      }
+    }
+    else
+    {
+      this.selectEntity(null);
+    }
   }
   else
   {
 
     this.modelManipulator.mode = this.manipulationMode;
     this.modelManipulator.setMode(this.modelManipulator.mode);
-    // model was selected during view mode
-    if (this.selectedEntity)
-    {
-      this.selectEntity(this.selectedEntity);
-    }
+
   }
 
   this.refresh3DViews();
