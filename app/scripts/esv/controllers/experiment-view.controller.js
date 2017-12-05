@@ -55,13 +55,16 @@
       simulationInfo,
       contextMenuState,
       timeout,
-      window
+      window,
+      applyForceService
     ) {
       this.element = element;
       this.userContextService = userContextService;
       this.simulationInfo = simulationInfo;
 
       stateService.Initialize();
+
+      applyForceService.initialize(); // stupid call to avoid "not being used jshint"
 
       // Query the state of the simulation
       stateService.getCurrentState().then(function() {
@@ -226,6 +229,7 @@
       'contextMenuState',
       '$timeout',
       '$window',
+      'applyForceService',
       (...args) => new ExperimentViewController(...args)
     ]);
 })();
