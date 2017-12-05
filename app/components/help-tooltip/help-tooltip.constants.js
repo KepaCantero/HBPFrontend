@@ -46,6 +46,8 @@
         'Toggle the spike-train visualization. Each neuron of the used network is represented by a horizontal bar (sorted by the neuron ID). Each bar displays the recent history of the spike events for the corresponding neuron.\n This visualization is available only if the corresponding neuron monitor transfer function has been defined.',
       JOINT_PLOT:
         'Toggle the robot joints plot. Select which of the available joints and their properties (e.g. velocity or position) should be displayed with the check-boxes on the left. The plot shows the latest values of the selected joint properties.',
+      PERFORMANCE_VIEW:
+        'Toggle the performance monitor. You can use this panel to profile your experiment.',
       ROBOT_VIEW:
         "Toggle the robot camera view. Each camera source is visualized in a separate image window. This allows the user to observe 'what the robot sees'.",
       OWNER_DISPLAY:
