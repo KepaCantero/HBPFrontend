@@ -74,51 +74,64 @@
             </div>
           </div>
 
+          <div uib-collapse="!pageState.deletingExperiment ||  (exp.id != pageState.selected) ">
+            <div class="list-entry-container center">
+              <i class="fa fa-spinner fa-spin"></i>&nbsp;
+              <i>Deleting experiment from storage...</i>
+            </div>
+          </div>
+
           <div class="list-entry-buttons list-entry-container center" ng-if="exp.id == pageState.selected">
             <div class="btn-group" role="group" ng-hide="editing[nameID] || editing[descID] || loadingEdit">
               <!-- Servers are available and the user has edit rights: launch button enabled -->
               <button analytics-on analytics-event="Launch" analytics-category="Experiment" ng-if="config.canLaunchExperiments && userinfo.hasEditRights && exp.availableServers.length > 0"
                 class="btn btn-default" tooltip-trigger="mouseenter" ng-click="pageState.startingExperiment == exp.id || startNewExperiment(exp, false);"
-                ng-disabled="pageState.startingExperiment == exp.id">
+                ng-disabled="pageState.startingExperiment == exp.id || pageState.deletingExperiment">
             <i class="fa fa-plus"></i> Launch
           </button>
 
-              <!-- No server available but the user has edit rights: launch button disabled -->
-              <button ng-if="config.canLaunchExperiments && userinfo.hasEditRights && exp.availableServers.length == 0" class="btn btn-default disabled enable-tooltip"
+          <!-- No server available but the user has edit rights: launch button disabled -->
+          <button ng-if="config.canLaunchExperiments && userinfo.hasEditRights && exp.availableServers.length == 0" class="btn btn-default disabled enable-tooltip"
                 uib-tooltip="Sorry, no available servers." tooltip-trigger="mouseenter" tooltip-placement="top">
             <i class="fa fa-plus"></i> Launch
           </button>
 
-              <!-- No edit rights: launch button disabled -->
-              <button ng-if="config.canLaunchExperiments && !userinfo.hasEditRights" class="btn btn-default disabled enable-tooltip" uib-tooltip="Sorry, you don't have sufficient rights to launch a simulation."
+          <!-- No edit rights: launch button disabled -->
+         <button ng-if="config.canLaunchExperiments && !userinfo.hasEditRights" class="btn btn-default disabled enable-tooltip" uib-tooltip="Sorry, you don't have sufficient rights to launch a simulation."
                 tooltip-trigger="mouseenter" tooltip-placement="top">
             <i class="fa fa-plus"></i> Launch
           </button>
 
-              <!-- Option to Launch in Single Process Mode -->
-              <button ng-if="config.canLaunchExperiments && exp.configuration.brainProcesses > 1 && userinfo.hasEditRights && exp.availableServers.length > 0"
+          <!-- Option to Launch in Single Process Mode -->
+          <button ng-if="config.canLaunchExperiments && exp.configuration.brainProcesses > 1 && userinfo.hasEditRights && exp.availableServers.length > 0"
                 class="btn btn-default" ng-click="pageState.startingExperiment == exp.id || startNewExperiment(exp, true);" ng-disabled="pageState.startingExperiment == exp.id">
             <i class="fa fa-plus"></i> Launch in Single Process Mode
           </button>
 
-              <!-- No edit rights: launch in single process button disabled -->
-              <button ng-if="config.canLaunchExperiments && exp.configuration.brainProcesses > 1 && !userinfo.hasEditRights" class="btn btn-default disabled enable-tooltip"
+          <!-- No edit rights: launch in single process button disabled -->
+          <button ng-if="config.canLaunchExperiments && exp.configuration.brainProcesses > 1 && !userinfo.hasEditRights" class="btn btn-default disabled enable-tooltip"
                 uib-tooltip="Sorry, you don't have sufficient rights to launch a simulation." tooltip-trigger="mouseenter" tooltip-placement="top">
             <i class="fa fa-plus"></i> Launch in Single Process Mode
           </button>
 
-              <!-- Join button -->
-              <button analytics-on analytics-event="Join" analytics-category="Experiment" ng-if="config.canLaunchExperiments && exp.joinableServers.length > 0"
+          <button analytics-on analytics-event="Launch" analytics-category="Experiment" ng-if="isPrivateExperiment && config.canLaunchExperiments"
+            class="btn btn-default" tooltip-trigger="mouseenter" ng-click="deleteExperiment(exp.id)" ng-disabled = "pageState.deletingExperiment || pageState.startingExperiment == exp.id">
+           <i class="fa fa-times"></i> Delete experiment
+          </button>
+
+          <!-- Join button -->
+          <button analytics-on analytics-event="Join" analytics-category="Experiment" ng-if="config.canLaunchExperiments && exp.joinableServers.length > 0"
                 class="btn btn-default" ng-disabled="pageState.startingExperiment" ng-click="pageState.showJoin = !pageState.showJoin">
             <i class="fa fa-sign-in"></i> Simulations »
           </button>
 
-              <button ng-if="config.canCloneExperiments && userinfo.hasEditRights" analytics-on analytics-event="Clone" class="btn btn-default"
-                analytics-label="Collab" analytics-value="exp.id" class="btn btn-default" ng-click="cloneExperiment(exp)">
+          <button ng-if="config.canCloneExperiments && userinfo.hasEditRights" analytics-on analytics-event="Clone" class="btn btn-default"
+                analytics-label="Collab" analytics-value="exp.id" class="btn btn-default" ng-click="cloneExperiment(exp)"
+                ng-disabled="isCloneRequested">
             <i class="fa fa-pencil"></i> Clone
           </button>
 
-              <button ng-if="config.canCloneExperiments && !userinfo.hasEditRights" class="btn btn-default disabled enable-tooltip" tooltip-trigger="mouseenter"
+         <button ng-if="config.canCloneExperiments && !userinfo.hasEditRights" class="btn btn-default disabled enable-tooltip" tooltip-trigger="mouseenter"
                 tooltip-placement="top">
             <i class="fa fa-pencil"></i> Clone
           </button>

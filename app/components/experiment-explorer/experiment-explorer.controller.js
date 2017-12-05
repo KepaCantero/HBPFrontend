@@ -28,6 +28,7 @@
     constructor(
       $scope,
       $element,
+      $window,
       $location,
       $stateParams,
       $q,
@@ -37,6 +38,7 @@
       storageServer
     ) {
       this.$scope = $scope;
+      this.$window = $window;
       this.$location = $location;
       this.$stateParams = $stateParams;
       this.storageServer = storageServer;
@@ -95,8 +97,9 @@
         e.files = [];
         e.folders = [];
       });
-
-      this.selectParent(experiment);
+      if (!this.experimentList.deleting) {
+        this.selectParent(experiment);
+      }
     }
 
     selectParent(parent) {
@@ -166,6 +169,14 @@
         .then(() => this.selectParent(parent))
         .catch(err => this.onError('Failed to delete folder', err))
         .finally(() => (folder.deleting = false));
+    }
+
+    deleteExperiment(experiment) {
+      this.experimentList.deleting = true;
+      this.storageServer.deleteExperiment(experiment.uuid).then(() => {
+        this.experimentList.deleting = false;
+        this.$window.location.reload();
+      });
     }
 
     deleteFile(file) {
@@ -286,6 +297,7 @@
     .controller('ExperimentExplorerController', [
       '$scope',
       '$element',
+      '$window',
       '$location',
       '$stateParams',
       '$q',

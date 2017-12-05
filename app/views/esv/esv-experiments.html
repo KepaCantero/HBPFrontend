@@ -4,10 +4,10 @@
 
 <div class="container-with-navbar-margin">
   <div class="list-container">
-    <div class="form-group form-inline col-xs-6">
+    <div class="form-group form-inline col-xs-3">
       <input ng-model="query" style="width:auto;" type="text" class="top-buttons form-control input-sm" placeholder="Experiment Filter...">
     </div>
-    <div class="form-group form-inline col-xs-6">
+    <div class="form-group form-inline col-xs-9">
       <button style="float:right;" ng-if="loadPrivateExperiments" ng-click="cloneAnotherExperiment()" class="btn btn-default enable-tooltip"
         uib-tooltip="Clone another template experiment" tooltip-trigger="mouseenter" tooltip-placement="bottom">
          Template experiments
@@ -28,7 +28,7 @@
 
     <hr class="list-separator">
 
-    <experiment-list ng-if="showExperiments" query="query" private="loadPrivateExperiments" load-private-experiments="reloadExperiments(true)"></experiment-list>
+    <experiment-list ng-if="showExperiments" query="query" private="loadPrivateExperiments" reinit="reinit()" load-private-experiments="reloadExperiments(true)"></experiment-list>
 
   </div>
 </div>

@@ -32,7 +32,6 @@
     '$window',
     'nrpUser',
     'environmentService',
-    'storageServer',
     function(
       $scope,
       $location,
@@ -137,6 +136,14 @@
                 $scope.progressMessage = msg;
               }
             ); //in progress
+        };
+
+        $scope.deleteExperiment = function(expName) {
+          $scope.pageState.deletingExperiment = true;
+          experimentsService.deleteExperiment(expName).then(() => {
+            $scope.pageState.deletingExperiment = false;
+            return $scope.reinit();
+          });
         };
 
         // Stop an already initialized or running experiment

@@ -31,6 +31,7 @@
       scope: {
         private: '=',
         loadPrivateExperiments: '&',
+        reinit: '&',
         query: '='
       },
       replace: true,
