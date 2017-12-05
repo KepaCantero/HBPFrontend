@@ -46,9 +46,10 @@
               let lowerQuery = scope.query.toLowerCase();
               if (
                 !~exp.configuration.name.toLowerCase().indexOf(lowerQuery) &&
-                !exp.configuration.tags.some(
-                  t => t.toLowerCase().indexOf(lowerQuery) == 0
-                )
+                (!exp.configuration.tags ||
+                  !exp.configuration.tags.some(
+                    t => t.toLowerCase().indexOf(lowerQuery) == 0
+                  ))
               )
                 return false;
             }
