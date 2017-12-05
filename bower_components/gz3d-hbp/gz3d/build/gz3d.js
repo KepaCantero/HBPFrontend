@@ -2711,6 +2711,8 @@ GZ3D.Composer.prototype.updateComposerWithMasterSettings = function ()
 
         this.gz3dScene.normalizedComposerSettings = JSON.parse(JSON.stringify(this.gz3dScene.composerSettings));
 
+        var maxShadow = null;
+
         switch (this.currentMasterSettings)
         {
             case GZ3D.MASTER_QUALITY_BEST: break;    // Keep the settings as they are by default
@@ -2723,14 +2725,15 @@ GZ3D.Composer.prototype.updateComposerWithMasterSettings = function ()
                 this.gz3dScene.normalizedComposerSettings.levelsInWhite = 1.0;
                 this.gz3dScene.normalizedComposerSettings.levelsOutBlack = 0.0;
                 this.gz3dScene.normalizedComposerSettings.levelsOutWhite = 1.0;
-            /* falls through */
+                this.gz3dScene.normalizedComposerSettings.shadows = false;
+                /* falls through */
 
             case GZ3D.MASTER_QUALITY_LOW:
-                this.gz3dScene.normalizedComposerSettings.shadows = false;
                 this.gz3dScene.normalizedComposerSettings.skyBox = '';
                 this.gz3dScene.normalizedComposerSettings.pbrMaterial = false;
                 this.gz3dScene.normalizedComposerSettings.fog = false;
                 this.gz3dScene.normalizedComposerSettings.sun = '';
+                maxShadow = 1024;
             /* falls through */
 
             case GZ3D.MASTER_QUALITY_MIDDLE:
@@ -2738,21 +2741,25 @@ GZ3D.Composer.prototype.updateComposerWithMasterSettings = function ()
                 this.gz3dScene.normalizedComposerSettings.ssao = false;
                 this.gz3dScene.normalizedComposerSettings.bloom = false;
 
-                if (this.gz3dScene.normalizedComposerSettings.shadowSettings)
+                if (!maxShadow)
                 {
-                    for (var i = 0; i < this.gz3dScene.normalizedComposerSettings.shadowSettings.length; i = i + 1)
-                    {
-                        var settings = this.gz3dScene.normalizedComposerSettings.shadowSettings[i];
-
-                        if (settings.mapSize >= 1024)
-                        {
-                            settings.mapSize = 1024;
-                        }
-                    }
+                    maxShadow = 2048;
                 }
 
-
             /* falls through */
+        }
+
+        if (maxShadow && this.gz3dScene.normalizedComposerSettings.shadowSettings && this.gz3dScene.normalizedComposerSettings.shadows)
+        {
+            for (var i = 0; i < this.gz3dScene.normalizedComposerSettings.shadowSettings.length; i = i + 1)
+            {
+                var settings = this.gz3dScene.normalizedComposerSettings.shadowSettings[i];
+
+                if (settings.mapSize >= maxShadow)
+                {
+                    settings.mapSize = maxShadow;
+                }
+            }
         }
     }
 };
