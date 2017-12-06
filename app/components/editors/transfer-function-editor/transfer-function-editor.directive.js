@@ -53,10 +53,11 @@
     .module('exdFrontendApp')
     .constant(
       'DEFAULT_TF_CODE',
-      "@nrp.Robot2Neuron()\ndef {0}(t):\n\
-      #log the first timestep (20ms), each couple of seconds\n\
-      if (t%2<0.02):\n\
-        clientLogger.info('Time: ', t)"
+      `@nrp.Robot2Neuron()
+def {0}(t):
+    #log the first timestep (20ms), each couple of seconds
+    if t % 2 < 0.02:
+        clientLogger.info('Time: ', t)`
     )
     .directive('transferFunctionEditor', [
       '$log',
