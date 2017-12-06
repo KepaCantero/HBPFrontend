@@ -213,6 +213,11 @@
           width: 700,
           height: 450
         }
+      },
+      APPLY_FORCE_CONFIGURATION: {
+        name: 'Apply Force',
+        directive: 'apply-force-view',
+        isResizeable: false
       }
     });
 })();

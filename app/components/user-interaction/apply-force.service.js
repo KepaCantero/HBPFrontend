@@ -29,9 +29,24 @@ angular.module('userInteractionModule').service('applyForceService', [
   'roslib',
   'contextMenuState',
   'simulationInfo',
-  function(gz3d, roslib, contextMenuState, simulationInfo) {
+  'stateService',
+  'dynamicViewOverlayService',
+  'DYNAMIC_VIEW_CHANNELS',
+  'STATE',
+  function(
+    gz3d,
+    roslib,
+    contextMenuState,
+    simulationInfo,
+    stateService,
+    dynamicViewOverlayService,
+    DYNAMIC_VIEW_CHANNELS,
+    STATE
+  ) {
     function ApplyForceService() {
       var that = this;
+
+      this.forceVector = new THREE.Vector3(0, 0, 1);
 
       this.initialize = () => {
         contextMenuState.pushItemGroup({
@@ -53,6 +68,20 @@ angular.module('userInteractionModule').service('applyForceService', [
           },
 
           show: function(model) {
+            dynamicViewOverlayService
+              .isOverlayOpen(DYNAMIC_VIEW_CHANNELS.APPLY_FORCE_CONFIGURATION)
+              .then(isOpen => {
+                if (isOpen) {
+                  dynamicViewOverlayService.closeAllOverlaysOfType(
+                    DYNAMIC_VIEW_CHANNELS.APPLY_FORCE_CONFIGURATION
+                  );
+                  if (that.targetModel !== undefined) {
+                    that.targetModel.remove(that.widgetRoot);
+                    gz3d.scene.refresh3DViews();
+                  }
+                }
+              });
+
             this.visible = this.items[0].visible = !model.userData.is_static;
             if (this.visible) {
               that.targetModel = model;
@@ -71,13 +100,101 @@ angular.module('userInteractionModule').service('applyForceService', [
         });
       };
 
-      var enableApplyForceMode = function() {
+      var enableApplyForceMode = () => {
         contextMenuState.hideMenu();
         attachEventListeners();
+        stateService.setCurrentState(STATE.PAUSED);
       };
 
-      var disableApplyForceMode = function() {
+      this.disableApplyForceMode = () => {
         detachEventListeners();
+        dynamicViewOverlayService
+          .isOverlayOpen(DYNAMIC_VIEW_CHANNELS.APPLY_FORCE_CONFIGURATION)
+          .then(isOpen => {
+            if (isOpen)
+              dynamicViewOverlayService.closeAllOverlaysOfType(
+                DYNAMIC_VIEW_CHANNELS.APPLY_FORCE_CONFIGURATION
+              );
+          });
+        this.OnApplyForce = undefined;
+
+        this.targetModel.remove(this.widgetRoot);
+        gz3d.scene.refresh3DViews();
+      };
+
+      this.RotationChanged = () => {
+        update3DWidgetForceDirection(this.forceVector);
+      };
+
+      let create3DWidget = () => {
+        this.widgetRoot = new THREE.Object3D();
+        this.widgetRoot.visible = true;
+        this.widgetRoot.up = new THREE.Vector3(0, 0, 1);
+
+        this.widgetToruses = new THREE.Object3D();
+        this.widgetRoot.add(this.widgetToruses);
+        let geometry = new THREE.TorusBufferGeometry(0.5, 0.01, 16, 100);
+        let material = new THREE.MeshBasicMaterial({
+          color: 0x777777,
+          opacity: 0.6
+        });
+        material.transparent = true;
+        let torus1 = new THREE.Mesh(geometry, material);
+        this.widgetToruses.add(torus1);
+        let torus2 = new THREE.Mesh(geometry, material);
+        torus2.rotateOnAxis(new THREE.Vector3(0, 1, 0), Math.PI / 2);
+        this.widgetToruses.add(torus2);
+        let torus3 = new THREE.Mesh(geometry, material);
+        torus3.rotateOnAxis(new THREE.Vector3(1, 0, 0), Math.PI / 2);
+        this.widgetToruses.add(torus3);
+
+        // vector indicator
+        let vectorGeometry = new THREE.ConeBufferGeometry(0.05, 0.5, 32);
+        let vectorMaterial = new THREE.MeshBasicMaterial({
+          color: 0x00ff00,
+          opacity: 0.6
+        });
+        vectorMaterial.transparent = true;
+        this.widgetVector = new THREE.Mesh(vectorGeometry, vectorMaterial);
+        this.widgetRoot.add(this.widgetVector);
+        this.widgetVector.position.sub(new THREE.Vector3(0, 0, 0.25));
+        this.widgetVector.quaternion.setFromAxisAngle(
+          new THREE.Vector3(1, 0, 0),
+          Math.PI / 2
+        );
+      };
+      create3DWidget();
+
+      let update3DWidget = (forceVectorWorld, applyPointWorld) => {
+        let widgetOffset = this.targetModel.worldToLocal(
+          applyPointWorld.clone()
+        );
+        this.widgetRoot.position.set(
+          widgetOffset.x,
+          widgetOffset.y,
+          widgetOffset.z
+        );
+
+        update3DWidgetForceDirection(forceVectorWorld);
+      };
+
+      let update3DWidgetForceDirection = forceVectorWorld => {
+        let widgetOrientation = new THREE.Quaternion();
+        widgetOrientation.setFromUnitVectors(
+          new THREE.Vector3(0, 0, 1),
+          forceVectorWorld.clone().normalize()
+        );
+        let rootOrientation = this.targetModel.quaternion
+          .clone()
+          .inverse()
+          .multiply(widgetOrientation);
+        this.widgetRoot.quaternion.set(
+          rootOrientation.x,
+          rootOrientation.y,
+          rootOrientation.z,
+          rootOrientation.w
+        );
+        gz3d.scene.refresh3DViews();
       };
 
       this.applyForceToLink = mousePos => {
@@ -85,14 +202,10 @@ angular.module('userInteractionModule').service('applyForceService', [
         if (linkIntersection) {
           let link = linkIntersection.link;
 
-          var forceVector = new THREE.Vector3();
-          forceVector
-            .subVectors(
-              linkIntersection.intersection.point,
-              gz3d.scene.viewManager.mainUserView.camera.position
-            )
+          const forceVector = this.forceVector
+            .clone()
             .normalize()
-            .multiplyScalar(1000);
+            .multiplyScalar(500);
 
           /* eslint-disable camelcase */
           var request = new ROSLIB.ServiceRequest({
@@ -156,6 +269,7 @@ angular.module('userInteractionModule').service('applyForceService', [
         return undefined;
       };
 
+      let cancelOnStateChange = undefined;
       var attachEventListeners = () => {
         var userViewDOM = gz3d.scene.viewManager.mainUserView.container;
         this.domElementPointerBindings = userViewDOM ? userViewDOM : document;
@@ -166,6 +280,21 @@ angular.module('userInteractionModule').service('applyForceService', [
           onMouseUp,
           false
         );
+        cancelOnStateChange = stateService.addStateCallback(newState => {
+          // cancel apply force if experiment is continued
+          if (newState === STATE.STARTED) {
+            stateService.removeStateCallback(cancelOnStateChange);
+
+            dynamicViewOverlayService
+              .isOverlayOpen(DYNAMIC_VIEW_CHANNELS.APPLY_FORCE_CONFIGURATION)
+              .then(isOpen => {
+                if (isOpen)
+                  dynamicViewOverlayService.closeAllOverlaysOfType(
+                    DYNAMIC_VIEW_CHANNELS.APPLY_FORCE_CONFIGURATION
+                  );
+              });
+          }
+        });
       };
 
       var detachEventListeners = () => {
@@ -180,8 +309,41 @@ angular.module('userInteractionModule').service('applyForceService', [
 
       var onMouseUp = event => {
         var mousePos = { x: event.clientX, y: event.clientY };
-        this.applyForceToLink(mousePos);
-        disableApplyForceMode();
+
+        dynamicViewOverlayService
+          .isOverlayOpen(DYNAMIC_VIEW_CHANNELS.APPLY_FORCE_CONFIGURATION)
+          .then(isOpen => {
+            if (isOpen) {
+              dynamicViewOverlayService.closeAllOverlaysOfType(
+                DYNAMIC_VIEW_CHANNELS.APPLY_FORCE_CONFIGURATION
+              );
+              this.disableApplyForceMode();
+            }
+
+            const linkIntersection = this.getLinkRayCastIntersection(mousePos);
+            if (linkIntersection !== undefined) {
+              dynamicViewOverlayService
+                .createDynamicOverlay(
+                  DYNAMIC_VIEW_CHANNELS.APPLY_FORCE_CONFIGURATION
+                )
+                .then(() => {
+                  this.targetModel.add(this.widgetRoot);
+                  this.targetPoint = linkIntersection.intersection.point.clone();
+                  const viewDir = this.targetPoint
+                    .clone()
+                    .sub(gz3d.scene.viewManager.mainUserView.camera.position);
+                  this.forceVector.set(viewDir.x, viewDir.y, viewDir.z);
+                  this.forceVector.normalize();
+                  update3DWidget(this.forceVector, this.targetPoint);
+                  detachEventListeners();
+
+                  this.OnApplyForce = () => {
+                    this.applyForceToLink(mousePos);
+                    this.disableApplyForceMode();
+                  };
+                });
+            }
+          });
       };
     }
 

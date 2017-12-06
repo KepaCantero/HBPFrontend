@@ -1,0 +1,26 @@
+<!-- build:css(.tmp) styles/esv/apply-force-view.css -->
+<link rel="stylesheet" href="components/dynamic-view-overlay/dynamic-view-overlay.style.css"/>
+<!-- endbuild -->
+<div class="dynamic-view-overlay-content">
+    <li>
+        <h6>Direction</h6>
+        <ol>
+            <li>
+                x: <input interactive type="number" name="rotate-x" class="vec3-num-input" ng-model="vm.applyForceService.forceVector.x"
+                          ng-keydown="suppressKeyPress($event)" ng-change="vm.applyForceService.RotationChanged()">
+            </li>
+            <li class="vec3-num-input-item">
+                y: <input interactive type="number" name="rotate-y" class="vec3-num-input" ng-model="vm.applyForceService.forceVector.y"
+                          ng-keydown="suppressKeyPress($event)" ng-change="vm.applyForceService.RotationChanged()">
+            </li>
+            <li class="vec3-num-input-item">
+                z: <input interactive type="number" name="rotate-z" class="vec3-num-input" ng-model="vm.applyForceService.forceVector.z"
+                          ng-keydown="suppressKeyPress($event)" ng-change="vm.applyForceService.RotationChanged()">
+            </li>
+        </ol>
+    </li>
+
+    <button type="button" ng-click="vm.applyForceService.OnApplyForce()">
+        Apply
+    </button>
+</div>

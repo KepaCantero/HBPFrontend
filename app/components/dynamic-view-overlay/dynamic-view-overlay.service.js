@@ -135,7 +135,8 @@
     }
 
     removeOverlay(id) {
-      document.getElementById(id).remove();
+      let element = document.getElementById(id);
+      if (element) element.remove();
       delete this.overlays[id];
     }
 

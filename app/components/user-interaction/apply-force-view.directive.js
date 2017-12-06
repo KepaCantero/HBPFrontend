@@ -21,52 +21,16 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  * ---LICENSE-END**/
+(function() {
+  'use strict';
 
-//@import "styles/esv/pop-over-viewer.scss";
-
-$overlayHeaderHeight: 50px;
-
-.dynamic-view-overlay-wrapper {
-  display: flex;
-  flex-direction: column;
-  position: absolute;
-
-  min-width: 200px;
-  min-height: 100px;
-
-  border-radius: 8px;
-  border-color: black;
-  border: 2px solid;
-  background: rgba(255, 255, 255, 0.9);
-
-  .dynamic-view-overlay-titlebar {
-    display: flex;
-    flex-direction: row;
-    height: $overlayHeaderHeight;
-
-    .titlebar-name {
-      width: 100%;
-      border-radius: 3px;
-      -moz-border-radius: 3px;
-      -webkit-border-radius: 3px;
-      border: 1px solid #e1e1e1;
-      background: #f0f0f0;
-      align-self: center;
-      margin: 10px;
-      padding: 5px 5px 5px 20px;
-    }
-
-    .titlebar-button-close {
-      min-width: 25px;
-      min-height: 25px;
-      margin: 10px;
-      align-self: center;
-    }
-  }
-
-  .dynamic-view-overlay-content {
-    width: auto;
-    align-self: center;
-    padding: 0px 5px 5px 20px;
-  }
-}
+  angular.module('userInteractionModule').directive('applyForceView', [
+    () => ({
+      templateUrl: 'components/user-interaction/apply-force-view.template.html',
+      restrict: 'E',
+      scope: {},
+      controller: 'ApplyForceViewController',
+      controllerAs: 'vm'
+    })
+  ]);
+})();

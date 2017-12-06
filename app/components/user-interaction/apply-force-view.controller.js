@@ -22,51 +22,36 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  * ---LICENSE-END**/
 
-//@import "styles/esv/pop-over-viewer.scss";
+(function() {
+  'use strict';
 
-$overlayHeaderHeight: 50px;
+  class ApplyForceViewController {
+    constructor($scope, baseEventHandler, applyForceService) {
+      this.applyForceService = applyForceService;
 
-.dynamic-view-overlay-wrapper {
-  display: flex;
-  flex-direction: column;
-  position: absolute;
+      $scope.$on('$destroy', () => {
+        applyForceService.disableApplyForceMode();
+      });
 
-  min-width: 200px;
-  min-height: 100px;
-
-  border-radius: 8px;
-  border-color: black;
-  border: 2px solid;
-  background: rgba(255, 255, 255, 0.9);
-
-  .dynamic-view-overlay-titlebar {
-    display: flex;
-    flex-direction: row;
-    height: $overlayHeaderHeight;
-
-    .titlebar-name {
-      width: 100%;
-      border-radius: 3px;
-      -moz-border-radius: 3px;
-      -webkit-border-radius: 3px;
-      border: 1px solid #e1e1e1;
-      background: #f0f0f0;
-      align-self: center;
-      margin: 10px;
-      padding: 5px 5px 5px 20px;
-    }
-
-    .titlebar-button-close {
-      min-width: 25px;
-      min-height: 25px;
-      margin: 10px;
-      align-self: center;
+      $scope.suppressKeyPress = function(event) {
+        baseEventHandler.suppressAnyKeyPress(event);
+      };
     }
   }
 
-  .dynamic-view-overlay-content {
-    width: auto;
-    align-self: center;
-    padding: 0px 5px 5px 20px;
-  }
-}
+  /**
+   * @ngdoc function
+   * @name userInteractionModule.controller:ApplyForceViewController
+   * @description
+   * # ApplyForceViewController
+   * Controller for the overlay view to control force behaviour
+   */
+  angular
+    .module('userInteractionModule')
+    .controller('ApplyForceViewController', [
+      '$scope',
+      'baseEventHandler',
+      'applyForceService',
+      (...args) => new ApplyForceViewController(...args)
+    ]);
+})();
