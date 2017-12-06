@@ -257,55 +257,55 @@
       var page = renderEsvWebPage({ dev: true });
 
       var experiments = page.find('.experiment-box');
-      expect(experiments.length).toBe(2);
+      expect(experiments.length).toBe(3);
 
       $rootScope.query = 'test';
       $rootScope.$digest();
       experiments = page.find('.experiment-box');
-      expect(experiments.length).toBe(0);
+      expect(experiments.length).toBe(1);
 
       $rootScope.query = 'develop';
       $rootScope.$digest();
       experiments = page.find('.experiment-box');
-      expect(experiments.length).toBe(1);
+      expect(experiments.length).toBe(2);
 
       $rootScope.query = 'absent';
       $rootScope.$digest();
       experiments = page.find('.experiment-box');
-      expect(experiments.length).toBe(0);
+      expect(experiments.length).toBe(1);
     });
 
     it('should filter experiments by tag', function() {
       var page = renderEsvWebPage({ dev: true });
 
       var experiments = page.find('.experiment-box');
-      expect(experiments.length).toBe(2);
+      expect(experiments.length).toBe(3);
 
       $rootScope.query = 'tag';
       $rootScope.$digest();
       experiments = page.find('.experiment-box');
-      expect(experiments.length).toBe(2);
+      expect(experiments.length).toBe(3);
 
       $rootScope.query = 'tag1';
       $rootScope.$digest();
       experiments = page.find('.experiment-box');
-      expect(experiments.length).toBe(2);
+      expect(experiments.length).toBe(3);
 
       $rootScope.query = 'tag2';
       $rootScope.$digest();
       experiments = page.find('.experiment-box');
-      expect(experiments.length).toBe(1);
+      expect(experiments.length).toBe(2);
 
       $rootScope.query = 'tag3';
       $rootScope.$digest();
       experiments = page.find('.experiment-box');
-      expect(experiments.length).toBe(0);
+      expect(experiments.length).toBe(1);
     });
 
     it('should show all experiments in dev mode', function() {
       var page = renderEsvWebPage({ dev: true });
       var experiments = page.find('.experiment-box');
-      expect(experiments.length).toBe(2);
+      expect(experiments.length).toBe(3);
     });
 
     it('should not allow to chose backend when in dev mode', function() {
@@ -325,7 +325,7 @@
       //select first experiment
       page
         .find('.experiment-box')
-        .first()
+        .last()
         .click();
 
       var selectServer = page.find('select[ng-model="exp.devServer"]');
@@ -337,7 +337,7 @@
       //select first experiment
       page
         .find('.experiment-box')
-        .first()
+        .last()
         .click();
 
       var versionLink = page.find('a[name="versionLink"]');
@@ -349,7 +349,7 @@
       //select first experiment
       page
         .find('.experiment-box')
-        .first()
+        .last()
         .click();
 
       var versionLink = page.find('a[name="versionLink"]');
@@ -363,7 +363,9 @@
         .toArray()
         .map(function(elem) {
           return elem.textContent.trim();
-        });
+        })
+        .slice(1)
+        .slice(-2);
 
       var sortedExperimentNames = _.map(
         defaultPageOptions.experiments,

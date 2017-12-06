@@ -57,7 +57,6 @@
           $scope.robotUploaded = false;
           $scope.environmentUploaded = false;
           $scope.newExperiment = 'newExperiment';
-          $scope.brain = false;
           $scope.experimentCloned = false;
           //object containing the path to the robot,env, brain
           //looks like : {
@@ -69,29 +68,31 @@
 
           var RobotUploader = {
             name: 'Robot',
-            uploadFromPublicEnv: function() {
+            uploadFromTemplates: function() {
               delete $scope.entities;
               newExperimentProxyService
-                .getEntity('robots')
+                .getTemplateModels('robots')
                 .then(function(robotsArray) {
                   $scope.entities = $scope.parseEntityList(robotsArray);
                 });
-              $scope.createUploadModal('PrivateCollab');
+              $scope.createUploadModal('PrivateStorage');
             },
-            uploadFromPrivateCollab: function() {
+            uploadFromPrivateStorage: function() {
               delete $scope.entities;
-              storageServer
-                .getExperiments('robots')
-                .then($scope.createEntitiesListFromEntityFiles, function(
-                  error
-                ) {
+              storageServer.getCustomModels('robots').then(
+                function(robots) {
+                  robots.map(function(robot) {
+                    robot.id = robot.name;
+                  });
+                  $scope.entities = robots;
+                },
+                function(error) {
                   $scope.createErrorPopup(error);
                   nrpModalService.destroyModal();
-                })
-                .then(function(robots) {
-                  $scope.entities = robots;
-                });
-              $scope.createUploadModal('PrivateCollab');
+                }
+              );
+
+              $scope.createUploadModal('PrivateStorage');
             },
             uploadFromLocalEnv: function() {
               $scope.entityName = $scope.entityUploader.name;
@@ -101,29 +102,30 @@
 
           var EnvUploader = {
             name: 'Environment',
-            uploadFromPublicEnv: function() {
+            uploadFromTemplates: function() {
               delete $scope.entities;
               newExperimentProxyService
-                .getEntity('environments')
+                .getTemplateModels('environments')
                 .then(function(envsArray) {
                   $scope.entities = $scope.parseEntityList(envsArray);
                 });
-              $scope.createUploadModal('PrivateCollab');
+              $scope.createUploadModal('PrivateStorage');
             },
-            uploadFromPrivateCollab: function() {
+            uploadFromPrivateStorage: function() {
               delete $scope.entities;
-              storageServer
-                .getExperiments('environments')
-                .then($scope.createEntitiesListFromEntityFiles, function(
-                  error
-                ) {
+              storageServer.getCustomModels('environments').then(
+                function(environments) {
+                  environments.map(function(env) {
+                    env.id = env.name;
+                  });
+                  $scope.entities = environments;
+                },
+                function(error) {
                   $scope.createErrorPopup(error);
                   nrpModalService.destroyModal();
-                })
-                .then(function(environments) {
-                  $scope.entities = environments;
-                });
-              $scope.createUploadModal('PrivateCollab');
+                }
+              );
+              $scope.createUploadModal('PrivateStorage');
             },
             uploadFromLocalEnv: function() {
               $scope.entityName = $scope.entityUploader.name;
@@ -133,28 +135,30 @@
 
           var BrainUploader = {
             name: 'Brain',
-            uploadFromPublicEnv: function() {
+            uploadFromTemplates: function() {
               delete $scope.entities;
               newExperimentProxyService
-                .getEntity('brains')
+                .getTemplateModels('brains')
                 .then(function(brainsArray) {
                   $scope.entities = $scope.parseEntityList(brainsArray);
                 });
-              $scope.createUploadModal('PrivateCollab');
+              $scope.createUploadModal('PrivateStorage');
             },
-            uploadFromPrivateCollab: function() {
+            uploadFromPrivateStorage: function() {
               delete $scope.entities;
-              storageServer
-                .getExperiments('brains')
-                .then($scope.createEntitiesListFromBrainFiles, function(error) {
+              storageServer.getCustomModels('brains').then(
+                function(brains) {
+                  brains.map(function(brain) {
+                    brain.id = brain.name;
+                  });
+                  $scope.entities = brains;
+                },
+                function(error) {
                   $scope.createErrorPopup(error);
                   nrpModalService.destroyModal();
-                })
-                .then(function(brains) {
-                  $scope.entities = brains;
-                  $scope.brain = true;
-                });
-              $scope.createUploadModal('PrivateCollab');
+                }
+              );
+              $scope.createUploadModal('PrivateStorage');
             },
             uploadFromLocalEnv: function() {
               $scope.entityName = $scope.entityUploader.name;
@@ -190,13 +194,12 @@
           };
 
           var dict = {
-            PublicEnv: 'uploadFromPublicEnv',
-            PrivateCollab: 'uploadFromPrivateCollab',
+            PublicEnv: 'uploadFromTemplates',
+            PrivateStorage: 'uploadFromPrivateStorage',
             LocalEnv: 'uploadFromLocalEnv'
           };
 
           $scope.uploadEntity = function(environment) {
-            $scope.brain = false;
             $scope.entityUploader[dict[environment]]();
           };
 
@@ -236,7 +239,6 @@
           $scope.destroyDialog = function() {
             $scope.entityPageState = {};
             $scope.entityName = '';
-            $scope.brain = false;
             delete $scope.entities;
             nrpModalService.destroyModal();
           };
@@ -253,7 +255,7 @@
                 scope: $scope
               };
               nrpModalService.createModal(templateUrl);
-            } else if (mode === 'PrivateCollab') {
+            } else if (mode === 'PrivateStorage') {
               nrpModalService.createModal({
                 templateUrl: 'views/esv/entities-list.html',
                 closable: true,
@@ -280,58 +282,6 @@
                   });
               })
             );
-          };
-
-          $scope.createEntitiesListFromEntityFiles = function(files) {
-            var isImage = function(file) {
-              return file.content_type !== 'application/x-config';
-            };
-
-            files.forEach(function(file) {
-              file.entityId = file.name.split('.')[0];
-            });
-
-            var images = $q.all(
-              files
-                .filter(function(f) {
-                  return isImage(f);
-                })
-                .map(function(f) {
-                  return $q.all({
-                    id: f.entityId,
-                    imageData: $scope.retrieveImageFileContent(f.uuid)
-                  });
-                })
-            );
-
-            var configs = $q.all(
-              files
-                .filter(function(f) {
-                  return !isImage(f);
-                })
-                .map(function(f) {
-                  return $q
-                    .all({
-                      id: f.entityId,
-                      config: $scope.retrieveConfigFileContent(f.uuid)
-                    })
-                    .then(function(entity) {
-                      entity.description = entity.config.desc;
-                      entity.name = entity.config.name;
-                      return entity;
-                    });
-                })
-            );
-
-            return $q.all([images, configs]).then(function(entityData) {
-              return _(entityData)
-                .flatten()
-                .groupBy('id')
-                .map(function(f) {
-                  return _.merge(f[0], f[1]);
-                })
-                .value();
-            });
           };
 
           $scope.createErrorPopup = function(errorMessage) {
@@ -365,7 +315,7 @@
                 name: entity.name,
                 description: entity.description,
                 id: entity,
-                imageData: entity.thumbnail
+                thumbnail: entity.thumbnail
               });
             });
             return entities;

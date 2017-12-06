@@ -40,7 +40,7 @@
         return bbpConfig.get('api.proxy.url');
       };
       /**
-               *  Performs an HTTP request to the proxy to fetch an entity from the models
+               *  Performs an HTTP request to the proxy to fetch the list of  template models
                *  (i.e. robot, environment, brain etc).
                *  
                *  Example usage : 
@@ -50,7 +50,7 @@
                *  @return a promise containing the JSON with the response from the proxy. The 
                *  promise itself contains an array of entities. 
               **/
-      this.getEntity = function(entityName) {
+      this.getTemplateModels = function(entityName) {
         return $http({
           url: this.getProxyUrl() + '/models/' + entityName,
           method: 'GET'
