@@ -77,7 +77,8 @@
           getFile: buildAction({
             method: 'GET',
             transformResponse: transformFileResponse,
-            url: `${this.STORAGE_BASE_URL}/:experimentId/:filename`
+            url: `${this.STORAGE_BASE_URL}/:experimentId/:filename`,
+            responseType: 'text'
           }),
           getUserInfo: buildAction({
             method: 'GET',
