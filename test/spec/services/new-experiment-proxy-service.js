@@ -45,7 +45,7 @@ describe('Services: new-experiment-proxy-service', function() {
       data: reponseData
     };
     httpBackend.expectGET(proxyUrl + '/models/robots').respond(mockResponse);
-    var responsePromise = newExperimentProxyService.getEntity('robots');
+    var responsePromise = newExperimentProxyService.getTemplateModels('robots');
     httpBackend.flush();
     responsePromise.then(function(response) {
       expect(response.data.data).toEqual(reponseData);

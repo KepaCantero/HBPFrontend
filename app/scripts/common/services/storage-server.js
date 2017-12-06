@@ -38,6 +38,7 @@
       this.PROXY_URL = bbpConfig.get('api.proxy.url');
       this.STORAGE_BASE_URL = `${this.PROXY_URL}/storage`;
       this.IDENTITY_BASE_URL = `${this.PROXY_URL}/identity`;
+      this.CUSTOM_MODELS_URL = `/custommodels`;
 
       this.buildStorageResource();
     }
@@ -117,6 +118,11 @@
             headers: { 'Content-Type': 'application/octet-stream' },
             url: `${this.STORAGE_BASE_URL}/:experimentId/:filename`,
             transformRequest: []
+          }),
+          getCustomModels: buildAction({
+            method: 'GET',
+            isArray: true,
+            url: `${this.STORAGE_BASE_URL}/custommodels/:modelType`
           })
         }
       );
@@ -133,6 +139,10 @@
           .CLIENT_ID}&redirect_uri=${encodeURIComponent(location.href)}`;
       }
       return this.$q.reject(err);
+    }
+
+    getCustomModels(modelType) {
+      return this.proxyRsc.getCustomModels({ modelType }).$promise;
     }
 
     getExperiments(filter) {

@@ -54,159 +54,139 @@
       scope.destroyDialog();
     });
 
-    it('should check successful upload from private collab for the robot', function() {
-      spyOn(storageServer, 'getExperiments').and.returnValue(
-        window.$q.when([])
-      );
-
-      spyOn(
-        scope,
-        'createEntitiesListFromEntityFiles'
-      ).and.callFake(function() {
+    it('should check successful upload from private storage for the robot', function() {
+      spyOn(storageServer, 'getCustomModels').and.callFake(function() {
         var deferred = $q.defer();
-        deferred.resolve({
-          result: [
-            {
-              name: 'fakeICub',
-              description: 'fakeICubDescription',
-              imageData: ''
-            },
-            {
-              name: 'fakeHusky',
-              description: 'fakeHuskyDescription',
-              imageData: ''
-            }
-          ]
-        });
+        deferred.resolve([
+          {
+            name: 'fakeICub',
+            description: 'fakeICub',
+            id: 'fakeICub',
+            thumbnail: ''
+          },
+          {
+            name: 'fakeHusky',
+            description: 'fakeHuskyDescription',
+            id: 'fakeHusky',
+            thumbnail: ''
+          }
+        ]);
         return deferred.promise;
       });
 
       scope.uploadRobotDialog();
-      scope.uploadEntity('PrivateCollab');
+      scope.uploadEntity('PrivateStorage');
       scope.$digest();
-      expect(scope.entities.result[0]).toEqual({
+      console.log(scope.entities);
+      expect(scope.entities[0]).toEqual({
         name: 'fakeICub',
-        description: 'fakeICubDescription',
-        imageData: ''
+        description: 'fakeICub',
+        id: 'fakeICub',
+        thumbnail: ''
       });
-      expect(scope.entities.result[1].name).toBe('fakeHusky');
+      expect(scope.entities[1].name).toBe('fakeHusky');
     });
 
-    it('should check successful upload from private collab for the environment', function() {
-      spyOn(storageServer, 'getExperiments').and.returnValue(
-        window.$q.when([])
-      );
-
-      spyOn(
-        scope,
-        'createEntitiesListFromEntityFiles'
-      ).and.callFake(function() {
+    it('should check successful upload from private storage for the environment', function() {
+      spyOn(storageServer, 'getCustomModels').and.callFake(function() {
         var deferred = $q.defer();
-        deferred.resolve({
-          result: [
-            {
-              name: 'fake3DSpace',
-              description: 'fakeSpaceBotGroundDescription',
-              imageData: ''
-            },
-            {
-              name: 'fakeFZIGround',
-              description: 'fakeFZIGroundDescription',
-              imageData: ''
-            }
-          ]
-        });
+        deferred.resolve([
+          {
+            name: 'fake3DSpace',
+            description: 'fake3DSpace',
+            thumbnail: ''
+          },
+          {
+            name: 'fakeFZIGround',
+            description: 'fakeFZIGround',
+            thumbnail: ''
+          }
+        ]);
         return deferred.promise;
       });
-
       scope.uploadEnvironmentDialog();
-      scope.uploadEntity('PrivateCollab');
+      scope.uploadEntity('PrivateStorage');
       scope.$digest();
-      expect(scope.entities.result[0]).toEqual({
+      expect(scope.entities[0]).toEqual({
         name: 'fake3DSpace',
-        description: 'fakeSpaceBotGroundDescription',
-        imageData: ''
+        description: 'fake3DSpace',
+        id: 'fake3DSpace',
+        thumbnail: ''
       });
-      expect(scope.entities.result[1].name).toBe('fakeFZIGround');
+      expect(scope.entities[1].name).toBe('fakeFZIGround');
     });
 
-    it('should check successful upload from private collab for the brain', function() {
-      spyOn(storageServer, 'getExperiments').and.returnValue(
-        window.$q.when([])
-      );
-
-      spyOn(scope, 'createEntitiesListFromBrainFiles').and.callFake(function() {
+    it('should check successful upload from private storage for the brain', function() {
+      spyOn(storageServer, 'getCustomModels').and.callFake(function() {
         var deferred = $q.defer();
-        deferred.resolve({
-          result: [
-            {
-              name: 'fakeBrain1',
-              description: 'fakeBrain1Description',
-              imageData: ''
-            },
-            {
-              name: 'fakeBrain2',
-              description: 'fakeBrain2Description',
-              imageData: ''
-            }
-          ]
-        });
+        deferred.resolve([
+          {
+            name: 'fakeBraitenberg',
+            description: 'fakeBraitenberg',
+            thumbnail: ''
+          },
+          {
+            name: 'fakeIdleBrain',
+            description: 'fakeIdleBrain',
+            thumbnail: ''
+          }
+        ]);
         return deferred.promise;
       });
 
       scope.uploadBrainDialog();
-      scope.uploadEntity('PrivateCollab');
+      scope.uploadEntity('PrivateStorage');
       scope.$digest();
-      expect(scope.entities.result[0]).toEqual({
-        name: 'fakeBrain1',
-        description: 'fakeBrain1Description',
-        imageData: ''
+      expect(scope.entities[0]).toEqual({
+        name: 'fakeBraitenberg',
+        description: 'fakeBraitenberg',
+        thumbnail: '',
+        id: 'fakeBraitenberg'
       });
-      expect(scope.entities.result[1].name).toBe('fakeBrain2');
-      expect(scope.brain).toBe(true);
+      expect(scope.entities[1].name).toBe('fakeIdleBrain');
     });
 
-    it('should check unsuccessful upload from private collab for the robot', function() {
+    it('should check unsuccessful upload from private storage for the robot', function() {
       spyOn(scope, 'createErrorPopup').and.callFake(function() {
         return;
       });
-      spyOn(storageServer, 'getExperiments').and.returnValue(
+      spyOn(storageServer, 'getCustomModels').and.returnValue(
         window.$q.reject()
       );
       scope.uploadRobotDialog();
-      scope.uploadEntity('PrivateCollab');
+      scope.uploadEntity('PrivateStorage');
       scope.$digest();
       expect(scope.entities).toBe(undefined);
       expect(scope.createErrorPopup).toHaveBeenCalled();
     });
 
-    it('should check unsuccessful upload from private collab for the environment', function() {
+    it('should check unsuccessful upload from private storage for the environment', function() {
       spyOn(scope, 'createErrorPopup').and.callFake(function() {
         return;
       });
-      spyOn(storageServer, 'getExperiments').and.returnValue(
+      spyOn(storageServer, 'getCustomModels').and.returnValue(
         window.$q.reject()
       );
       scope.uploadEnvironmentDialog();
-      scope.uploadEntity('PrivateCollab');
+      scope.uploadEntity('PrivateStorage');
       scope.$digest();
       expect(scope.entities).toBe(undefined);
       expect(scope.createErrorPopup).toHaveBeenCalled();
     });
 
-    it('should check unsuccessful upload from private collab for the brain', function() {
+    it('should check unsuccessful upload from private storage for the brain', function() {
       spyOn(scope, 'createErrorPopup').and.callFake(angular.noop);
-      spyOn(storageServer, 'getExperiments').and.returnValue(
+      spyOn(storageServer, 'getCustomModels').and.returnValue(
         window.$q.reject()
       );
       scope.uploadBrainDialog();
-      scope.uploadEntity('PrivateCollab');
+      scope.uploadEntity('PrivateStorage');
       scope.$digest();
       expect(scope.entities).toBe(undefined);
       expect(scope.createErrorPopup).toHaveBeenCalled();
     });
 
-    it('should call the create upload from private collab function', function() {
+    it('should call the create upload from private storage function', function() {
       var mockBrainUploader = {
         name: 'FakeRobot',
         fakeFunction: function() {}
@@ -223,28 +203,31 @@
             name: 'Arm robot force based version',
             description:
               'Modified Hollie arm model for force based index finger movements.\n      In contrast to the first Hollie arm model it was required to remove the\n      PID control of the index finger joints to allow force control for this\n      particular finger.',
-            thumbnail: null,
+            thumbnail: '',
             path: 'robots/icub_model/model.config'
           },
           {
             name: 'Arm robot',
             description: 'First Hollie arm model.',
-            thumbnail: null
+            thumbnail: ''
           },
           {
             name: 'HBP Clearpath Robotics Husky A200',
             description: 'Clearpath Robotics Husky A200 - Extended HBP Model',
-            thumbnail: null
+            thumbnail: ''
           },
           {
             name: 'iCub HBP ros',
             description:
               'Model for the iCub humanoid robot. For more information check icub.org .',
-            thumbnail: null
+            thumbnail: ''
           }
         ]
       };
-      spyOn(newExperimentProxyService, 'getEntity').and.callFake(function() {
+      spyOn(
+        newExperimentProxyService,
+        'getTemplateModels'
+      ).and.callFake(function() {
         var deferred = $q.defer();
         deferred.resolve(mockProxyResponse);
         return deferred.promise;
@@ -258,7 +241,7 @@
 
       expect(scope.entities[0].name).toEqual('Arm robot force based version');
       expect(scope.entities[1].description).toEqual('First Hollie arm model.');
-      expect(scope.entities[2].thumbnail).toBe(null || undefined);
+      expect(scope.entities[2].thumbnail).toBe('');
       expect(scope.entities.length).toBe(4);
       var mockSelectedEntity = mockProxyResponse.data[0];
       scope.completeUploadEntity(mockSelectedEntity);
@@ -271,27 +254,30 @@
           {
             name: 'Fake environment1',
             description: 'Fake Description1',
-            thumbnail: null,
+            thumbnail: '',
             path: 'environments/virtual_world/model.config'
           },
           {
             name: 'Fake environment2',
             description: 'Fake Description2',
-            thumbnail: null
+            thumbnail: ''
           },
           {
             name: 'Fake environment3',
             description: 'Fake Description3',
-            thumbnail: null
+            thumbnail: ''
           },
           {
             name: 'Fake environment4',
             description: 'Fake Description5', //ha
-            thumbnail: null
+            thumbnail: ''
           }
         ]
       };
-      spyOn(newExperimentProxyService, 'getEntity').and.callFake(function() {
+      spyOn(
+        newExperimentProxyService,
+        'getTemplateModels'
+      ).and.callFake(function() {
         var deferred = $q.defer();
         deferred.resolve(mockProxyResponse);
         return deferred.promise;
@@ -304,7 +290,7 @@
       expect(scope.entityName).toEqual('Environment');
       expect(scope.entities[0].name).toEqual('Fake environment1');
       expect(scope.entities[1].description).toEqual('Fake Description2');
-      expect(scope.entities[2].thumbnail).toBe(null || undefined);
+      expect(scope.entities[2].thumbnail).toBe('');
       expect(scope.entities.length).toBe(4);
       var mockSelectedEntity = mockProxyResponse.data[0];
       scope.completeUploadEntity(mockSelectedEntity);
@@ -318,30 +304,33 @@
             name: 'FakeBrain1',
             description:
               'This brain is fake, which means that a zombie can get confused while trying to eat it',
-            thumbnail: null,
+            thumbnail: '',
             path: 'brains/braitenberg.py'
           },
           {
             name: 'FakeBrain2',
             description: 'FakeBrain2Description',
-            thumbnail: null,
+            thumbnail: '',
             path: 'fakePath2/fakePath2.sdf'
           },
           {
             name: 'FakeBrain3',
             description: 'FakeBrain3Description',
-            thumbnail: null,
+            thumbnail: '',
             path: 'fakePath3/fakePath3.sdf'
           },
           {
             name: 'FakeBrain4',
             description: 'FakeBrain4Description',
-            thumbnail: null,
+            thumbnail: '',
             path: 'fakePath4/fakePath4.sdf'
           }
         ]
       };
-      spyOn(newExperimentProxyService, 'getEntity').and.callFake(function() {
+      spyOn(
+        newExperimentProxyService,
+        'getTemplateModels'
+      ).and.callFake(function() {
         var deferred = $q.defer();
         deferred.resolve(mockProxyResponse);
         return deferred.promise;
@@ -356,7 +345,7 @@
         'This brain is fake, which means that a zombie can get confused while trying to eat it'
       );
       expect(scope.entities[1].name).toEqual('FakeBrain2');
-      expect(scope.entities[1].thumbnail).toBe(null || undefined);
+      expect(scope.entities[1].thumbnail).toBe('');
       expect(scope.entities.length).toBe(4);
       var mockSelectedEntity = mockProxyResponse.data[0];
       scope.completeUploadEntity(mockSelectedEntity);
@@ -424,58 +413,6 @@
       expect(clbErrorDialog.open).toHaveBeenCalled();
     });
 
-    it('should test the createEntitiesListFromEntityFiles function', function() {
-      /* eslint-disable camelcase*/
-      var mockCollabStorageResponse = [
-        {
-          content_type: 'application/x-config',
-          description: '',
-          uuid: '5626127f-eaaf-4eef-9806-d152a7894eae',
-          entity_type: 'file',
-          name: 'icub.config'
-        },
-        {
-          content_type: 'image/png',
-          description: '',
-          uuid: '07419007-8353-45bd-9645-d1d6c3dc5e59',
-          entity_type: 'file',
-          name: 'icub.png'
-        },
-        {
-          content_type: 'application/x-config',
-          description: '',
-          uuid: '79e51141-98cf-4ece-aa1b-b766d7842d53',
-          entity_type: 'file',
-          name: 'lauron.config'
-        },
-        {
-          content_type: 'image/png',
-          description: '',
-          uuid: '4f541ef0-84f7-4509-9745-b10eee176205',
-          entity_type: 'file',
-          name: 'lauron.png'
-        }
-      ];
-      /* eslint-enable camelcase*/
-      spyOn(scope, 'retrieveImageFileContent').and.callFake(function() {
-        var deferred = $q.defer();
-        deferred.resolve();
-        return deferred.promise;
-      });
-      spyOn(scope, 'retrieveConfigFileContent').and.callFake(function() {
-        var deferred = $q.defer();
-        deferred.resolve({
-          config: {
-            desc: 'fakeDesc'
-          }
-        });
-        return deferred.promise;
-      });
-      scope.createEntitiesListFromEntityFiles(mockCollabStorageResponse);
-      expect(scope.retrieveImageFileContent).toHaveBeenCalled();
-      expect(scope.retrieveConfigFileContent).toHaveBeenCalled();
-    });
-
     it('should test the retrieveImageFileContent function', function() {
       spyOn(storageServer, 'getBase64Content').and.returnValue(
         window.$q.when([])
@@ -536,7 +473,6 @@
       scope.destroyDialog();
       expect(scope.entityPageState).toEqual({});
       expect(scope.entityName).toBe('');
-      expect(scope.brain).toBe(false);
       expect(scope.entities).toBe(undefined);
       expect(nrpModalService.destroyModal).toHaveBeenCalled();
     });
