@@ -10,15 +10,13 @@
                           href="{{platformDocumentationURL}}/nrp/user_manual/simulation_setup/hard_reset.html">a few
       points</a> that should be taken into consideration when changing neuronal networks during a simulation.
   </p>
-  <!-- TODO: remove when we support distributed brain updates, also see ng-show conditions below -->
-  <strong style="color: red;" ng-show="isMultipleBrains()">Editing Brain Source Is Currently Disabled for Multiprocess Brain Simulations</strong>
   <div ng-show="pynnScript === undefined" class="alert alert-info" role="alert">
     There is no PyNN script available for this experiment.
   </div>
   <div ng-show="pynnScript !== undefined">
-    <p ng-hide="isMultipleBrains()">Populations (set of neurons indices) can be defined here and referred to in transfer functions:
+    <p>Populations (set of neurons indices) can be defined here and referred to in transfer functions:
     </p>
-    <form name="populationForm" ng-hide="isMultipleBrains()">
+    <form name="populationForm">
       <table class="table table-striped">
         <thead>
           <tr>
@@ -66,8 +64,7 @@
     <button class="btn btn-default btn-md" owner-only ng-click="download()">
      <i class="glyphicon glyphicon-download"></i><span> Download</span>
     </button>
-    <button class="btn btn-default btn-md" owner-only type="file" ngf-select="uploadFile($file)" accept=".py"
-      ng-hide="isMultipleBrains()">
+    <button class="btn btn-default btn-md" owner-only type="file" ngf-select="uploadFile($file)" accept=".py">
       <i class="glyphicon glyphicon-upload"></i><span> Upload</span>
     </button>
     <hr>
@@ -84,7 +81,6 @@
     <div  style="padding-bottom: 30px;">
       <button type="button" class="btn btn-default btn-md"
               owner-only
-              ng-hide="isMultipleBrains()"
               ng-click="apply(0)"
               ng-disabled="loading || stateService.statePending || !populationForm.$valid || !localBrainDirty"
               v-busy="loading || stateService.statePending"

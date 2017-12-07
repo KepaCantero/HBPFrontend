@@ -96,22 +96,11 @@
           var ScriptObject = pythonCodeHelper.ScriptObject;
           scope.pynnScript = new ScriptObject(0, 'empty');
 
-          scope.isMultipleBrains = function() {
-            return simulationInfo.experimentDetails.brainProcesses > 1;
-          };
+          scope.editorOptions = codeEditorsServices.getDefaultEditorOptions();
 
-          scope.editorOptions = {};
-
-          $timeout(() => {
-            scope.editorOptions = angular.extend(
-              {},
-              codeEditorsServices.getDefaultEditorOptions(),
-              { readOnly: scope.isMultipleBrains() && 'nocursor' }
-            );
-            scope.editorOptions = codeEditorsServices.ownerOnlyOptions(
-              scope.editorOptions
-            );
-          });
+          scope.editorOptions = codeEditorsServices.ownerOnlyOptions(
+            scope.editorOptions
+          );
 
           scope.resetListenerUnbindHandler = scope.$on('RESET', function(
             event,

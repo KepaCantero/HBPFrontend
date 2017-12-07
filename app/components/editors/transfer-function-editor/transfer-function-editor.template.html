@@ -10,9 +10,7 @@
     Further implementation details on the underlying Transfer Functions Framework and the Closed Loop Engine can be obtained
     <a target="_blank" href="{{cleDocumentationURL}}/architecture/transfer_functions.html">here</a>.</p>
   <div ng-show="(stateService.currentState === STATE.INITIALIZED)" class="alert alert-warning" role="alert">The simulation is in initialized state. It has to be started (or started and paused) to enable transfer function edition.</div>
-  <!-- TODO: remove when we support distributed TF updates/deletion, also see ng-show conditions below -->
-  <strong style="color: red;" ng-show="isMultipleBrains()">Editing Transfer Functions Is Currently Disabled for Multiprocess Brain Simulations</strong>
-  <div ng-hide="isMultipleBrains()">
+  <div>
     <hr style="margin-bottom: 10px;">
     <h4 class="collapsable-title" ng-click="togglePopulations()">
       <div class="collapsearrow" ng-class="showPopulations?'expanded':'collapsed'"></div>
@@ -60,7 +58,7 @@
   <h4>
     Transfer functions
   </h4>
-  <transfer-function-editor-buttons ng-hide="isMultipleBrains()"></transfer-function-editor-buttons>
+  <transfer-function-editor-buttons></transfer-function-editor-buttons>
   <div ng-repeat="transferFunction in transferFunctions">
     <hr>
     <h4><input type="text" readonly class="tf-name" ng-model="transferFunction.name" name="tfName"
@@ -76,7 +74,7 @@
       </div>
     </div>
 
-    <div ng-hide="isMultipleBrains()">
+    <div>
       <button type="button" class="btn btn-default btn-md"
               owner-only
               ng-disabled="!transferFunction.dirty || (stateService.currentState === STATE.INITIALIZED) || stateService.statePending || transferFunction.error.Input"
@@ -95,5 +93,5 @@
     </div>
   </div>
   <hr>
-  <transfer-function-editor-buttons ng-show="transferFunctions[0] && !isMultipleBrains()" append-at-end="true" style="padding-bottom: 30px;"></transfer-function-editor-buttons>
+  <transfer-function-editor-buttons ng-show="transferFunctions[0]" append-at-end="true" style="padding-bottom: 30px;"></transfer-function-editor-buttons>
 </div>

@@ -126,17 +126,7 @@ def {0}(t):
             scope.isSavingToCollab = false;
             scope.collabDirty = false;
 
-            scope.isMultipleBrains = function() {
-              return simulationInfo.experimentDetails.brainProcesses > 1;
-            };
-
-            scope.editorOptions = angular.extend(
-              {},
-              codeEditorsServices.getDefaultEditorOptions(),
-              {
-                readOnly: scope.isMultipleBrains() && 'nocursor'
-              }
-            );
+            scope.editorOptions = codeEditorsServices.getDefaultEditorOptions();
 
             scope.editorOptions = codeEditorsServices.ownerOnlyOptions(
               scope.editorOptions
