@@ -173,10 +173,13 @@
 
     deleteExperiment(experiment) {
       this.experimentList.deleting = true;
-      this.storageServer.deleteExperiment(experiment.uuid).then(() => {
-        this.experimentList.deleting = false;
-        this.$window.location.reload();
-      });
+      this.storageServer
+        .deleteExperiment(experiment.uuid)
+        .then(() => {
+          this.$window.location.reload();
+        })
+        .catch(err => this.onError('Failed to delete experiment', err))
+        .finally(() => (this.experimentList.deleting = false));
     }
 
     deleteFile(file) {
