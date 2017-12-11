@@ -194,9 +194,12 @@
         .getBlobContent(this.selectedParent.uuid, file.uuid)
         .then(response => {
           let link = document.createElement('a');
+          link.style.display = 'none';
+          document.body.appendChild(link);
           link.href = window.URL.createObjectURL(response.data);
           link.download = response.filename;
           link.click();
+          document.body.removeChild(link);
         })
         .catch(err => this.onError('Failed to download file', err))
         .finally(() => (file.downloading = false));
