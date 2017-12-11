@@ -699,6 +699,12 @@ def {0}(t):
               }
             };
 
+            // Population changed update
+            scope.$on('pynn.populationsChanged', function() {
+              scope.transferFunctions = [];
+              scope.refresh();
+            });
+
             saveErrorsService.registerCallback(DIRTY_TYPE, function(newTFs) {
               scope.transferFunctions = newTFs;
             });
