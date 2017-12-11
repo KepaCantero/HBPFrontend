@@ -3867,7 +3867,7 @@ THREE.ColladaLoader = function () {
 
 		}
 
-		props[ 'shading' ] = preferredShading;
+		props[ 'flatShading' ] = preferredShading;
 		props[ 'side' ] = this.effect.doubleSided ? THREE.DoubleSide : THREE.FrontSide;
 
 		switch ( this.type ) {

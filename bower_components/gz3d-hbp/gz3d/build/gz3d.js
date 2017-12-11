@@ -330,6 +330,8 @@ GZ3D.AnimatedModel.prototype.loadAnimatedModel = function(modelName) {
     that.scene.add(helper);
     that.scene.add(modelParent);
 
+    that.scene.applyComposerSettingsToModel(modelParent);
+
     // Progress update: execute callback
     element.done = true;
     if (GZ3D.assetProgressCallback) {
@@ -363,13 +365,10 @@ GZ3D.AnimatedModel.prototype.updateJoint = function(robotName, jointName, jointV
         rotationMatrix.makeRotationAxis(rotationAxis, rotationAngle);
 
         targetBone.setRotationFromMatrix(rotationMatrix);
-
-        // Update animation handler and skeleton helper
-        // TODO: Move this to the animation loop to synchronize animations with the actual frame rate.
-        // Alternative: Use the clock helper class from three.js for retrieving the actual frame rate delta.
-        entity.userData['Skeleton_Visual_Helper'].update(0.016);
       }
     }
+
+    this.scene.refresh3DViews();
   }
 };
 
@@ -424,7 +423,7 @@ GZ3D.VisualMuscleModel.prototype.updateVisualization = function(message) {
           cylinder = this.cylinderMesh(cylinderEndPoint_1, cylinderEndPoint_2, radius, new THREE.MeshLambertMaterial({
             color: color,
             wireframe: false,
-            shading: THREE.FlatShading
+            flatShading: THREE.FlatShading
           }));
           this.scene.add(cylinder);
 
@@ -856,8 +855,8 @@ GZ3D.AutoAlignModel.prototype.alignToObjects = function (position)
             {
               if (i === 0)
               {
-                var s = bbox.size();
-                var s2 = snap2bbox.size();
+                var s = bbox.getSize();
+                var s2 = snap2bbox.getSize();
                 if (Math.abs(s.x - s2.x) > 0.01 || Math.abs(s.y - s2.y) > 0.01)
                 {
                   continue;
@@ -2580,7 +2579,7 @@ GZ3D.Composer.prototype.render = function (view)
             this.scene.background = this.currenSkyBoxTexture;
             this.cubeMapNeedsUpdate = false;
             this.prepareCubeMapEnvMapRender(false);
-            this.cubeCamera.updateCubeMap(view.renderer, this.scene);
+            this.cubeCamera.update(view.renderer, this.scene);
             this.prepareCubeMapEnvMapRender(true);
         }
     }
@@ -2696,6 +2695,7 @@ GZ3D.Composer.prototype.checkSceneReady = function ()
         if (prepstate===null)
         {
             this.sceneReadyCallback = undefined;
+            this.gz3dScene.refresh3DViews();
         }
     }
 };
@@ -5214,6 +5214,8 @@ GZ3D.GZIface.prototype.onConnected = function()
     }
     this.gui.setSceneStats(message);
     this.sceneTopic.unsubscribe();
+
+    this.scene.refresh3DViews();
   };
   this.sceneTopic.subscribe(sceneUpdate.bind(this));
 
@@ -9503,7 +9505,7 @@ GZ3D.Scene.prototype.init = function()
   this.spawnModel = new GZ3D.SpawnModel(this);
   // Material for simple shapes being spawned (grey transparent)
   this.spawnedShapeMaterial = new THREE.MeshPhongMaterial(
-      {color:0xffffff, shading: THREE.SmoothShading} );
+      {color:0xffffff, flatShading: THREE.SmoothShading} );
   this.spawnedShapeMaterial.transparent = true;
   this.spawnedShapeMaterial.opacity = 0.5;
 
@@ -9711,7 +9713,7 @@ GZ3D.Scene.prototype.init = function()
                                       new THREE.Vector3(radius, 0, 4*length),
                                       new THREE.Vector3(0, radius, 5*length),
                                       new THREE.Vector3(-radius, 0, 6*length)]);
-  geometry = new THREE.TubeGeometry(curve, 36, 0.01, 10, false, false);
+  geometry = new THREE.TubeGeometry(curve, 36, 0.01, 10, false);
 
   mesh = new THREE.Mesh(geometry, material);
   mesh.position.z = -0.23;
@@ -10310,7 +10312,7 @@ GZ3D.Scene.prototype.createPlane = function(normalX, normalY, normalZ,
 {
   var geometry = new THREE.PlaneGeometry(width, height, 1, 1);
   var material =  new THREE.MeshPhongMaterial(
-      {color:0xbbbbbb, shading: THREE.SmoothShading} ); // Later Gazebo/Grey
+      {color:0xbbbbbb, flatShading: THREE.SmoothShading} ); // Later Gazebo/Grey
   var mesh = new THREE.Mesh(geometry, material);
   var normal = new THREE.Vector3(normalX, normalY, normalZ);
   var cross = normal.crossVectors(normal, mesh.up);
