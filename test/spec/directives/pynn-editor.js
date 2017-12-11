@@ -139,8 +139,8 @@ describe('Directive: pynnEditor', function() {
       data_type: 'text',
       filename: '/path/filename.py',
       additional_populations: {
-        list1: [1, 2, 3],
-        index1: [9],
+        list1: { list: [1, 2, 3] },
+        index1: { list: [9] },
         slice0: { from: 0, to: 10, step: 1 }
       }
     };
@@ -149,7 +149,7 @@ describe('Directive: pynnEditor', function() {
       data: '// binary h5 data',
       data_type: 'base64',
       filename: '/path/filename.h5',
-      additional_populations: { short_list: [0] }
+      additional_populations: { short_list: { list: [0] } }
     };
     var expectedScript = data.data;
     var expectedPopulations = [
