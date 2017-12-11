@@ -218,7 +218,7 @@
                 populationObject.step = 1;
               }
               if (!isSlice) {
-                var str = populationObject.toString();
+                var str = populationObject.list.toString();
                 populationObject = {
                   list: str,
                   name: name
