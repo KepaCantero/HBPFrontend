@@ -148,6 +148,7 @@
           // * env poses reset
           scope.refresh = function() {
             refreshEditor();
+            if (scope.collabDirty) return;
             scope.loading = true;
             backendInterfaceService.getBrain(function(response) {
               scope.loading = false;
@@ -430,7 +431,11 @@
           };
 
           scope.$watch('pynnScript.code', function(after, before) {
-            if (before !== 'empty') scope.onPynnChange(true);
+            if (
+              before !== 'empty' &&
+              before.replace(/\r/g, '') !== after.replace(/\r/g, '')
+            )
+              scope.onPynnChange(true);
           });
 
           scope.$watchCollection('populations', function(after, before) {
