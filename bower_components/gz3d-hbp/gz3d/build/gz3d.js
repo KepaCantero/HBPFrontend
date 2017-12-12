@@ -205,6 +205,7 @@ GZ3D.AnimatedModel = function(scene) {
 
 GZ3D.AnimatedModel.prototype.loadAnimatedModel = function(modelName) {
   this.loader = new THREE.ColladaLoader();
+  this.loader.textureLoadedCallback = ()=>{this.scene.refresh3DViews();};
 
   // Helper function to enable 'skinning' property so three.js treats meshes as deformable
 
@@ -985,9 +986,33 @@ GZ3D.AutoAlignModel.prototype.alignOnShape = function (position, hitDesc)
 
     if (hitDesc && hitDesc.object && hitDesc.face)
     {
-      var av = hitDesc.object.geometry.vertices[hitDesc.face.a],
-        bv = hitDesc.object.geometry.vertices[hitDesc.face.b],
+      var av,bv,cv;
+
+      if (hitDesc.object.geometry.vertices)
+      {
+        av = hitDesc.object.geometry.vertices[hitDesc.face.a];
+        bv = hitDesc.object.geometry.vertices[hitDesc.face.b];
         cv = hitDesc.object.geometry.vertices[hitDesc.face.c];
+      }
+      else if (hitDesc.object.geometry.attributes)
+      {
+        var itemSize = hitDesc.object.geometry.attributes.position.itemSize;
+        var array = hitDesc.object.geometry.attributes.position.array;
+        var i;
+
+        i = hitDesc.face.a*itemSize;
+        av = new THREE.Vector3(array[i],array[i+1],array[i+2]);
+
+        i = hitDesc.face.b*itemSize;
+        bv = new THREE.Vector3(array[i],array[i+1],array[i+2]);
+
+        i = hitDesc.face.c*itemSize;
+        cv = new THREE.Vector3(array[i],array[i+1],array[i+2]);
+      }
+      else
+      {
+        return;
+      }
 
       var q = hitDesc.object.getWorldQuaternion();
 
@@ -2028,7 +2053,7 @@ GZ3D.Composer.prototype.updatePBRMaterial = function (node)
                 node.pbrMeshMaterial.roughness = 1.0;
                 node.pbrMeshMaterial.metalness = 1.0;
                 node.pbrMeshMaterial.skinning = node.stdMeshMaterial.skinning;
-                node.pbrMeshMaterial.aoMapIntensity = cs.pbrAOMapIntensity ? cs.pbrAOMapIntensity : 1.0;
+                node.pbrMeshMaterial.aoMapIntensity = 1.0;
             }
 
             if (cs.dynamicEnvMap)
@@ -11096,6 +11121,8 @@ GZ3D.Scene.prototype.loadCollada = function(uri, submesh, centerSubmesh,
   }
 
   var loader = new THREE.ColladaLoader();
+  loader.textureLoadedCallback = ()=>{this.refresh3DViews();};
+
   // var loader = new ColladaLoader2();
   // loader.options.convertUpAxis = true;
   var thatURI = uri;
