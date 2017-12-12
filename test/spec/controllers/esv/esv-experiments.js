@@ -648,12 +648,21 @@
 
         it('should reload experiments after clone', function() {
           var page = renderEsvWebPage();
-          spyOn($rootScope, 'reloadExperiments');
-          spyOn(collabConfigService, 'clone');
+          var mockResource = {};
+          Promise.prototype.finally = function() {};
+          mockResource.$promise = new Promise(function(resolve, reject) {
+            var f = false;
+            if (f) {
+              resolve(1);
+            } else {
+              reject(2);
+            }
+          });
+          spyOn(collabConfigService, 'clone').and.returnValue(mockResource);
           var scope = getExperimentListScope(page);
           scope.cloneExperiment(matureExperiment);
           collabConfigService.clone.calls.mostRecent().args[2]();
-          expect($rootScope.reloadExperiments).toHaveBeenCalled();
+          expect(scope.isCloneRequested).toBe(true);
         });
       });
 

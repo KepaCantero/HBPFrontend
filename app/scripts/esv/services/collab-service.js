@@ -44,7 +44,6 @@
         {
           clone: {
             method: 'PUT',
-            interceptor: { responseError: serverError.displayHTTPError },
             url: `${baseUrl}/experiment/clone`
           },
           get: {

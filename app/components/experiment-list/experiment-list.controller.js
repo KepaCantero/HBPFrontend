@@ -32,6 +32,7 @@
     '$window',
     'nrpUser',
     'environmentService',
+    'clbErrorDialog',
     function(
       $scope,
       $location,
@@ -40,7 +41,8 @@
       collabConfigService,
       $window,
       nrpUser,
-      environmentService
+      environmentService,
+      clbErrorDialog
     ) {
       $scope.pageState = {};
       $scope.isPrivateExperiment = environmentService.isPrivateExperiment();
@@ -55,32 +57,48 @@
 
       $scope.cloneExperiment = function(experiment) {
         $scope.isCloneRequested = true;
-        collabConfigService.clone(
-          null,
-          {
-            /* eslint-disable camelcase */
-            exp_configuration_path:
-              experiment.configuration.experimentConfiguration,
-            context_id: $stateParams.ctx
-            /* eslint-enable camelcase */
-          },
-          function() {
-            try {
-              $window.document
-                .getElementById('clb-iframe-workspace')
-                .contentWindow.parent.postMessage(
-                  {
-                    eventName: 'location',
-                    data: { url: window.location.href.split('?')[0] }
-                  },
-                  '*'
-                );
-            } catch (err) {
-              //not in using collab website, do nothing
+        collabConfigService
+          .clone(
+            null,
+            {
+              /* eslint-disable camelcase */
+              exp_configuration_path:
+                experiment.configuration.experimentConfiguration,
+              context_id: $stateParams.ctx
+              /* eslint-enable camelcase */
+            },
+            function() {
+              try {
+                $window.document
+                  .getElementById('clb-iframe-workspace')
+                  .contentWindow.parent.postMessage(
+                    {
+                      eventName: 'location',
+                      data: { url: window.location.href.split('?')[0] }
+                    },
+                    '*'
+                  );
+              } catch (err) {
+                //not in using collab website, do nothing
+              }
             }
+          )
+          .$promise.then(() => {
             $scope.loadPrivateExperiments();
-          }
-        );
+          })
+          .catch(err => {
+            err = {
+              type: 'Error while cloning',
+              data: err.data,
+              message:
+                'Cloning operation failed. The cloning server might be unavailable',
+              code: err.statusText + ' ' + err.status
+            };
+            clbErrorDialog.open(err).then(() => {});
+          })
+          .finally(() => {
+            $scope.isCloneRequested = false;
+          });
       };
 
       $scope.canStopSimulation = function(simul) {
