@@ -47,6 +47,7 @@ angular.module('userInteractionModule').service('applyForceService', [
       var that = this;
 
       this.forceVector = new THREE.Vector3(0, 0, 1);
+      this.forceStrength = 1000; // assume newton as unit
 
       this.initialize = () => {
         contextMenuState.pushItemGroup({
@@ -205,7 +206,7 @@ angular.module('userInteractionModule').service('applyForceService', [
           const forceVector = this.forceVector
             .clone()
             .normalize()
-            .multiplyScalar(500);
+            .multiplyScalar(this.forceStrength);
 
           /* eslint-disable camelcase */
           var request = new ROSLIB.ServiceRequest({
@@ -217,7 +218,7 @@ angular.module('userInteractionModule').service('applyForceService', [
               torque: { x: 0.0, y: 0.0, z: 0.0 }
             },
             start_time: { secs: 0, nsecs: 0 },
-            duration: { secs: 0, nsecs: 500000000 /*0.5s*/ }
+            duration: { secs: 0, nsecs: 100000000 /*0.1s*/ }
           });
           /* eslint-enable camelcase */
 
