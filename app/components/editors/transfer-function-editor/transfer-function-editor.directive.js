@@ -274,13 +274,8 @@ def {0}(t):
                   var found = angular.isDefined(tf);
                   if (found) {
                     tf.local = false;
-                    if (tf.dirty) {
+                    if (!tf.dirty) {
                       tf.code = transferFunction.code;
-                      codeEditorsServices.resetEditor(
-                        codeEditorsServices.getEditor(
-                          'transfer-function-' + transferFunction.id
-                        )
-                      );
                     }
                   } else {
                     scope.transferFunctions.unshift(transferFunction);
