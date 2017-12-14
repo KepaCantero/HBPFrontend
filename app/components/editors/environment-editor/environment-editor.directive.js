@@ -90,6 +90,7 @@
           scope.isPrivateExperiment = environmentService.isPrivateExperiment();
           scope.isSavingToCollab = false;
           scope.categories = [];
+          scope.physicsEngine = simulationInfo.experimentDetails.physicsEngine;
 
           scope.updateVisibleModels = function() {
             scope.visibleModels = [];
@@ -116,6 +117,10 @@
             scope.categories = res.data;
 
             for (var i = 0; i < scope.categories.length; i++) {
+              scope.categories[i].models = scope.categories[i].models.filter(
+                m => !m.physicsIgnore || m.physicsIgnore !== scope.physicsEngine
+              );
+
               scope.categories[i].visible = i === 0;
               scope.categories[i].colorMode = 'default';
               scope.categories[i].color = {};
