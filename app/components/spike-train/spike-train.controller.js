@@ -263,21 +263,23 @@
     }
   }
 
+  SpikeTrainController.$$ngIsClass = true;
+  SpikeTrainController.$inject = [
+    '$element',
+    '$filter',
+    '$scope',
+    '$timeout',
+    'RESET_TYPE',
+    'SPIKE_TIMELABEL_SPACE',
+    'spikeListenerService',
+    'editorToolbarService'
+  ];
+
   angular
     .module('spikeTrainModule', [
       'spikeListenerModule',
       'exdFrontendApp.Constants'
     ])
     .constant('SPIKE_TIMELABEL_SPACE', 15) // Vertical space in the canvas reserved for the time label
-    .controller('SpikeTrainController', [
-      '$element',
-      '$filter',
-      '$scope',
-      '$timeout',
-      'RESET_TYPE',
-      'SPIKE_TIMELABEL_SPACE',
-      'spikeListenerService',
-      'editorToolbarService',
-      (...args) => new SpikeTrainController(...args)
-    ]);
+    .controller('SpikeTrainController', SpikeTrainController);
 })();

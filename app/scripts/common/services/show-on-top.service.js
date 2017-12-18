@@ -60,7 +60,5 @@
     }
   }
 
-  angular
-    .module('showOnTop')
-    .service('showOnTopService', () => new ShowOnTopService());
+  angular.module('showOnTop').service('showOnTopService', ShowOnTopService);
 })();

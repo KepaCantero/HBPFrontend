@@ -43,6 +43,6 @@
     "commit": "3ad9d5c77f9a803c69a257ce399ced4e40a92ad5"
   },
   "_source": "ssh://bbpcode.epfl.ch/platform/JSLibAngularHbpCommon",
-  "_target": "2.3.0",
+  "_target": "~2.3.0",
   "_originalSource": "angular-hbp-common"
 }

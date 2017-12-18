@@ -632,46 +632,48 @@
     }
   }
 
+  EditorToolbarController.$$ngIsClass = true;
+  EditorToolbarController.$inject = [
+    '$rootScope',
+    '$scope',
+    '$timeout',
+    '$location',
+    '$window',
+    'contextMenuState',
+    'userContextService',
+    'stateService',
+    'gz3d',
+    'editorsPanelService',
+    'userNavigationService',
+    'objectInspectorService',
+    'performanceMonitorService',
+    'nrpAnalytics',
+    'clbConfirm',
+    'environmentService',
+    'backendInterfaceService',
+    'environmentRenderingService',
+    'splash',
+    'simulationInfo',
+    'videoStreamService',
+    'dynamicViewOverlayService',
+    'helpTooltipService',
+    'editorToolbarService',
+    'gz3dViewsService',
+    'clientLoggerService',
+    'bbpConfig',
+    'STATE',
+    'NAVIGATION_MODES',
+    'EDIT_MODE',
+    'RESET_TYPE',
+    'DYNAMIC_VIEW_CHANNELS',
+    'rosCommanderService'
+  ];
+
   angular
     .module('editorToolbarModule', [
       'helpTooltipModule',
       'clb-ui-dialog',
       'rosTerminalModule'
     ])
-    .controller('EditorToolbarController', [
-      '$rootScope',
-      '$scope',
-      '$timeout',
-      '$location',
-      '$window',
-      'contextMenuState',
-      'userContextService',
-      'stateService',
-      'gz3d',
-      'editorsPanelService',
-      'userNavigationService',
-      'objectInspectorService',
-      'performanceMonitorService',
-      'nrpAnalytics',
-      'clbConfirm',
-      'environmentService',
-      'backendInterfaceService',
-      'environmentRenderingService',
-      'splash',
-      'simulationInfo',
-      'videoStreamService',
-      'dynamicViewOverlayService',
-      'helpTooltipService',
-      'editorToolbarService',
-      'gz3dViewsService',
-      'clientLoggerService',
-      'bbpConfig',
-      'STATE',
-      'NAVIGATION_MODES',
-      'EDIT_MODE',
-      'RESET_TYPE',
-      'DYNAMIC_VIEW_CHANNELS',
-      'rosCommanderService',
-      (...args) => new EditorToolbarController(...args)
-    ]);
+    .controller('EditorToolbarController', EditorToolbarController);
 })();

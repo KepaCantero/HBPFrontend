@@ -113,12 +113,8 @@
     }
   }
 
-  angular
-    .module('gz3dModule')
-    .service('gz3dViewsService', [
-      '$q',
-      'gz3d',
-      'environmentRenderingService',
-      (...args) => new GZ3DViewsService(...args)
-    ]);
+  GZ3DViewsService.$$ngIsClass = true;
+  GZ3DViewsService.$inject = ['$q', 'gz3d', 'environmentRenderingService'];
+
+  angular.module('gz3dModule').service('gz3dViewsService', GZ3DViewsService);
 })();

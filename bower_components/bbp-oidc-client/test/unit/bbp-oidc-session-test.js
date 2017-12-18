@@ -274,49 +274,4 @@ describe('bbpOidcSession', function() {
         });
 
     });
-
-    describe('.ensureToken()', function() {
-        var storage, token, logoutUrl, tokenValue;
-        beforeEach(function() {
-            tokenValue = 'ABCD';
-            storage = new StorageStub();
-            token = storage.tokens;
-            token[provider] = {
-                'access_token': tokenValue
-            };
-            jso_registerStorageHandler(storage);
-        });
-
-        it('should retrieve a promise', function() {
-            var p = bbpOidcSession.ensureToken(true);
-            expect(p.then).toBeDefined();
-        });
-
-
-        it('should retrieve a promise that resolves when there is a token' , function(done) {
-            var p = bbpOidcSession.ensureToken(true);
-            p.then(function() {
-                done();
-            });
-        });
-
-        it('should retrieve a promise that does not resolve when there is no token' , function(done) {
-            // wipe tokens
-            storage.tokens = {};
-            var resolved = false;
-            var p = bbpOidcSession.ensureToken(true);
-            p.then(function() {
-                resolved = true;
-                done.fail('should never resolve!');
-            });
-
-            // wait a time shorter than the test timout (5s)
-            setTimeout(function() {
-                if(!resolved) {
-                    done();
-                }
-            }, 1000);
-        });
-    });
-
 });

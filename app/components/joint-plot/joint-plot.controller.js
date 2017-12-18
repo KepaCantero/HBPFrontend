@@ -150,14 +150,16 @@
     }
   }
 
+  JoinPlotController.$$ngIsClass = true;
+  JoinPlotController.$inject = [
+    '$element',
+    '$scope',
+    'RESET_TYPE',
+    'jointService',
+    'dynamicViewOverlayService'
+  ];
+
   angular
     .module('jointPlotModule', ['bbpConfig'])
-    .controller('JoinPlotController', [
-      '$element',
-      '$scope',
-      'RESET_TYPE',
-      'jointService',
-      'dynamicViewOverlayService',
-      (...args) => new JoinPlotController(...args)
-    ]);
+    .controller('JoinPlotController', JoinPlotController);
 })();

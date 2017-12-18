@@ -120,13 +120,15 @@
     }
   }
 
+  DynamicViewOverlayController.$$ngIsClass = true;
+  DynamicViewOverlayController.$inject = [
+    '$element',
+    '$scope',
+    '$timeout',
+    'dynamicViewOverlayService'
+  ];
+
   angular
     .module('dynamicViewOverlayModule', ['dynamicViewModule'])
-    .controller('DynamicViewOverlayController', [
-      '$element',
-      '$scope',
-      '$timeout',
-      'dynamicViewOverlayService',
-      (...args) => new DynamicViewOverlayController(...args)
-    ]);
+    .controller('DynamicViewOverlayController', DynamicViewOverlayController);
 })();

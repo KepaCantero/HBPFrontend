@@ -209,14 +209,16 @@
     }
   }
 
+  DynamicViewOverlayService.$$ngIsClass = true;
+  DynamicViewOverlayService.$inject = [
+    '$compile',
+    '$q',
+    '$rootScope',
+    '$timeout',
+    'nrpAnalytics'
+  ];
+
   angular
     .module('dynamicViewOverlayModule')
-    .factory('dynamicViewOverlayService', [
-      '$compile',
-      '$q',
-      '$rootScope',
-      '$timeout',
-      'nrpAnalytics',
-      (...args) => new DynamicViewOverlayService(...args)
-    ]);
+    .service('dynamicViewOverlayService', DynamicViewOverlayService);
 })();

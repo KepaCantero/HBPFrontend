@@ -99,17 +99,19 @@
     }
   }
 
+  LogConsoleController.$$ngIsClass = true;
+  LogConsoleController.$inject = [
+    '$scope',
+    '$timeout',
+    '$element',
+    'stateService',
+    'clientLoggerService',
+    'editorToolbarService',
+    'STATE',
+    'LOG_TYPE'
+  ];
+
   angular
     .module('clientLoggerModule')
-    .controller('LogConsoleController', [
-      '$scope',
-      '$timeout',
-      '$element',
-      'stateService',
-      'clientLoggerService',
-      'editorToolbarService',
-      'STATE',
-      'LOG_TYPE',
-      (...args) => new LogConsoleController(...args)
-    ]);
+    .controller('LogConsoleController', LogConsoleController);
 })();

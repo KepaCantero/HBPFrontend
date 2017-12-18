@@ -10,7 +10,8 @@ describe('Directive: logConsole', function() {
     childScope,
     clientLoggerServiceMock,
     clientLoggerController,
-    LOG_TYPE;
+    LOG_TYPE,
+    scheduler;
 
   beforeEach(module('clientLoggerServiceMock'));
 
@@ -27,6 +28,14 @@ describe('Directive: logConsole', function() {
         $timeout = _$timeout_;
         clientLoggerServiceMock = _clientLoggerService_;
         LOG_TYPE = _LOG_TYPE_;
+
+        scheduler = new Rx.TestScheduler();
+        var originalBufferTime = Rx.Observable.prototype.bufferTime;
+        spyOn(Rx.Observable.prototype, 'bufferTime').and.callFake(function(
+          initialDelay
+        ) {
+          return originalBufferTime.call(this, initialDelay, scheduler);
+        });
 
         element = $compile('<log-console></log-console>')($rootScope);
         $rootScope.$digest();
@@ -45,8 +54,9 @@ describe('Directive: logConsole', function() {
         level: LOG_TYPE.INFO,
         message: 'test'
       });
+      scheduler.flush();
       $timeout.flush();
-      expect(clientLoggerController.logs.length).toBe(0);
+      expect(clientLoggerController.logs.length).toBe(1);
     });
 
     it('should ignore ADVERTISEMENT logs', function() {

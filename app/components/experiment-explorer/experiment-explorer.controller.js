@@ -298,19 +298,21 @@
     }
   }
 
+  ExperimentExplorerController.$$ngIsClass = true;
+  ExperimentExplorerController.$inject = [
+    '$scope',
+    '$element',
+    '$window',
+    '$location',
+    '$stateParams',
+    '$q',
+    '$log',
+    '$uibModal',
+    'clbErrorDialog',
+    'storageServer'
+  ];
+
   angular
     .module('experimentExplorer', ['storageServer'])
-    .controller('ExperimentExplorerController', [
-      '$scope',
-      '$element',
-      '$window',
-      '$location',
-      '$stateParams',
-      '$q',
-      '$log',
-      '$uibModal',
-      'clbErrorDialog',
-      'storageServer',
-      (...args) => new ExperimentExplorerController(...args)
-    ]);
+    .controller('ExperimentExplorerController', ExperimentExplorerController);
 })();

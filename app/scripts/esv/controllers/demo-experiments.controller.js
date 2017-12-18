@@ -126,14 +126,16 @@
     }
   }
 
+  DemoExperimentsController.$$ngIsClass = true;
+  DemoExperimentsController.$inject = [
+    '$scope',
+    'experimentsFactory',
+    '$timeout',
+    '$location',
+    'environmentService'
+  ];
+
   angular
     .module('exdFrontendApp')
-    .controller('demoExperimentsController', [
-      '$scope',
-      'experimentsFactory',
-      '$timeout',
-      '$location',
-      'environmentService',
-      (...args) => new DemoExperimentsController(...args)
-    ]);
+    .controller('demoExperimentsController', DemoExperimentsController);
 })();

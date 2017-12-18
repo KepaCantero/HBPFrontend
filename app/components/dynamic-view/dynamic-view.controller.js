@@ -80,15 +80,17 @@
     }
   }
 
+  DynamicViewController.$$ngIsClass = true;
+  DynamicViewController.$inject = [
+    '$compile',
+    '$element',
+    '$rootScope',
+    '$scope'
+  ];
+
   angular
     .module('dynamicViewModule', [])
-    .controller('DynamicViewController', [
-      '$compile',
-      '$element',
-      '$rootScope',
-      '$scope',
-      (...args) => new DynamicViewController(...args)
-    ])
+    .controller('DynamicViewController', DynamicViewController)
     .constant('DYNAMIC_VIEW_CHANNELS', {
       BRAIN_VISUALIZER: {
         name: 'Brain Visualizer',

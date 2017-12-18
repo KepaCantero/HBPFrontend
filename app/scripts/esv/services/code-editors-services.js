@@ -56,7 +56,7 @@
 
       function getEditor(id) {
         var codeMirrorDiv = document.getElementById(id).firstChild;
-        return codeMirrorDiv.CodeMirror;
+        return codeMirrorDiv && codeMirrorDiv.CodeMirror;
       }
 
       function getEditorChild(id, parent) {
@@ -66,7 +66,7 @@
 
       function refreshEditor(editor) {
         $timeout(function() {
-          editor.refresh();
+          editor.refresh && editor.refresh();
         }, 100);
       }
 

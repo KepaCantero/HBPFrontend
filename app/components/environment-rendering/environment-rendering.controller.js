@@ -164,6 +164,20 @@
     }
   }
 
+  EnvironmentRenderingController.$$ngIsClass = true;
+  EnvironmentRenderingController.$inject = [
+    '$scope',
+    '$element',
+    'userContextService',
+    'experimentService',
+    'userNavigationService',
+    'environmentRenderingService',
+    'gz3dViewsService',
+    'stateService',
+    'videoStreamService',
+    'dynamicViewOverlayService'
+  ];
+
   /**
    * @ngdoc function
    * @name environmentRenderingModule.controller:EnvironmentRenderingController
@@ -173,17 +187,8 @@
    */
   angular
     .module('environmentRenderingModule')
-    .controller('EnvironmentRenderingController', [
-      '$scope',
-      '$element',
-      'userContextService',
-      'experimentService',
-      'userNavigationService',
-      'environmentRenderingService',
-      'gz3dViewsService',
-      'stateService',
-      'videoStreamService',
-      'dynamicViewOverlayService',
-      (...args) => new EnvironmentRenderingController(...args)
-    ]);
+    .controller(
+      'EnvironmentRenderingController',
+      EnvironmentRenderingController
+    );
 })();

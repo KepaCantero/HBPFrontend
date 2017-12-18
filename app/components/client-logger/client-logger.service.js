@@ -149,17 +149,19 @@
     }
   }
 
+  ClientLoggerService.$$ngIsClass = true;
+  ClientLoggerService.$inject = [
+    'roslib',
+    'simulationInfo',
+    'bbpConfig',
+    'dynamicViewOverlayService',
+    'DYNAMIC_VIEW_CHANNELS',
+    'LOG_TYPE'
+  ];
+
   angular
     .module('clientLoggerModule', [])
-    .service('clientLoggerService', [
-      'roslib',
-      'simulationInfo',
-      'bbpConfig',
-      'dynamicViewOverlayService',
-      'DYNAMIC_VIEW_CHANNELS',
-      'LOG_TYPE',
-      (...args) => new ClientLoggerService(...args)
-    ])
+    .service('clientLoggerService', ClientLoggerService)
     .constant('LOG_TYPE', {
       INFO: 1,
       ADVERTS: 2

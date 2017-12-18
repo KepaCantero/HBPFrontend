@@ -119,8 +119,8 @@ angular.module('userInteractionModule').service('applyForceService', [
           });
         this.OnApplyForce = undefined;
 
-        this.targetModel.remove(this.widgetRoot);
-        gz3d.scene.refresh3DViews();
+        this.targetModel && this.targetModel.remove(this.widgetRoot);
+        gz3d.scene && gz3d.scene.refresh3DViews();
       };
 
       this.RotationChanged = () => {

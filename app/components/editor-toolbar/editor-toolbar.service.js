@@ -159,12 +159,14 @@
     }
   }
 
+  EditorToolbarService.$$ngIsClass = true;
+  EditorToolbarService.$inject = [
+    'dynamicViewOverlayService',
+    'editorsPanelService',
+    'DYNAMIC_VIEW_CHANNELS'
+  ];
+
   angular
     .module('editorToolbarModule')
-    .service('editorToolbarService', [
-      'dynamicViewOverlayService',
-      'editorsPanelService',
-      'DYNAMIC_VIEW_CHANNELS',
-      (...args) => new EditorToolbarService(...args)
-    ]);
+    .service('editorToolbarService', EditorToolbarService);
 })();

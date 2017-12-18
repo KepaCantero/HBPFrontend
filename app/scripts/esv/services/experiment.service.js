@@ -86,17 +86,19 @@
     }
   }
 
+  ExperimentService.$$ngIsClass = true;
+  ExperimentService.$inject = [
+    '$q',
+    'simulationInfo',
+    'simulationControl',
+    'bbpConfig',
+    'nrpUser',
+    'experimentsFactory',
+    'nrpFrontendVersion',
+    'nrpBackendVersions'
+  ];
+
   angular
     .module('experimentModule', ['nrpBackendAbout', 'editorToolbarModule'])
-    .factory('experimentService', [
-      '$q',
-      'simulationInfo',
-      'simulationControl',
-      'bbpConfig',
-      'nrpUser',
-      'experimentsFactory',
-      'nrpFrontendVersion',
-      'nrpBackendVersions',
-      (...args) => new ExperimentService(...args)
-    ]);
+    .service('experimentService', ExperimentService);
 })();

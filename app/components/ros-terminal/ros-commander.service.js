@@ -59,13 +59,10 @@
     }
   }
 
+  RosCommanderService.$$ngIsClass = true;
+  RosCommanderService.$inject = ['roslib', 'simulationInfo'];
+
   angular
     .module('rosTerminalModule', [])
-    .factory('rosCommanderService', [
-      'roslib',
-      'simulationInfo',
-      'dynamicViewOverlayService',
-      'DYNAMIC_VIEW_CHANNELS',
-      (...args) => new RosCommanderService(...args)
-    ]);
+    .service('rosCommanderService', RosCommanderService);
 })();

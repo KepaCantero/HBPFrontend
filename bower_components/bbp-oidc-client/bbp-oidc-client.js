@@ -17,25 +17,6 @@
 	 * CryptoJS core components.
 	 */
 	var CryptoJS = CryptoJS || (function (Math, undefined) {
-	    /*
-	     * Local polyfil of Object.create
-	     */
-	    var create = Object.create || (function () {
-	        function F() {};
-
-	        return function (obj) {
-	            var subtype;
-
-	            F.prototype = obj;
-
-	            subtype = new F();
-
-	            F.prototype = null;
-
-	            return subtype;
-	        };
-	    }())
-
 	    /**
 	     * CryptoJS namespace.
 	     */
@@ -50,7 +31,7 @@
 	     * Base object for prototypal inheritance.
 	     */
 	    var Base = C_lib.Base = (function () {
-
+	        function F() {}
 
 	        return {
 	            /**
@@ -73,7 +54,8 @@
 	             */
 	            extend: function (overrides) {
 	                // Spawn
-	                var subtype = create(this);
+	                F.prototype = this;
+	                var subtype = new F();
 
 	                // Augment
 	                if (overrides) {
@@ -81,7 +63,7 @@
 	                }
 
 	                // Create default initializer
-	                if (!subtype.hasOwnProperty('init') || this.init === subtype.init) {
+	                if (!subtype.hasOwnProperty('init')) {
 	                    subtype.init = function () {
 	                        subtype.$super.init.apply(this, arguments);
 	                    };
@@ -1351,45 +1333,34 @@
 	            // Shortcuts
 	            var base64StrLength = base64Str.length;
 	            var map = this._map;
-	            var reverseMap = this._reverseMap;
-
-	            if (!reverseMap) {
-	                    reverseMap = this._reverseMap = [];
-	                    for (var j = 0; j < map.length; j++) {
-	                        reverseMap[map.charCodeAt(j)] = j;
-	                    }
-	            }
 
 	            // Ignore padding
 	            var paddingChar = map.charAt(64);
 	            if (paddingChar) {
 	                var paddingIndex = base64Str.indexOf(paddingChar);
-	                if (paddingIndex !== -1) {
+	                if (paddingIndex != -1) {
 	                    base64StrLength = paddingIndex;
 	                }
 	            }
 
 	            // Convert
-	            return parseLoop(base64Str, base64StrLength, reverseMap);
+	            var words = [];
+	            var nBytes = 0;
+	            for (var i = 0; i < base64StrLength; i++) {
+	                if (i % 4) {
+	                    var bits1 = map.indexOf(base64Str.charAt(i - 1)) << ((i % 4) * 2);
+	                    var bits2 = map.indexOf(base64Str.charAt(i)) >>> (6 - (i % 4) * 2);
+	                    var bitsCombined = bits1 | bits2;
+	                    words[nBytes >>> 2] |= (bitsCombined) << (24 - (nBytes % 4) * 8);
+	                    nBytes++;
+	                }
+	            }
 
+	            return WordArray.create(words, nBytes);
 	        },
 
 	        _map: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/='
 	    };
-
-	    function parseLoop(base64Str, base64StrLength, reverseMap) {
-	      var words = [];
-	      var nBytes = 0;
-	      for (var i = 0; i < base64StrLength; i++) {
-	          if (i % 4) {
-	              var bits1 = reverseMap[base64Str.charCodeAt(i - 1)] << ((i % 4) * 2);
-	              var bits2 = reverseMap[base64Str.charCodeAt(i)] >>> (6 - (i % 4) * 2);
-	              words[nBytes >>> 2] |= (bits1 | bits2) << (24 - (nBytes % 4) * 8);
-	              nBytes++;
-	          }
-	      }
-	      return WordArray.create(words, nBytes);
-	    }
 	}());
 
 
@@ -5144,7 +5115,7 @@ if(typeof KJUR=="undefined"||!KJUR){KJUR={}}if(typeof KJUR.jws=="undefined"||!KJ
 
 })(window, window.jQuery);
 
-/* global Promise, jso_configure, jso_ensureTokens, jso_getToken, jso_wipe */
+/* global jso_configure, jso_ensureTokens, jso_getToken, jso_wipe */
 (function(exp){
     'use strict';
 
@@ -5193,7 +5164,6 @@ if(typeof KJUR=="undefined"||!KJUR){KJUR={}}if(typeof KJUR.jws=="undefined"||!KJ
         this.ensureTokens = function() {
             var scopesToEnsure = {};
             scopesToEnsure[provider] = scopes;
-            // returns true when a token is found, triggers the redirect otherwise
             return jso_ensureTokens(scopesToEnsure);
         };
 
@@ -5247,21 +5217,16 @@ if(typeof KJUR=="undefined"||!KJUR){KJUR={}}if(typeof KJUR.jws=="undefined"||!KJ
         var opts = deepExtend(defaultOpts, options);
 
         function init() {
-            return new Promise(function(resolve, reject) {
-                jso = new JsoWrapper(opts);
-                jso.configure();
+            jso = new JsoWrapper(opts);
+            jso.configure();
 
-                // This check has to occurs every time.
-                if (opts.ensureToken) {
-                    if(!jso.getToken()) {
-                        // if there's no token, check if the session with oidc is still active
-                        getTokenOrLogout();
-                        return; // do not reject either, a redirect is expected soon...
-                    }
+            // This check has to occurs every time.
+            if (opts.ensureToken) {
+                if(!jso.getToken()) {
+                    // if there's no token, check if the session with oidc is still active
+                    getTokenOrLogout();
                 }
-                // no redirect, good
-                resolve();
-            });
+            }
         }
 
         function login() {
@@ -5360,16 +5325,11 @@ if(typeof KJUR=="undefined"||!KJUR){KJUR={}}if(typeof KJUR.jws=="undefined"||!KJ
                 }
             },
             setEnsureToken: function(value) {
-                return new Promise(function(resolve, reject) {
-                    var newVal = !!value;
-                    if(opts.ensureToken !== newVal) {
-                        opts.ensureToken = newVal;
-                        resolve(init());
-                    } else if(jso.getToken()) {
-                        resolve(true);
-                    }
-                    // if not changed and no token found: redirect in progress
-                });
+                var newVal = !!value;
+                if(opts.ensureToken !== newVal) {
+                    opts.ensureToken = newVal;
+                    init();
+                }
             },
             isEnsureToken: function() {
                 return opts.ensureToken;

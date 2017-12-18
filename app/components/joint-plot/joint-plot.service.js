@@ -120,12 +120,8 @@
     }
   }
 
-  angular
-    .module('jointPlotModule')
-    .factory('jointService', [
-      'roslib',
-      'simulationInfo',
-      'bbpConfig',
-      (...args) => new JointPlotService(...args)
-    ]);
+  JointPlotService.$$ngIsClass = true;
+  JointPlotService.$inject = ['roslib', 'simulationInfo', 'bbpConfig'];
+
+  angular.module('jointPlotModule').service('jointService', JointPlotService);
 })();

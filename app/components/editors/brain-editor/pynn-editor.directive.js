@@ -114,7 +114,7 @@
 
           scope.$on('$destroy', () => {
             scope.resetListenerUnbindHandler();
-            scope.unbindWatcherResize();
+            scope.unbindWatcherResize && scope.unbindWatcherResize();
             scope.unbindListenerUpdatePanelUI();
             stateService.removeMessageCallback(messageCallbackHandler);
             editorToolbarService.showPynnEditor = false;

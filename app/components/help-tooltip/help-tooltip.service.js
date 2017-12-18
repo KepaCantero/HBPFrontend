@@ -92,11 +92,10 @@
     }
   }
 
+  HelpTooltipService.$$ngIsClass = true;
+  HelpTooltipService.$inject = ['HELP_CODES', 'nrpAnalytics'];
+
   angular
     .module('helpTooltipModule')
-    .service('helpTooltipService', [
-      'HELP_CODES',
-      'nrpAnalytics',
-      (...args) => new HelpTooltipService(...args)
-    ]);
+    .service('helpTooltipService', HelpTooltipService);
 })();

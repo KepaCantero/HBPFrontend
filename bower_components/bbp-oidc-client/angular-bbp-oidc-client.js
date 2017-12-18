@@ -17,25 +17,6 @@
 	 * CryptoJS core components.
 	 */
 	var CryptoJS = CryptoJS || (function (Math, undefined) {
-	    /*
-	     * Local polyfil of Object.create
-	     */
-	    var create = Object.create || (function () {
-	        function F() {};
-
-	        return function (obj) {
-	            var subtype;
-
-	            F.prototype = obj;
-
-	            subtype = new F();
-
-	            F.prototype = null;
-
-	            return subtype;
-	        };
-	    }())
-
 	    /**
 	     * CryptoJS namespace.
 	     */
@@ -50,7 +31,7 @@
 	     * Base object for prototypal inheritance.
 	     */
 	    var Base = C_lib.Base = (function () {
-
+	        function F() {}
 
 	        return {
 	            /**
@@ -73,7 +54,8 @@
 	             */
 	            extend: function (overrides) {
 	                // Spawn
-	                var subtype = create(this);
+	                F.prototype = this;
+	                var subtype = new F();
 
 	                // Augment
 	                if (overrides) {
@@ -81,7 +63,7 @@
 	                }
 
 	                // Create default initializer
-	                if (!subtype.hasOwnProperty('init') || this.init === subtype.init) {
+	                if (!subtype.hasOwnProperty('init')) {
 	                    subtype.init = function () {
 	                        subtype.$super.init.apply(this, arguments);
 	                    };
@@ -1351,45 +1333,34 @@
 	            // Shortcuts
 	            var base64StrLength = base64Str.length;
 	            var map = this._map;
-	            var reverseMap = this._reverseMap;
-
-	            if (!reverseMap) {
-	                    reverseMap = this._reverseMap = [];
-	                    for (var j = 0; j < map.length; j++) {
-	                        reverseMap[map.charCodeAt(j)] = j;
-	                    }
-	            }
 
 	            // Ignore padding
 	            var paddingChar = map.charAt(64);
 	            if (paddingChar) {
 	                var paddingIndex = base64Str.indexOf(paddingChar);
-	                if (paddingIndex !== -1) {
+	                if (paddingIndex != -1) {
 	                    base64StrLength = paddingIndex;
 	                }
 	            }
 
 	            // Convert
-	            return parseLoop(base64Str, base64StrLength, reverseMap);
+	            var words = [];
+	            var nBytes = 0;
+	            for (var i = 0; i < base64StrLength; i++) {
+	                if (i % 4) {
+	                    var bits1 = map.indexOf(base64Str.charAt(i - 1)) << ((i % 4) * 2);
+	                    var bits2 = map.indexOf(base64Str.charAt(i)) >>> (6 - (i % 4) * 2);
+	                    var bitsCombined = bits1 | bits2;
+	                    words[nBytes >>> 2] |= (bitsCombined) << (24 - (nBytes % 4) * 8);
+	                    nBytes++;
+	                }
+	            }
 
+	            return WordArray.create(words, nBytes);
 	        },
 
 	        _map: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/='
 	    };
-
-	    function parseLoop(base64Str, base64StrLength, reverseMap) {
-	      var words = [];
-	      var nBytes = 0;
-	      for (var i = 0; i < base64StrLength; i++) {
-	          if (i % 4) {
-	              var bits1 = reverseMap[base64Str.charCodeAt(i - 1)] << ((i % 4) * 2);
-	              var bits2 = reverseMap[base64Str.charCodeAt(i)] >>> (6 - (i % 4) * 2);
-	              words[nBytes >>> 2] |= (bits1 | bits2) << (24 - (nBytes % 4) * 8);
-	              nBytes++;
-	          }
-	      }
-	      return WordArray.create(words, nBytes);
-	    }
 	}());
 
 
@@ -2135,7 +2106,7 @@ function oaep_pad(s, n, hash)
     var DB = rstr_sha1('') + PS + '\x01' + s;
     var seed = new Array(SHA1_SIZE);
     new SecureRandom().nextBytes(seed);
-
+    
     var dbMask = oaep_mgf1_arr(seed, DB.length, hash || rstr_sha1);
     var maskedDB = [];
 
@@ -2170,7 +2141,7 @@ function RSAKey() {
 // Set the public key fields N and e from hex strings
 function RSASetPublic(N,E) {
   this.isPublic = true;
-  if (typeof N !== "string")
+  if (typeof N !== "string") 
   {
     this.n = N;
     this.e = E;
@@ -2237,7 +2208,7 @@ RSAKey.prototype.type = "RSA";
  * This software is licensed under the terms of the MIT License.
  * http://kjur.github.com/jsrsasign/license/
  *
- * The above copyright and license notice shall be
+ * The above copyright and license notice shall be 
  * included in all copies or substantial portions of the Software.
  */
 
@@ -2348,7 +2319,7 @@ function pss_mgf1_str(seed, len, hash) {
  * @return returns hexadecimal string of signature value.
  */
 function _rsasign_signStringPSS(s, hashAlg, sLen) {
-    var hashFunc = function(sHex) { return KJUR.crypto.Util.hashHex(sHex, hashAlg); }
+    var hashFunc = function(sHex) { return KJUR.crypto.Util.hashHex(sHex, hashAlg); } 
     var hHash = hashFunc(rstrtohex(s));
 
     if (sLen === undefined) sLen = -1;
@@ -2379,7 +2350,7 @@ function _rsasign_signWithMessageHashPSS(hHash, hashAlg, sLen) {
     var emBits = this.n.bitLength() - 1;
     var emLen = Math.ceil(emBits / 8);
     var i;
-    var hashFunc = function(sHex) { return KJUR.crypto.Util.hashHex(sHex, hashAlg); }
+    var hashFunc = function(sHex) { return KJUR.crypto.Util.hashHex(sHex, hashAlg); } 
 
     if (sLen === -1 || sLen === undefined) {
         sLen = hLen; // same as hash length
@@ -2495,7 +2466,7 @@ function _rsasign_verifyString(sMsg, hSig) {
     var biDecryptedSig = this.doPublic(biSig);
     var hDigestInfo = biDecryptedSig.toString(16).replace(/^1f+00/, '');
     var digestInfoAry = _rsasign_getAlgNameAndHashFromHexDisgestInfo(hDigestInfo);
-
+  
     if (digestInfoAry.length == 0) return false;
     var algName = digestInfoAry[0];
     var diHashValue = digestInfoAry[1];
@@ -2523,7 +2494,7 @@ function _rsasign_verifyWithMessageHash(sHashHex, hSig) {
     var biDecryptedSig = this.doPublic(biSig);
     var hDigestInfo = biDecryptedSig.toString(16).replace(/^1f+00/, '');
     var digestInfoAry = _rsasign_getAlgNameAndHashFromHexDisgestInfo(hDigestInfo);
-
+  
     if (digestInfoAry.length == 0) return false;
     var algName = digestInfoAry[0];
     var diHashValue = digestInfoAry[1];
@@ -2692,7 +2663,7 @@ RSAKey.SALT_LEN_RECOVER = -2;
  * This software is licensed under the terms of the MIT License.
  * http://kjur.github.com/jsrsasign/license
  *
- * The above copyright and license notice shall be
+ * The above copyright and license notice shall be 
  * included in all copies or substantial portions of the Software.
  */
 
@@ -2705,7 +2676,7 @@ RSAKey.SALT_LEN_RECOVER = -2;
  * @license <a href="http://kjur.github.io/jsrsasign/license/">MIT License</a>
  */
 
-/**
+/** 
  * kjur's class library name space
  * @name KJUR
  * @namespace kjur's class library name space
@@ -2965,7 +2936,7 @@ KJUR.crypto.Util = new function() {
      * @since 1.1.2
      */
     this.getCryptoJSMDByName = function(s) {
-
+	
     };
 };
 
@@ -3162,7 +3133,7 @@ KJUR.crypto.MessageDigest = function(params) {
 };
 
 /**
- * Mac(Message Authentication Code) class which is very similar to java.security.Mac class
+ * Mac(Message Authentication Code) class which is very similar to java.security.Mac class 
  * @name KJUR.crypto.Mac
  * @class Mac class which is very similar to java.security.Mac class
  * @param {Array} params parameters for constructor
@@ -3292,7 +3263,7 @@ KJUR.crypto.Mac = function(params) {
     };
 
     /**
-     * performs final update on the digest using hexadecimal string,
+     * performs final update on the digest using hexadecimal string, 
      * then completes the digest computation
      * @name doFinalHex
      * @memberOf KJUR.crypto.Mac
@@ -3380,7 +3351,7 @@ KJUR.crypto.Mac = function(params) {
  * sig2.init(certPEM);
  * sig.updateString('aaa');
  * var isValid = sig2.verify(hSigVal);
- *
+ * 
  * // ECDSA signing
  * var sig = new KJUR.crypto.Signature({'alg':'SHA1withECDSA'});
  * sig.init(prvKeyPEM);
@@ -3551,7 +3522,7 @@ KJUR.crypto.Signature = function(params) {
 		    var ec = new KJUR.crypto.ECDSA({curve: this.eccurvename});
 		    return ec.verifyHex(this.sHashHex, hSigVal, this.ecpubhex);
 		} else if (this.pubkeyAlgName == "rsaandmgf1") {
-		    return this.pubKey.verifyWithMessageHashPSS(this.sHashHex, hSigVal,
+		    return this.pubKey.verifyWithMessageHashPSS(this.sHashHex, hSigVal, 
 								this.mdAlgName,
 								this.pssSaltLen);
 		} else if (this.pubkeyAlgName == "rsa") {
@@ -3831,7 +3802,7 @@ KJUR.crypto.OID = new function() {
  * This software is licensed under the terms of the MIT License.
  * http://kjur.github.com/jsjws/license/
  *
- * The above copyright and license notice shall be
+ * The above copyright and license notice shall be 
  * included in all copies or substantial portions of the Software.
  *
  * DEPENDS ON:
@@ -3854,7 +3825,7 @@ KJUR.crypto.OID = new function() {
  * </ul>
  * All functions in 'base64x.js' are defined in {@link _global_} and not
  * in this class.
- *
+ * 
  * @class Base64URL and supplementary functions for Tom Wu's base64.js library
  * @author Kenji Urushima
  * @version 1.1 (07 May 2012)
@@ -3869,7 +3840,7 @@ function Base64x() {
 /**
  * convert a string to an array of character codes
  * @param {String} s
- * @return {Array of Numbers}
+ * @return {Array of Numbers} 
  */
 function stoBA(s) {
     var a = new Array();
@@ -4140,7 +4111,7 @@ function b64nltohex(s) {
     var b64 = s.replace(/[^0-9A-Za-z\/+=]*/g, '');
     var hex = b64tohex(b64);
     return hex;
-}
+} 
 
 // ==== URIComponent / hex ================================
 /**
@@ -4168,7 +4139,7 @@ function hextouricmp(s) {
  * convert UTFa hexadecimal string to a URLComponent string such like "%67%68".<br/>
  * Note that these "<code>0-9A-Za-z!'()*-._~</code>" characters will not
  * converted to "%xx" format by builtin 'encodeURIComponent()' function.
- * However this 'encodeURIComponentAll()' function will convert
+ * However this 'encodeURIComponentAll()' function will convert 
  * all of characters into "%xx" format.
  * @param {String} s hexadecimal string
  * @return {String} URIComponent string such like "%67%68"
@@ -4190,9 +4161,9 @@ function encodeURIComponentAll(u8) {
 
 // ==== new lines ================================
 /**
- * convert all DOS new line("\r\n") to UNIX new line("\n") in
+ * convert all DOS new line("\r\n") to UNIX new line("\n") in 
  * a String "s".
- * @param {String} s string
+ * @param {String} s string 
  * @return {String} converted string
  */
 function newline_toUnix(s) {
@@ -4201,9 +4172,9 @@ function newline_toUnix(s) {
 }
 
 /**
- * convert all UNIX new line("\r\n") to DOS new line("\n") in
+ * convert all UNIX new line("\r\n") to DOS new line("\n") in 
  * a String "s".
- * @param {String} s string
+ * @param {String} s string 
  * @return {String} converted string
  */
 function newline_toDos(s) {
@@ -4675,7 +4646,7 @@ if(typeof KJUR=="undefined"||!KJUR){KJUR={}}if(typeof KJUR.jws=="undefined"||!KJ
 		return tokens;
 	};
 	Api_default_storage.prototype.wipeTokens = function(provider) {
-		//localStorage.removeItem("tokens-" + provider);
+		localStorage.removeItem("tokens-" + provider);
 	};
 	/*
 	 * Save a single token for a provider.
@@ -5144,7 +5115,7 @@ if(typeof KJUR=="undefined"||!KJUR){KJUR={}}if(typeof KJUR.jws=="undefined"||!KJ
 
 })(window, window.jQuery);
 
-/* global Promise, jso_configure, jso_ensureTokens, jso_getToken, jso_wipe */
+/* global jso_configure, jso_ensureTokens, jso_getToken, jso_wipe */
 (function(exp){
     'use strict';
 
@@ -5193,7 +5164,6 @@ if(typeof KJUR=="undefined"||!KJUR){KJUR={}}if(typeof KJUR.jws=="undefined"||!KJ
         this.ensureTokens = function() {
             var scopesToEnsure = {};
             scopesToEnsure[provider] = scopes;
-            // returns true when a token is found, triggers the redirect otherwise
             return jso_ensureTokens(scopesToEnsure);
         };
 
@@ -5247,21 +5217,16 @@ if(typeof KJUR=="undefined"||!KJUR){KJUR={}}if(typeof KJUR.jws=="undefined"||!KJ
         var opts = deepExtend(defaultOpts, options);
 
         function init() {
-            return new Promise(function(resolve, reject) {
-                jso = new JsoWrapper(opts);
-                jso.configure();
+            jso = new JsoWrapper(opts);
+            jso.configure();
 
-                // This check has to occurs every time.
-                if (opts.ensureToken) {
-                    if(!jso.getToken()) {
-                        // if there's no token, check if the session with oidc is still active
-                        getTokenOrLogout();
-                        return; // do not reject either, a redirect is expected soon...
-                    }
+            // This check has to occurs every time.
+            if (opts.ensureToken) {
+                if(!jso.getToken()) {
+                    // if there's no token, check if the session with oidc is still active
+                    getTokenOrLogout();
                 }
-                // no redirect, good
-                resolve();
-            });
+            }
         }
 
         function login() {
@@ -5360,16 +5325,11 @@ if(typeof KJUR=="undefined"||!KJUR){KJUR={}}if(typeof KJUR.jws=="undefined"||!KJ
                 }
             },
             setEnsureToken: function(value) {
-                return new Promise(function(resolve, reject) {
-                    var newVal = !!value;
-                    if(opts.ensureToken !== newVal) {
-                        opts.ensureToken = newVal;
-                        resolve(init());
-                    } else if(jso.getToken()) {
-                        resolve(true);
-                    }
-                    // if not changed and no token found: redirect in progress
-                });
+                var newVal = !!value;
+                if(opts.ensureToken !== newVal) {
+                    opts.ensureToken = newVal;
+                    init();
+                }
             },
             isEnsureToken: function() {
                 return opts.ensureToken;
@@ -5420,7 +5380,7 @@ if(typeof KJUR=="undefined"||!KJUR){KJUR={}}if(typeof KJUR.jws=="undefined"||!KJ
             };
 
             this.ensureToken = function(value) {
-                return client.setEnsureToken(!!value);
+                client.setEnsureToken(!!value);
             };
 
             this.logout = function($q) {
@@ -5435,8 +5395,7 @@ if(typeof KJUR=="undefined"||!KJUR){KJUR={}}if(typeof KJUR.jws=="undefined"||!KJ
                     logout: this.logout($q),
                     token: client.getToken,
                     alwaysPromptLogin: this.alwaysPromptLogin,
-                    ensureToken: this.ensureToken,
-                    wipeToken: client.wipeToken
+                    ensureToken: this.ensureToken
                 };
             }];
         })
@@ -5472,56 +5431,3 @@ if(typeof KJUR=="undefined"||!KJUR){KJUR={}}if(typeof KJUR.jws=="undefined"||!KJ
             };
         }]);
 }());
-
-angular.module('bbpOidcClient')
-.directive('hbpOidcSessionWatcher',
-  ['$window', '$sce', '$rootScope', 'bbpConfig', 'bbpOidcSession',
-  function($window, $sce, $rootScope, bbpConfig, bbpOidcSession) {
-  'use strict';
-
-  return {
-    restrict: 'E',
-    template: '<iframe id="hbp_oidc_frame" ng-src="{{oidcSessionPage}}" width="1" height="1" style="display: none"></iframe>',
-    link: function(scope, element) {
-      var sessionPageUrl = bbpConfig.get('auth.url') + '/session-page';
-      scope.oidcSessionPage = $sce.trustAsResourceUrl(sessionPageUrl);
-
-      $rootScope.$on('$stateChangeStart', function(evt) {
-        var token = bbpOidcSession.token();
-        if(token) {
-          validateToken(token);
-        }
-      });
-
-      /**
-       * it sends a message to the oidc iframe with the current token to validate
-       * against the current OIDC session.
-       */
-      function validateToken(token) {
-        var msg = JSON.stringify({
-          token: token
-        });
-        var iframe = element[0].querySelector('#hbp_oidc_frame');
-        $(iframe).on('load', function() {
-          iframe.contentWindow.postMessage(msg, '*');
-        });
-      }
-
-      /**
-       * waits for reply from oidc iframe.
-       * The oidc ifram returns a boolean telling if the logged in user
-       * is the same of the one linked to the token.
-       */
-      function receiveMessage(event) {
-        if(event.origin.match(/^https:\/\/services(-dev)?.humanbrainproject.eu$/)) {
-          if(event.data === false) {
-            bbpOidcSession.wipeToken();
-            $window.location.reload(true);
-          }
-        }
-      }
-
-      $window.addEventListener('message', receiveMessage, false);
-    }
-  };
-}]);

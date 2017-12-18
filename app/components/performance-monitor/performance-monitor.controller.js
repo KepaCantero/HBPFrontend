@@ -41,13 +41,15 @@
     }
   }
 
+  PerformanceMonitorController.$$ngIsClass = true;
+  PerformanceMonitorController.$inject = [
+    '$element',
+    '$scope',
+    'performanceMonitorService',
+    'editorToolbarService'
+  ];
+
   angular
     .module('performanceMonitorModule', [])
-    .controller('PerformanceMonitorController', [
-      '$element',
-      '$scope',
-      'performanceMonitorService',
-      'editorToolbarService',
-      (...args) => new PerformanceMonitorController(...args)
-    ]);
+    .controller('PerformanceMonitorController', PerformanceMonitorController);
 })();

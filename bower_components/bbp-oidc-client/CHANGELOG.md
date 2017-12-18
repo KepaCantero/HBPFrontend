@@ -1,37 +1,10 @@
 <a name"0.0.0"></a>
-## 0.0.0 (2017-01-05)
+## 0.0.0 (2016-04-20)
 
 
 #### Bug Fixes
 
-* **session:** validate token on StateChange (https://bbpteam.epfl.ch/reps/gerrit/platform/JSLibOidcClient.git/commit/?id=4dfc24a2e19fd65686aea2ba1dbc018607b4c240)
-
-
-<a name"0.0.0"></a>
-## 0.0.0 (2017-01-05)
-
-
-#### Features
-
-* **session:** directive to check oidc session (https://bbpteam.epfl.ch/reps/gerrit/platform/JSLibOidcClient.git/commit/?id=c540faffe3e48a90883f046b06f617386ea78f35)
-
-
-<a name"0.0.0"></a>
-## 0.0.0 (2016-04-19)
-
-
-#### Bug Fixes
-
-* **logout:** logout issue in firefox (https://bbpteam.epfl.ch/reps/gerrit/platform/JSLibOidcClient.git/commit/?id=eae0b7f5200567869fb742513b89fb97d43b2b78)
-
-
-<a name"0.0.0"></a>
-## 0.0.0 (2016-04-15)
-
-
-#### Features
-
-* **promise:** ensureToken return a promise (https://bbpteam.epfl.ch/reps/gerrit/platform/JSLibOidcClient.git/commit/?id=6a45644c93620fb1862a15aa3442a1e1d26d0bb6)
+* **logout:** logout issue in firefox (https://bbpteam.epfl.ch/reps/gerrit/platform/JSLibOidcClient.git/commit/?id=a4e5b1fb997738f228bf85cd84b070c131f3e618)
 
 
 <a name"0.0.0"></a>

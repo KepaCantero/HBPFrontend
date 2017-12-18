@@ -82,16 +82,22 @@
       $timeout(scope.process, nextTimeToCheck);
     }
   }
+
+  DemoAutorunExperimentController.$$ngIsClass = true;
+  DemoAutorunExperimentController.$inject = [
+    '$scope',
+    '$timeout',
+    '$window',
+    '$location',
+    'experimentsFactory',
+    'environmentService',
+    'STATE'
+  ];
+
   angular
     .module('exdFrontendApp')
-    .controller('DemoAutorunExperimentController', [
-      '$scope',
-      '$timeout',
-      '$window',
-      '$location',
-      'experimentsFactory',
-      'environmentService',
-      'STATE',
-      (...args) => new DemoAutorunExperimentController(...args)
-    ]);
+    .controller(
+      'DemoAutorunExperimentController',
+      DemoAutorunExperimentController
+    );
 })();
