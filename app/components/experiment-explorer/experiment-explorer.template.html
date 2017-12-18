@@ -52,7 +52,7 @@
             <i class="fa" ng-class="vm.selectedExperiment.uuid == exp.uuid?'fa-folder-open-o':'fa-folder-o'"></i>
             <span class="experiment-label">{{exp.name}}</span>
             <span class="delete-exp-button" ng-click="!vm.experimentList.deleting && vm.deleteExperiment(exp)">
-              <i ng-if="!vm.experimentList.deleting" disable-animate class="fa fa-remove" style="color:#e84539" title="Delete Experiment"></i>
+              <i ng-if="!vm.experimentList.deleting" disable-animate class="fa fa-remove" style="color:#e84539" title="Delete"></i>
               <i ng-if="vm.experimentList.deleting" disable-animate class="fa fa-spinner fa-spin fa-1x fa-fw" title="Deleting..."></i>
             </span>
           </div>
