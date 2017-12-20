@@ -135,9 +135,9 @@
           // * brain reset
           // * simulation reset
           // * env poses reset
-          scope.refresh = function() {
+          scope.refresh = function(forceRefresh = false) {
             refreshEditor();
-            if (scope.collabDirty) return;
+            if (!forceRefresh && scope.collabDirty) return;
             scope.loading = true;
             backendInterfaceService.getBrain(function(response) {
               scope.loading = false;
@@ -330,7 +330,7 @@
                   result.data.error_line === -1 &&
                   result.data.error_column === -1
                 ) {
-                  scope.refresh();
+                  scope.refresh(true);
                   clbErrorDialog.open({
                     type: 'Impossible to delete population',
                     message:
