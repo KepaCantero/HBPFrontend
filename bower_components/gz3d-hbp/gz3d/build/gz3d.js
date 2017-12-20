@@ -5191,6 +5191,48 @@ GZ3D.GZIface.prototype.onConnected = function()
     messageType : 'scene',
   });
 
+
+  var isChildModel = function(modelList,name, firstlevel =true)
+  {
+    for(var i=0;i<modelList.length;i++)
+    {
+        var model = modelList[i];
+        if (!firstlevel)
+        {
+          if (name===model.name)
+          {
+            return true;
+          }
+        }
+
+        var isChild = isChildModel(model.model, name,false);
+        if (isChild)
+        {
+          return true;
+        }
+    }
+
+    return false;
+  };
+
+  var createModelHierarchy = function(gzface, parentObject, model)
+  {
+    var modelObj = gzface.createModelFromMsg(model);
+    if (modelObj)
+    {
+      parentObject.add(modelObj);
+      gzface.scene.applyComposerSettingsToModel(modelObj);
+      gzface.gui.setModelStats(model, 'update');
+
+      for(var i=0;i<model.model.length;i++)
+      {
+          createModelHierarchy(gzface, modelObj,model.model[i] );
+      }
+    }
+
+    return modelObj;
+  };
+
   var sceneUpdate = function(message)
   {
     if (message.name)
@@ -5231,12 +5273,21 @@ GZ3D.GZIface.prototype.onConnected = function()
       this.gui.setLightStats(light, 'update');
     }
 
-    for (var j = 0; j < message.model.length; ++j)
+    var j, model;
+    var hierachyOnlyModels = [];
+
+    for (j = 0; j < message.model.length; ++j)
     {
-      var model = message.model[j];
-      var modelObj = this.createModelFromMsg(model);
-      this.scene.add(modelObj);
-      this.gui.setModelStats(model, 'update');
+      model = message.model[j];
+      if (!isChildModel(message.model,model.name))
+      {
+        hierachyOnlyModels.push(model);
+      }
+    }
+
+    for (j = 0; j < hierachyOnlyModels.length; ++j)
+    {
+      createModelHierarchy(this, this.scene, hierachyOnlyModels[j]);
     }
 
     GZ3D.assetProgressData.prepared = true;
@@ -5270,14 +5321,32 @@ GZ3D.GZIface.prototype.onConnected = function()
     messageType : 'pose',
   });
 
+
   var poseUpdate = function(message)
   {
-    var entity = this.scene.getByName(message.name);
-    if (entity && entity !== this.scene.modelManipulator.object
-        && entity.parent !== this.scene.modelManipulator.object)
+    var poseApplyUpdate = function(scope, message)
     {
-      this.scene.updatePose(entity, message.position, message.orientation);
-      this.gui.setModelStats(message, 'update');
+      var entity = scope.scene.getByName(message.name);
+      if (entity && entity !== scope.scene.modelManipulator.object
+          && entity.parent !== scope.scene.modelManipulator.object)
+      {
+        scope.scene.updatePose(entity, message.position, message.orientation);
+        scope.gui.setModelStats(message, 'update');
+      }
+    };
+
+    if (message.name)
+    {
+      poseApplyUpdate(this,message);
+    }
+    else
+    {
+      var keys = Object.keys(message);
+
+      for (var i=0;i<keys.length; i++)
+      {
+        poseApplyUpdate(this,message[keys[i]]);
+      }
     }
   };
 
@@ -5368,11 +5437,9 @@ GZ3D.GZIface.prototype.onConnected = function()
   {
     if (!this.scene.getByName(message.name))
     {
-      var modelObj = this.createModelFromMsg(message);
+      var modelObj = createModelHierarchy(this, this.scene, message);
       if (modelObj)
       {
-        this.scene.add(modelObj);
-        this.scene.applyComposerSettingsToModel(modelObj);
         guiEvents.emit('notification_popup', message.name+' inserted');
       }
 
@@ -5957,7 +6024,7 @@ GZ3D.GZIface.prototype.createModelFromMsg = function(model)
     }
     modelObj.add(linkObj);
 
-    // only load individual link visuals if they are not replaced by an animated model
+    // only load individual link visuals if they are not replaced by an createVisualFromMsganimated model
     if (animatedModel === null)
     {
       for (var k = 0; k < link.visual.length; ++k)
@@ -5987,7 +6054,7 @@ GZ3D.GZIface.prototype.createModelFromMsg = function(model)
     for (var i = 0; i < link.sensor.length; ++i) {
       var sensor = link.sensor[i];
 
-      var sensorObj = this.createSensorFromMsg(sensor);
+      var sensorObj = this.createSensorFromMsg(sensor,link.name);
       if (sensorObj && !sensorObj.parent)
       {
         linkObj.add(sensorObj);
@@ -6142,7 +6209,7 @@ GZ3D.GZIface.prototype.createRoadsFromMsg = function(roads)
   return roadObj;
 };
 
-GZ3D.GZIface.prototype.createSensorFromMsg = function(sensor)
+GZ3D.GZIface.prototype.createSensorFromMsg = function(sensor,modelName)
 {
   var sensorObj = new THREE.Object3D();
   sensorObj.name = sensor.name;
@@ -6195,7 +6262,7 @@ GZ3D.GZIface.prototype.createSensorFromMsg = function(sensor)
     };
 
     var viewManager = this.scene.viewManager;
-    var viewName = 'view_' + sensor.name;
+    var viewName = modelName +' (' + sensor.name+')';
     var view = viewManager.createView(viewName, cameraParams);
     if (!view) {
       console.error('GZ3D.GZIface.createSensorFromMsg() - failed to create view ' + viewName);
@@ -6227,6 +6294,7 @@ GZ3D.GZIface.prototype.createGeom = function(geom, material, parent, modelScale)
   var uriPath = GZ3D.assetsPath;
   var that = this;
   var mat = this.parseMaterial(material);
+  var defaultMat = {diffuse:[0.7,0.7,0.7], flatShading: THREE.SmoothShading};
 
   //geometries' sizes in scene messages are scaled, must un-scale them first
   //cfr. physics::Link::UpdateVisualGeomSDF
@@ -6234,22 +6302,26 @@ GZ3D.GZIface.prototype.createGeom = function(geom, material, parent, modelScale)
   {
     var unScaledSize = (new THREE.Vector3().copy(geom.box.size)).divide(modelScale);
     obj = this.scene.createBox(unScaledSize.x, unScaledSize.y, unScaledSize.z);
+    if (!mat) {mat = defaultMat;}
   }
   else if (geom.cylinder)
   {
     var unscaledRadiusCylinder = geom.cylinder.radius / Math.max(modelScale.x, modelScale.y);
     var unScaledLength = geom.cylinder.length / modelScale.z;
     obj = this.scene.createCylinder(unscaledRadiusCylinder, unScaledLength);
+    if (!mat) {mat = defaultMat;}
   }
   else if (geom.sphere)
   {
     var unscaledRadiusSphere = geom.sphere.radius / Math.max(modelScale.x, modelScale.y, modelScale.z);
     obj = this.scene.createSphere(unscaledRadiusSphere);
+    if (!mat) {mat = defaultMat;}
   }
   else if (geom.plane)
   {
     obj = this.scene.createPlane(geom.plane.normal.x, geom.plane.normal.y,
-        geom.plane.normal.z, geom.plane.size.x, geom.plane.size.y);
+    geom.plane.normal.z, geom.plane.size.x, geom.plane.size.y);
+    if (!mat) {mat = defaultMat;}
   }
   else if (geom.mesh)
   {
@@ -6542,6 +6614,12 @@ GZ3D.GZIface.prototype.parseMaterial = function(material)
   var scale;
   var mat;
 
+  function setMatRGB(dest, src)
+  {
+    if (src)  {return [src.r, src.g, src.b, src.a ];}
+    if (dest) {return dest;}
+  }
+
   // get texture from material script
   var script  = material.script;
   if (script)
@@ -6553,10 +6631,32 @@ GZ3D.GZIface.prototype.parseMaterial = function(material)
         mat = this.material[script.name];
         if (mat)
         {
-          ambient = mat['ambient'];
-          diffuse = mat['diffuse'];
-          emissive = mat['emissive'];
-          specular = mat['specular'];
+          ambient = setMatRGB(mat['ambient'],material['ambient']);
+          diffuse = setMatRGB(mat['diffuse'],material['diffuse']);
+          emissive = setMatRGB(mat['emissive'],material['emissive']);
+          specular = setMatRGB(mat['specular'],material['specular']);
+
+          if (ambient)
+          {
+            var maxVal = Math.max(Math.max(ambient[0],ambient[1]),ambient[2]) ;
+            if (maxVal)
+            {
+              // ThreeJS does not support ambient in material - apply the ambient only if it has a color
+              var color = [ambient[0]/maxVal,ambient[1]/maxVal,ambient[2]/maxVal,1.0];
+
+              if (diffuse)
+              {
+                diffuse[0] *= color[0];
+                diffuse[1] *= color[1];
+                diffuse[2] *= color[2];
+              }
+              else
+              {
+                diffuse = color;
+              }
+            }
+          }
+
           opacity = mat['opacity'];
           scale = mat['scale'];
 
