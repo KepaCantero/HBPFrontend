@@ -74,7 +74,7 @@
       var saveSettings = function() {
         simulationConfigService.saveConfigFile(
           '3d-settings',
-          JSON.stringify(gz3d.scene.composerSettings)
+          JSON.stringify(gz3d.scene.composerSettings, null, 2)
         );
       };
 
