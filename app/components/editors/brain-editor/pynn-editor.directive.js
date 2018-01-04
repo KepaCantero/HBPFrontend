@@ -408,6 +408,7 @@
           scope.deletePopulation = function(index) {
             scope.populations.splice(index, 1);
             scope.updateRegexPatterns();
+            scope.apply(0);
           };
 
           scope.onPynnChange = function() {
