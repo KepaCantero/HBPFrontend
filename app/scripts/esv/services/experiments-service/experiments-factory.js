@@ -101,6 +101,7 @@
             else
               return new TemplateExperimentsService(
                 experimentProxyService,
+                $q,
                 ...baseDependecies
               );
           }

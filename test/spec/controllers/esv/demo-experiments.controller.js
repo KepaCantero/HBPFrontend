@@ -181,6 +181,9 @@
       environmentService.setPrivateExperiment(pageOptions.collab);
 
       $httpBackend
+        .whenGET(new RegExp(proxyUrl + '/availableServers'))
+        .respond(200, [hostName]);
+      $httpBackend
         .whenGET(new RegExp(proxyUrl + '/experiments'))
         .respond(200, pageOptions.experiments);
       $httpBackend
