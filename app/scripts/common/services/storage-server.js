@@ -135,6 +135,12 @@
           getMaintenanceMode: buildAction({
             method: 'GET',
             url: `${this.PROXY_URL}/maintenancemode`
+          }),
+          setCustomModel: buildAction({
+            method: 'POST',
+            headers: { 'Content-Type': 'application/octet-stream' },
+            url: `${this.STORAGE_BASE_URL}/custommodels/:modelType/:modelName`,
+            transformRequest: []
           })
         }
       );
@@ -142,6 +148,11 @@
 
     getCustomModels(modelType) {
       return this.proxyRsc.getCustomModels({ modelType }).$promise;
+    }
+
+    setCustomModel(modelName, modelType, fileContent) {
+      return this.proxyRsc.setCustomModel({ modelName, modelType }, fileContent)
+        .$promise;
     }
 
     getExperiments(filter) {

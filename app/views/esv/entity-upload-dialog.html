@@ -11,7 +11,7 @@
         <!-- button group div -->
         <!-- Public env library button -->
         <button class="btn btn-block" tooltip-trigger="mouseenter" ng-click="uploadEntity('PublicEnv')" ng-disabled="pageState.startingExperiment == true">
-                  From the Public Libraries
+                  From the template models library
             </button>
         <br>
         <!--Private Library button -->
@@ -20,8 +20,8 @@
             </button>
         <br>
         <!-- Local environment , i.e. file system button -->
-        <button class="btn btn-block" tooltip-trigger="mouseenter" ng-click="uploadEntity('LocalEnv')" ng-disabled="true || pageState.startingExperiment == true">
-                  From your local environment
+        <button class="btn btn-block" tooltip-trigger="mouseenter" ng-click="uploadFileClick(entityName)" ng-disabled="pageState.startingExperiment == true">
+                  Upload from your computer
             </button>
         <br>
         <br>

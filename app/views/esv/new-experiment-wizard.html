@@ -13,7 +13,7 @@
                 </div>
             </div>
             <!-- description div -->
-            <div>Here you can create a new experiment. You can upload your own custom environment, robot, and brain.</div>
+            <div>Here you can create a new experiment from scratch. Choose your own custom environment, robot, and brain.</div>
             <br>
             <!-- when clicked div -->
             <div class="list-entry-buttons list-entry-container center" ng-if="pageState.selected == newExperiment">
@@ -35,14 +35,20 @@
                                 <i ng-style="{'color':brainUploaded? 'darkseagreen': ''}" ng-class="{true: 'fa fa-check', false:'fa fa-upload'}[brainUploaded]"></i> Choose Brain
                                 </button>
                                 <br>
-                                <br>
+                                <br>                            
                                 <!-- clone button -->
                                 <div align="center">
                                      <div uib-collapse="!isCloneRequested">
                                          <div class="list-entry-container center">
                                             <i class="fa fa-spinner fa-spin"></i>&nbsp;
-                                            <i>Copying files to the storage.This might take some minutes, so please be patient...</i>
+                                            <i>Copying files to the storage.This might take some time, so please be patient...</i>
                                          </div>
+                                    </div>
+                                    <div uib-collapse="!uploadingModel">
+                                            <div class="list-entry-container center">
+                                                <i class="fa fa-spinner fa-spin"></i>&nbsp;
+                                                <i>Uploading model to the storage.This might take some time, so please be patient...</i>
+                                            </div>
                                     </div>
                                     <button analytics-on analytics-event="CloneNewExperiment" ng-if="pageState.selected == newExperiment" ng-disabled="!brainUploaded || !environmentUploaded || !robotUploaded"
                                         class="btn btn-default enable-tooltip" tooltip-trigger="mouseenter" tooltip-placement="top" ng-click="cloneNewExperiment('newExperiment')">
