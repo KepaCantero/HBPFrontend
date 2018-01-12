@@ -64,7 +64,7 @@
 
       stateService.Initialize();
 
-      applyForceService.initialize(); // stupid call to avoid "not being used jshint"
+      //applyForceService.initialize(); // stupid call to avoid "not being used jshint"
 
       // Query the state of the simulation
       stateService.getCurrentState().then(function() {
@@ -165,6 +165,7 @@
         };
 
         contextMenuState.pushItemGroup(colorableMenuItemGroup);
+        contextMenuState.pushItemGroup(applyForceService.contextMenuItem);
 
         //main context menu handler
         scope.onContainerMouseDown = function(event) {

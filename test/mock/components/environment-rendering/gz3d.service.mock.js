@@ -28,9 +28,7 @@
         renderer: {
           domElement: {}
         },
-        camera: {
-          position: new THREE.Vector3()
-        }
+        camera: new THREE.PerspectiveCamera()
       },
       {
         type: 'camera',
@@ -39,9 +37,7 @@
         renderer: {
           domElement: {}
         },
-        camera: {
-          position: new THREE.Vector3()
-        }
+        camera: new THREE.PerspectiveCamera()
       }
     ];
 

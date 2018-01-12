@@ -95,8 +95,8 @@
      * @param message is a string that includes the message
      * @param type is a LOG_TYPE that represents the location where the message is displayed
      */
-    logMessage(message, type = this.LOG_TYPE.INFO) {
-      this.subject.next({ level: type, message: message });
+    logMessage(message, type = this.LOG_TYPE.INFO, duration = 2000 /*2s*/) {
+      this.subject.next({ level: type, message: message, duration: duration });
     }
 
     /**

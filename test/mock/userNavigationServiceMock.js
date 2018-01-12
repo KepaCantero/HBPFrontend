@@ -28,6 +28,9 @@
           copy: jasmine.createSpy('copyRotation')
         }
       };
+      this.controls = {
+        enabled: false
+      };
       this.lookatRobotControls = {
         setLookatTarget: jasmine.createSpy('setLookatTarget'),
         setDistance: jasmine.createSpy('setDistance')
