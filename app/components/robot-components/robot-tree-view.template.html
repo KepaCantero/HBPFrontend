@@ -1,0 +1,11 @@
+<link rel="stylesheet" type="text/css" href="bower_components/angular-tree-control/css/tree-control.css">
+<!-- build:css(.tmp) components/robot-components/robot-tree-view.style.css -->
+<link rel="stylesheet" type="text/css" href="components/robot-components/robot-tree-view.style.css">
+<!-- endbuild -->
+
+<div class="robot-tree-wrapper">
+  <treecontrol class="tree-light" tree-model="treeData" options="treeOptions"
+               filter-expression="filterThreeJSTree" on-selection="showSelected(node)">
+    {{node.name}}
+  </treecontrol>
+</div>

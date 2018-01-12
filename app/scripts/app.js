@@ -100,7 +100,8 @@
       'userInteractionModule',
       'robotDocumentation',
       'adminModule',
-      'modal'
+      'modal',
+      'robotComponentsModule'
     ])
     // Routes
     .config([

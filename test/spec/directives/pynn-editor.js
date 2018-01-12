@@ -533,7 +533,7 @@ describe('Directive: pynnEditor', function() {
       setTimeout(function() {
         expect(isolateScope.pynnScript.code).toBe(newPynnScript);
         done();
-      });
+      }, 100);
     });
   });
 });

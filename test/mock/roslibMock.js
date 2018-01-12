@@ -6,6 +6,8 @@
       this.getOrCreateConnectionTo = jasmine.createSpy(
         'getOrCreateConnectionTo'
       );
+      this.Service = jasmine.createSpy('Service');
+      this.ServiceRequest = jasmine.createSpy('ServiceRequest');
     }
   ]);
 })();
