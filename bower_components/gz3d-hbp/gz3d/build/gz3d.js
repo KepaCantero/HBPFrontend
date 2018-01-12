@@ -6003,6 +6003,25 @@ var getShapeName = function(object3D) {
 
 };
 
+GZ3D.GZIface.prototype.loadCollisionVisuals = function(object)
+{
+  if (object._pendingCollisionVisuals)
+  {
+    for(var i=0;i<object._pendingCollisionVisuals.length; i++)
+    {
+      var collDef = object._pendingCollisionVisuals[i];
+
+      var collisionVisualObj = this.createVisualFromMsg(collDef.collisionVisual, collDef.modelScale);
+      if (collisionVisualObj && !collisionVisualObj.parent)
+      {
+        object.add(collisionVisualObj);
+      }
+    }
+
+    object._pendingCollisionVisuals = undefined;
+  }
+};
+
 GZ3D.GZIface.prototype.createModelFromMsg = function(model)
 {
   var modelObj = new THREE.Object3D();
@@ -6066,11 +6085,13 @@ GZ3D.GZIface.prototype.createModelFromMsg = function(model)
         for (var m = 0; m < link.collision[l].visual.length; ++m)
         {
           var collisionVisual = link.collision[l].visual[m];
-          var collisionVisualObj = this.createVisualFromMsg(collisionVisual, model.scale);
-          if (collisionVisualObj && !collisionVisualObj.parent)
+
+          if (!linkObj._pendingCollisionVisuals)
           {
-            linkObj.add(collisionVisualObj);
+            linkObj._pendingCollisionVisuals = [];
           }
+
+          linkObj._pendingCollisionVisuals.push( {'collisionVisual':collisionVisual, 'modelScale':model.scale} );
         }
       }
     }
@@ -6458,6 +6479,8 @@ GZ3D.GZIface.prototype.createGeom = function(geom, material, parent, modelScale)
       rootModel = rootModel.parent;
     }
 
+    var isCollModel = rootModel.name.indexOf('COLLISION_VISUAL') >= 0 ;
+
     // find model from database, download the mesh if it exists
     // var manifestXML;
     // var manifestURI = GAZEBO_MODEL_DATABASE_URI + '/manifest.xml';
@@ -6506,10 +6529,16 @@ GZ3D.GZIface.prototype.createGeom = function(geom, material, parent, modelScale)
         }
 
         var modelUri = uriPath + '/' + modelName;
+        var modelCacheKey = modelUri;
 
-        if (modelUri in this.scene.cachedModels)
+        if (isCollModel)
         {
-          var cachedData = this.scene.cachedModels[modelUri];
+          modelCacheKey += '__COLLISION_VISUAL__';
+        }
+
+        if (modelCacheKey in this.scene.cachedModels)
+        {
+          var cachedData = this.scene.cachedModels[modelCacheKey];
 
           if (cachedData.referenceObject)
           {
@@ -6523,7 +6552,7 @@ GZ3D.GZIface.prototype.createGeom = function(geom, material, parent, modelScale)
         }
         else
         {
-          this.scene.cachedModels[modelUri] =
+          this.scene.cachedModels[modelCacheKey] =
           {
             referenceObject:null,
             objects:[parent]
@@ -6562,7 +6591,7 @@ GZ3D.GZIface.prototype.createGeom = function(geom, material, parent, modelScale)
                     }
                   }
 
-                  cachedData = that.scene.cachedModels[modelUri];
+                  cachedData = that.scene.cachedModels[modelCacheKey];
                   cachedData.referenceObject = dae;
                   for(var i = 0; i<cachedData.objects.length; i++)
                   {
@@ -6668,7 +6697,7 @@ GZ3D.GZIface.prototype.createGeom = function(geom, material, parent, modelScale)
           allChildren[c].castShadow = false;
           allChildren[c].receiveShadow = false;
 
-          allChildren[c].visible = that.scene.showCollisions;
+          allChildren[c].visible = that.scene.showCollisions || visualObj.visible;
         }
       }
     }
@@ -6772,9 +6801,12 @@ GZ3D.GZIface.prototype.parseMaterial = function(material)
 
               if (diffuse)
               {
-                diffuse[0] *= color[0];
-                diffuse[1] *= color[1];
-                diffuse[2] *= color[2];
+                if (Math.abs(diffuse[0]-diffuse[1])< Number.EPSILON && Math.abs(diffuse[1]-diffuse[2])< Number.EPSILON)
+                {
+                  diffuse[0] *= color[0];
+                  diffuse[1] *= color[1];
+                  diffuse[2] *= color[2];
+                }
               }
               else
               {

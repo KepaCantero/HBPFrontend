@@ -282,6 +282,13 @@
             this.selectedObject.showCollision = this.showCollision;
 
             var that = this;
+
+            if (this.showCollision) {
+              this.selectedObject.traverse(function(node) {
+                gz3d.iface.loadCollisionVisuals(node);
+              });
+            }
+
             this.selectedObject.traverse(function(node) {
               if (node.name.indexOf('COLLISION_VISUAL') >= 0) {
                 // found collision geometry node, get all meshes attached

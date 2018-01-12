@@ -115,6 +115,7 @@
     this.iface = {
       addCanDeletePredicate: jasmine.createSpy('addCanDeletePredicate'),
       setAssetProgressCallback: jasmine.createSpy('setAssetProgressCallback'),
+      loadCollisionVisuals: jasmine.createSpy('loadCollisionVisuals'),
       registerWebSocketConnectionCallback: jasmine.createSpy(
         'registerWebSocketConnectionCallback'
       ),
