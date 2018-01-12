@@ -67,8 +67,7 @@ describe('Directive: object-inspector', function() {
   it('should register guiEvents has to be removed on destroy', function() {
     expect(gz3d.gui.guiEvents.on).toHaveBeenCalledTimes(2);
 
-    $scope.$broadcast('$destroy');
-    $scope.$digest();
+    elementScope.cleanup();
     expect(gz3d.gui.guiEvents.removeListener).toHaveBeenCalledTimes(2);
   });
 });

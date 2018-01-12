@@ -17,6 +17,22 @@
       this.setModeHumanBody = jasmine.createSpy('setModeHumanBody');
       this.setLookatRobotCamera = jasmine.createSpy('setLookatRobotCamera');
       this.update = jasmine.createSpy('update');
+      this.userCamera = {
+        updateMatrixWorld: jasmine.createSpy('updateMatrixWorld'),
+        position: {
+          clone: jasmine.createSpy('clonePosition'),
+          copy: jasmine.createSpy('copyPosition')
+        },
+        rotation: {
+          clone: jasmine.createSpy('cloneRotation'),
+          copy: jasmine.createSpy('copyRotation')
+        }
+      };
+      this.lookatRobotControls = {
+        setLookatTarget: jasmine.createSpy('setLookatTarget'),
+        setDistance: jasmine.createSpy('setDistance')
+      };
+      this.navigationMode = 'FreeCamera';
     })
     .constant('NAVIGATION_MODES', {
       FREE_CAMERA: 'FreeCamera',

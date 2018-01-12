@@ -44,7 +44,10 @@
       'gz3d',
       'stateService',
       'colorableObjectService',
+      'isNotARobotPredicate',
       'simulationInfo',
+      'userNavigationService',
+      'NAVIGATION_MODES',
       function(
         $timeout,
         EDIT_MODE,
@@ -54,7 +57,10 @@
         gz3d,
         stateService,
         colorableObjectService,
-        simulationInfo
+        isNotARobotPredicate,
+        simulationInfo,
+        userNavigationService,
+        NAVIGATION_MODES
       ) {
         //var objectInspectorService = {
         function ObjectInspectorService() {
@@ -75,11 +81,19 @@
           this.lockXAxis = undefined;
           this.lockYAxis = undefined;
           this.lockTAxis = undefined;
+          this.selectedTab = 0;
+          this.robotMode = false;
 
           this.getSelectedObjectShape = function() {
             if (this.selectedObject) {
               return this.selectedObject.getShapeName();
             }
+          };
+
+          this.isRobot = function() {
+            return (
+              this.selectedObject && !isNotARobotPredicate(this.selectedObject)
+            );
           };
 
           this.isSelectedObjectSimpleShape = function() {
@@ -451,6 +465,71 @@
             that.updateStyle('R', selectedStyle, 'E');
           };
 
+          this.setRobotMode = function(robotMode) {
+            if (this.robotMode !== robotMode) {
+              this.robotMode = robotMode;
+              if (this.robotMode) {
+                this.robotObject = this.selectedObject;
+
+                this.previousNavigationMode =
+                  userNavigationService.navigationMode;
+                this.previousCameraPosition = userNavigationService.userCamera.position.clone();
+                this.previousCameraRotation = userNavigationService.userCamera.rotation.clone();
+                this.previousLookAtObject =
+                  userNavigationService.lookatRobotControls.lookAtTarget;
+
+                userNavigationService.lookatRobotControls.setLookatTarget(null);
+                userNavigationService.setLookatRobotCamera();
+                userNavigationService.lookatRobotControls.setDistance(
+                  userNavigationService.lookatRobotControls.minDistance * 1.5
+                );
+
+                gz3d.scene.setViewAs(
+                  this.selectedObject,
+                  OBJECT_VIEW_MODE.TRANSPARENT
+                );
+
+                gz3d.scene.setRobotInfoVisible(this.selectedObject, true);
+              } else {
+                userNavigationService.userCamera.position.copy(
+                  this.previousCameraPosition
+                );
+                userNavigationService.userCamera.rotation.copy(
+                  this.previousCameraRotation
+                );
+                userNavigationService.userCamera.updateMatrixWorld(true);
+
+                gz3d.scene.setViewAs(this.robotObject, OBJECT_VIEW_MODE.NORMAL);
+                gz3d.scene.setRobotInfoVisible(this.robotObject, false);
+
+                if (this.previousNavigationMode) {
+                  switch (this.previousNavigationMode) {
+                    case NAVIGATION_MODES.FREE_CAMERA:
+                      userNavigationService.setModeFreeCamera();
+                      break;
+
+                    case NAVIGATION_MODES.GHOST:
+                      userNavigationService.setModeGhost();
+                      break;
+
+                    case NAVIGATION_MODES.HUMAN_BODY:
+                      if (stateService.currentState !== STATE.PAUSED) {
+                        userNavigationService.setModeHumanBody();
+                      }
+                      break;
+
+                    case NAVIGATION_MODES.LOOKAT_ROBOT:
+                      userNavigationService.lookatRobotControls.setLookatTarget(
+                        this.previousLookAtObject
+                      );
+                      userNavigationService.setLookatRobotCamera();
+                      break;
+                  }
+                }
+              }
+            }
+          };
+
           this.update = function() {
             // update selected object
             that.selectedObject = gz3d.scene.selectedEntity;
@@ -458,7 +537,14 @@
               angular.isUndefined(that.selectedObject) ||
               that.selectedObject === null
             ) {
+              that.selectedTab = 0;
+              that.setRobotMode(false);
               return;
+            }
+
+            if (!that.isRobot()) {
+              that.selectedTab = 0;
+              that.setRobotMode(false);
             }
 
             if (that.checkLightSelected()) {

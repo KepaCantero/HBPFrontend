@@ -270,6 +270,11 @@ THREE.LookatRobotControls = function (userView, robot)
     event.preventDefault();
   };
 
+  this.setDistance = function (dist)
+  {
+    this.applyAbsDistance = dist;
+  };
+
   this.update = function (elapsed, translationSensitivity, rotationSensitivity)
   {
     if (!elapsed)
@@ -339,6 +344,12 @@ THREE.LookatRobotControls = function (userView, robot)
     this.currentVector.sub(this.lookAtTarget.position);
     currentDistance = this.currentVector.length();
     this.currentVector.normalize();
+
+    if (this.applyAbsDistance)
+    {
+      currentDistance = this.applyAbsDistance;
+      this.applyAbsDistance = null;
+    }
 
     if (this.distanceDelta)
     {

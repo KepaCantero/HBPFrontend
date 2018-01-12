@@ -59,7 +59,7 @@
           scope.suppressKeyPress = function(event) {
             baseEventHandler.suppressAnyKeyPress(event);
           };
-          objectInspectorService.update();
+          $timeout(objectInspectorService.update, 0);
 
           const setTreeSelected = function() {
             $timeout(objectInspectorService.update, 0); //force scope.$apply
@@ -71,14 +71,19 @@
           };
           gz3d.gui.guiEvents.on('delete_entity', deleteEntity);
 
-          scope.$on('$destroy', function() {
+          scope.cleanup = function() {
             // remove the callback
             objectInspectorService.setManipulationMode(EDIT_MODE.VIEW);
+            objectInspectorService.setRobotMode(false);
             gz3d.gui.guiEvents.removeListener(
               'setTreeSelected',
               setTreeSelected
             );
             gz3d.gui.guiEvents.removeListener('delete_entity', deleteEntity);
+          };
+
+          scope.$on('$destroy', function() {
+            scope.cleanup();
           });
         }
       };

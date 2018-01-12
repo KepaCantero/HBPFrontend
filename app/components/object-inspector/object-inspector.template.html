@@ -9,13 +9,19 @@
         <i ng-class="{'fa fa-plus': minimized, 'fa fa-minus': !minimized}" aria-hidden="true"></i>
       </button>
   </div>
+
+  <div>
+    <h4 class="selected-object-name">{{objectInspectorService.selectedObject ? objectInspectorService.selectedObject.name : 'nothing selected'}}</h4>
+  </div>
+
   <!-- sections of the object inspector -->
   <div id="sections" ng-show="!minimized">
     <ol class="sections-list">
       <!-- section - object identifier -->
-      <li class="section-item">
-        <h4 class="selected-object-name">{{objectInspectorService.selectedObject ? objectInspectorService.selectedObject.name : 'nothing selected'}}</h4>
-      </li>
+
+      <uib-tabset style="height:100%; display: flex; flex-direction: column;" active="objectInspectorService.selectedTab">
+        <uib-tab heading="3D" index="0"  select="objectInspectorService.setRobotMode(false);">
+
       <!-- section - transform -->
       <li class="section-item" ng-show="objectInspectorService.selectedObject">
         <ol class="sub-sections-list">
@@ -213,6 +219,14 @@
           </li>
         </ol>
       </li>
+
+    </uib-tab>
+
+    <uib-tab heading="Robot" index="1" disable="!objectInspectorService.isRobot()" select="objectInspectorService.setRobotMode(true);">
+    </uib-tab>
+
+    </uib-tabset>
+
     </ol>
   </div>
   <!-- minimized view -->

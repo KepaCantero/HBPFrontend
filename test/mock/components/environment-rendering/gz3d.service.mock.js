@@ -50,6 +50,7 @@
       resetView: jasmine.createSpy('resetView'),
       refresh3DViews: jasmine.createSpy('refresh3DViews'),
       setDefaultCameraPose: jasmine.createSpy('setDefaultCameraPose'),
+      setRobotInfoVisible: jasmine.createSpy('setRobotInfoVisible'),
       container: {
         addEventListener: jasmine.createSpy('addEventListener')
       },

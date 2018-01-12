@@ -20,7 +20,7 @@ describe('Services: objectInspectorService', function() {
     objectInspectorService,
     colorableObjectService;
   var gz3d, stateService, EDIT_MODE, STATE, OBJECT_VIEW_MODE;
-  var mockObject;
+  var mockObject, NAVIGATION_MODES, userNavigationService;
 
   var htmlMock = {};
   htmlMock['oe-viewmode-normal'] = document.createElement('input');
@@ -68,6 +68,7 @@ describe('Services: objectInspectorService', function() {
     module('exdFrontendApp.Constants');
     module('dynamicViewOverlayServiceMock');
     module('editorToolbarServiceMock');
+    module('userNavigationServiceMock');
     module('gz3dMock');
 
     // inject service for testing.
@@ -82,7 +83,9 @@ describe('Services: objectInspectorService', function() {
       _STATE_,
       _colorableObjectService_,
       _mockObject_,
-      _OBJECT_VIEW_MODE_
+      _OBJECT_VIEW_MODE_,
+      _NAVIGATION_MODES_,
+      _userNavigationService_
     ) {
       $rootScope = _$rootScope_;
       $compile = _$compile_;
@@ -95,6 +98,8 @@ describe('Services: objectInspectorService', function() {
       colorableObjectService = _colorableObjectService_;
       mockObject = _mockObject_;
       OBJECT_VIEW_MODE = _OBJECT_VIEW_MODE_;
+      NAVIGATION_MODES = _NAVIGATION_MODES_;
+      userNavigationService = _userNavigationService_;
     });
 
     $scope = $rootScope.$new();
@@ -116,7 +121,7 @@ describe('Services: objectInspectorService', function() {
     expect(objectInspectorService.selectedObject).toBeDefined();
 
     gz3d.scene.selectedEntity = undefined;
-    $scope.$broadcast('$destroy');
+    $scope.$$childTail.cleanup();
     expect(objectInspectorService.selectedObject).toBeDefined();
     expect(objectInspectorService.setManipulationMode).toHaveBeenCalledWith(
       EDIT_MODE.VIEW
@@ -177,6 +182,34 @@ describe('Services: objectInspectorService', function() {
     gz3d.gui.guiEvents.emit('setTreeSelected');
     $timeout.flush();
     expect(objectInspectorService.showCollision).toBe(true);
+  });
+
+  it('should turn on/off robot mode', function() {
+    objectInspectorService.setRobotMode(true);
+    expect(objectInspectorService.robotMode).toBe(true);
+    objectInspectorService.setRobotMode(false);
+    expect(objectInspectorService.robotMode).toBe(false);
+  });
+
+  it('should reset navigation mode when exiting robot mode', function() {
+    userNavigationService.navigationMode = NAVIGATION_MODES.GHOST;
+    objectInspectorService.setRobotMode(true);
+    objectInspectorService.setRobotMode(false);
+    expect(userNavigationService.navigationMode).toBe(NAVIGATION_MODES.GHOST);
+
+    userNavigationService.navigationMode = NAVIGATION_MODES.HUMAN_BODY;
+    objectInspectorService.setRobotMode(true);
+    objectInspectorService.setRobotMode(false);
+    expect(userNavigationService.navigationMode).toBe(
+      NAVIGATION_MODES.HUMAN_BODY
+    );
+
+    userNavigationService.navigationMode = NAVIGATION_MODES.LOOKAT_ROBOT;
+    objectInspectorService.setRobotMode(true);
+    objectInspectorService.setRobotMode(false);
+    expect(userNavigationService.navigationMode).toBe(
+      NAVIGATION_MODES.LOOKAT_ROBOT
+    );
   });
 
   it("should react to 'delete_entity' event correctly: shown", function() {

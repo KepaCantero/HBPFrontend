@@ -5054,8 +5054,31 @@ GZ3D.GZIface.prototype.init = function()
 {
   this.material = [];
   this.entityMaterial = {};
+  this.sensorIcons = {};
+
+  this.initSensorIcons();
 
   this.connect();
+};
+
+GZ3D.GZIface.prototype.initSensorIcons = function()
+{
+  var loader = new THREE.ColladaLoader();
+
+  var textureLoader = new THREE.TextureLoader();
+
+  this.sensorIcons['generic'] = textureLoader.load('img/3denv/icons/sensor_Generic.png');
+  this.sensorIcons['ray'] = textureLoader.load('img/3denv/icons/sensor_Ray.png');
+  this.sensorIcons['camera'] = textureLoader.load('img/3denv/icons/sensor_Camera.png');
+
+  var that = this;
+  loader.load('img/3denv/icons/sensor.dae', function(collada)
+  {
+    var dae = collada.scene;
+    dae.updateMatrix();
+
+    that.sensorMesh = dae;
+  });
 };
 
 GZ3D.GZIface.prototype.setAssetProgressCallback = function(callback)
@@ -6022,6 +6045,7 @@ GZ3D.GZIface.prototype.createModelFromMsg = function(model)
       this.scene.setPose(linkObj, link.pose.position,
           link.pose.orientation);
     }
+    this.createLinkInfo(link, linkObj);
     modelObj.add(linkObj);
 
     // only load individual link visuals if they are not replaced by an createVisualFromMsganimated model
@@ -6043,7 +6067,8 @@ GZ3D.GZIface.prototype.createModelFromMsg = function(model)
         {
           var collisionVisual = link.collision[l].visual[m];
           var collisionVisualObj = this.createVisualFromMsg(collisionVisual, model.scale);
-          if (collisionVisualObj && !collisionVisualObj.parent) {
+          if (collisionVisualObj && !collisionVisualObj.parent)
+          {
             linkObj.add(collisionVisualObj);
           }
         }
@@ -6209,14 +6234,115 @@ GZ3D.GZIface.prototype.createRoadsFromMsg = function(roads)
   return roadObj;
 };
 
+GZ3D.GZIface.prototype.createLabel = function(text,link)
+{
+ // function for drawing rounded rectangles
+ var roundRect = function (ctx, x, y, w, h, r)
+ {
+   ctx.beginPath();
+   ctx.moveTo(x+r, y);
+   ctx.lineTo(x+w-r, y);
+   ctx.quadraticCurveTo(x+w, y, x+w, y+r);
+   ctx.lineTo(x+w, y+h-r);
+   ctx.quadraticCurveTo(x+w, y+h, x+w-r, y+h);
+   ctx.lineTo(x+r, y+h);
+   ctx.quadraticCurveTo(x, y+h, x, y+h-r);
+   ctx.lineTo(x, y+r);
+   ctx.quadraticCurveTo(x, y, x+r, y);
+   ctx.closePath();
+   ctx.fill();
+   context.lineWidth = 5;
+   ctx.stroke();
+ };
+
+  var canvas = document.createElement('canvas');
+  var size = 0.2;
+  canvas.width = 512;
+  canvas.height = 64;
+  var context = canvas.getContext('2d');
+  context.textAlign = 'center';
+
+  context.font = '32px Arial';
+
+  var boxSize = context.measureText(text).width+30;
+  if (boxSize>canvas.width)
+  {
+    boxSize = canvas.width;
+  }
+
+  if (link)
+  {
+    context.fillStyle = 'black';
+    context.strokeStyle = 'gray';
+  }
+  else
+  {
+    context.fillStyle = 'white';
+    context.strokeStyle = 'gray';
+  }
+
+ roundRect(context,(canvas.width/2)-(boxSize/2),2,boxSize,45,15);
+
+  if (link)
+  {
+    context.fillStyle = 'white';
+  }
+  else
+  {
+    context.fillStyle = 'black';
+  }
+
+  context.fillText(text, canvas.width / 2, canvas.height/2);
+  var texture = new THREE.Texture(canvas);
+  texture.needsUpdate = true;
+
+  var spriteMaterial = new THREE.SpriteMaterial( { map: texture, color: 0xffffff } );
+  spriteMaterial.transparent = true;
+  spriteMaterial.depthTest = false;
+  spriteMaterial.depthWrite = false;
+  var sprite = new THREE.Sprite( spriteMaterial );
+  sprite.scale.set(size, (canvas.height/canvas.width)*size,1.0);
+
+  return sprite;
+};
+
+GZ3D.GZIface.prototype.createLinkInfo = function(link,parent)
+{
+  var linkLabel = this.createLabel(link.name.replace('robot::',''),true);
+  linkLabel.name = 'ROBOT_INFO_VISUAL';
+  linkLabel.visible = false;
+  linkLabel.position.copy(new THREE.Vector3(0,0.0,0.00));
+  parent.add(linkLabel);
+};
+
 GZ3D.GZIface.prototype.createSensorFromMsg = function(sensor,modelName)
 {
   var sensorObj = new THREE.Object3D();
   sensorObj.name = sensor.name;
+  sensorObj._sensorSource = sensor;
 
   if (sensor.pose) {
     this.scene.setPose(sensorObj, sensor.pose.position, sensor.pose.orientation);
   }
+
+  var sensorIcon = (sensor.type in this.sensorIcons)?sensor.type:'generic';
+  var sensorIconMesh = this.sensorMesh.clone();
+  var material = new THREE.MeshBasicMaterial();
+  material.map = this.sensorIcons[sensorIcon];
+  sensorIconMesh.children[0].material = material;
+  sensorIconMesh.name = 'ROBOT_INFO_VISUAL';
+  sensorIconMesh.castShadow = false;
+  sensorIconMesh.receiveShadow = false;
+  sensorIconMesh.visible = false;
+  sensorIconMesh.scale.set(0.8,0.8,0.8);
+  sensorObj.add(sensorIconMesh);
+
+  var sensorLabel = this.createLabel(sensorObj.name);
+  sensorLabel.name = 'ROBOT_INFO_VISUAL';
+  sensorLabel.visible = false;
+  sensorLabel.position.copy(new THREE.Vector3(0,0.0,-0.03));
+  sensorObj.add(sensorLabel);
+
 
   if (sensor.type === 'camera') {
     // If we have a camera sensor we have a potential view that could be rendered
@@ -11798,7 +11924,7 @@ GZ3D.Scene.prototype.setViewAs = function(model, viewAs)
 
       if (viewAs === 'transparent')
       {
-        material.opacity = 0.25;
+        material.opacity = 0.4;
       }
       else  // normal or wireframe
       {
@@ -11817,7 +11943,9 @@ GZ3D.Scene.prototype.setViewAs = function(model, viewAs)
     if (descendants[i].material &&
         descendants[i].name.indexOf('boundingBox') === -1 &&
         descendants[i].name.indexOf('COLLISION_VISUAL') === -1 &&
+        descendants[i].name.indexOf('ROBOT_INFO_VISUAL') === -1 &&
         !this.getParentByPartialName(descendants[i], 'COLLISION_VISUAL')&&
+        !this.getParentByPartialName(descendants[i], 'ROBOT_INFO_VISUAL')&&
         descendants[i].name.indexOf('wireframe') === -1 &&
         descendants[i].name.indexOf('JOINT_VISUAL') === -1)
     {
@@ -12290,6 +12418,22 @@ GZ3D.Scene.prototype.refresh3DViews = function ()
 GZ3D.Scene.prototype.setScenePreparationReadyCallback = function (sceneReadyCallback)
 {
   this.composer.sceneReadyCallback = sceneReadyCallback;
+};
+
+/**
+ * Show sensors
+ *
+*/
+
+GZ3D.Scene.prototype.setRobotInfoVisible = function (object, visible)
+{
+  object.traverse(function (node)
+  {
+    if (node.name==='ROBOT_INFO_VISUAL')
+    {
+      node.visible = visible;
+    }
+  });
 };
 
 
