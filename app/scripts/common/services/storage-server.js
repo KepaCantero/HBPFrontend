@@ -103,6 +103,7 @@
           }),
           deleteFile: buildAction({
             method: 'DELETE',
+            isArray: true,
             url: `${this.STORAGE_BASE_URL}/:experimentId/:filename`
           }),
           deleteExperiment: buildAction({
