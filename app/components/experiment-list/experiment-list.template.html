@@ -15,7 +15,7 @@
           <div class="list-entry-container left-right title-line">
             <div class="h4" ng-hide="!loadingEdit && editing[nameID] && isPrivateExperiment">{{exp.configuration.name}}
               <a ng-if="exp.id == pageState.selected" style="font-size:15px;" name="edit-button" class="glyphicon glyphicon-pencil" href="javascript:void(0);"
-                ng-show="isPrivateExperiment && (!editing[nameID] && !editing[descID]) && !config.canCloneExperiments" id="edit-button"
+                ng-show="isPrivateExperiment && (!editing[nameID] && !editing[descID]) && (config.canCloneExperiments && config.canLaunchExperiments) && !pageState.deletingExperiment" id="edit-button"
                 v-busy="loadingEdit" ng-click="editExperiment(nameID);"></a>
             </div>
             <form ng-show="editing[nameID] && isPrivateExperiment && !loadingEdit">
@@ -26,9 +26,9 @@
             </form>
             <div ng-if="config.canLaunchExperiments && exp.joinableServers.length > 0" class="list-entry-running">({{exp.joinableServers.length}} simulation{{exp.joinableServers.length>1?'s':''}} running)</div>
           </div>
-          <div ng-if="exp.id == pageState.selected" ng-show="!isPrivateExperiment || config.canCloneExperiments">{{exp.configuration.description}}</div>
-          <div ng-if="exp.id == pageState.selected" ng-hide="!isPrivateExperiment || (editing[descID] && !loadingEdit) || config.canCloneExperiments">{{exp.configuration.description}}
-            <a style="font-size:15px;" name="edit-button" class="glyphicon glyphicon-pencil" href="javascript:void(0);" ng-show="isPrivateExperiment && (!editing[nameID] && !editing[descID])"
+          <div ng-if="exp.id == pageState.selected" ng-show="!isPrivateExperiment || (config.canCloneExperiments && !config.canLaunchExperiments)">{{exp.configuration.description}}</div>
+          <div ng-if="exp.id == pageState.selected" ng-hide="!private || (editing[descID] && !loadingEdit)">{{exp.configuration.description}}
+            <a style="font-size:15px;" name="edit-button" class="glyphicon glyphicon-pencil" href="javascript:void(0);" ng-show="isPrivateExperiment && (!editing[nameID] && !editing[descID]) && !pageState.deletingExperiment"
               v-busy="loadingEdit" ng-click="editExperiment(descID);"></a>
           </div>
           <form ng-show="editing[descID] && isPrivateExperiment && !loadingEdit">
@@ -126,8 +126,8 @@
           </button>
 
           <button ng-if="config.canCloneExperiments && userinfo.hasEditRights" analytics-on analytics-event="Clone" class="btn btn-default"
-                analytics-label="Collab" analytics-value="exp.id" class="btn btn-default" ng-click="cloneExperiment(exp)"
-                ng-disabled="isCloneRequested">
+                analytics-label="Collab" analytics-value="exp.id" class="btn btn-default" ng-click="clone(exp)"
+                ng-disabled="isCloneRequested || pageState.deletingExperiment">
             <i class="fa fa-pencil"></i> Clone
           </button>
 
