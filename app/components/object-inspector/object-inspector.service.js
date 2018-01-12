@@ -533,6 +533,9 @@
           this.update = function() {
             // update selected object
             that.selectedObject = gz3d.scene.selectedEntity;
+
+            that.isARobot = !isNotARobotPredicate(that.selectedObject);
+
             if (
               angular.isUndefined(that.selectedObject) ||
               that.selectedObject === null

@@ -25,14 +25,13 @@
   'use strict';
 
   /**
-   * @ngdoc overview
-   * @name exdFrontendApp
-   * @description
-   * # exdFrontendApp
-   *
-   * Main module of the application.
-   */
-
+     * @ngdoc overview
+     * @name exdFrontendApp
+     * @description
+     * # exdFrontendApp
+     *
+     * Main module of the application.
+     */
   angular
     .module('exdFrontendApp', [
       'ngAnimate',
@@ -98,7 +97,8 @@
       'experimentExplorer',
       'experimentList',
       'rosTerminalModule',
-      'userInteractionModule'
+      'userInteractionModule',
+      'robotDocumentation'
     ])
     // Routes
     .config([
@@ -182,6 +182,27 @@
               'environmentService',
               function(environmentService) {
                 return environmentService.setPrivateExperiment(false);
+              }
+            ]
+          }
+        };
+
+        var robotDocumentation = {
+          name: 'robot-doc',
+          url: '/robot-doc?config',
+          templateUrl: 'views/common/robot-documentation.html',
+          resolve: {
+            config: [
+              '$location',
+              '$http',
+              function($location, $http) {
+                return $http({
+                  url: $location.search().config,
+                  method: 'GET',
+                  transformResponse: function(xml) {
+                    return new X2JS().xml_str2json(xml);
+                  }
+                });
               }
             ]
           }
@@ -298,6 +319,7 @@
         home.state(newCollabOverviewState);
         home.state(experimentExplorerState);
 
+        home.state(robotDocumentation);
         home.state(esvWegStateDebug);
 
         // Provide a default route.

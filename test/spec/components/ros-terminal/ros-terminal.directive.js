@@ -10,7 +10,8 @@ describe('Directive: ros-terminal', function() {
     childScope,
     rosCommanderService,
     editorToolbarService,
-    rosCommandLine;
+    rosCommandLine,
+    $timeout;
 
   var roslibMock = {
     getOrCreateConnectionTo: jasmine
@@ -33,11 +34,13 @@ describe('Directive: ros-terminal', function() {
       _$rootScope_,
       $compile,
       _rosCommanderService_,
-      _editorToolbarService_
+      _editorToolbarService_,
+      _$timeout_
     ) {
       $rootScope = _$rootScope_;
       rosCommanderService = _rosCommanderService_;
       editorToolbarService = _editorToolbarService_;
+      $timeout = _$timeout_;
 
       spyOn(localStorage, 'getItem');
       spyOn(localStorage, 'setItem');
@@ -63,6 +66,8 @@ describe('Directive: ros-terminal', function() {
     expect(childScope.cmdLine).toBe('');
     rosCommandLine.trigger($.Event('keydown', { which: 40 })); // already new cmdline, no change
     expect(childScope.cmdLine).toBe('');
+    $timeout.flush();
+    $rootScope.$digest();
   });
 
   it('should focus when clicking in the terminal', function() {
@@ -130,6 +135,7 @@ describe('Directive: ros-terminal', function() {
     inject(function(_$rootScope_, _$timeout_, $compile) {
       $rootScope = _$rootScope_;
       $timeout = _$timeout_;
+      spyOn(localStorage, 'getItem').and.returnValue('[]');
 
       var element = $compile('<ros-terminal></ros-terminal>')($rootScope);
       $rootScope.$digest();

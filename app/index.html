@@ -2,265 +2,267 @@
 <html lang="en">
 
 <head>
-  <meta charset="utf-8">
-  <meta name="description" content="">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 
-  <title>Neurorobotics platform</title>
+    <title>Neurorobotics platform</title>
 
-  <link rel="stylesheet" href="node_modules/n3-charts/build/LineChart.min.css" />
+    <link rel="stylesheet" href="node_modules/n3-charts/build/LineChart.min.css" />
 
-  <!-- build:css(.) styles/vendor.css -->
-  <link rel="stylesheet" href="bower_components/font-awesome/css/font-awesome.css" />
-  <link rel="stylesheet" href="bower_components/codemirror/lib/codemirror.css" />
-  <link rel="stylesheet" href="bower_components/angular.panels/dist/angular.panels.min.css" />
-  <link rel="stylesheet" href="bower_components/v-button/dist/v-button.css" />
-  <link rel="stylesheet" href="bower_components/gz3d-hbp/gz3d/client/style/gz3d-hbp.css" />
-  <!-- endbuild -->
+    <!-- build:css(.) styles/vendor.css -->
+    <link rel="stylesheet" href="bower_components/font-awesome/css/font-awesome.css" />
+    <link rel="stylesheet" href="bower_components/codemirror/lib/codemirror.css" />
+    <link rel="stylesheet" href="bower_components/angular.panels/dist/angular.panels.min.css" />
+    <link rel="stylesheet" href="bower_components/v-button/dist/v-button.css" />
+    <link rel="stylesheet" href="bower_components/gz3d-hbp/gz3d/client/style/gz3d-hbp.css" />
+    <!-- endbuild -->
 
-  <!-- build:css(.tmp) styles/main.css -->
-  <link rel="stylesheet" href="styles/main.css" />
-  <link rel="stylesheet" href="styles/home.css" />
-  <link rel="stylesheet" href="styles/support.css" />
-  <link rel="stylesheet" href="styles/resizeable.css" />
-  <link rel="stylesheet" href="styles/esv/reset.css" />
-  <!-- endbuild -->
+    <!-- build:css(.tmp) styles/main.css -->
+    <link rel="stylesheet" href="styles/main.css" />
+    <link rel="stylesheet" href="styles/home.css" />
+    <link rel="stylesheet" href="styles/support.css" />
+    <link rel="stylesheet" href="styles/resizeable.css" />
+    <link rel="stylesheet" href="styles/esv/reset.css" />
+    <!-- endbuild -->
 
 </head>
 
 <body class="ng-cloak">
 
-  <!-- Google analytics -->
-  <script>
-    // Get analytics only for production/staging/development servers
-    var hostname = document.location.hostname;
-    (function(i, s, o, g, r, a, m) {
-      i['GoogleAnalyticsObject'] = r;
-      i[r] = i[r] || function() {
-        (i[r].q = i[r].q || []).push(arguments)
-      }, i[r].l = 1 * new Date();
-      a = s.createElement(o),
-        m = s.getElementsByTagName(o)[0];
-      a.async = 1;
-      a.src = g;
-      m.parentNode.insertBefore(a, m)
-    })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
-  </script>
+    <!-- Google analytics -->
+    <script>
+        // Get analytics only for production/staging/development servers
+        var hostname = document.location.hostname;
+        (function(i, s, o, g, r, a, m) {
+            i['GoogleAnalyticsObject'] = r;
+            i[r] = i[r] || function() {
+                (i[r].q = i[r].q || []).push(arguments)
+            }, i[r].l = 1 * new Date();
+            a = s.createElement(o),
+                m = s.getElementsByTagName(o)[0];
+            a.async = 1;
+            a.src = g;
+            m.parentNode.insertBefore(a, m)
+        })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+    </script>
 
-  <browser-support-alert></browser-support-alert>
+    <browser-support-alert></browser-support-alert>
 
-  <cluster-reservation-alert></cluster-reservation-alert>
+    <cluster-reservation-alert></cluster-reservation-alert>
 
-  <demo-carousel-alert></demo-carousel-alert>
+    <demo-carousel-alert></demo-carousel-alert>
 
-  <!-- Add your site or application content here -->
-  <div ui-view></div>
+    <!-- Add your site or application content here -->
+    <div ui-view></div>
 
-  <!-- build:js(.) scripts/vendor.js -->
-  <!-- bower:js -->
-  <script src="bower_components/jquery/dist/jquery.js"></script>
-  <script src="bower_components/angular/angular.js"></script>
-  <script src="bower_components/angular-animate/angular-animate.js"></script>
-  <script src="bower_components/angular-bbp-config/angular-bbp-config.js"></script>
-  <script src="bower_components/angular-cookies/angular-cookies.js"></script>
-  <script src="bower_components/angular-resource/angular-resource.js"></script>
-  <script src="bower_components/angular-sanitize/angular-sanitize.js"></script>
-  <script src="bower_components/angular-toArrayFilter/toArrayFilter.js"></script>
-  <script src="bower_components/angular-touch/angular-touch.js"></script>
-  <script src="bower_components/codemirror/lib/codemirror.js"></script>
-  <script src="bower_components/codemirror/mode/python/python.js"></script>
-  <script src="bower_components/codemirror/mode/shell/shell.js"></script>
-  <script src="bower_components/angular-ui-codemirror/ui-codemirror.js"></script>
-  <script src="bower_components/angular-ui-router/release/angular-ui-router.js"></script>
-  <script src="bower_components/angular.panels/dist/angular.panels.min.js"></script>
-  <script src="bower_components/bootstrap-sass-official/assets/javascripts/bootstrap.js"></script>
-  <script src="bower_components/es5-shim/es5-shim.js"></script>
+    <!-- build:js(.) scripts/vendor.js -->
+    <!-- bower:js -->
+    <script src="bower_components/jquery/dist/jquery.js"></script>
+    <script src="bower_components/angular/angular.js"></script>
+    <script src="bower_components/angular-animate/angular-animate.js"></script>
+    <script src="bower_components/angular-bbp-config/angular-bbp-config.js"></script>
+    <script src="bower_components/angular-cookies/angular-cookies.js"></script>
+    <script src="bower_components/angular-resource/angular-resource.js"></script>
+    <script src="bower_components/angular-sanitize/angular-sanitize.js"></script>
+    <script src="bower_components/angular-toArrayFilter/toArrayFilter.js"></script>
+    <script src="bower_components/angular-touch/angular-touch.js"></script>
+    <script src="bower_components/codemirror/lib/codemirror.js"></script>
+    <script src="bower_components/codemirror/mode/python/python.js"></script>
+    <script src="bower_components/codemirror/mode/shell/shell.js"></script>
+    <script src="bower_components/angular-ui-codemirror/ui-codemirror.js"></script>
+    <script src="bower_components/angular-ui-router/release/angular-ui-router.js"></script>
+    <script src="bower_components/angular.panels/dist/angular.panels.min.js"></script>
+    <script src="bower_components/bootstrap-sass-official/assets/javascripts/bootstrap.js"></script>
+    <script src="bower_components/es5-shim/es5-shim.js"></script>
   <script src="bower_components/three.js/three.js"></script>
-  <script src="bower_components/three.js/examples/js/controls/OrbitControls.js"></script>
-  <script src="bower_components/three.js/examples/js/Detector.js"></script>
-  <script src="bower_components/three.js/examples/js/shaders/CopyShader.js"></script>
-  <script src="bower_components/three.js/examples/js/shaders/ConvolutionShader.js"></script>
-  <script src="bower_components/three.js/examples/js/shaders/SSAOShader.js"></script>
-  <script src="bower_components/three.js/examples/js/shaders/FXAAShader.js"></script>
-  <script src="bower_components/three.js/examples/js/shaders/LuminosityShader.js"></script>
-  <script src="bower_components/three.js/examples/js/postprocessing/EffectComposer.js"></script>
-  <script src="bower_components/three.js/examples/js/postprocessing/RenderPass.js"></script>
-  <script src="bower_components/three.js/examples/js/postprocessing/MaskPass.js"></script>
-  <script src="bower_components/three.js/examples/js/postprocessing/ShaderPass.js"></script>
-  <script src="bower_components/three.js/examples/js/postprocessing/ManualMSAARenderPass.js"></script>
-  <script src="bower_components/three.js/examples/js/postprocessing/BloomPass.js"></script>
-  <script src="bower_components/eventemitter2/lib/eventemitter2.js"></script>
-  <script src="bower_components/xml2json/xml2json.js"></script>
-  <script src="bower_components/roslibjs/build/roslib.js"></script>
-  <script src="bower_components/lodash/lodash.js"></script>
-  <script src="bower_components/gz3d-hbp/gz3d/build/gz3d.js"></script>
-  <script src="bower_components/gz3d-hbp/gz3d/client/js/include/ColladaLoader.js"></script>
-  <script src="bower_components/gz3d-hbp/gz3d/client/js/include/first-person-controls.js"></script>
-  <script src="bower_components/gz3d-hbp/gz3d/client/js/include/lookat-robot-controls.js"></script>
-  <script src="bower_components/gz3d-hbp/gz3d/client/js/include/avatar-controls.js"></script>
-  <script src="bower_components/gz3d-hbp/gz3d/client/js/include/ThreeBackwardsCompatibility.js"></script>
-  <script src="bower_components/json3/lib/json3.js"></script>
-  <script src="bower_components/ng-file-upload/ng-file-upload.js"></script>
-  <script src="bower_components/stats.js/build/stats.min.js"></script>
-  <script src="bower_components/v-button/dist/v-button.js"></script>
-  <script src="bower_components/SHA-1/sha1.js"></script>
-  <script src="bower_components/angulartics/src/angulartics.js"></script>
-  <script src="bower_components/angulartics-google-analytics/lib/angulartics-ga.js"></script>
-  <script src="bower_components/brainvisualizer/src/brain3D.js"></script>
-  <script src="bower_components/brainvisualizer/src/brain3Dmainview.js"></script>
-  <script src="bower_components/brainvisualizer/src/brain3Dneuronrepresentation.js"></script>
-  <script src="bower_components/brainvisualizer/shaders/brain3Dshaders.js"></script>
-  <script src="bower_components/moment/moment.js"></script>
-  <script src="bower_components/angular-uuid4/angular-uuid4.js"></script>
-  <script src="bower_components/angular-deferred-bootstrap/angular-deferred-bootstrap.js"></script>
-  <script src="bower_components/angular-moment/angular-moment.js"></script>
-  <script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
-  <script src="bower_components/hello/dist/hello.all.js"></script>
-  <script src="bower_components/angular-hbp-collaboratory/angular-hbp-collaboratory.js"></script>
-  <!-- endbower -->
-  <!-- endbuild -->
+    <script src="bower_components/three.js/examples/js/controls/OrbitControls.js"></script>
+    <script src="bower_components/three.js/examples/js/Detector.js"></script>
+    <script src="bower_components/three.js/examples/js/shaders/CopyShader.js"></script>
+    <script src="bower_components/three.js/examples/js/shaders/ConvolutionShader.js"></script>
+    <script src="bower_components/three.js/examples/js/shaders/SSAOShader.js"></script>
+    <script src="bower_components/three.js/examples/js/shaders/FXAAShader.js"></script>
+    <script src="bower_components/three.js/examples/js/shaders/LuminosityShader.js"></script>
+    <script src="bower_components/three.js/examples/js/postprocessing/EffectComposer.js"></script>
+    <script src="bower_components/three.js/examples/js/postprocessing/RenderPass.js"></script>
+    <script src="bower_components/three.js/examples/js/postprocessing/MaskPass.js"></script>
+    <script src="bower_components/three.js/examples/js/postprocessing/ShaderPass.js"></script>
+    <script src="bower_components/three.js/examples/js/postprocessing/ManualMSAARenderPass.js"></script>
+    <script src="bower_components/three.js/examples/js/postprocessing/BloomPass.js"></script>
+    <script src="bower_components/eventemitter2/lib/eventemitter2.js"></script>
+    <script src="bower_components/xml2json/xml2json.js"></script>
+    <script src="bower_components/roslibjs/build/roslib.js"></script>
+    <script src="bower_components/lodash/lodash.js"></script>
+    <script src="bower_components/gz3d-hbp/gz3d/build/gz3d.js"></script>
+    <script src="bower_components/gz3d-hbp/gz3d/client/js/include/ColladaLoader.js"></script>
+    <script src="bower_components/gz3d-hbp/gz3d/client/js/include/first-person-controls.js"></script>
+    <script src="bower_components/gz3d-hbp/gz3d/client/js/include/lookat-robot-controls.js"></script>
+    <script src="bower_components/gz3d-hbp/gz3d/client/js/include/avatar-controls.js"></script>
+    <script src="bower_components/gz3d-hbp/gz3d/client/js/include/ThreeBackwardsCompatibility.js"></script>
+    <script src="bower_components/json3/lib/json3.js"></script>
+    <script src="bower_components/ng-file-upload/ng-file-upload.js"></script>
+    <script src="bower_components/stats.js/build/stats.min.js"></script>
+    <script src="bower_components/v-button/dist/v-button.js"></script>
+    <script src="bower_components/abdmob/x2js/xml2json.min.js"></script>
+    <script src="bower_components/SHA-1/sha1.js"></script>
+    <script src="bower_components/angulartics/src/angulartics.js"></script>
+    <script src="bower_components/angulartics-google-analytics/lib/angulartics-ga.js"></script>
+    <script src="bower_components/brainvisualizer/src/brain3D.js"></script>
+    <script src="bower_components/brainvisualizer/src/brain3Dmainview.js"></script>
+    <script src="bower_components/brainvisualizer/src/brain3Dneuronrepresentation.js"></script>
+    <script src="bower_components/brainvisualizer/shaders/brain3Dshaders.js"></script>
+    <script src="bower_components/moment/moment.js"></script>
+    <script src="bower_components/angular-uuid4/angular-uuid4.js"></script>
+    <script src="bower_components/angular-deferred-bootstrap/angular-deferred-bootstrap.js"></script>
+    <script src="bower_components/angular-moment/angular-moment.js"></script>
+    <script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+    <script src="bower_components/hello/dist/hello.all.js"></script>
+    <script src="bower_components/angular-hbp-collaboratory/angular-hbp-collaboratory.js"></script>
+    <!-- endbower -->
+    <!-- endbuild -->
 
-  <script src="node_modules/d3/d3.min.js"></script>
-  <script src="node_modules/n3-charts/build/LineChart.min.js"></script>
-  <script src="node_modules/rxjs/bundles/Rx.min.js"></script>
-  <script src="node_modules/chart.js/dist/Chart.min.js"></script>
+    <script src="node_modules/d3/d3.min.js"></script>
+    <script src="node_modules/n3-charts/build/LineChart.min.js"></script>
+    <script src="node_modules/rxjs/bundles/Rx.min.js"></script>
+    <script src="node_modules/chart.js/dist/Chart.min.js"></script>
 
-  <!-- build:js({app,.tmp,.}) scripts/app.js -->
-  <script src="scripts/app.js"></script>
-  <script src="scripts/common/controllers/main.js"></script>
-  <script src="scripts/common/directives/resizeable.js"></script>
-  <script src="scripts/common/directives/show-on-top.directive.js"></script>
-  <script src="scripts/common/directives/movable.js"></script>
-  <script src="scripts/common/directives/disable-animate.js"></script>
-  <script src="scripts/common/filters/time-filters.js"></script>
-  <script src="scripts/common/filters/string-list-filters.js"></script>
-  <script src="scripts/common/filters/bytes-filter.js"></script>
-  <script src="scripts/common/services/show-on-top.service.js"></script>
-  <script src="scripts/common/services/nrp-error-handlers.js"></script>
-  <script src="scripts/common/services/splash.js"></script>
-  <script src="scripts/common/services/asset-loading-splash.js"></script>
-  <script src="scripts/common/services/storage-server.js"></script>
-  <script src="scripts/common/services/download-file-service.js"></script>
-  <script src="scripts/common/directives/bindHtmlAndCompile.js"></script>
-  <script src="components/editors/editor-panel.controller.js"></script>
-  <script src="scripts/common/services/nrp-angulartics.js"></script>
-  <script src="scripts/esv/controllers/experiment-view.controller.js"></script>
-  <script src="scripts/esv/controllers/esv-experiments.js"></script>
-  <script src="scripts/esv/controllers/demo-experiments.controller.js"></script>
-  <script src="scripts/esv/controllers/demo-waiting.controller.js"></script>
-  <script src="scripts/esv/directives/context-menu.js"></script>
-  <script src="scripts/esv/directives/materials-chooser.js"></script>
-  <script src="scripts/esv/directives/owner-only.js"></script>
-  <script src="scripts/esv/directives/editable-experiment.js"></script>
-  <script src="scripts/esv/directives/experiment-details.js"></script>
-  <script src="scripts/esv/filters/experiment-status.js"></script>
-  <script src="scripts/esv/services/collab-service.js"></script>
-  <script src="scripts/esv/services/documentation-urls.js"></script>
-  <script src="scripts/esv/services/simulation-control.js"></script>
-  <script src="scripts/esv/services/context-menu-service.js"></script>
-  <script src="scripts/esv/services/backend-interface.js"></script>
-  <script src="scripts/esv/services/roslib-angular.js"></script>
-  <script src="scripts/esv/services/simulation-info-service.js"></script>
-  <script src="scripts/esv/services/slurminfo-service.js"></script>
-  <script src="scripts/esv/services/spike-listener-service.js"></script>
-  <script src="scripts/esv/services/simstate-angular.js"></script>
-  <script src="scripts/esv/services/python-code-helper.js"></script>
-  <script src="scripts/esv/services/nrp-versions.js"></script>
-  <script src="scripts/esv/services/collab-experiment-lock-service.js"></script>
-  <script src="scripts/esv/services/collab-3dsettings-service.js"></script>
-  <script src="scripts/esv/services/colorable-object-service.js"></script>
-  <script src="scripts/esv/services/base-event-handler.js"></script>
-  <script src="scripts/esv/services/user-navigation.js"></script>
-  <script src="scripts/esv/services/experimentProxyService.js"></script>
-  <script src="scripts/esv/services/experiments-service/base-experiments-service.js"></script>
-  <script src="scripts/esv/services/experiments-service/private-experiments-service.js"></script>
-  <script src="scripts/esv/services/experiments-service/template-experiments-service.js"></script>
-  <script src="scripts/esv/services/experiments-service/experiments-factory.js"></script>
-  <script src="scripts/esv/services/environment-service.js"></script>
-  <script src="scripts/esv/services/is-not-a-robot-predicate.js"></script>
-  <script src="scripts/esv/services/code-editors-services.js"></script>
-  <script src="scripts/esv/services/user-context-service.js"></script>
-  <script src="components/editors/editor-panel.service.js"></script>
-  <script src="scripts/esv/services/experiment.service.js"></script>
-  <script src="scripts/esv/directives/camera-view.js"></script>
-  <script src="scripts/esv/directives/ros-reconnecting.js"></script>
-  <script src="scripts/esv/services/simulation-config-service.js"></script>
-  <script src="scripts/esv/services/nrp-user-service.js"></script>
-  <script src="scripts/esv/services/auto-save-service.js"></script>
-  <script src="scripts/esv/directives/simulation-timeout-extender.js"></script>
-  <script src="scripts/esv/services/save-editor-errors.js"></script>
-  <script src="scripts/esv/services/temp-file-service.js"></script>
-  <script src="scripts/esv/directives/new-experiment-wizard.js"></script>
-  <script src="scripts/common/services/nrp-modal-service.js"></script>
-  <script src="scripts/esv/services/new-experiment-proxy-service.js"></script>
-  <script src="components/brain-visualizer/brain-visualizer.directive.js"></script>
-  <script src="components/brain-visualizer/brain-visualizer-panel.controller.js"></script>
-  <script src="components/brain-visualizer/brain-visualizer-panel.directive.js"></script>
-  <script src="components/alerts/browser-support/browser-support.directive.js"></script>
-  <script src="components/alerts/browser-support/browser-support.service.js"></script>
-  <script src="components/alerts/cluster-reservation/cluster-reservation.directive.js"></script>
-  <script src="components/alerts/demo-carousel/demo-carousel.directive.js"></script>
-  <script src="components/dynamic-view/dynamic-view.controller.js"></script>
-  <script src="components/client-logger/client-logger.service.js"></script>
-  <script src="components/client-logger/log-adverts/log-adverts.directive.js"></script>
-  <script src="components/client-logger/log-console/log-console.controller.js"></script>
-  <script src="components/client-logger/log-console/log-console.directive.js"></script>
-  <script src="components/dynamic-view/dynamic-view.controller.js"></script>
-  <script src="components/dynamic-view/dynamic-view.directive.js"></script>
-  <script src="components/dynamic-view-overlay/dynamic-view-overlay.controller.js"></script>
-  <script src="components/dynamic-view-overlay/dynamic-view-overlay.directive.js"></script>
-  <script src="components/dynamic-view-overlay/dynamic-view-overlay.service.js"></script>
-  <script src="components/editors/editor-panel.directive.js"></script>
-  <script src="components/editors/brain-editor/pynn-editor.directive.js"></script>
-  <script src="components/editors/environment-editor/environment-editor.directive.js"></script>
-  <script src="components/editors/state-machine-editor/smach-editor.directive.js"></script>
-  <script src="components/editors/transfer-function-editor/graphical-editor.directive.js"></script>
-  <script src="components/editors/transfer-function-editor/transfer-function-editor.directive.js"></script>
-  <script src="components/editors/transfer-function-editor/transfer-function-editor-buttons.directive.js"></script>
-  <script src="components/environment-rendering/environment-rendering.modules.js"></script>
-  <script src="components/environment-rendering/environment-rendering.controller.js"></script>
-  <script src="components/environment-rendering/environment-rendering.directive.js"></script>
-  <script src="components/environment-rendering/environment-rendering.service.js"></script>
-  <script src="components/environment-rendering/gz3d.service.js"></script>
-  <script src="components/environment-rendering/gz3d-views.service.js"></script>
-  <script src="components/environment-settings/environment-settings-panel.controller.js"></script>
-  <script src="components/environment-settings/environment-settings-panel.directive.js"></script>
-  <script src="components/environment-settings/environment-settings-usercamera.directive.js"></script>
-  <script src="components/environment-settings/environment-settings-colors.directive.js"></script>
-  <script src="components/environment-settings/environment-settings-environment.directive.js"></script>
-  <script src="components/environment-settings/environment-settings-master.directive.js"></script>
-  <script src="components/environment-settings/environment-settings-quality.directive.js"></script>
-  <script src="components/environment-settings/rgb-curve-editor.directive.js"></script>
-  <script src="components/experiment-explorer/experiment-explorer.controller.js"></script>
-  <script src="components/experiment-explorer/experiment-explorer.directive.js"></script>
-  <script src="components/experiment-list/experiment-list.controller.js"></script>
-  <script src="components/experiment-list/experiment-list.directive.js"></script>
-  <script src="components/joint-plot/joint-plot.controller.js"></script>
-  <script src="components/joint-plot/joint-plot.directive.js"></script>
-  <script src="components/joint-plot/joint-plot.service.js"></script>
-  <script src="components/spike-train/spike-train.controller.js"></script>
-  <script src="components/spike-train/spike-train.directive.js"></script>
-  <script src="components/help-tooltip/help-tooltip.constants.js"></script>
-  <script src="components/help-tooltip/help-tooltip.directive.js"></script>
-  <script src="components/help-tooltip/help-tooltip.service.js"></script>
-  <script src="components/help-tooltip/popover/help-tooltip-popover.directive.js"></script>
-  <script src="components/editor-toolbar/editor-toolbar.controller.js"></script>
-  <script src="components/editor-toolbar/editor-toolbar.directive.js"></script>
-  <script src="components/editor-toolbar/editor-toolbar.service.js"></script>
-  <script src="components/video-stream/video-stream.directive.js"></script>
-  <script src="components/video-stream/video-stream.service.js"></script>
-  <script src="components/object-inspector/object-inspector.directive.js"></script>
-  <script src="components/object-inspector/object-inspector.service.js"></script>
-  <script src="components/performance-monitor/performance-monitor.controller.js"></script>
-  <script src="components/performance-monitor/performance-monitor.directive.js"></script>
-  <script src="components/performance-monitor/performance-monitor.service.js"></script>
-  <script src="components/ros-terminal/ros-commander.service.js"></script>
-  <script src="components/ros-terminal/ros-terminal.directive.js"></script>
-  <script src="components/user-interaction/user-interaction.modules.js"></script>
-  <script src="components/user-interaction/apply-force.service.js"></script>
-  <script src="components/user-interaction/apply-force-view.controller.js"></script>
-  <script src="components/user-interaction/apply-force-view.directive.js"></script>
-  <!-- endbuild -->
+    <!-- build:js({app,.tmp,.}) scripts/app.js -->
+    <script src="scripts/app.js"></script>
+    <script src="scripts/common/controllers/main.js"></script>
+    <script src="scripts/common/directives/resizeable.js"></script>
+    <script src="scripts/common/directives/show-on-top.directive.js"></script>
+    <script src="scripts/common/directives/movable.js"></script>
+    <script src="scripts/common/directives/disable-animate.js"></script>
+    <script src="scripts/common/filters/time-filters.js"></script>
+    <script src="scripts/common/filters/string-list-filters.js"></script>
+    <script src="scripts/common/filters/bytes-filter.js"></script>
+    <script src="scripts/common/services/show-on-top.service.js"></script>
+    <script src="scripts/common/services/nrp-error-handlers.js"></script>
+    <script src="scripts/common/services/splash.js"></script>
+    <script src="scripts/common/services/asset-loading-splash.js"></script>
+    <script src="scripts/common/services/storage-server.js"></script>
+    <script src="scripts/common/services/download-file-service.js"></script>
+    <script src="scripts/common/directives/bindHtmlAndCompile.js"></script>
+    <script src="components/editors/editor-panel.controller.js"></script>
+    <script src="scripts/common/services/nrp-angulartics.js"></script>
+    <script src="scripts/esv/controllers/experiment-view.controller.js"></script>
+    <script src="scripts/esv/controllers/esv-experiments.js"></script>
+    <script src="scripts/esv/controllers/demo-experiments.controller.js"></script>
+    <script src="scripts/esv/controllers/demo-waiting.controller.js"></script>
+    <script src="scripts/esv/directives/context-menu.js"></script>
+    <script src="scripts/esv/directives/materials-chooser.js"></script>
+    <script src="scripts/esv/directives/owner-only.js"></script>
+    <script src="scripts/esv/directives/editable-experiment.js"></script>
+    <script src="scripts/esv/directives/experiment-details.js"></script>
+    <script src="scripts/esv/filters/experiment-status.js"></script>
+    <script src="scripts/esv/services/collab-service.js"></script>
+    <script src="scripts/esv/services/documentation-urls.js"></script>
+    <script src="scripts/esv/services/simulation-control.js"></script>
+    <script src="scripts/esv/services/context-menu-service.js"></script>
+    <script src="scripts/esv/services/backend-interface.js"></script>
+    <script src="scripts/esv/services/roslib-angular.js"></script>
+    <script src="scripts/esv/services/simulation-info-service.js"></script>
+    <script src="scripts/esv/services/slurminfo-service.js"></script>
+    <script src="scripts/esv/services/spike-listener-service.js"></script>
+    <script src="scripts/esv/services/simstate-angular.js"></script>
+    <script src="scripts/esv/services/python-code-helper.js"></script>
+    <script src="scripts/esv/services/nrp-versions.js"></script>
+    <script src="scripts/esv/services/collab-experiment-lock-service.js"></script>
+    <script src="scripts/esv/services/collab-3dsettings-service.js"></script>
+    <script src="scripts/esv/services/colorable-object-service.js"></script>
+    <script src="scripts/esv/services/base-event-handler.js"></script>
+    <script src="scripts/esv/services/user-navigation.js"></script>
+    <script src="scripts/esv/services/experimentProxyService.js"></script>
+    <script src="scripts/esv/services/experiments-service/base-experiments-service.js"></script>
+    <script src="scripts/esv/services/experiments-service/private-experiments-service.js"></script>
+    <script src="scripts/esv/services/experiments-service/template-experiments-service.js"></script>
+    <script src="scripts/esv/services/experiments-service/experiments-factory.js"></script>
+    <script src="scripts/esv/services/environment-service.js"></script>
+    <script src="scripts/esv/services/is-not-a-robot-predicate.js"></script>
+    <script src="scripts/esv/services/code-editors-services.js"></script>
+    <script src="scripts/esv/services/user-context-service.js"></script>
+    <script src="components/editors/editor-panel.service.js"></script>
+    <script src="scripts/esv/services/experiment.service.js"></script>
+    <script src="scripts/esv/directives/camera-view.js"></script>
+    <script src="scripts/esv/directives/ros-reconnecting.js"></script>
+    <script src="scripts/esv/services/simulation-config-service.js"></script>
+    <script src="scripts/esv/services/nrp-user-service.js"></script>
+    <script src="scripts/esv/services/auto-save-service.js"></script>
+    <script src="scripts/esv/directives/simulation-timeout-extender.js"></script>
+    <script src="scripts/esv/services/save-editor-errors.js"></script>
+    <script src="scripts/esv/services/temp-file-service.js"></script>
+    <script src="scripts/esv/directives/new-experiment-wizard.js"></script>
+    <script src="scripts/common/services/nrp-modal-service.js"></script>
+    <script src="scripts/esv/services/new-experiment-proxy-service.js"></script>
+    <script src="components/brain-visualizer/brain-visualizer.directive.js"></script>
+    <script src="components/brain-visualizer/brain-visualizer-panel.controller.js"></script>
+    <script src="components/brain-visualizer/brain-visualizer-panel.directive.js"></script>
+    <script src="components/alerts/browser-support/browser-support.directive.js"></script>
+    <script src="components/alerts/browser-support/browser-support.service.js"></script>
+    <script src="components/alerts/cluster-reservation/cluster-reservation.directive.js"></script>
+    <script src="components/alerts/demo-carousel/demo-carousel.directive.js"></script>
+    <script src="components/dynamic-view/dynamic-view.controller.js"></script>
+    <script src="components/client-logger/client-logger.service.js"></script>
+    <script src="components/client-logger/log-adverts/log-adverts.directive.js"></script>
+    <script src="components/client-logger/log-console/log-console.controller.js"></script>
+    <script src="components/client-logger/log-console/log-console.directive.js"></script>
+    <script src="components/dynamic-view/dynamic-view.controller.js"></script>
+    <script src="components/dynamic-view/dynamic-view.directive.js"></script>
+    <script src="components/dynamic-view-overlay/dynamic-view-overlay.controller.js"></script>
+    <script src="components/dynamic-view-overlay/dynamic-view-overlay.directive.js"></script>
+    <script src="components/dynamic-view-overlay/dynamic-view-overlay.service.js"></script>
+    <script src="components/editors/editor-panel.directive.js"></script>
+    <script src="components/editors/brain-editor/pynn-editor.directive.js"></script>
+    <script src="components/editors/environment-editor/environment-editor.directive.js"></script>
+    <script src="components/editors/state-machine-editor/smach-editor.directive.js"></script>
+    <script src="components/editors/transfer-function-editor/graphical-editor.directive.js"></script>
+    <script src="components/editors/transfer-function-editor/transfer-function-editor.directive.js"></script>
+    <script src="components/editors/transfer-function-editor/transfer-function-editor-buttons.directive.js"></script>
+    <script src="components/environment-rendering/environment-rendering.modules.js"></script>
+    <script src="components/environment-rendering/environment-rendering.controller.js"></script>
+    <script src="components/environment-rendering/environment-rendering.directive.js"></script>
+    <script src="components/environment-rendering/environment-rendering.service.js"></script>
+    <script src="components/environment-rendering/gz3d.service.js"></script>
+    <script src="components/environment-rendering/gz3d-views.service.js"></script>
+    <script src="components/environment-settings/environment-settings-panel.controller.js"></script>
+    <script src="components/environment-settings/environment-settings-panel.directive.js"></script>
+    <script src="components/environment-settings/environment-settings-usercamera.directive.js"></script>
+    <script src="components/environment-settings/environment-settings-colors.directive.js"></script>
+    <script src="components/environment-settings/environment-settings-environment.directive.js"></script>
+    <script src="components/environment-settings/environment-settings-master.directive.js"></script>
+    <script src="components/environment-settings/environment-settings-quality.directive.js"></script>
+    <script src="components/environment-settings/rgb-curve-editor.directive.js"></script>
+    <script src="components/experiment-explorer/experiment-explorer.controller.js"></script>
+    <script src="components/experiment-explorer/experiment-explorer.directive.js"></script>
+    <script src="components/experiment-list/experiment-list.controller.js"></script>
+    <script src="components/experiment-list/experiment-list.directive.js"></script>
+    <script src="components/joint-plot/joint-plot.controller.js"></script>
+    <script src="components/joint-plot/joint-plot.directive.js"></script>
+    <script src="components/joint-plot/joint-plot.service.js"></script>
+    <script src="components/spike-train/spike-train.controller.js"></script>
+    <script src="components/spike-train/spike-train.directive.js"></script>
+    <script src="components/help-tooltip/help-tooltip.constants.js"></script>
+    <script src="components/help-tooltip/help-tooltip.directive.js"></script>
+    <script src="components/help-tooltip/help-tooltip.service.js"></script>
+    <script src="components/help-tooltip/popover/help-tooltip-popover.directive.js"></script>
+    <script src="components/editor-toolbar/editor-toolbar.controller.js"></script>
+    <script src="components/editor-toolbar/editor-toolbar.directive.js"></script>
+    <script src="components/editor-toolbar/editor-toolbar.service.js"></script>
+    <script src="components/video-stream/video-stream.directive.js"></script>
+    <script src="components/video-stream/video-stream.service.js"></script>
+    <script src="components/object-inspector/object-inspector.directive.js"></script>
+    <script src="components/object-inspector/object-inspector.service.js"></script>
+    <script src="components/performance-monitor/performance-monitor.controller.js"></script>
+    <script src="components/performance-monitor/performance-monitor.directive.js"></script>
+    <script src="components/performance-monitor/performance-monitor.service.js"></script>
+    <script src="components/ros-terminal/ros-commander.service.js"></script>
+    <script src="components/ros-terminal/ros-terminal.directive.js"></script>
+    <script src="components/user-interaction/user-interaction.modules.js"></script>
+    <script src="components/user-interaction/apply-force.service.js"></script>
+    <script src="components/user-interaction/apply-force-view.controller.js"></script>
+    <script src="components/user-interaction/apply-force-view.directive.js"></script>
+    <script src="components/robot-documentation/robot-documentation.directive.js"></script>
+    <!-- endbuild -->
 
 </body>
 

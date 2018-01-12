@@ -1,0 +1,34 @@
+robot-doc-viewer {
+  font-size: 18px;
+
+  .publication {
+    margin-bottom: 20px;
+
+    .publication-author {
+      font-style: italic;
+      font-size: 90%;
+      color: #868e96;
+    }
+  }
+
+  .media-item {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    > * {
+      margin: 5px;
+    }
+
+    .figure-img {
+      max-width: 560px;
+      max-height: 380px;
+    }
+
+    .figure-caption {
+      font-size: 90%;
+      color: #868e96;
+      text-align: center;
+    }
+  }
+}

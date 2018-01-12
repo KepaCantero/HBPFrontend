@@ -58,6 +58,8 @@ describe('Services: objectInspectorService', function() {
   beforeEach(module('exd.templates')); // import html template
   beforeEach(module('exdFrontendApp'));
   beforeEach(module('stateServiceMock'));
+  beforeEach(module('simulationInfoMock'));
+
   beforeEach(function() {
     // load the module.
     module('simulationInfoService');

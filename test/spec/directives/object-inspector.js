@@ -15,6 +15,7 @@ describe('Directive: object-inspector', function() {
   beforeEach(module('exdFrontendApp'));
   beforeEach(module('exd.templates'));
   beforeEach(module('gz3dMock'));
+  beforeEach(module('simulationInfoMock'));
   beforeEach(module('dynamicViewOverlayServiceMock'));
   beforeEach(
     module(function($provide) {
