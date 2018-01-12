@@ -446,6 +446,7 @@ def {0}(t):
                       function() {}
                     );
                     scope.transferFunctions.splice(index, 1);
+                    scope.collabDirty = environmentService.isPrivateExperiment();
                   }
                 })
               );
