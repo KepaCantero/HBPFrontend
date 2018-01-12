@@ -23,7 +23,7 @@ module.exports = function(config) {
       // order matters here, they should be in front of the bower
       // section.
 
-      'bower_components/three.js/build/three.js',
+      'bower_components/three.js/three.js',
       'bower_components/three.js/examples/js/postprocessing/EffectComposer.js',
 
       // The lines between 'bower:' and 'endbower' are filled automagically with the respective bower components.
@@ -46,7 +46,7 @@ module.exports = function(config) {
       'bower_components/angular-ui-router/release/angular-ui-router.js',
       'bower_components/angular.panels/dist/angular.panels.min.js',
       'bower_components/es5-shim/es5-shim.js',
-      'bower_components/three.js/build/three.js',
+      'bower_components/three.js/three.js',
       'bower_components/three.js/examples/js/controls/OrbitControls.js',
       'bower_components/three.js/examples/js/Detector.js',
       'bower_components/three.js/examples/js/shaders/CopyShader.js',
