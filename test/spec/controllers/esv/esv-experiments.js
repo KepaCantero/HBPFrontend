@@ -36,6 +36,7 @@
       displayName: 'Claudio Sousa'
     },
     groups: [{ name: 'hbp-sp10-user-edit-rights' }],
+    availableServers: [{ id: hostName }],
     experiments: {
       matureExperiment: matureExperiment,
       developementExperiment: {
@@ -197,6 +198,9 @@
       $httpBackend
         .whenGET(new RegExp(proxyUrl + '/experiments'))
         .respond(200, pageOptions.experiments);
+      $httpBackend
+        .whenGET(new RegExp(proxyUrl + '/availableServers'))
+        .respond(200, pageOptions.availableServers);
       $httpBackend
         .whenGET(new RegExp(proxyUrl + '/experimentImage/'))
         .respond(200, {});
@@ -404,7 +408,7 @@
     });
 
     it('should NOT allow launching when NO available server', function() {
-      var page = renderEsvWebPage({ dev: true });
+      var page = renderEsvWebPage({ dev: true, availableServers: [] });
       page
         .find('.experiment-box')
         .first()

@@ -76,12 +76,10 @@
             .catch(serverError.displayHTTPError);
         }
 
-        function getAvailableServers(experimentId) {
+        function getAvailableServers() {
           return $http
-            .get(getProxyUrl() + '/availableServers/' + (experimentId || ''))
-            .then(function(response) {
-              return response.data;
-            })
+            .get(getProxyUrl() + '/availableServers')
+            .then(response => response.data)
             .catch(serverError.displayHTTPError);
         }
       }

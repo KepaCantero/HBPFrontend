@@ -3,19 +3,26 @@
 
   /*global BaseExperimentsService */
   class TemplateExperimentsService extends BaseExperimentsService {
-    constructor(experimentProxyService, ...baseDependencies) {
+    constructor(experimentProxyService, $q, ...baseDependencies) {
       super(...baseDependencies);
 
       this.experimentProxyService = experimentProxyService;
+      this.$q = $q;
     }
 
     getExperiments() {
-      return this.experimentProxyService.getExperiments().then(experiments =>
-        _.map(experiments, (exp, id) => {
-          exp.id = id;
-          return exp;
-        })
-      );
+      return this.$q
+        .all([
+          this.experimentProxyService.getAvailableServers(),
+          this.experimentProxyService.getExperiments()
+        ])
+        .then(([availableServers, experiments]) =>
+          _.map(experiments, (exp, id) => {
+            exp.id = id;
+            exp.availableServers = availableServers;
+            return exp;
+          })
+        );
     }
 
     getExperimentImage(exp) {
