@@ -77,7 +77,7 @@
     },
     "three.js": {
       "main": [
-        "build/three.js",
+        "three.js",
         "examples/js/controls/OrbitControls.js",
         "examples/js/Detector.js",
         "examples/js/shaders/CopyShader.js",

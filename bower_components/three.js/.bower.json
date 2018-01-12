@@ -1,35 +1,33 @@
 {
   "name": "three.js",
+  "version": "0.89.0",
   "homepage": "http://threejs.org/",
+  "authors": [
+    "http://mrdoob.com"
+  ],
   "description": "JavaScript 3D library",
-  "main": "build/three.js",
+  "main": "three.min.js",
   "keywords": [
-    "three",
     "threejs",
-    "three.js",
-    "3D",
+    "3d",
     "webgl"
   ],
   "license": "MIT",
   "ignore": [
     "**/.*",
-    "*.md",
-    "/docs",
-    "/editor",
-    "/examples/*",
-    "!/examples/js",
-    "/src",
-    "/test",
-    "/utils",
-    "/LICENSE"
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
   ],
-  "_release": "r88",
+  "_release": "0.89.0",
   "_resolution": {
-    "type": "tag",
-    "tag": "r88",
-    "commit": "9e7f09485532b8f0ef2051115d97aa002e58c80b"
+    "type": "version",
+    "tag": "0.89.0",
+    "commit": "231defe7eae96a7843579556ce5a43f1486f6720"
   },
-  "_source": "https://github.com/mrdoob/three.js.git",
-  "_target": "r88",
-  "_originalSource": "threejs"
+  "_source": "https://github.com/jiyinyiyong/three.js.git",
+  "_target": "0.89.0",
+  "_originalSource": "three.js",
+  "_direct": true
 }
