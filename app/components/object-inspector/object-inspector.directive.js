@@ -32,6 +32,7 @@
     'baseEventHandler',
     'gz3d',
     'EDIT_MODE',
+    'simulationInfo',
     function(
       OBJECT_VIEW_MODE,
       $timeout,
@@ -39,7 +40,8 @@
       objectInspectorService,
       baseEventHandler,
       gz3d,
-      EDIT_MODE
+      EDIT_MODE,
+      simulationInfo
     ) {
       return {
         templateUrl:
@@ -55,6 +57,8 @@
 
           scope.EDIT_MODE = EDIT_MODE;
           scope.OBJECT_VIEW_MODE = OBJECT_VIEW_MODE;
+
+          scope.robotConfigPath = simulationInfo.experimentDetails.robotPath;
 
           scope.suppressKeyPress = function(event) {
             baseEventHandler.suppressAnyKeyPress(event);

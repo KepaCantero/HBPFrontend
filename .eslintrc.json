@@ -18,6 +18,7 @@
     "moment": true,
     "Chart": true,
     "d3": true,
-    "THREE": true
+    "THREE": true,
+    "X2JS": true
   }
 }

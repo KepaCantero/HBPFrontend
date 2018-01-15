@@ -74,6 +74,7 @@ module.exports = function(config) {
       'bower_components/ng-file-upload/ng-file-upload.js',
       'bower_components/stats.js/build/stats.min.js',
       'bower_components/v-button/dist/v-button.js',
+      'bower_components/abdmob/x2js/xml2json.min.js',
       'bower_components/SHA-1/sha1.js',
       'bower_components/angulartics/src/angulartics.js',
       'bower_components/angulartics-google-analytics/lib/angulartics-ga.js',

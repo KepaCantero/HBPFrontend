@@ -36,7 +36,14 @@
       'experimentProxyService',
       'experimentList',
       'environmentService',
-      function($q, experimentProxyService, experimentList, environmentService) {
+      'bbpConfig',
+      function(
+        $q,
+        experimentProxyService,
+        experimentList,
+        environmentService,
+        bbpConfig
+      ) {
         let initialized = $q.defer();
         var thisService = {
           initialize: initialize,
@@ -78,6 +85,9 @@
                   { experimentId: experimentID },
                   function(data) {
                     var configuration = data.data.experiment_configuration;
+                    configuration.robotPath =
+                      bbpConfig.get('api.proxy.url') +
+                      `/storage/${experimentID}/robot.config?byname=true`;
                     setExperimentDetails(configuration);
                   }
                 ).$promise;
@@ -114,6 +124,9 @@
                       }
                     }
                   }
+
+                  configuration.robotPath = `${serverConfig.gzweb
+                    .assets}/${configuration.robotPath}/model.config`;
 
                   setExperimentDetails(configuration);
                 });

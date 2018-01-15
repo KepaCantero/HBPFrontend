@@ -34,6 +34,12 @@ $objectInspectorMinHeight: 40px;
   width: $objectInspectorMinWidth;
 }
 
+.robot-doc-link {
+  text-align: center;
+  width: 100%;
+  display: inline-block;
+}
+
 #header {
   display: flex;
   flex-direction: row;
