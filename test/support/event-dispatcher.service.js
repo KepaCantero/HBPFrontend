@@ -29,8 +29,8 @@
             event.button = 0;
             event.buttons = 0;
           }
-          event.pageX = pageX;
-          event.pageY = pageY;
+          event.pageX = event.clientX = pageX;
+          event.pageY = event.clientY = pageY;
           event.initEvent(eventType, true, true);
 
           return event;
