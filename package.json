@@ -80,7 +80,8 @@
     "lint": "grunt eslint",
     "postinstall":
       "rm -rf node_modules/grunt-contrib-uglify/node_modules/uglify-js/",
-    "precommit": "lint-staged"
+    "precommit": "lint-staged",
+    "build_doc": "jsdoc -r app/scripts -d docs"
   },
   "lint-staged": {
     "*.{json,scss}": [
@@ -98,7 +99,9 @@
   },
   "repository": {
     "type": "git",
-    "url": "ssh://bbpcode.epfl.ch/neurorobotics/ExDFrontend"
+    "url": "ssh://bbpcode.epfl.ch/neurorobotics/ExDFrontend",
+    "issueurl":
+      "https://bitbucket.org/hbpneurorobotics/neurorobotics-platform/issues?status=new&status=open"
   },
   "files": ["package.json", "dist"],
   "keywords": [
@@ -110,7 +113,7 @@
     "designer",
     "exd"
   ],
-  "author": "HBP",
+  "author": "HBP Neurorobotics Platform",
   "license": "GPL2",
   "private": false
 }
