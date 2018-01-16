@@ -81,7 +81,7 @@
     "postinstall":
       "rm -rf node_modules/grunt-contrib-uglify/node_modules/uglify-js/",
     "precommit": "lint-staged",
-    "build_doc": "jsdoc -r app/scripts -d docs"
+    "build_doc": "jsdoc --readme ./README.md -r app/scripts -d docs"
   },
   "lint-staged": {
     "*.{json,scss}": [
@@ -100,7 +100,9 @@
   "repository": {
     "type": "git",
     "url": "ssh://bbpcode.epfl.ch/neurorobotics/ExDFrontend",
-    "issueurl":
+    "doc_url":
+      "https://developer.humanbrainproject.eu/docs/projects/HBP%20Neurorobotics%20Platform/1.2/index.html",
+    "issuesurl":
       "https://bitbucket.org/hbpneurorobotics/neurorobotics-platform/issues?status=new&status=open"
   },
   "files": ["package.json", "dist"],
@@ -115,5 +117,36 @@
   ],
   "author": "HBP Neurorobotics Platform",
   "license": "GPL2",
-  "private": false
+  "private": false,
+  "contributors": [
+    "Fabian Aichele",
+    "Mahmoud Akl",
+    "Ugo Albanese",
+    "Alessandro Ambrosano",
+    "Manos Angelidis",
+    "Kepa Cantero",
+    "Stefan Deser",
+    "Yves Schmid Dornbierer",
+    "Bernd Eckstein",
+    "Egidio Falotico",
+    "Christian Haupt",
+    "Georg Hinkel",
+    "Luc Guyot",
+    "Jacques Kaiser",
+    "Sven Liedtke",
+    "Patrick Maier",
+    "Susie Murphy",
+    "Dario Palermo",
+    "Daniel Peppicelli",
+    "Igor Peric",
+    "David Plecher",
+    "Alina Roitberg",
+    "Kenny Sharma",
+    "Ievgen Smielik",
+    "Claudio Sousa",
+    "Lorenzo Vannucci",
+    "Axel von Arnim",
+    "Sandro Weber",
+    "Michael Welter"
+  ]
 }
