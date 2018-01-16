@@ -1,6 +1,6 @@
 {
   "name": "exdfrontend",
-  "version": "1.3.8",
+  "version": "1.3.9",
   "description": "Neurorobotics experiment designer",
   "dependencies": {
     "rxjs": "^5.4.2",
@@ -75,11 +75,9 @@
     "validate": "grunt validate",
     "build": "grunt build",
     "tag": "grunt publish",
-    "prettify":
-      "node_modules/prettier/bin/prettier.js  \"**/*.{js,json,scss}\" --write",
+    "prettify": "node_modules/prettier/bin/prettier.js  \"**/*.{js,json,scss}\" --write",
     "lint": "grunt eslint",
-    "postinstall":
-      "rm -rf node_modules/grunt-contrib-uglify/node_modules/uglify-js/",
+    "postinstall": "rm -rf node_modules/grunt-contrib-uglify/node_modules/uglify-js/",
     "precommit": "lint-staged",
     "build_doc": "jsdoc -r app/scripts -d docs"
   },
@@ -100,10 +98,12 @@
   "repository": {
     "type": "git",
     "url": "ssh://bbpcode.epfl.ch/neurorobotics/ExDFrontend",
-    "issueurl":
-      "https://bitbucket.org/hbpneurorobotics/neurorobotics-platform/issues?status=new&status=open"
+    "issueurl": "https://bitbucket.org/hbpneurorobotics/neurorobotics-platform/issues?status=new&status=open"
   },
-  "files": ["package.json", "dist"],
+  "files": [
+    "package.json",
+    "dist"
+  ],
   "keywords": [
     "angular",
     "application",
