@@ -28,12 +28,14 @@
     'CAMERA_SENSITIVITY_RANGE',
     'gz3d',
     'collab3DSettingsService',
+    'userInteractionSettingsService',
     'simulationInfo',
     'editorToolbarService',
     function(
       CAMERA_SENSITIVITY_RANGE,
       gz3d,
       collab3DSettingsService,
+      userInteractionSettingsService,
       simulationInfo,
       editorToolbarService
     ) {
@@ -54,11 +56,12 @@
               );
               gz3d.scene.applyComposerSettings(true);
             }
-            collab3DSettingsService.setDefaultNavigationSensitivity();
+            userInteractionSettingsService.loadSettings();
           };
 
           scope.saveSettings = function() {
             collab3DSettingsService.saveSettings();
+            userInteractionSettingsService.saveSettings();
           };
 
           scope.closePanel = function() {

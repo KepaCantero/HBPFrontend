@@ -25,17 +25,11 @@
   'use strict';
 
   angular.module('exdFrontendApp').service('collab3DSettingsService', [
-    'CAMERA_SENSITIVITY_RANGE',
     'gz3d',
     'simulationConfigService',
     'userNavigationService',
     'simulationInfo',
-    function(
-      CAMERA_SENSITIVITY_RANGE,
-      gz3d,
-      simulationConfigService,
-      userNavigationService
-    ) {
+    function(gz3d, simulationConfigService) {
       var loadSettings = function() {
         if (gz3d.scene.defaultComposerSettings === undefined) {
           gz3d.scene.defaultComposerSettings = JSON.parse(
@@ -52,18 +46,6 @@
               JSON.stringify(gz3d.scene.composerSettings)
             );
 
-            if (
-              gz3d.scene.composerSettings.defaultCameraMode === 'lookatrobot'
-            ) {
-              if (userNavigationService.lookatRobotControls) {
-                userNavigationService.setLookatRobotCamera();
-              } else {
-                userNavigationService.initAsLookatRobot = true;
-              }
-            }
-
-            setDefaultNavigationSensitivity();
-
             return fileContent;
           })
           .catch(function() {
@@ -78,36 +60,9 @@
         );
       };
 
-      var setDefaultNavigationSensitivity = function() {
-        var sensitivity = gz3d.scene.defaultComposerSettings.cameraSensitivity;
-        if (sensitivity && sensitivity.translation) {
-          userNavigationService.translationSensitivity = Math.min(
-            CAMERA_SENSITIVITY_RANGE.TRANSLATION_MAX,
-            Math.max(
-              CAMERA_SENSITIVITY_RANGE.TRANSLATION_MIN,
-              sensitivity.translation
-            )
-          );
-        } else {
-          userNavigationService.translationSensitivity = 1.0;
-        }
-        if (sensitivity && sensitivity.rotation) {
-          userNavigationService.rotationSensitivity = Math.min(
-            CAMERA_SENSITIVITY_RANGE.ROTATION_MAX,
-            Math.max(
-              CAMERA_SENSITIVITY_RANGE.ROTATION_MIN,
-              sensitivity.rotation
-            )
-          );
-        } else {
-          userNavigationService.rotationSensitivity = 1.0;
-        }
-      };
-
       return {
         loadSettings: loadSettings,
-        saveSettings: saveSettings,
-        setDefaultNavigationSensitivity: setDefaultNavigationSensitivity
+        saveSettings: saveSettings
       };
     }
   ]);
