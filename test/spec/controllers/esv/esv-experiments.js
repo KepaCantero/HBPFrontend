@@ -97,7 +97,8 @@
       storageServer,
       $q,
       clbErrorDialog,
-      collabConfigService;
+      collabConfigService,
+      clbConfirm;
 
     var serverErrorMock = {
       displayHTTPError: jasmine
@@ -149,7 +150,8 @@
         _storageServer_,
         _$q_,
         _clbErrorDialog_,
-        _collabConfigService_
+        _collabConfigService_,
+        _clbConfirm_
       ) {
         $http = _$http_;
         $controller = _$controller_;
@@ -172,6 +174,7 @@
         clbErrorDialog = _clbErrorDialog_;
         environmentService = _environmentService_;
         collabConfigService = _collabConfigService_;
+        clbConfirm = _clbConfirm_;
       })
     );
 
@@ -648,6 +651,62 @@
           spyOn($window.location, 'reload');
           $httpBackend.whenPUT(collabContextlessUrl).respond(200, {});
           page.find('[analytics-event="Clone"]').click();
+        });
+
+        it('should delete experiment successfully', function() {
+          var experimentsService;
+          var createExperimentsService =
+            experimentsFactory.createExperimentsService;
+          spyOn(
+            experimentsFactory,
+            'createExperimentsService'
+          ).and.callFake(function() {
+            experimentsService = createExperimentsService.apply(
+              experimentsFactory,
+              arguments
+            );
+            return experimentsService;
+          });
+
+          var page = renderEsvWebPage();
+          experimentsService.deleteExperiment = function() {
+            return $q.when();
+          };
+          spyOn(clbConfirm, 'open').and.returnValue($q.when({}));
+          var scope = getExperimentListScope(page);
+          scope.deleteExperiment(matureExperiment);
+          expect(clbConfirm.open).toHaveBeenCalled();
+        });
+
+        it('should fail to delete experiment', function() {
+          var experimentsService;
+          var createExperimentsService =
+            experimentsFactory.createExperimentsService;
+          spyOn(
+            experimentsFactory,
+            'createExperimentsService'
+          ).and.callFake(function() {
+            experimentsService = createExperimentsService.apply(
+              experimentsFactory,
+              arguments
+            );
+            return experimentsService;
+          });
+
+          var page = renderEsvWebPage();
+          experimentsService.deleteExperiment = function() {
+            return $q.reject({
+              data: 'Delete operation failed',
+              statusText: '404',
+              status: 404
+            });
+          };
+          spyOn(clbConfirm, 'open').and.returnValue($q.when({}));
+          spyOn(clbErrorDialog, 'open').and.returnValue($q.when({}));
+
+          var scope = getExperimentListScope(page);
+          scope.deleteExperiment(matureExperiment);
+          expect(clbConfirm.open).toHaveBeenCalled();
         });
 
         it('should reload experiments after clone', function() {
