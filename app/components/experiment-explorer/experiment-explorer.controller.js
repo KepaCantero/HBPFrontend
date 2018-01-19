@@ -36,7 +36,8 @@
       $uibModal,
       clbErrorDialog,
       storageServer,
-      clbConfirm
+      clbConfirm,
+      experimentsFactory
     ) {
       this.$scope = $scope;
       this.$window = $window;
@@ -51,7 +52,46 @@
 
       this.experimentInput = $element.find('#experiment-input');
       this.experimentInput.on('change', e => this.uploadFile(e));
+      this.experimentsFactory = experimentsFactory;
+
       $scope.$on('$destroy', () => this.experimentInput.off('change'));
+    }
+
+    loadPrivateExperimentList() {
+      var experimentsService = this.experimentsFactory.createExperimentsService(
+        true
+      );
+      experimentsService.initialize();
+      experimentsService
+        .getExperiments()
+        .then(experiments => {
+          this.privateExperiments = experiments;
+        })
+        .catch(err => this.onError('Failed to load Private Experiments', err));
+    }
+
+    isPrivateExperimentRunning(experiment) {
+      this.isExperimentRunning = false;
+      _.forEach(this.privateExperiments, privateExperiment => {
+        if (experiment.uuid == privateExperiment.id) {
+          this.isExperimentRunning =
+            privateExperiment.private &&
+            privateExperiment.joinableServers.length > 0;
+          if (this.isExperimentRunning) {
+            this.clbErrorDialog.open({
+              type: 'Error.',
+              message:
+                'A Simulation based on this experiment is already running, cannot delete the experiment '
+            });
+          }
+        }
+      });
+      return this.isExperimentRunning;
+    }
+
+    loadExperiments() {
+      this.loadExperimentList();
+      this.loadPrivateExperimentList();
     }
 
     loadExperimentList() {
@@ -322,7 +362,8 @@
     '$uibModal',
     'clbErrorDialog',
     'storageServer',
-    'clbConfirm'
+    'clbConfirm',
+    'experimentsFactory'
   ];
 
   angular
