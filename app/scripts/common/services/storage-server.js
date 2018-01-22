@@ -47,10 +47,7 @@
       const FILE_REGEXP = /attachment; filename=(.*)/;
       let buildAction = action =>
         angular.merge(action, {
-          headers: { 'Context-Id': () => this.$stateParams.ctx },
-          interceptor: {
-            responseError: err => this.$q.reject(this.onError(err))
-          }
+          headers: { 'Context-Id': () => this.$stateParams.ctx }
         });
 
       let transformFileResponse = (data, header) => {
@@ -128,19 +125,6 @@
           })
         }
       );
-    }
-
-    onError(err) {
-      let absoluteUrl = /^https?:\/\//i;
-      if (err.status === 302) {
-        //redirect
-        let url = err.data;
-        if (!absoluteUrl.test(url)) url = `${this.PROXY_URL}${url}`;
-        localStorage.removeItem(this.STORAGE_KEY);
-        this.$window.location.href = `${url}&client_id=${this
-          .CLIENT_ID}&redirect_uri=${encodeURIComponent(location.href)}`;
-      }
-      return this.$q.reject(err);
     }
 
     getCustomModels(modelType) {
@@ -274,6 +258,10 @@
       this.$location.url(pathMinusAccessToken);
     }
 
+    clearStoredToken() {
+      localStorage.removeItem(this.STORAGE_KEY);
+    }
+
     getStoredToken() {
       let storedItem = localStorage.getItem(this.STORAGE_KEY);
       if (!storedItem) {
@@ -297,20 +285,5 @@
   angular
     .module('storageServer', ['ngResource', 'bbpConfig', 'ui.router'])
     .service('storageServer', StorageServer)
-    .service('storageServerTokenManager', StorageServerTokenManager)
-    .factory('storageServerRequestInterceptor', [
-      'storageServerTokenManager',
-      storageServerTokenManager => ({
-        request: function(requestConfig) {
-          var token = storageServerTokenManager.getStoredToken();
-          requestConfig.headers.Authorization = 'Bearer ' + token;
-          return requestConfig;
-        }
-      })
-    ])
-    .config([
-      '$httpProvider',
-      $httpProvider =>
-        $httpProvider.interceptors.push('storageServerRequestInterceptor')
-    ]);
+    .service('storageServerTokenManager', StorageServerTokenManager);
 })();

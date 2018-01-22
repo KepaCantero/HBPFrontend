@@ -98,7 +98,8 @@
       'experimentList',
       'rosTerminalModule',
       'userInteractionModule',
-      'robotDocumentation'
+      'robotDocumentation',
+      'adminModule'
     ])
     // Routes
     .config([
@@ -293,6 +294,20 @@
           templateUrl: 'views/common/support.html'
         };
 
+        var adminState = {
+          name: 'admin',
+          url: '/admin',
+          templateUrl: 'views/admin/admin.html',
+          controller: 'adminPageCtrl',
+          controllerAs: '$ctrl'
+        };
+
+        var maintenanceState = {
+          name: 'maintenance',
+          url: '/maintenance',
+          templateUrl: 'views/common/maintenance.html'
+        };
+
         var newCollabOverviewState = {
           name: 'create-collab-overview',
           url: '/create-collab-overview',
@@ -318,6 +333,9 @@
         home.state(supportState);
         home.state(newCollabOverviewState);
         home.state(experimentExplorerState);
+
+        home.state(adminState);
+        home.state(maintenanceState);
 
         home.state(robotDocumentation);
         home.state(esvWegStateDebug);

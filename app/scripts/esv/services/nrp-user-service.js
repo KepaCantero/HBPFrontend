@@ -64,9 +64,9 @@
       return {
         getCurrentUser: _.memoize(getCurrentUser),
         getReservation: getReservation,
-        isMemberOfClusterReservationGroup: _.memoize(() =>
-          isGroupMember('hbp-sp10-cluster-reservation')
-        ),
+        isMemberOfClusterReservationGroup: () =>
+          isGroupMember('hbp-sp10-cluster-reservation'),
+        isAdministrator: () => isGroupMember('hbp-sp10-administrators'),
         getOwnerDisplayName: _.memoize(getOwnerName),
         getCurrentUserInfo: _.memoize(getCurrentUserInfo)
       };

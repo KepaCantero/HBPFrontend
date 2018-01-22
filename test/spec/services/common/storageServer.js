@@ -34,20 +34,6 @@
       expect(storageServer.proxyRsc).toBeDefined();
     });
 
-    it('should handle non specific errors correctly', function(done) {
-      var throwableError = { status: 403 };
-      storageServer.onError(throwableError).catch(done);
-      $rootScope.$digest();
-    });
-
-    it('should handle redirect errors correctly', function() {
-      var moveError = { status: 302, data: 'myloginpage' };
-      storageServer.onError(moveError);
-      expect(windowMock.location.href).toMatch(
-        'http://proxymyloginpage&client_id=test-client-id&redirect_uri=http%3A%2F%2Flocalhost%3A900'
-      );
-    });
-
     it('should retrieve experiments', function(done) {
       var experiments = ['exp1', 'exp2'];
       $httpBackend
