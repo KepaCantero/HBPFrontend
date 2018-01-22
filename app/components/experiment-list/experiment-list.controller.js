@@ -33,6 +33,7 @@
     'nrpUser',
     'environmentService',
     'clbErrorDialog',
+    'clbConfirm',
     function(
       $scope,
       $location,
@@ -42,7 +43,8 @@
       $window,
       nrpUser,
       environmentService,
-      clbErrorDialog
+      clbErrorDialog,
+      clbConfirm
     ) {
       $scope.pageState = {};
       $scope.isPrivateExperiment = environmentService.isPrivateExperiment();
@@ -157,11 +159,36 @@
         };
 
         $scope.deleteExperiment = function(expName) {
-          $scope.pageState.deletingExperiment = true;
-          experimentsService.deleteExperiment(expName).then(() => {
-            $scope.pageState.deletingExperiment = false;
-            return $scope.reinit();
-          });
+          clbConfirm
+            .open({
+              title: 'Delete experiment?',
+              confirmLabel: 'Yes',
+              cancelLabel: 'No',
+              template:
+                'Are you sure you would like to delete this experiment?',
+              closable: true
+            })
+            .then(() => {
+              $scope.pageState.deletingExperiment = true;
+              experimentsService
+                .deleteExperiment(expName)
+                .then(() => {
+                  return $scope.reinit();
+                })
+                .catch(err => {
+                  err = {
+                    type: 'Error while deleting experiment',
+                    data: err.data,
+                    message:
+                      'Deleting experiment failed. The storage server might be unavailable',
+                    code: err.statusText + ' ' + err.status
+                  };
+                  clbErrorDialog.open(err).then(() => {});
+                })
+                .finally(() => {
+                  $scope.pageState.deletingExperiment = false;
+                });
+            });
         };
 
         // Stop an already initialized or running experiment

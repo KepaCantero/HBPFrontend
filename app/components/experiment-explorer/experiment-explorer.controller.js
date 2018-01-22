@@ -35,7 +35,8 @@
       $log,
       $uibModal,
       clbErrorDialog,
-      storageServer
+      storageServer,
+      clbConfirm
     ) {
       this.$scope = $scope;
       this.$window = $window;
@@ -46,6 +47,7 @@
       this.$log = $log;
       this.$uibModal = $uibModal;
       this.clbErrorDialog = clbErrorDialog;
+      this.clbConfirm = clbConfirm;
 
       this.experimentInput = $element.find('#experiment-input');
       this.experimentInput.on('change', e => this.uploadFile(e));
@@ -172,14 +174,24 @@
     }
 
     deleteExperiment(experiment) {
-      this.experimentList.deleting = true;
-      this.storageServer
-        .deleteExperiment(experiment.uuid)
-        .then(() => {
-          this.$window.location.reload();
+      this.clbConfirm
+        .open({
+          title: 'Delete experiment?',
+          confirmLabel: 'Yes',
+          cancelLabel: 'No',
+          template: 'Are you sure you would like to delete this experiment?',
+          closable: true
         })
-        .catch(err => this.onError('Failed to delete experiment', err))
-        .finally(() => (this.experimentList.deleting = false));
+        .then(() => {
+          this.experimentList.deleting = true;
+          this.storageServer
+            .deleteExperiment(experiment.uuid)
+            .then(() => {
+              this.$window.location.reload();
+            })
+            .catch(err => this.onError('Failed to delete experiment', err))
+            .finally(() => (this.experimentList.deleting = false));
+        });
     }
 
     deleteFile(file) {
@@ -309,7 +321,8 @@
     '$log',
     '$uibModal',
     'clbErrorDialog',
-    'storageServer'
+    'storageServer',
+    'clbConfirm'
   ];
 
   angular

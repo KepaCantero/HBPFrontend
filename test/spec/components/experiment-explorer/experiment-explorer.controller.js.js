@@ -221,6 +221,23 @@ describe('Controller: ExperimentExplorerController', function() {
     $httpBackend.flush();
   });
 
+  it('should throw when deleting experiment', function() {
+    var controller = loadExperiments();
+
+    selectExperiment(controller);
+
+    selectFolder(controller);
+
+    $httpBackend
+      .expectDELETE(STORAGE_URL + '207a87c9-78d9-4504-bde7-6919feaac12b')
+      .respond(500);
+
+    controller.deleteExperiment(controller.experimentList[0].folders[0]);
+
+    $rootScope.$digest();
+    $httpBackend.flush();
+  });
+
   it('should download file', function() {
     var controller = loadExperiments();
 
