@@ -87,7 +87,6 @@
           }
         );
       };
-
       var resourceTransferFunctionSimulation = function(backendBaseUrl) {
         return $resource(
           backendBaseUrl + '/simulation/:sim_id/transfer-functions',
@@ -96,6 +95,12 @@
             transferFunctions: {
               method: 'GET',
               interceptor: { responseError: serverError.displayHTTPError }
+            },
+            activate: {
+              method: 'PUT',
+              url:
+                backendBaseUrl +
+                '/simulation/:sim_id/transfer-functions/:transfer_function_name/activation/:activate'
             },
             edit: {
               method: 'PUT',
@@ -479,6 +484,26 @@
             function(data) {
               callback(data);
             }
+          );
+        },
+        setActivateTransferFunction: function(
+          name,
+          data,
+          activate,
+          successCallback,
+          errorCallback
+        ) {
+          resourceTransferFunctionSimulation(
+            simulationInfo.serverBaseUrl
+          ).activate(
+            {
+              sim_id: simulationInfo.simulationID,
+              transfer_function_name: name,
+              activate: activate
+            },
+            data,
+            successCallback,
+            errorCallback
           );
         },
         editTransferFunction: function(
