@@ -12,7 +12,8 @@ describe('Directive: graphicalEditor', function() {
     SOURCE_TYPE,
     TRANSFER_FUNCTION_TYPE,
     pythonCodeHelper,
-    ScriptObject;
+    ScriptObject,
+    $timeout;
 
   var backendInterfaceServiceMock = {
     getPopulations: jasmine.createSpy('getPopulations'),
@@ -86,6 +87,7 @@ describe('Directive: graphicalEditor', function() {
     ) {
       $rootScope = _$rootScope_;
       $compile = _$compile_;
+      $timeout = _$timeout_;
       SOURCE_TYPE = _SOURCE_TYPE_;
       TRANSFER_FUNCTION_TYPE = _TRANSFER_FUNCTION_TYPE_;
       backendInterfaceService = _backendInterfaceService_;
@@ -166,6 +168,14 @@ describe('Directive: graphicalEditor', function() {
     expect(
       isolateScope.getFriendlyTopicName({ publishing: false, topic: 'bar' })
     ).toEqual('subscribes to bar');
+  });
+
+  it('should apply editor options', function() {
+    spyOn(isolateScope, 'applyEditorOptions').and.callThrough();
+    $timeout.flush(110);
+    isolateScope.$apply();
+
+    expect(isolateScope.applyEditorOptions).toHaveBeenCalled();
   });
 
   it('does nothing on apply or delete if no transfer function present', function() {
