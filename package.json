@@ -1,6 +1,6 @@
 {
   "name": "exdfrontend",
-  "version": "1.3.10",
+  "version": "1.3.11",
   "description": "Neurorobotics experiment designer",
   "dependencies": {
     "rxjs": "^5.4.2",
@@ -75,11 +75,9 @@
     "validate": "grunt validate",
     "build": "grunt build",
     "tag": "grunt publish",
-    "prettify":
-      "node_modules/prettier/bin/prettier.js  \"**/*.{js,json,scss}\" --write",
+    "prettify": "node_modules/prettier/bin/prettier.js  \"**/*.{js,json,scss}\" --write",
     "lint": "grunt eslint",
-    "postinstall":
-      "rm -rf node_modules/grunt-contrib-uglify/node_modules/uglify-js/",
+    "postinstall": "rm -rf node_modules/grunt-contrib-uglify/node_modules/uglify-js/",
     "precommit": "lint-staged",
     "build_doc": "jsdoc --readme ./README.md -r app/scripts -d docs"
   },
@@ -100,12 +98,13 @@
   "repository": {
     "type": "git",
     "url": "ssh://bbpcode.epfl.ch/neurorobotics/ExDFrontend",
-    "doc_url":
-      "https://developer.humanbrainproject.eu/docs/projects/HBP%20Neurorobotics%20Platform/1.2/index.html",
-    "issuesurl":
-      "https://bitbucket.org/hbpneurorobotics/neurorobotics-platform/issues?status=new&status=open"
+    "doc_url": "https://developer.humanbrainproject.eu/docs/projects/HBP%20Neurorobotics%20Platform/1.2/index.html",
+    "issuesurl": "https://bitbucket.org/hbpneurorobotics/neurorobotics-platform/issues?status=new&status=open"
   },
-  "files": ["package.json", "dist"],
+  "files": [
+    "package.json",
+    "dist"
+  ],
   "keywords": [
     "angular",
     "application",
