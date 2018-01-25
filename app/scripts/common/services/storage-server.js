@@ -127,6 +127,10 @@
             method: 'GET',
             isArray: true,
             url: `${this.STORAGE_BASE_URL}/custommodels/:modelType`
+          }),
+          cloneTemplate: buildAction({
+            method: 'POST',
+            url: `${this.STORAGE_BASE_URL}/clone/`
           })
         }
       );
@@ -224,6 +228,10 @@
 
     cloneClonedExperiment(experiment) {
       return this.proxyRsc.setClonedExperiment({ experiment }, null).$promise;
+    }
+
+    cloneTemplate(expPath, contextId) {
+      return this.proxyRsc.cloneTemplate({ expPath, contextId }).$promise;
     }
   }
 

@@ -25,7 +25,7 @@
   'use strict';
 
   angular
-    .module('simulationConfigModule', ['collabServices', 'storageServer'])
+    .module('simulationConfigModule', ['storageServer'])
     .service('simulationConfigService', [
       '$resource',
       'simulationInfo',

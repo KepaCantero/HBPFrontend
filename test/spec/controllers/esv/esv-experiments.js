@@ -97,7 +97,6 @@
       storageServer,
       $q,
       clbErrorDialog,
-      collabConfigService,
       clbConfirm;
 
     var serverErrorMock = {
@@ -150,7 +149,6 @@
         _storageServer_,
         _$q_,
         _clbErrorDialog_,
-        _collabConfigService_,
         _clbConfirm_
       ) {
         $http = _$http_;
@@ -173,7 +171,6 @@
         $q = _$q_;
         clbErrorDialog = _clbErrorDialog_;
         environmentService = _environmentService_;
-        collabConfigService = _collabConfigService_;
         clbConfirm = _clbConfirm_;
       })
     );
@@ -755,9 +752,9 @@
           var page = renderEsvWebPage();
           var scope = getExperimentListScope(page);
           scope.config.canLaunchExperiments = false;
-          spyOn(collabConfigService, 'clone').and.returnValue(
-            $q.when({ clonedExp: 'fakeUUID', originalExp: 'fake_uuid' })
-          );
+          // spyOn(collabConfigService, 'clone').and.returnValue(
+          //   $q.when({ clonedExp: 'fakeUUID', originalExp: 'fake_uuid' })
+          // );
           spyOn(scope, 'cloneExperiment');
           scope.clone('Exp_0');
           expect(scope.cloneExperiment).toHaveBeenCalled();
@@ -778,20 +775,9 @@
 
         it('should reload experiments after clone', function() {
           var page = renderEsvWebPage();
-          var mockResource = {};
-          Promise.prototype.finally = function() {};
-          mockResource.$promise = new Promise(function(resolve, reject) {
-            var f = false;
-            if (f) {
-              resolve(1);
-            } else {
-              reject(2);
-            }
-          });
-          spyOn(collabConfigService, 'clone').and.returnValue(mockResource);
+          spyOn(storageServer, 'cloneTemplate').and.returnValue($q.resolve(1));
           var scope = getExperimentListScope(page);
           scope.cloneExperiment(matureExperiment);
-          collabConfigService.clone.calls.mostRecent().args[2]();
           expect(scope.isCloneRequested).toBe(true);
         });
       });

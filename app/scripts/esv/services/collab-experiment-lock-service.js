@@ -25,7 +25,7 @@
   'use strict';
 
   angular
-    .module('collabExperimentLockModule', ['collabServices'])
+    .module('collabExperimentLockModule', [])
     .value('LOCK_FILE_VALIDITY_MAX_AGE_HOURS', 24) //after x hours, lock file is ignored
     .provider('collabExperimentLockService', function() {
       //The edition lock file name that will be created within the experiment folder

@@ -28,26 +28,23 @@
     '$location',
     '$stateParams',
     'experimentsFactory',
-    'collabConfigService',
+    'storageServer',
     '$window',
     'nrpUser',
     'environmentService',
     'clbErrorDialog',
     'clbConfirm',
-    'storageServer',
-    '$timeout',
     function(
       $scope,
       $location,
       $stateParams,
       experimentsFactory,
-      collabConfigService,
+      storageServer,
       $window,
       nrpUser,
       environmentService,
       clbErrorDialog,
-      clbConfirm,
-      storageServer
+      clbConfirm
     ) {
       $scope.pageState = {};
       $scope.isPrivateExperiment = environmentService.isPrivateExperiment();
@@ -131,35 +128,27 @@
 
       $scope.cloneExperiment = function(experiment) {
         $scope.isCloneRequested = true;
-        collabConfigService
-          .clone(
-            null,
-            {
-              /* eslint-disable camelcase */
-              exp_configuration_path:
-                experiment.configuration.experimentConfiguration,
-              context_id: $stateParams.ctx
-              /* eslint-enable camelcase */
-            },
-            function() {
-              try {
-                $window.document
-                  .getElementById('clb-iframe-workspace')
-                  .contentWindow.parent.postMessage(
-                    {
-                      eventName: 'location',
-                      data: { url: window.location.href.split('?')[0] }
-                    },
-                    '*'
-                  );
-              } catch (err) {
-                //not in using collab website, do nothing
-              }
-            }
+        storageServer
+          .cloneTemplate(
+            experiment.configuration.experimentConfiguration,
+            $stateParams.ctx
           )
-          .$promise.then(() => {
-            $scope.loadPrivateExperiments();
+          .then(() => {
+            try {
+              $window.document
+                .getElementById('clb-iframe-workspace')
+                .contentWindow.parent.postMessage(
+                  {
+                    eventName: 'location',
+                    data: { url: window.location.href.split('?')[0] }
+                  },
+                  '*'
+                );
+            } catch (err) {
+              //not in using collab website, do nothing
+            }
           })
+          .then(() => $scope.loadPrivateExperiments())
           .catch(err => $scope.throwCloningError(err))
           .finally(() => {
             $scope.isCloneRequested = false;

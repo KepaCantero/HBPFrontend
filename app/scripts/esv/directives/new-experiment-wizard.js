@@ -31,7 +31,6 @@
     'clbErrorDialog',
     '$http',
     'newExperimentProxyService',
-    'collabConfigService',
     '$window',
     '$stateParams',
     function(
@@ -41,7 +40,6 @@
       clbErrorDialog,
       $http,
       newExperimentProxyService,
-      collabConfigService,
       $window
     ) {
       return {
@@ -322,25 +320,27 @@
           };
 
           $scope.cloneNewExperiment = function(experimentID) {
+            //prevent warning: to remove once code commented has been merged
+            $window, experimentID;
             $scope.isCloneRequested = true;
-            collabConfigService.clone(
-              { experimentId: experimentID },
-              {
-                experimentID: experimentID,
-                brainPath: $scope.paths.brainPath,
-                robotPath: $scope.paths.robotPath,
-                envPath: $scope.paths.environmentPath
-              },
-              function() {
-                $window.location.reload();
-                $window.parent.postMessage(
-                  {
-                    eventName: 'navigation.reload'
-                  },
-                  '*'
-                );
-              }
-            );
+            // collabConfigService.clone(
+            //   { experimentId: experimentID },
+            //   {
+            //     experimentID: experimentID,
+            //     brainPath: $scope.paths.brainPath,
+            //     robotPath: $scope.paths.robotPath,
+            //     envPath: $scope.paths.environmentPath
+            //   },
+            //  function() {
+            //    $window.location.reload();
+            //    $window.parent.postMessage(
+            //      {
+            //        eventName: 'navigation.reload'
+            //      },
+            //      '*'
+            //    );
+            //  }
+            // );
           };
         }
       };

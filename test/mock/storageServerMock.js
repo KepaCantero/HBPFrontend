@@ -26,6 +26,12 @@
           return $q.when([{ name: 'hbp-sp10-user-edit-rights' }]);
         });
 
+      this.cloneTemplate = jasmine
+        .createSpy('storageServerMock.cloneTemplate')
+        .and.callFake(function() {
+          return $q.when([{ name: 'hbp-sp10-user-edit-rights' }]);
+        });
+
       this.reset = function() {
         this.getCurrentUser.calls.reset();
         this.getUser.calls.reset();

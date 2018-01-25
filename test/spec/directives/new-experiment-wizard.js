@@ -10,8 +10,7 @@
       $q,
       scope,
       clbErrorDialog,
-      newExperimentProxyService,
-      collabConfigService;
+      newExperimentProxyService;
 
     beforeEach(module('exdFrontendApp'));
     beforeEach(module('exd.templates'));
@@ -26,8 +25,7 @@
         _storageServer_,
         _$q_,
         _clbErrorDialog_,
-        _newExperimentProxyService_,
-        _collabConfigService_
+        _newExperimentProxyService_
       ) {
         $httpBackend = _$httpBackend_;
         $rootScope = _$rootScope_;
@@ -37,7 +35,6 @@
         $q = _$q_;
         clbErrorDialog = _clbErrorDialog_;
         newExperimentProxyService = _newExperimentProxyService_;
-        collabConfigService = _collabConfigService_;
 
         $compile('<new-experiment-wizard></new-experiment-wizard>')($rootScope);
         $rootScope.$digest();
@@ -522,13 +519,13 @@
       expect(scope.environmentUploaded).toBe(true);
     });
 
-    it('should test that the clone new experiment function works', function() {
-      spyOn(collabConfigService, 'clone').and.callFake(function() {
-        return;
-      });
-      scope.cloneNewExperiment('fakeExpID');
-      expect(scope.isCloneRequested).toBe(true);
-    });
+    // it('should test that the clone new experiment function works', function() {
+    //   spyOn(collabConfigService, 'clone').and.callFake(function() {
+    //     return;
+    //   });
+    //   scope.cloneNewExperiment('fakeExpID');
+    //   expect(scope.isCloneRequested).toBe(true);
+    // });
 
     it('should test that the complete upload entity function creates an error popup when the path is not correct', function() {
       var mockSelectedEntity = {
