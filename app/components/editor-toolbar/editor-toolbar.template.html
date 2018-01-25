@@ -139,11 +139,7 @@
             <!-- navigation mode -->
 
             <!-- code editor icon -->
-            <div class="hbp-toolbar-action hide-overflow" ng-class="{ 'active': vm.editorsPanelService.showEditorPanel,
-                              'disabled': vm.userContextService.editIsDisabled || vm.editorsPanelService.loadingEditPanel ||
-                                          (vm.stateService.currentState === vm.STATE.HALTED) ||
-                                          (vm.stateService.currentState === vm.STATE.STOPPED) ||
-                                          (vm.stateService.currentState === vm.STATE.FAILED)}" ng-click="vm.codeEditorButtonClickHandler()" help-tooltip="CODE_EDITOR" uib-tooltip="Sorry, you cannot edit at the moment as {{userEditing}} started editing {{timeEditStarted}}."
+            <div class="hbp-toolbar-action hide-overflow" ng-class="{ 'active': vm.editorsPanelService.showEditorPanel }" ng-click="vm.codeEditorButtonClickHandler()" help-tooltip="CODE_EDITOR" uib-tooltip="Sorry, you cannot edit at the moment as {{userEditing}} started editing {{timeEditStarted}}."
                 tooltip-trigger="mouseenter" tooltip-enable="vm.userContextService.editIsDisabled" v-busy="vm.editorsPanelService.loadingEditPanel" v-busy-label="Loading the edit panel">
                 <i class="fa fa-pencil-square-o fa-2x vertcenter"></i>
             </div>
