@@ -1,7 +1,7 @@
 'use strict';
 
 describe('Services: collab-3dsettings-service', function() {
-  var gz3dMock, collab3DSettingsService, userNavigationService;
+  var gz3dMock, collab3DSettingsService;
 
   gz3dMock = { scene: { composerSettings: {} } };
   gz3dMock.scene.applyComposerSettings = function() {};
@@ -44,9 +44,8 @@ describe('Services: collab-3dsettings-service', function() {
   );
 
   beforeEach(
-    inject(function(_collab3DSettingsService_, _userNavigationService_) {
+    inject(function(_collab3DSettingsService_) {
       collab3DSettingsService = _collab3DSettingsService_;
-      userNavigationService = _userNavigationService_;
     })
   );
 
@@ -60,21 +59,5 @@ describe('Services: collab-3dsettings-service', function() {
     spyOn(simulationConfigServiceMock, 'saveConfigFile').and.callThrough();
     collab3DSettingsService.saveSettings();
     expect(simulationConfigServiceMock.saveConfigFile).toHaveBeenCalled();
-  });
-
-  it('should apply default sensitivity settings correctly', function() {
-    spyOn(
-      collab3DSettingsService,
-      'setDefaultNavigationSensitivity'
-    ).and.callThrough();
-    collab3DSettingsService.loadSettings();
-    expect(userNavigationService.translationSensitivity).toBe(1.1);
-    expect(userNavigationService.rotationSensitivity).toBe(1.2);
-
-    // no default values in config file
-    gz3dMock.scene.defaultComposerSettings.cameraSensitivity = undefined;
-    collab3DSettingsService.setDefaultNavigationSensitivity();
-    expect(userNavigationService.translationSensitivity).toBe(1.0);
-    expect(userNavigationService.rotationSensitivity).toBe(1.0);
   });
 });
