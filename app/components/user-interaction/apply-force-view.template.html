@@ -1,14 +1,15 @@
 <!-- build:css(.tmp) styles/esv/apply-force-view.css -->
 <link rel="stylesheet" href="components/dynamic-view-overlay/dynamic-view-overlay.style.css"/>
+<link rel="stylesheet" href="components/user-interaction/apply-force-view.style.css" />
 <!-- endbuild -->
 <div class="dynamic-view-overlay-content">
     <h6>Direction</h6>
         x: <input interactive type="number" name="rotate-x" class="vec3-num-input" ng-model="vm.applyForceService.forceVector.x"
-                  ng-keydown="suppressKeyPress($event)" ng-change="vm.applyForceService.RotationChanged()">
+                  ng-keydown="suppressKeyPress($event)" ng-change="vm.applyForceService.onUIChangeForceVector()">
         y: <input interactive type="number" name="rotate-y" class="vec3-num-input" ng-model="vm.applyForceService.forceVector.y"
-                  ng-keydown="suppressKeyPress($event)" ng-change="vm.applyForceService.RotationChanged()">
+                  ng-keydown="suppressKeyPress($event)" ng-change="vm.applyForceService.onUIChangeForceVector()">
         z: <input interactive type="number" name="rotate-z" class="vec3-num-input" ng-model="vm.applyForceService.forceVector.z"
-                  ng-keydown="suppressKeyPress($event)" ng-change="vm.applyForceService.RotationChanged()">
+                  ng-keydown="suppressKeyPress($event)" ng-change="vm.applyForceService.onUIChangeForceVector()">
         <h6>Strength</h6>
         in newton applied over a period of 0.1 seconds</br>
         <input interactive type="number" ng-model="vm.applyForceService.forceStrength"

@@ -22,37 +22,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  * ---LICENSE-END**/
 
-(function() {
-  'use strict';
-
-  class ApplyForceViewController {
-    constructor($scope, baseEventHandler, applyForceService) {
-      this.applyForceService = applyForceService;
-
-      $scope.$on('$destroy', () => {
-        applyForceService.disableApplyForceMode();
-        applyForceService.detachGizmo();
-      });
-
-      $scope.suppressKeyPress = function(event) {
-        baseEventHandler.suppressAnyKeyPress(event);
-      };
-    }
-  }
-
-  /**
-   * @ngdoc function
-   * @name userInteractionModule.controller:ApplyForceViewController
-   * @description
-   * # ApplyForceViewController
-   * Controller for the overlay view to control force behaviour
-   */
-  angular
-    .module('userInteractionModule')
-    .controller('ApplyForceViewController', [
-      '$scope',
-      'baseEventHandler',
-      'applyForceService',
-      (...args) => new ApplyForceViewController(...args)
-    ]);
-})();
+.vec3-num-input {
+  width: 50px;
+}

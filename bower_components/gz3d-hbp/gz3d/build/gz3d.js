@@ -8053,6 +8053,10 @@ GZ3D.Manipulator = function(gz3dScene, mobile)
     // If one of the current pickers was touched
     if(intersect)
     {
+      if (scope.gz3dScene.controls) {
+        scope.gz3dScene.controls.enabled = false;
+      }
+
       if(selectedPicker !== intersect.object)
       {
         // Back to original color
@@ -8121,6 +8125,10 @@ GZ3D.Manipulator = function(gz3dScene, mobile)
 
     scope.userView.container.removeEventListener('touchmove', onPointerMove, false);
     scope.userView.container.removeEventListener('touchend', onTouchEnd, false);
+
+    if (scope.gz3dScene.controls) {
+      scope.gz3dScene.controls.enabled = true;
+    }
   }
 
   this.highlightPicker = function (picker) {
@@ -8230,6 +8238,10 @@ GZ3D.Manipulator = function(gz3dScene, mobile)
     if(intersect)
     {
       selectPicker(event);
+
+      if (scope.gz3dScene.controls) {
+        scope.gz3dScene.controls.enabled = false;
+      }
     }
 
     scope.userView.container.addEventListener('mousemove', onPointerMove, false);
@@ -8743,6 +8755,9 @@ GZ3D.Manipulator = function(gz3dScene, mobile)
   function onMouseUp(event)
   {
     handleAxisLockEnd();
+    if (scope.gz3dScene.controls) {
+      scope.gz3dScene.controls.enabled = true;
+    }
   }
 
   /**
@@ -10475,28 +10490,6 @@ GZ3D.Scene.prototype.render = function()
 
 GZ3D.Scene.prototype.updateUI = function()
 {
-  // Kill camera control when:
-  // -manipulating
-  // -using radial menu
-  // -pointer over menus
-  // -spawning
-
-
-  if (this.controls) {
-    if (this.modelManipulator.hovered ||
-      this.radialMenu.showing ||
-      this.pointerOnMenu ||
-      this.spawnModel.active ||
-      this.naturalAutoAlignMode)
-    {
-      this.controls.enabled = false;
-    }
-    else
-    {
-      this.controls.enabled = true;
-    }
-  }
-
   this.modelManipulator.update();
   this.radialMenu.update();
 };
