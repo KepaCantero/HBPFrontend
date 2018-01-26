@@ -118,6 +118,11 @@
             url: `${this.STORAGE_BASE_URL}/:experimentId/:filename`,
             transformRequest: []
           }),
+          setClonedExperiment: buildAction({
+            method: 'POST',
+            url: `${this.STORAGE_BASE_URL}/clone/:experiment`,
+            transformRequest: []
+          }),
           getCustomModels: buildAction({
             method: 'GET',
             isArray: true,
@@ -215,6 +220,10 @@
 
     getCurrentUserGroups() {
       return this.proxyRsc.getCurrentUserGroups().$promise;
+    }
+
+    cloneClonedExperiment(experiment) {
+      return this.proxyRsc.setClonedExperiment({ experiment }, null).$promise;
     }
   }
 

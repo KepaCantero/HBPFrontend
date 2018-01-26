@@ -709,6 +709,73 @@
           expect(clbConfirm.open).toHaveBeenCalled();
         });
 
+        it('should clone a cloned experiment successfully', function() {
+          var page = renderEsvWebPage();
+          var scope = getExperimentListScope(page);
+          spyOn(storageServer, 'cloneClonedExperiment').and.returnValue(
+            $q.when({ clonedExp: 'fakeUUID', originalExp: 'fake_uuid' })
+          );
+          spyOn(scope, 'changeExpName').and.returnValue($q.when());
+          scope.cloneClonedExperiment('Exp_0');
+          expect(storageServer.cloneClonedExperiment).toHaveBeenCalled();
+          expect(scope.isCloneRequested).toBe(true);
+        });
+
+        it('should fail to clone a cloned experiment', function() {
+          var page = renderEsvWebPage();
+          var scope = getExperimentListScope(page);
+          spyOn(storageServer, 'cloneClonedExperiment').and.returnValue(
+            $q.reject({ data: 'Error' })
+          );
+          scope.cloneClonedExperiment('Exp_0');
+          expect(storageServer.cloneClonedExperiment).toHaveBeenCalled();
+          expect(scope.isCloneRequested).toBe(true);
+        });
+
+        it('should call the clone with the correct parameters (cloneCloned)', function() {
+          var page = renderEsvWebPage();
+          var scope = getExperimentListScope(page);
+          scope.config.canLaunchExperiments = true;
+          spyOn(storageServer, 'cloneClonedExperiment').and.returnValue(
+            $q.when({ clonedExp: 'fakeUUID', originalExp: 'fake_uuid' })
+          );
+          spyOn(storageServer, 'getFileContent').and.returnValue(
+            $q.when({
+              uuid: 'fakeUUID',
+              data:
+                '<xml><name>Name</name><thumbnail>thumbnail.png</thumbnail><description>Desc</description><timeout>840.0</timeout></xml>'
+            })
+          );
+          spyOn(storageServer, 'setFileContent').and.returnValue($q.when());
+          scope.clone('Exp_0');
+          //expect(scope.cloneClonedExperiment).toHaveBeenCalled();
+        });
+
+        it('should call the clone with the correct parameters (cloneTemplate)', function() {
+          var page = renderEsvWebPage();
+          var scope = getExperimentListScope(page);
+          scope.config.canLaunchExperiments = false;
+          spyOn(collabConfigService, 'clone').and.returnValue(
+            $q.when({ clonedExp: 'fakeUUID', originalExp: 'fake_uuid' })
+          );
+          spyOn(scope, 'cloneExperiment');
+          scope.clone('Exp_0');
+          expect(scope.cloneExperiment).toHaveBeenCalled();
+        });
+
+        it('should throw in the changeExpName function', function() {
+          var page = renderEsvWebPage();
+          var scope = getExperimentListScope(page);
+          spyOn(storageServer, 'getFileContent').and.callFake(function() {
+            return $q.when({
+              data:
+                '<xml><name>Name</name><thumbnail>thumbnail.png</thumbnail><description>Desc</description><timeout>840.0</timeout></xml>'
+            });
+          });
+          scope.changeExpName('Exp_0', 'Exp_0_0');
+          expect(storageServer.getFileContent).toHaveBeenCalled();
+        });
+
         it('should reload experiments after clone', function() {
           var page = renderEsvWebPage();
           var mockResource = {};
@@ -773,7 +840,7 @@
             .find('.experiment-box')
             .first()
             .click();
-          checkButtonsVisibility(page, { launch: 2, clone: 0 });
+          checkButtonsVisibility(page, { launch: 2, clone: 1 });
         });
       });
     });
