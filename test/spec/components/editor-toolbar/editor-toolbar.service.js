@@ -67,6 +67,31 @@ describe('Service: EditorToolbar', function() {
       ).toHaveBeenCalledWith(DYNAMIC_VIEW_CHANNELS.LOG_CONSOLE);
     });
 
+    it('Toggle Ros Terminal should create console overlay if none is open', function() {
+      dynamicViewOverlayService.isOverlayOpen.and.returnValue({
+        then: jasmine.createSpy('then').and.callFake(function(fn) {
+          fn(false);
+        })
+      });
+      editorToolbarService.toggleRosTerminal();
+      expect(
+        dynamicViewOverlayService.createDynamicOverlay
+      ).toHaveBeenCalledWith(DYNAMIC_VIEW_CHANNELS.ROS_TERMINAL);
+    });
+
+    it('Toggle Ros Terminal should be closed if already open', function() {
+      dynamicViewOverlayService.isOverlayOpen.and.returnValue({
+        then: jasmine.createSpy('then').and.callFake(function(fn) {
+          fn(true);
+        })
+      });
+
+      editorToolbarService.toggleRosTerminal();
+      expect(
+        dynamicViewOverlayService.closeAllOverlaysOfType
+      ).toHaveBeenCalledWith(DYNAMIC_VIEW_CHANNELS.ROS_TERMINAL);
+    });
+
     it('Toggle Brainvisualizer should create console overlay if none is open', function() {
       dynamicViewOverlayService.isOverlayOpen.and.returnValue({
         then: jasmine.createSpy('then').and.callFake(function(fn) {
@@ -77,6 +102,19 @@ describe('Service: EditorToolbar', function() {
       expect(editorToolbarService.isBrainVisualizerActive).toBe(true);
       expect(
         dynamicViewOverlayService.createDynamicOverlay
+      ).toHaveBeenCalledWith(DYNAMIC_VIEW_CHANNELS.BRAIN_VISUALIZER);
+    });
+
+    it('Toggle Brainvisualizer should be closed if already open', function() {
+      dynamicViewOverlayService.isOverlayOpen.and.returnValue({
+        then: jasmine.createSpy('then').and.callFake(function(fn) {
+          fn(true);
+        })
+      });
+      editorToolbarService.toggleBrainvisualizer();
+      expect(editorToolbarService.isBrainVisualizerActive).toBe(false);
+      expect(
+        dynamicViewOverlayService.closeAllOverlaysOfType
       ).toHaveBeenCalledWith(DYNAMIC_VIEW_CHANNELS.BRAIN_VISUALIZER);
     });
 
@@ -92,19 +130,6 @@ describe('Service: EditorToolbar', function() {
 
       editorToolbarService.toggleForceApplyMode();
       expect(pullForceService.Deactivate).toHaveBeenCalled();
-    });
-
-    it('Toggle Brainvisualizer should be closed if already open', function() {
-      dynamicViewOverlayService.isOverlayOpen.and.returnValue({
-        then: jasmine.createSpy('then').and.callFake(function(fn) {
-          fn(true);
-        })
-      });
-      editorToolbarService.toggleBrainvisualizer();
-      expect(editorToolbarService.isBrainVisualizerActive).toBe(false);
-      expect(
-        dynamicViewOverlayService.closeAllOverlaysOfType
-      ).toHaveBeenCalledWith(DYNAMIC_VIEW_CHANNELS.BRAIN_VISUALIZER);
     });
 
     it('Toggle Spike Train should create console overlay if none is open', function() {
