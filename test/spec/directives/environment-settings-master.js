@@ -9,6 +9,7 @@ describe('Directive: environment settings master', function() {
 
   beforeEach(module('exdFrontendApp'));
   beforeEach(module('exd.templates'));
+  beforeEach(module('editorToolbarServiceMock'));
 
   beforeEach(
     module(function($provide) {

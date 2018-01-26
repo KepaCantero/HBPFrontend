@@ -4,6 +4,7 @@ describe('Directive: ros-terminal', function() {
   beforeEach(module('exdFrontendApp'));
   beforeEach(module('exd.templates')); // import html template
   beforeEach(module('simulationInfoMock'));
+  beforeEach(module('editorToolbarServiceMock'));
 
   var $rootScope,
     element,
@@ -121,6 +122,7 @@ describe('Directive: ros-terminal', function() {
   beforeEach(module('exdFrontendApp'));
   beforeEach(module('exd.templates')); // import html template
   beforeEach(module('simulationInfoMock'));
+  beforeEach(module('editorToolbarServiceMock'));
 
   let $rootScope, $timeout, childScope, rosResponseObs, rosCommandLine;
 

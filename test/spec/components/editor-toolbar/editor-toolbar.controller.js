@@ -52,6 +52,7 @@ describe('Controller: EditorToolbarController', function() {
   beforeEach(module('clientLoggerServiceMock'));
   beforeEach(module('dynamicViewOverlayServiceMock'));
   beforeEach(module('gz3dViewsServiceMock'));
+  beforeEach(module('pullForceServiceMock'));
   beforeEach(module('nrpModalServiceMock'));
 
   var simulationStateObject = {
@@ -954,6 +955,7 @@ describe('Controller: Gz3dViewCtrl - mocked window', function() {
   beforeEach(module('environmentRenderingServiceMock'));
   beforeEach(module('stateServiceMock'));
   beforeEach(module('clientLoggerServiceMock'));
+  beforeEach(module('pullForceServiceMock'));
 
   beforeEach(
     module(function() {

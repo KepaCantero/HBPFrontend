@@ -1,7 +1,10 @@
 'use strict';
 
 describe('Service: EditorToolbar', function() {
-  var editorToolbarService, dynamicViewOverlayService, DYNAMIC_VIEW_CHANNELS;
+  var editorToolbarService,
+    pullForceService,
+    dynamicViewOverlayService,
+    DYNAMIC_VIEW_CHANNELS;
 
   // load the corresponding module
   beforeEach(module('editorToolbarModule'));
@@ -9,14 +12,17 @@ describe('Service: EditorToolbar', function() {
 
   beforeEach(module('dynamicViewOverlayServiceMock'));
   beforeEach(module('editorsPanelServiceMock'));
+  beforeEach(module('pullForceServiceMock'));
 
   beforeEach(
     inject(function(
       _editorToolbarService_,
+      _pullForceService_,
       _dynamicViewOverlayService_,
       _DYNAMIC_VIEW_CHANNELS_
     ) {
       editorToolbarService = _editorToolbarService_;
+      pullForceService = _pullForceService_;
       dynamicViewOverlayService = _dynamicViewOverlayService_;
       DYNAMIC_VIEW_CHANNELS = _DYNAMIC_VIEW_CHANNELS_;
     })
@@ -72,6 +78,20 @@ describe('Service: EditorToolbar', function() {
       expect(
         dynamicViewOverlayService.createDynamicOverlay
       ).toHaveBeenCalledWith(DYNAMIC_VIEW_CHANNELS.BRAIN_VISUALIZER);
+    });
+
+    it('Activate pull mode', function() {
+      editorToolbarService.forceApplyModeActive = false;
+
+      editorToolbarService.toggleForceApplyMode();
+      expect(pullForceService.Activate).toHaveBeenCalled();
+    });
+
+    it('deactivate pull mode', function() {
+      editorToolbarService.forceApplyModeActive = true;
+
+      editorToolbarService.toggleForceApplyMode();
+      expect(pullForceService.Deactivate).toHaveBeenCalled();
     });
 
     it('Toggle Brainvisualizer should be closed if already open', function() {

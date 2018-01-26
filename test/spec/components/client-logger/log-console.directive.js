@@ -14,6 +14,7 @@ describe('Directive: logConsole', function() {
     scheduler;
 
   beforeEach(module('clientLoggerServiceMock'));
+  beforeEach(module('editorToolbarServiceMock'));
 
   describe(' - test without missed logs', function() {
     beforeEach(

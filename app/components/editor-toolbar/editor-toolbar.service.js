@@ -28,6 +28,7 @@
     constructor(
       dynamicViewOverlayService,
       editorsPanelService,
+      pullForceService,
       DYNAMIC_VIEW_CHANNELS
     ) {
       this.showBrainvisualizerPanel = false;
@@ -40,9 +41,11 @@
       this.showPynnEditor = false;
       this.showSmachEditor = false;
       this.showEditorMenu = false;
+      this.forceApplyModeActive = false;
 
       this.dynamicViewOverlayService = dynamicViewOverlayService;
       this.editorsPanelService = editorsPanelService;
+      this.pullForceService = pullForceService;
       this.DYNAMIC_VIEW_CHANNELS = DYNAMIC_VIEW_CHANNELS;
     }
 
@@ -72,6 +75,10 @@
 
     get isPerformanceViewActive() {
       return this.showPerformanceView;
+    }
+
+    get isForceApplyModeActive() {
+      return this.forceApplyModeActive;
     }
 
     toggleLogConsole() {
@@ -157,12 +164,27 @@
           this.showRosTerminal = !visible;
         });
     }
+    disableForceApplyMode() {
+      if (this.forceApplyModeActive) {
+        this.forceApplyModeActive = false;
+        this.pullForceService.Deactivate();
+      }
+    }
+    toggleForceApplyMode() {
+      this.forceApplyModeActive = !this.forceApplyModeActive;
+      if (this.forceApplyModeActive) {
+        this.pullForceService.Activate();
+      } else {
+        this.pullForceService.Deactivate();
+      }
+    }
   }
 
   EditorToolbarService.$$ngIsClass = true;
   EditorToolbarService.$inject = [
     'dynamicViewOverlayService',
     'editorsPanelService',
+    'pullForceService',
     'DYNAMIC_VIEW_CHANNELS'
   ];
 

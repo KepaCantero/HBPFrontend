@@ -420,4 +420,27 @@ describe('Services: environmentRenderingService', function() {
 
     expect(collab3DSettingsService.loadSettings).toHaveBeenCalled();
   });
+
+  it(' - update rendering callback', function() {
+    var testFunction = jasmine.createSpy('testFunction');
+    var testFunction2 = jasmine.createSpy('testFunction2');
+    environmentRenderingService.addOnUpdateRenderingCallback(testFunction);
+
+    environmentRenderingService.update(13);
+
+    expect(testFunction).toHaveBeenCalledWith(13);
+    testFunction.calls.reset();
+
+    environmentRenderingService.addOnUpdateRenderingCallback(testFunction2);
+    environmentRenderingService.removeOnUpdateRenderingCallback(testFunction);
+
+    environmentRenderingService.update(14);
+    expect(testFunction).not.toHaveBeenCalled();
+    expect(testFunction2).toHaveBeenCalledWith(14);
+    testFunction2.calls.reset();
+
+    environmentRenderingService.removeOnUpdateRenderingCallback(testFunction2);
+    expect(testFunction).not.toHaveBeenCalled();
+    expect(testFunction2).not.toHaveBeenCalled();
+  });
 });

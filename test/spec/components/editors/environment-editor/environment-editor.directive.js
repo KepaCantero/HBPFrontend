@@ -20,7 +20,7 @@ describe('Directive: environment-designer', function() {
   beforeEach(module('simulationInfoMock'));
   beforeEach(module('stateServiceMock'));
   beforeEach(module('dynamicViewOverlayServiceMock'));
-  beforeEach(module('contextMenuStateMock'));
+  beforeEach(module('contextMenuStateServiceMock'));
   beforeEach(module('gz3dMock'));
   beforeEach(
     module(function($provide) {

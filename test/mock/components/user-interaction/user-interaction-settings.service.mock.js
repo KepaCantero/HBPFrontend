@@ -31,5 +31,6 @@
         .and.callFake(function() {
           return window.$q.when();
         });
+      this.settingsData = mockSettingsData;
     });
 })();

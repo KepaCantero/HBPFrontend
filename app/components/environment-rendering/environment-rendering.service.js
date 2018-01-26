@@ -82,13 +82,23 @@
           this.sceneInitialized = function() {
             return this.deferredSceneInitialized.promise;
           };
+          let onUpdateRenderingCallbacks = [];
+          this.addOnUpdateRenderingCallback = callback => {
+            onUpdateRenderingCallbacks.push(callback);
+          };
+          this.removeOnUpdateRenderingCallback = callback => {
+            onUpdateRenderingCallbacks = onUpdateRenderingCallbacks.filter(
+              element => {
+                return element !== callback;
+              }
+            );
+          };
 
           this.init = function() {
             this.initAnimationFrameFunctions();
 
             // default to 30 fps cap
             this.setFPSLimit(FPS_LIMIT.FPS_30);
-
             stateService.getCurrentState().then(function() {
               if (stateService.currentState !== STATE.STOPPED) {
                 gz3d.Initialize();
@@ -183,11 +193,15 @@
             }
           };
 
-          this.update = function(tElapsed) {
+          this.update = tElapsed => {
             if (!angular.isDefined(gz3d.scene)) {
               return;
             }
 
+            for (let i = 0; i < onUpdateRenderingCallbacks.length; i++) {
+              const func = onUpdateRenderingCallbacks[i];
+              func(tElapsed);
+            }
             userNavigationService.update(tElapsed);
             gz3d.scene.render();
           };
