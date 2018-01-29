@@ -243,6 +243,12 @@
           templateUrl: 'views/esv/demo-experiments.html',
           controller: 'demoExperimentsController',
           resolve: {
+            maintenanceMode: [
+              'storageServer',
+              function(storageServer) {
+                return storageServer.getMaintenanceMode();
+              }
+            ],
             setCollabState: [
               'environmentService',
               function(environmentService) {
