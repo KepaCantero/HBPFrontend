@@ -48,6 +48,7 @@
     'TRANSFER_FUNCTION_TYPE',
     'simulationInfo',
     'codeEditorsServices',
+    'environmentService',
     function(
       $log,
       backendInterfaceService,
@@ -62,7 +63,8 @@
       SOURCE_TYPE,
       TRANSFER_FUNCTION_TYPE,
       simulationInfo,
-      codeEditorsServices
+      codeEditorsServices,
+      environmentService
     ) {
       return {
         templateUrl:
@@ -77,13 +79,17 @@
           scope.populations = [];
           scope.topics = [];
           scope.transferFunctions = [];
+          scope.devMode = environmentService.isDevMode();
 
           scope.transferFunction = null;
           scope.selectedTF = null;
+          scope.centerPanelTabSelection = 'script';
 
           scope.selectedTopic = null;
           scope.selectedPopulation = null;
           scope.isNeuronsSelected = false;
+          scope.addMode = null;
+          scope.newVariableName = '';
 
           scope.stateService = stateService;
           scope.STATE = STATE;
@@ -92,6 +98,9 @@
           scope.TRANSFER_FUNCTION_TYPE = TRANSFER_FUNCTION_TYPE;
 
           scope.editorOptions = codeEditorsServices.getDefaultEditorOptions();
+          scope.editorOptions = codeEditorsServices.ownerOnlyOptions(
+            scope.editorOptions
+          );
 
           scope.onNewErrorMessageReceived = function(msg) {
             if (
@@ -128,6 +137,10 @@
             scope.onNewErrorMessageReceived,
             true
           );
+
+          scope.centerPanelTabChanged = function(newtab) {
+            scope.centerPanelTabSelection = newtab;
+          };
 
           scope.cleanCompileError = function(transferFunction) {
             delete transferFunction.error[scope.ERROR.COMPILE];
@@ -199,12 +212,74 @@
             scope.topics = response.topics;
           };
 
+          let refreshEditor = reset => {
+            var editor = codeEditorsServices.getEditorChild(
+              'codeEditor',
+              element[0]
+            );
+            codeEditorsServices.refreshEditor(editor);
+            if (reset) codeEditorsServices.resetEditor(editor);
+          };
+
+          scope.applyEditorOptions = function() {
+            var editor = codeEditorsServices.getEditorChild(
+              'codeEditor',
+              element[0]
+            );
+
+            for (let opt in scope.editorOptions) {
+              editor.setOption(opt, scope.editorOptions[opt]);
+            }
+          };
+
+          scope.refresh = function() {
+            refreshEditor();
+          };
+
+          // only start watching for changes after a little timeout
+          // the flood of changes during compilation will cause angular to throw digest errors when watched
+          $timeout(() => {
+            // refresh on resize
+            scope.unbindWatcherResize = scope.$watch(
+              () => {
+                if (element[0].offsetParent) {
+                  return [
+                    element[0].offsetParent.offsetWidth,
+                    element[0].offsetParent.offsetHeight
+                  ].join('x');
+                } else {
+                  return '';
+                }
+              },
+              () => {
+                refreshEditor();
+              }
+            );
+            refreshEditor();
+            scope.applyEditorOptions();
+          }, 100);
+
+          // update UI
+          scope.unbindListenerUpdatePanelUI = scope.$on(
+            'UPDATE_PANEL_UI',
+            function() {
+              // prevent calling the select functions of the tabs
+              scope.refresh();
+            }
+          );
+
+          scope.$on('$destroy', () => {
+            scope.unbindWatcherResize && scope.unbindWatcherResize();
+            scope.unbindListenerUpdatePanelUI();
+          });
+
           scope.control.refresh = function() {
             backendInterfaceService.getStructuredTransferFunctions(
               scope.loadTransferFunctions
             );
             backendInterfaceService.getPopulations(scope.loadPopulations);
             backendInterfaceService.getTopics(scope.loadTopics);
+            refreshEditor();
           };
 
           scope.setTFtype = function(tf) {
@@ -342,6 +417,8 @@
             scope.selectTransferFunction(tf.name);
             scope.createDevice();
             tf.devices[0].name = 'device';
+
+            scope.addMode = null;
           };
 
           var detectDefaultTopic = function(t) {
@@ -399,17 +476,21 @@
             return prefix + counter;
           };
 
-          scope.addNewVariable = function() {
+          scope.addNewVariable = function(variableBaseName) {
             var variable = {};
             variable.name = getFreeName(
               scope.transferFunction.variables,
-              'variable'
+              variableBaseName
             );
             //eslint-disable-next-line camelcase
             variable.initial_value = '0';
             variable.type = 'int';
+            variable.showDetails = true;
+
             scope.transferFunction.variables.push(variable);
             scope.setDirty(scope.transferFunction);
+
+            scope.addMode = '';
           };
 
           scope.createTopicChannel = function(publishing) {
@@ -422,6 +503,8 @@
               scope.transferFunction.topics.push(top);
               scope.setDirty(scope.transferFunction);
             }
+
+            scope.addMode = null;
           };
 
           scope.setTopicName = function(top) {
@@ -487,6 +570,8 @@
               scope.transferFunction.devices.push(dev);
               scope.setDirty(scope.transferFunction);
             }
+
+            scope.addMode = null;
           };
 
           scope.deleteFrom = function(array, element) {

@@ -506,12 +506,13 @@ describe('Directive: graphicalEditor', function() {
 
     it('should create a new variable correctly', function() {
       isolateScope.selectTransferFunction('tf1');
-      isolateScope.addNewVariable();
+      isolateScope.addNewVariable('variable');
       expect(isolateScope.transferFunction.variables.length).toEqual(1);
       expect(isolateScope.transferFunction.variables[0]).toEqual({
         name: 'variable1',
         initial_value: '0',
-        type: 'int'
+        type: 'int',
+        showDetails: true
       });
     });
 
