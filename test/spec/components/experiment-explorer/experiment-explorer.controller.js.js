@@ -7,6 +7,35 @@ describe('Controller: ExperimentExplorerController', function() {
 
   var $httpBackend, $rootScope, $log, element, storageServer;
 
+  var experimentProxyService, $q, experimentsFactory;
+
+  var MOCKED_EXPERIMENT = [
+    {
+      availableServers: [],
+      configuration: [],
+      id: 'Experiment_0',
+      uuid: 'Experiment_0',
+      joinableServers: [
+        {
+          runningSimulation: [],
+          server: 'localhost'
+        }
+      ],
+      private: true
+    }
+  ];
+
+  var privateExperimentsService = {
+    initialize: function() {
+      return;
+    },
+    getExperiments: function() {
+      var deferred = $q.defer();
+      deferred.resolve(MOCKED_EXPERIMENT);
+      return deferred.promise;
+    }
+  };
+
   var MOCKED_DATA = {
     experiments: [
       {
@@ -61,16 +90,21 @@ describe('Controller: ExperimentExplorerController', function() {
       _$rootScope_,
       _$httpBackend_,
       _$log_,
-      _storageServer_
+      _storageServer_,
+      _experimentProxyService_,
+      _$q_,
+      _experimentsFactory_
     ) {
       $rootScope = _$rootScope_;
       $httpBackend = _$httpBackend_;
       $log = _$log_;
       storageServer = _storageServer_;
-
       element = $compile('<experiment-explorer></experiment-explorer>')(
         $rootScope
       );
+      experimentsFactory = _experimentsFactory_;
+      $q = _$q_;
+      experimentProxyService = _experimentProxyService_;
     })
   );
 
@@ -79,9 +113,17 @@ describe('Controller: ExperimentExplorerController', function() {
       .whenGET(STORAGE_URL + 'experiments')
       .respond(MOCKED_DATA.experiments);
 
+    spyOn(experimentProxyService, 'getAvailableServers').and.returnValue(
+      $q.when([])
+    );
+    spyOn(experimentProxyService, 'getJoinableServers').and.returnValue(
+      $q.when([])
+    );
+    spyOn(storageServer, 'getFileContent').and.returnValue(window.$q.when({}));
+
     $rootScope.$digest();
     var controller = element.scope().vm;
-    controller.loadExperimentList();
+    controller.loadExperiments();
     $rootScope.$digest();
     $httpBackend.flush();
 
@@ -412,5 +454,44 @@ describe('Controller: ExperimentExplorerController', function() {
     var fileType = controller.getFileType({ extension: 'myExt' });
 
     expect(fileType).toBe('myExt file');
+  });
+
+  var loadControllerwithRunningExperiment = function(data) {
+    spyOn(storageServer, 'getExperiments').and.returnValue($q.when(data));
+
+    spyOn(experimentsFactory, 'createExperimentsService').and.returnValue(
+      privateExperimentsService
+    );
+
+    $rootScope.$digest();
+    var controller = element.scope().vm;
+    controller.loadExperimentList();
+    controller.loadPrivateExperimentList();
+    $rootScope.$digest();
+    return controller;
+  };
+
+  it('should not delete experiments while is running', function() {
+    var ExperimentsLoaded = loadControllerwithRunningExperiment(
+      MOCKED_EXPERIMENT
+    );
+    ExperimentsLoaded.isPrivateExperimentRunning(MOCKED_EXPERIMENT[0]);
+    expect(ExperimentsLoaded.isExperimentRunning).toBe(true);
+  });
+
+  it('should delete experiments while is running', function() {
+    MOCKED_EXPERIMENT[0].private = false;
+    var ExperimentsLoaded = loadControllerwithRunningExperiment(
+      MOCKED_EXPERIMENT
+    );
+    ExperimentsLoaded.isPrivateExperimentRunning(MOCKED_EXPERIMENT[0]);
+    expect(ExperimentsLoaded.isExperimentRunning).toBe(false);
+  });
+
+  it('should retrieve the private experiments', function() {
+    var ExperimentsLoaded = loadControllerwithRunningExperiment(
+      MOCKED_EXPERIMENT
+    );
+    expect(ExperimentsLoaded.privateExperiments[0].id).toBe('Experiment_0');
   });
 });

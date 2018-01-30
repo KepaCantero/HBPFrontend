@@ -115,7 +115,7 @@
           </button>
 
           <button analytics-on analytics-event="Launch" analytics-category="Experiment" ng-if="isPrivateExperiment && config.canLaunchExperiments"
-            class="btn btn-default" tooltip-trigger="mouseenter" ng-click="deleteExperiment(exp.id)" ng-disabled = "pageState.deletingExperiment || pageState.startingExperiment == exp.id">
+            class="btn btn-default" tooltip-trigger="mouseenter" ng-click="deleteExperiment(exp.id)" ng-disabled = "pageState.deletingExperiment || pageState.startingExperiment == exp.id  || (config.canLaunchExperiments && exp.joinableServers.length > 0)">
            <i class="fa fa-times"></i> Delete
           </button>
 

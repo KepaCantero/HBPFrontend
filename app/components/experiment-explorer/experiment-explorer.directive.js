@@ -33,7 +33,7 @@
       restrict: 'E',
       controller: 'ExperimentExplorerController',
       controllerAs: 'vm',
-      link: scope => scope.vm.loadExperimentList()
+      link: scope => scope.vm.loadExperiments()
     }))
     .directive('experimentFolders', () => ({
       restrict: 'E',
