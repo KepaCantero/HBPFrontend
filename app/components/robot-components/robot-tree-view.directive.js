@@ -28,7 +28,9 @@
     () => ({
       templateUrl: 'components/robot-components/robot-tree-view.template.html',
       restrict: 'E',
-      scope: {},
+      scope: {
+        onSelectionChange: '&'
+      },
       controller: 'RobotTreeViewController',
       controllerAs: 'vm'
     })

@@ -152,6 +152,24 @@ describe('Service: dynamicViewOverlayService', function() {
     expect(mockOverlayController.closeOverlay).toHaveBeenCalled();
   });
 
+  it(' - applyAttributesToOverlay()', function() {
+    var overlayWrapperMock = { setAttribute: function() {}, style: {} };
+    var channelAttrMock = {
+      isResizeable: false, // default true
+      maxWidth: 100,
+      maxHeight: 100,
+      overflowX: 'auto',
+      overflowY: 'auto'
+    };
+
+    dynamicViewOverlayService.applyAttributesToOverlay(
+      overlayWrapperMock,
+      channelAttrMock
+    );
+
+    expect(overlayWrapperMock.style.maxWidth).toBe(100);
+  });
+
   it(' - getOverlayParentElement()', function() {
     spyOn(angular, 'element').and.callThrough();
     dynamicViewOverlayService.getOverlayParentElement();

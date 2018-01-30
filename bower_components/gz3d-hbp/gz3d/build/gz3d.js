@@ -2609,6 +2609,9 @@ GZ3D.Composer.prototype.render = function (view)
         }
     }
 
+
+    this.gz3dScene.labelManager.onRender();
+
     var camera = view.camera;
     var width = view.container.clientWidth;
     var height = view.container.clientHeight;
@@ -5054,31 +5057,8 @@ GZ3D.GZIface.prototype.init = function()
 {
   this.material = [];
   this.entityMaterial = {};
-  this.sensorIcons = {};
-
-  this.initSensorIcons();
 
   this.connect();
-};
-
-GZ3D.GZIface.prototype.initSensorIcons = function()
-{
-  var loader = new THREE.ColladaLoader();
-
-  var textureLoader = new THREE.TextureLoader();
-
-  this.sensorIcons['generic'] = textureLoader.load('img/3denv/icons/sensor_Generic.png');
-  this.sensorIcons['ray'] = textureLoader.load('img/3denv/icons/sensor_Ray.png');
-  this.sensorIcons['camera'] = textureLoader.load('img/3denv/icons/sensor_Camera.png');
-
-  var that = this;
-  loader.load('img/3denv/icons/sensor.dae', function(collada)
-  {
-    var dae = collada.scene;
-    dae.updateMatrix();
-
-    that.sensorMesh = dae;
-  });
 };
 
 GZ3D.GZIface.prototype.setAssetProgressCallback = function(callback)
@@ -6003,25 +5983,6 @@ var getShapeName = function(object3D) {
 
 };
 
-GZ3D.GZIface.prototype.loadCollisionVisuals = function(object)
-{
-  if (object._pendingCollisionVisuals)
-  {
-    for(var i=0;i<object._pendingCollisionVisuals.length; i++)
-    {
-      var collDef = object._pendingCollisionVisuals[i];
-
-      var collisionVisualObj = this.createVisualFromMsg(collDef.collisionVisual, collDef.modelScale);
-      if (collisionVisualObj && !collisionVisualObj.parent)
-      {
-        object.add(collisionVisualObj);
-      }
-    }
-
-    object._pendingCollisionVisuals = undefined;
-  }
-};
-
 GZ3D.GZIface.prototype.createModelFromMsg = function(model)
 {
   var modelObj = new THREE.Object3D();
@@ -6064,7 +6025,8 @@ GZ3D.GZIface.prototype.createModelFromMsg = function(model)
       this.scene.setPose(linkObj, link.pose.position,
           link.pose.orientation);
     }
-    this.createLinkInfo(link, linkObj);
+
+    linkObj._linkSource = link;
     modelObj.add(linkObj);
 
     // only load individual link visuals if they are not replaced by an createVisualFromMsganimated model
@@ -6085,13 +6047,11 @@ GZ3D.GZIface.prototype.createModelFromMsg = function(model)
         for (var m = 0; m < link.collision[l].visual.length; ++m)
         {
           var collisionVisual = link.collision[l].visual[m];
-
-          if (!linkObj._pendingCollisionVisuals)
+          var collisionVisualObj = this.createVisualFromMsg(collisionVisual, model.scale);
+          if (collisionVisualObj && !collisionVisualObj.parent)
           {
-            linkObj._pendingCollisionVisuals = [];
+            linkObj.add(collisionVisualObj);
           }
-
-          linkObj._pendingCollisionVisuals.push( {'collisionVisual':collisionVisual, 'modelScale':model.scale} );
         }
       }
     }
@@ -6255,85 +6215,9 @@ GZ3D.GZIface.prototype.createRoadsFromMsg = function(roads)
   return roadObj;
 };
 
-GZ3D.GZIface.prototype.createLabel = function(text,link)
-{
- // function for drawing rounded rectangles
- var roundRect = function (ctx, x, y, w, h, r)
- {
-   ctx.beginPath();
-   ctx.moveTo(x+r, y);
-   ctx.lineTo(x+w-r, y);
-   ctx.quadraticCurveTo(x+w, y, x+w, y+r);
-   ctx.lineTo(x+w, y+h-r);
-   ctx.quadraticCurveTo(x+w, y+h, x+w-r, y+h);
-   ctx.lineTo(x+r, y+h);
-   ctx.quadraticCurveTo(x, y+h, x, y+h-r);
-   ctx.lineTo(x, y+r);
-   ctx.quadraticCurveTo(x, y, x+r, y);
-   ctx.closePath();
-   ctx.fill();
-   context.lineWidth = 5;
-   ctx.stroke();
- };
-
-  var canvas = document.createElement('canvas');
-  var size = 0.2;
-  canvas.width = 512;
-  canvas.height = 64;
-  var context = canvas.getContext('2d');
-  context.textAlign = 'center';
-
-  context.font = '32px Arial';
-
-  var boxSize = context.measureText(text).width+30;
-  if (boxSize>canvas.width)
-  {
-    boxSize = canvas.width;
-  }
-
-  if (link)
-  {
-    context.fillStyle = 'black';
-    context.strokeStyle = 'gray';
-  }
-  else
-  {
-    context.fillStyle = 'white';
-    context.strokeStyle = 'gray';
-  }
-
- roundRect(context,(canvas.width/2)-(boxSize/2),2,boxSize,45,15);
-
-  if (link)
-  {
-    context.fillStyle = 'white';
-  }
-  else
-  {
-    context.fillStyle = 'black';
-  }
-
-  context.fillText(text, canvas.width / 2, canvas.height/2);
-  var texture = new THREE.Texture(canvas);
-  texture.needsUpdate = true;
-
-  var spriteMaterial = new THREE.SpriteMaterial( { map: texture, color: 0xffffff } );
-  spriteMaterial.transparent = true;
-  spriteMaterial.depthTest = false;
-  spriteMaterial.depthWrite = false;
-  var sprite = new THREE.Sprite( spriteMaterial );
-  sprite.scale.set(size, (canvas.height/canvas.width)*size,1.0);
-
-  return sprite;
-};
-
 GZ3D.GZIface.prototype.createLinkInfo = function(link,parent)
 {
-  var linkLabel = this.createLabel(link.name.replace('robot::',''),true);
-  linkLabel.name = 'ROBOT_INFO_VISUAL';
-  linkLabel.visible = false;
-  linkLabel.position.copy(new THREE.Vector3(0,0.0,0.00));
-  parent.add(linkLabel);
+  this.createLabel(parent,new THREE.Vector3(0,0,0), link.name.replace('robot::',''),true);
 };
 
 GZ3D.GZIface.prototype.createSensorFromMsg = function(sensor,modelName)
@@ -6347,25 +6231,6 @@ GZ3D.GZIface.prototype.createSensorFromMsg = function(sensor,modelName)
   if (sensor.pose) {
     this.scene.setPose(sensorObj, sensor.pose.position, sensor.pose.orientation);
   }
-
-  var sensorIcon = (sensor.type in this.sensorIcons)?sensor.type:'generic';
-  var sensorIconMesh = this.sensorMesh.clone();
-  var material = new THREE.MeshBasicMaterial();
-  material.map = this.sensorIcons[sensorIcon];
-  sensorIconMesh.children[0].material = material;
-  sensorIconMesh.name = 'ROBOT_INFO_VISUAL';
-  sensorIconMesh.castShadow = false;
-  sensorIconMesh.receiveShadow = false;
-  sensorIconMesh.visible = false;
-  sensorIconMesh.scale.set(0.8,0.8,0.8);
-  sensorObj.add(sensorIconMesh);
-
-  var sensorLabel = this.createLabel(sensorObj.name);
-  sensorLabel.name = 'ROBOT_INFO_VISUAL';
-  sensorLabel.visible = false;
-  sensorLabel.position.copy(new THREE.Vector3(0,0.0,-0.03));
-  sensorObj.add(sensorLabel);
-
 
   if (sensor.type === 'camera') {
     // If we have a camera sensor we have a potential view that could be rendered
@@ -6481,8 +6346,6 @@ GZ3D.GZIface.prototype.createGeom = function(geom, material, parent, modelScale)
       rootModel = rootModel.parent;
     }
 
-    var isCollModel = rootModel.name.indexOf('COLLISION_VISUAL') >= 0 ;
-
     // find model from database, download the mesh if it exists
     // var manifestXML;
     // var manifestURI = GAZEBO_MODEL_DATABASE_URI + '/manifest.xml';
@@ -6531,16 +6394,10 @@ GZ3D.GZIface.prototype.createGeom = function(geom, material, parent, modelScale)
         }
 
         var modelUri = uriPath + '/' + modelName;
-        var modelCacheKey = modelUri;
 
-        if (isCollModel)
+        if (modelUri in this.scene.cachedModels)
         {
-          modelCacheKey += '__COLLISION_VISUAL__';
-        }
-
-        if (modelCacheKey in this.scene.cachedModels)
-        {
-          var cachedData = this.scene.cachedModels[modelCacheKey];
+          var cachedData = this.scene.cachedModels[modelUri];
 
           if (cachedData.referenceObject)
           {
@@ -6554,7 +6411,7 @@ GZ3D.GZIface.prototype.createGeom = function(geom, material, parent, modelScale)
         }
         else
         {
-          this.scene.cachedModels[modelCacheKey] =
+          this.scene.cachedModels[modelUri] =
           {
             referenceObject:null,
             objects:[parent]
@@ -6593,7 +6450,7 @@ GZ3D.GZIface.prototype.createGeom = function(geom, material, parent, modelScale)
                     }
                   }
 
-                  cachedData = that.scene.cachedModels[modelCacheKey];
+                  cachedData = that.scene.cachedModels[modelUri];
                   cachedData.referenceObject = dae;
                   for(var i = 0; i<cachedData.objects.length; i++)
                   {
@@ -6699,7 +6556,7 @@ GZ3D.GZIface.prototype.createGeom = function(geom, material, parent, modelScale)
           allChildren[c].castShadow = false;
           allChildren[c].receiveShadow = false;
 
-          allChildren[c].visible = that.scene.showCollisions || visualObj.visible;
+          allChildren[c].visible = that.scene.showCollisions;
         }
       }
     }
@@ -6803,12 +6660,9 @@ GZ3D.GZIface.prototype.parseMaterial = function(material)
 
               if (diffuse)
               {
-                if (Math.abs(diffuse[0]-diffuse[1])< Number.EPSILON && Math.abs(diffuse[1]-diffuse[2])< Number.EPSILON)
-                {
-                  diffuse[0] *= color[0];
-                  diffuse[1] *= color[1];
-                  diffuse[2] *= color[2];
-                }
+                diffuse[0] *= color[0];
+                diffuse[1] *= color[1];
+                diffuse[2] *= color[2];
               }
               else
               {
@@ -7125,6 +6979,385 @@ GZ3D.GZIface.prototype.parseMaterial = function(material)
   }
 };
 */
+
+/**
+ * HBP
+ *
+ * Manage labels in the 3D scene.
+ *
+ */
+
+GZ3D.LabelManager = function (gz3dScene)
+{
+    this.scene = gz3dScene;
+
+    this.init();
+};
+
+GZ3D.LabelManager.prototype.init = function ()
+{
+    this.sensorIcons = {};
+    this.perObjectLabels = {};
+
+    this.initMeshIcons();
+};
+
+GZ3D.LabelManager.prototype.initMeshIcons = function ()
+{
+    var loader = new THREE.ColladaLoader();
+
+    var textureLoader = new THREE.TextureLoader();
+
+    this.sensorIcons['generic'] = textureLoader.load('img/3denv/icons/sensor_Generic.png');
+    this.sensorIcons['ray'] = textureLoader.load('img/3denv/icons/sensor_Ray.png');
+    this.sensorIcons['camera'] = textureLoader.load('img/3denv/icons/sensor_Camera.png');
+
+    var that = this;
+    loader.load('img/3denv/icons/sensor.dae', function (collada)
+    {
+        var dae = collada.scene;
+        dae.updateMatrix();
+
+        that.sensorMesh = dae;
+    });
+
+    loader.load('img/3denv/icons/joint.dae', function (collada)
+    {
+        var dae = collada.scene;
+        dae.updateMatrix();
+
+        that.jointMesh = dae;
+    });
+};
+
+GZ3D.LabelManager.prototype.createJoint3DIcon = function (jointObj, joint)
+{
+    var jointIcon = 'generic';
+    var jointIconMesh = this.jointMesh.clone();
+    var material = new THREE.MeshBasicMaterial();
+    material.map = this.sensorIcons[jointIcon];
+    jointIconMesh.children[0].material = material;
+    jointIconMesh.name = 'LABEL_INFO_VISUAL';
+    jointIconMesh.castShadow = false;
+    jointIconMesh.receiveShadow = false;
+    jointIconMesh.visible = true;
+    jointIconMesh.scale.set(0.8, 0.8, 0.8);
+    jointObj.add(jointIconMesh);
+    return jointIconMesh;
+};
+
+GZ3D.LabelManager.prototype.createSensor3DIcon = function (sensorObj, sensor)
+{
+    var sensorIcon = (sensor.type in this.sensorIcons) ? sensor.type : 'generic';
+    var sensorIconMesh = this.sensorMesh.clone();
+    var material = new THREE.MeshBasicMaterial();
+    material.map = this.sensorIcons[sensorIcon];
+    sensorIconMesh.children[0].material = material;
+    sensorIconMesh.name = 'LABEL_INFO_VISUAL';
+    sensorIconMesh.castShadow = false;
+    sensorIconMesh.receiveShadow = false;
+    sensorIconMesh.visible = true;
+    sensorIconMesh.scale.set(0.8, 0.8, 0.8);
+    sensorObj.add(sensorIconMesh);
+    return sensorIconMesh;
+};
+
+GZ3D.LabelManager.prototype.createLabel = function (text, link, parent)
+{
+    // function for drawing rounded rectangles
+    var roundRect = function (ctx, x, y, w, h, r)
+    {
+        ctx.beginPath();
+        ctx.moveTo(x + r, y);
+        ctx.lineTo(x + w - r, y);
+        ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+        ctx.lineTo(x + w, y + h - r);
+        ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+        ctx.lineTo(x + r, y + h);
+        ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+        ctx.lineTo(x, y + r);
+        ctx.quadraticCurveTo(x, y, x + r, y);
+        ctx.closePath();
+        ctx.fill();
+        context.lineWidth = 5;
+        ctx.stroke();
+    };
+
+    var canvas = document.createElement('canvas');
+    var size = 0.4;
+    canvas.width = 512;
+    canvas.height = 64;
+    var context = canvas.getContext('2d');
+    context.textAlign = 'center';
+
+    context.font = '32px Arial';
+
+    var boxSize = context.measureText(text).width + 30;
+    var boxHeight = 45;
+    if (boxSize > canvas.width)
+    {
+        boxSize = canvas.width;
+    }
+
+    if (link)
+    {
+        context.fillStyle = 'black';
+        context.strokeStyle = 'gray';
+    }
+    else
+    {
+        context.fillStyle = 'white';
+        context.strokeStyle = 'gray';
+    } roundRect(context, (canvas.width / 2) - (boxSize / 2), 2, boxSize, boxHeight, 15);
+
+    roundRect(context, (canvas.width / 2) - (boxSize / 2), 2, boxSize, boxHeight, 15);
+
+    if (link)
+    {
+        context.fillStyle = 'white';
+    }
+    else
+    {
+        context.fillStyle = 'black';
+    }
+
+    context.fillText(text, canvas.width / 2, canvas.height / 2);
+    var texture = new THREE.Texture(canvas);
+    texture.needsUpdate = true;
+
+    var geometry = new THREE.PlaneGeometry(size, (canvas.height / canvas.width) * size);
+    var material = new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide, map: texture });
+    material.transparent = true;
+    material.depthTest = false;
+    material.depthWrite = false;
+
+    var plane = new THREE.Mesh(geometry, material);
+    plane._ignoreRaycast = true;
+    plane.visible = true;
+    plane.name = 'LABEL_INFO_VISUAL';
+
+    var hitGeometry = new THREE.PlaneGeometry(size / (canvas.width / boxSize), size / ((canvas.height / boxHeight) / (canvas.height / canvas.width)));
+    var hitPlane = new THREE.Mesh(hitGeometry, material);
+    hitPlane.visible = false;
+    hitPlane._raycastOnly = true;
+    hitPlane.name = 'LABEL_INFO_VISUAL';
+
+    if (!parent._relatedLabels)
+    {
+        parent._relatedLabels = [];
+    }
+
+    parent._relatedLabels.push(hitPlane);
+    parent._relatedLabels.push(plane);
+
+    this.scene.scene.add(hitPlane);
+    this.scene.scene.add(plane);
+
+    hitPlane._labelOwner = parent;
+    plane._labelOwner = parent;
+
+    plane._hitPlane = hitPlane;
+
+    return plane;
+};
+
+GZ3D.LabelManager.prototype.onRender = function ()
+{
+    var tempVector = new THREE.Vector3();
+    var bbox = new THREE.Box3();
+    var nodePos = new THREE.Vector3(), q = new THREE.Quaternion(), s = new THREE.Vector3();
+
+    for (var key in this.perObjectLabels)
+    {
+        if (this.perObjectLabels.hasOwnProperty(key))
+        {
+            var labelInfoList = this.perObjectLabels[key];
+
+            if (labelInfoList.length && labelInfoList[0].root._labelsVisible)
+            {
+                var root = labelInfoList[0].root;
+                var labelPos = [];
+
+                bbox.setFromObject(root);
+                var bsphere = bbox.getBoundingSphere();
+
+                for(var i=0;i<labelInfoList.length;i++)
+                {
+                    var labelInfo = labelInfoList[i];
+                    var node = labelInfo.node;
+                    var line = labelInfo.line;
+
+                    // Label
+
+                    node.matrixWorld.decompose(nodePos, q, s);
+
+                    var dir = nodePos.clone();
+                    dir.sub(bsphere.center);
+
+                    var l = dir.length();
+
+                    if (l<=Number.EPSILON || isNaN(l))
+                    {
+                        dir.set(0,0,-1);
+                    }
+                    else
+                    {
+                        dir.divideScalar(l);
+                    }
+
+                    dir.multiplyScalar(bsphere.radius);
+
+                    var finalLabelPos = bsphere.center.clone();
+                    finalLabelPos.add(dir);
+
+                    finalLabelPos.z += 0.25;
+
+                    if (finalLabelPos.z<bbox.min.z)
+                    {
+                        finalLabelPos.z = bbox.min.z+0.1;
+
+                        dir.set(finalLabelPos.x,finalLabelPos.y,0);
+                        dir.normalize();
+                        dir.multiplyScalar(bsphere.radius+0.1);
+
+                        finalLabelPos = bsphere.center.clone();
+                        finalLabelPos.add(dir);
+                    }
+
+                    // Check if it is too close from another label
+                    // We keep it simple, because it has to be in real-time
+
+                    dir.normalize();
+                    dir.multiplyScalar(0.08);
+
+                    for(var li = 0; li<labelPos.length; li++)
+                    {
+                        tempVector.copy(finalLabelPos);
+                        tempVector.sub(labelPos[li]);
+
+                        if (tempVector.length()<0.1)
+                        {
+                            finalLabelPos.add(dir);
+                        }
+                    }
+
+                    labelPos.push(finalLabelPos);
+                    labelInfo.label.position.copy(finalLabelPos);
+                    labelInfo.label.quaternion.copy(this.scene.camera.quaternion);
+
+                    if (labelInfo.label._hitPlane)
+                    {
+                        labelInfo.label._hitPlane.position.copy(finalLabelPos);
+                        labelInfo.label._hitPlane.quaternion.copy(this.scene.camera.quaternion);
+                    }
+
+                    // Line
+
+                    line.position.copy(nodePos);
+
+                    if (!(line.geometry.vertices[1].equals(nodePos)))
+                    {
+                        line.geometry.vertices[1] = labelInfo.label.position.clone().sub(nodePos);
+                        line.geometry.verticesNeedUpdate = true;
+                    }
+                }
+            }
+        }
+    }
+};
+
+GZ3D.LabelManager.prototype.createLineLabel = function (parent)
+{
+    var lineGeometry = new THREE.Geometry();
+    var vertArray = lineGeometry.vertices;
+    vertArray.push( new THREE.Vector3(0,0,0), new THREE.Vector3(1, 1, 1) );
+
+    var lineMaterial = new THREE.LineBasicMaterial( { color: 0x888888, linewidth: 3 });
+    var line = new THREE.Line( lineGeometry, lineMaterial );
+    lineGeometry.computeLineDistances();
+
+    this.scene.scene.add(line);
+
+    line.name = 'LABEL_INFO_VISUAL';
+    line._ignoreRaycast = true;
+
+    if (!parent._relatedLabels)
+    {
+        parent._relatedLabels = [];
+    }
+
+    parent._relatedLabels.push(line);
+
+    return line;
+};
+
+
+GZ3D.LabelManager.prototype.setLabelInfoVisible = function (root, visible)
+{
+    var that = this;
+    var iconMesh;
+    var labelMesh;
+    var labelLine;
+
+    root._labelsVisible = visible;
+
+    root.traverse(function (node)
+    {
+        if (node._linkSource)
+        {
+            if (!node._labelInitialized && visible)
+            {
+                node._labelInitialized = true;
+                iconMesh = that.createJoint3DIcon(node,node._linkSource);
+                labelLine = that.createLineLabel(node);
+                labelMesh = that.createLabel(node._linkSource.name, true, node);
+
+                if (!that.perObjectLabels[root.uuid])
+                {
+                    that.perObjectLabels[root.uuid] = [];
+                }
+
+                that.perObjectLabels[root.uuid].push({ 'root': root, 'node': node, 'icon3d': iconMesh, 'label': labelMesh, 'line':labelLine });
+            }
+
+        }
+        else if (node._sensorSource)
+        {
+            if (!node._labelInitialized && visible)
+            {
+                node._labelInitialized = true;
+                iconMesh = that.createSensor3DIcon(node, node._sensorSource);
+                labelLine = that.createLineLabel(node);
+                labelMesh = that.createLabel(node._sensorSource.name, false, node);
+
+                if (!that.perObjectLabels[root.uuid])
+                {
+                    that.perObjectLabels[root.uuid] = [];
+                }
+
+                that.perObjectLabels[root.uuid].push({ 'root': root, 'node': node, 'icon3d': iconMesh, 'label': labelMesh, 'line':labelLine  });
+            }
+        }
+        else if (node.name === 'LABEL_INFO_VISUAL' && !node._raycastOnly)
+        {
+            node.visible = visible;
+        }
+
+        if (node._relatedLabels)
+        {
+            for (var i = 0; i < node._relatedLabels.length; i++)
+            {
+                if (!node._relatedLabels[i]._raycastOnly)
+                {
+                    node._relatedLabels[i].visible = visible;
+                }
+            }
+        }
+
+    });
+
+};
+
 
 /**
  * GZ3D Levels. Simply color levels shader.
@@ -9797,6 +10030,9 @@ GZ3D.Scene.prototype.init = function()
   this.composerSettings = new GZ3D.ComposerSettings();
   this.normalizedComposerSettings = new GZ3D.ComposerSettings();
 
+  // create label manager
+  this.labelManager = new GZ3D.LabelManager(this);
+
   // Grid
   this.grid = new THREE.GridHelper(10, 1,new THREE.Color( 0xCCCCCC ),new THREE.Color( 0x4D4D4D ));
   this.grid.name = 'grid';
@@ -9809,6 +10045,7 @@ GZ3D.Scene.prototype.init = function()
   this.scene.add(this.grid);
 
   this.showCollisions = false;
+  this.lockSelectedIdentity = false;
 
   this.showLightHelpers = false;
 
@@ -10266,9 +10503,14 @@ GZ3D.Scene.prototype.onPointerUp = function(event)
     // Model found
     if (model)
     {
-      if (model.name === 'plane')
+
+      if (model.name.indexOf('LABEL_INFO_VISUAL') >= 0)
       {
-        // Do nothing to the floor plane
+        guiEvents.emit('setTreeSelection', model.name);
+      }
+      else if (model.name === 'plane')
+      {
+        // Do nothing
       }
       else if (this.modelManipulator.pickerNames.indexOf(model.name) >= 0)
       {
@@ -10371,6 +10613,44 @@ GZ3D.Scene.prototype.onKeyDown = function(event)
 };
 
 /**
+ * Prepare face to camera object for ray cast
+ *
+ */
+
+GZ3D.Scene.prototype.prepareModelsForRaycast = function(before)
+{
+  var that = this;
+  this.scene.traverse(function(node){
+
+    if (before)
+    {
+      if (node._ignoreRaycast)
+      {
+        node._ignoreRayCastVisiblePrevState = node.visible;
+        node.visible = false;
+      }
+      else if (node._raycastOnly)
+      {
+        node.visible = true;
+      }
+    }
+    else
+    {
+      if (node._ignoreRayCastVisiblePrevState)
+      {
+        node.visible = node._ignoreRayCastVisiblePrevState;
+        node._ignoreRayCastVisiblePrevState = undefined;
+      }
+      else if (node._raycastOnly)
+      {
+        node.visible = false;
+      }
+    }
+  });
+
+};
+
+/**
  * Check if there's a model immediately under canvas coordinate 'pos'
  * @param {THREE.Vector2} pos - Canvas coordinates
  * @param {THREE.Vector3} intersect - Empty at input,
@@ -10387,14 +10667,29 @@ GZ3D.Scene.prototype.getRayCastModel = function(pos, intersect)
   var raycaster = new THREE.Raycaster();
   raycaster.setFromCamera(normalizedScreenCoords, this.camera);
 
+  this.prepareModelsForRaycast(true);
   var objects = raycaster.intersectObjects(this.scene.children, true);
+  this.prepareModelsForRaycast(false);
 
   var model;
-  var point;
+  var point, i;
   if (objects.length > 0)
   {
+    for (i = 0; i < objects.length; ++i)
+    {
+      model = objects[i].object;
+
+      // Check first robot info
+
+      if (model.name.indexOf('LABEL_INFO_VISUAL') >= 0)
+      {
+        this.robotInfoObject = model;
+        return model;
+      }
+    }
+
     modelsloop:
-    for (var i = 0; i < objects.length; ++i)
+    for (i = 0; i < objects.length; ++i)
     {
       model = objects[i].object;
       if (model.name.indexOf('_lightHelper') >= 0)
@@ -10402,6 +10697,7 @@ GZ3D.Scene.prototype.getRayCastModel = function(pos, intersect)
         model = model.parent;
         break;
       }
+
 
       if (!this.modelManipulator.hovered &&
           (model.name === 'plane'))
@@ -11970,9 +12266,9 @@ GZ3D.Scene.prototype.setViewAs = function(model, viewAs)
     if (descendants[i].material &&
         descendants[i].name.indexOf('boundingBox') === -1 &&
         descendants[i].name.indexOf('COLLISION_VISUAL') === -1 &&
-        descendants[i].name.indexOf('ROBOT_INFO_VISUAL') === -1 &&
+        descendants[i].name.indexOf('LABEL_INFO_VISUAL') === -1 &&
         !this.getParentByPartialName(descendants[i], 'COLLISION_VISUAL')&&
-        !this.getParentByPartialName(descendants[i], 'ROBOT_INFO_VISUAL')&&
+        !this.getParentByPartialName(descendants[i], 'LABEL_INFO_VISUAL')&&
         descendants[i].name.indexOf('wireframe') === -1 &&
         descendants[i].name.indexOf('JOINT_VISUAL') === -1)
     {
@@ -12033,6 +12329,11 @@ GZ3D.Scene.prototype.getParentByPartialName = function(object, name)
  */
 GZ3D.Scene.prototype.selectEntity = function(object)
 {
+  if (this.lockSelectedIdentity)
+  {
+    return;
+  }
+
   if (object)
   {
     var animatedExt = '_animated';
@@ -12448,19 +12749,23 @@ GZ3D.Scene.prototype.setScenePreparationReadyCallback = function (sceneReadyCall
 };
 
 /**
- * Show sensors
+ * Show labels for sensors and links
  *
 */
 
-GZ3D.Scene.prototype.setRobotInfoVisible = function (object, visible)
+GZ3D.Scene.prototype.setLabelInfoVisible = function (object, visible)
 {
-  object.traverse(function (node)
+  this.labelManager.setLabelInfoVisible(object,visible);
+
+  if (visible)
   {
-    if (node.name==='ROBOT_INFO_VISUAL')
-    {
-      node.visible = visible;
-    }
-  });
+    this.hideBoundingBox();
+  }
+  else if (this.selectedEntity)
+  {
+    this.showBoundingBox(this.selectedEntity);
+  }
+
 };
 
 

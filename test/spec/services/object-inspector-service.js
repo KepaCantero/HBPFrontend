@@ -186,6 +186,25 @@ describe('Services: objectInspectorService', function() {
     expect(objectInspectorService.showCollision).toBe(true);
   });
 
+  it('should turn on/off lock axis', function() {
+    objectInspectorService.onLockAxisChange();
+    expect(gz3d.scene.modelManipulator.lockXAxis).toBe(
+      objectInspectorService.lockXAxis
+    );
+    expect(gz3d.scene.modelManipulator.lockYAxis).toBe(
+      objectInspectorService.lockYAxis
+    );
+    expect(gz3d.scene.modelManipulator.lockZAxis).toBe(
+      objectInspectorService.lockZAxis
+    );
+  });
+
+  it('should support get mesh by name', function() {
+    var mockManipulatorPicker = { X: { name: 'mock' } };
+    gz3d.scene.modelManipulator.pickerMeshes = mockManipulatorPicker;
+    expect(objectInspectorService.getMeshByName('X').name).toBe('mock');
+  });
+
   it('should turn on/off robot mode', function() {
     objectInspectorService.setRobotMode(true);
     expect(objectInspectorService.robotMode).toBe(true);
