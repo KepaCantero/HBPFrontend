@@ -393,7 +393,7 @@
 
     function checkNewExperimentButtonsVisibility(page, options) {
       checkButtonVisibility(page, 'uploadEnvironment', options.environment);
-      checkButtonVisibility(page, 'uploadRobot', options.robot);
+      checkButtonVisibility(page, 'uploadModelZip', options.robot);
       checkButtonVisibility(page, 'uploadBrain', options.brain);
       checkButtonVisibility(page, 'CloneNewExperiment', options.cloneNew);
     }
@@ -633,7 +633,7 @@
             .click();
           checkNewExperimentButtonsVisibility(page, {
             environment: 1,
-            robot: 1,
+            robot: 0,
             brain: 1,
             cloneNew: 1
           });
