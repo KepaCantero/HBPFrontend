@@ -4,3 +4,4 @@ reports/
 doc/
 test_e2e/
 .bundle/
+package.json
