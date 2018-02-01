@@ -1,24 +1,21 @@
 {
-  "name": "brainvisualizer",
-  "version": "0.0.0",
-
+  "name": "brainvisualizer", 
+  "version": "1.3.10", 
   "authors": [
     "HBP, Epfl"
-  ],
-
+  ], 
   "repository": {
-    "url": "git+ssh://bbpcode.epfl.ch/neurorobotics/brainvisualizer",
+    "url": "git+ssh://bbpcode.epfl.ch/neurorobotics/brainvisualizer", 
     "type": "git"
-  },
-
-  "description": "Javascript class to display a 3D brain",
+  }, 
+  "description": "Javascript class to display a 3D brain", 
   "main": [
-    "src/brain3D.js",
-    "src/brain3Dmainview.js",
-    "src/brain3Dneuronrepresentation.js",
+    "src/brain3D.js", 
+    "src/brain3Dmainview.js", 
+    "src/brain3Dneuronrepresentation.js", 
     "shaders/brain3Dshaders.js"
-  ],
-  "license": "GPL2",
-  "homepage": "",
+  ], 
+  "license": "GPL2", 
+  "homepage": "", 
   "private": true
 }

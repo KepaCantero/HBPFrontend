@@ -1,37 +1,37 @@
 {
-  "name": "brainvisualizer",
-  "version": "0.0.0",
-  "description": "Javascript class for brain visualization",
-  "main": "Gruntfile.js",
+  "name": "brainvisualizer", 
+  "version": "1.3.10", 
+  "description": "Javascript class for brain visualization", 
+  "main": "Gruntfile.js", 
   "directories": {
     "test": "test"
-  },
-  "dependencies": {},
+  }, 
+  "dependencies": {}, 
   "devDependencies": {
-    "grunt": "~1.0.1",
-    "grunt-karma": "~2.0.0",
-    "karma": "~1.1.2",
-    "load-grunt-tasks": "~3.5.0",
-    "karma-phantomjs-launcher": "~1.0.1",
-    "karma-chrome-launcher": "~1.0.1",
-    "jasmine-core": "~2.4.1",
-    "karma-jasmine": "~1.0.2",
-    "karma-coverage": "~1.1.1",
-    "karma-junit-reporter": "~1.1.0",
-    "karma-ng-html2js-preprocessor": "~1.0.0",
-    "grunt-contrib-clean": "~1.0.0",
-    "grunt-version": "~1.1.1",
-    "grunt-contrib-imagemin": "~1.0.1",
-    "grunt-ng-annotate": "~2.0.2",
+    "grunt": "~1.0.1", 
+    "grunt-karma": "~2.0.0", 
+    "karma": "~1.1.2", 
+    "load-grunt-tasks": "~3.5.0", 
+    "karma-phantomjs-launcher": "~1.0.1", 
+    "karma-chrome-launcher": "~1.0.1", 
+    "jasmine-core": "~2.4.1", 
+    "karma-jasmine": "~1.0.2", 
+    "karma-coverage": "~1.1.1", 
+    "karma-junit-reporter": "~1.1.0", 
+    "karma-ng-html2js-preprocessor": "~1.0.0", 
+    "grunt-contrib-clean": "~1.0.0", 
+    "grunt-version": "~1.1.1", 
+    "grunt-contrib-imagemin": "~1.0.1", 
+    "grunt-ng-annotate": "~2.0.2", 
     "grunt-contrib-copy": "~1.0.0"
-  },
+  }, 
   "scripts": {
     "test": "grunt test"
-  },
+  }, 
   "repository": {
-    "type": "git",
+    "type": "git", 
     "url": "ssh://bbpcode.epfl.ch/neurorobotics/brainvisualizer"
-  },
-  "author": "HBP",
+  }, 
+  "author": "HBP", 
   "license": "GPL2"
 }
