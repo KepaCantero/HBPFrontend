@@ -1,6 +1,6 @@
 <link rel="stylesheet" href="components/robot-documentation/robot-documentation.style.css" />
 
-<div class="container">
+<div class="container" ng-if="$ctrl.show">
     <div class="row">
 
         <div class="col-sm-12">
@@ -25,11 +25,11 @@
             {{$ctrl.config.model.description}}
 
 
-            <ng-if ng-if="$ctrl.config.model.publication">
+            <ng-if ng-if="$ctrl.config.model.documentation.publication">
                 <div class="page-header">
                     <h2>Publications</h2>
                 </div>
-                <div class="publication" ng-repeat="publication in $ctrl.config.model.publication">
+                <div class="publication" ng-repeat="publication in $ctrl.config.model.documentation.publication">
                     <a ng-href="{{publication._url}}">{{publication._title}}</a>
                     <br/>
                     <span class="publication-author">{{publication._authors}}</span>
@@ -37,35 +37,35 @@
             </ng-if>
 
 
-            <ng-if ng-if="$ctrl.config.model.sensors.sensor || $ctrl.config.model.actuators.actuator">
+            <ng-if ng-if="$ctrl.config.model.documentation.sensors.sensor || $ctrl.config.model.documentation.actuators.actuator">
                 <div class="page-header">
                     <h2>Details</h2>
                 </div>
-                <ng-if ng-if="$ctrl.config.model.sensors.sensor">
+                <ng-if ng-if="$ctrl.config.model.documentation.sensors.sensor">
                     <h3>Sensors:</h3>
                     <ul>
-                        <li class="sensor" ng-repeat="sensor in $ctrl.config.model.sensors.sensor"> {{sensor._name}} ({{sensor._type}})</li>
+                        <li class="sensor" ng-repeat="sensor in $ctrl.config.model.documentation.sensors.sensor"> {{sensor._name}} ({{sensor._type}})</li>
                     </ul>
                 </ng-if>
-                <ng-if ng-if="$ctrl.config.model.actuators.actuator">
+                <ng-if ng-if="$ctrl.config.model.documentation.actuators.actuator">
                     <h3>Actuators:</h3>
                     <ul>
-                        <li class="actuator" ng-repeat="actuator in $ctrl.config.model.actuators.actuator"> {{actuator._name}} ({{actuator._type}})</li>
+                        <li class="actuator" ng-repeat="actuator in $ctrl.config.model.documentation.actuators.actuator"> {{actuator._name}} ({{actuator._type}})</li>
                     </ul>
                 </ng-if>
             </ng-if>
 
 
-            <ng-if ng-if="$ctrl.config.model.picture || $ctrl.config.model.youtube">
+            <ng-if ng-if="$ctrl.config.model.documentation.picture || $ctrl.config.model.documentation.youtube">
                 <div class="page-header">
                     <h2>Media</h2>
                 </div>
                 <div class="media-item">
-                    <figure class="figure" ng-repeat="picture in $ctrl.config.model.picture">
+                    <figure class="figure" ng-repeat="picture in $ctrl.config.model.documentation.picture">
                         <img ng-src="{{picture._url}}" class="figure-img img-fluid rounded" alt="{{picture._title}}">
                         <figcaption class="figure-caption">{{picture._title}}</figcaption>
                     </figure>
-                    <div ng-repeat="youtube in $ctrl.config.model.youtube">
+                    <div ng-repeat="youtube in $ctrl.config.model.documentation.youtube">
                         <iframe type="text/html" width="560" height="380" ng-src="{{youtube.url}}" frameborder="0"></iframe>
                         <figcaption class="figure-caption">{{youtube._title}}</figcaption>
                     </div>

@@ -18,6 +18,7 @@ describe('Services: userNavigationService', function() {
   beforeEach(module('simulationInfoMock'));
   beforeEach(module('userNavigationModule'));
   beforeEach(module('storageServerMock'));
+  beforeEach(module('userInteractionSettingsServiceMock'));
 
   // provide mock objects
   beforeEach(

@@ -21,28 +21,66 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  * ---LICENSE-END**/
+
+.graphical-editor-tf-container {
+  position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding-top: 10px;
+  padding-right: 10px;
+  padding-bottom: 0px;
+  padding-left: 10px;
+}
+
 ul {
-  padding-left: 15px;
+  padding-left: 0px;
 }
 
 li {
   list-style-type: none;
 }
 
+.tf-title {
+  font-size: 16px;
+  margin-top: 2px;
+}
+
+.populationCheckBox {
+  color: black;
+  font-size: 12px;
+  margin-left: 10px;
+}
+
+.tfNotSelected {
+  color: black;
+  font-size: 14px;
+}
+
+.tfSelected {
+  color: black;
+  background-color: #ddecf9;
+  font-size: 14px;
+}
+
 .notSelected {
-  color: blue;
+  color: black;
+  font-size: 13px;
 }
 
 .selected {
-  color: red;
+  color: black;
+  background-color: #ddecf9;
+  font-size: 13px;
 }
 
 .normal {
   flex: 1;
-  min-width: 200px;
+  min-width: 180px;
   padding-right: 15px;
   padding-left: 15px;
   transition: all cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.5s;
+  background: white;
 }
 
 .normal.selected {
@@ -59,24 +97,284 @@ li {
   transition: all cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.5s;
 }
 
-.container {
+.tf-edit-area {
   display: flex;
   width: 100%;
-  word-wrap: break-word;
+  height: 100%;
+  min-width: 830px;
+}
+
+.smallButtonBlock {
+  display: flex;
+  justify-content: space-evenly;
+  width: 100%;
+  margin-top: 10px;
 }
 
 .left-panel {
-  flex-grow: 1;
+  flex-grow: 0;
   flex-basis: 20%;
+  margin-bottom: 10px;
+  min-width: 250px;
+  display: flex;
+  flex-direction: column;
+  max-width: 250px;
 }
 
 .center-panel {
   flex-grow: 3;
   flex-basis: 50%;
   flex-direction: column;
+  display: flex;
+  margin-bottom: 10px;
+  margin-top: 3px;
 }
 
 .right-panel {
-  flex-grow: 1;
+  flex-grow: 0;
   flex-basis: 20%;
+  margin-left: 20px;
+  margin-bottom: 10px;
+  min-width: 250px;
+  max-width: 250px;
+  display: flex;
+  flex-direction: column;
+  margin-top: 3px;
+}
+
+.underlined-tab-area {
+  width: 100%;
+  display: flex;
+}
+
+.underlined-tab {
+  font-size: 15px;
+  color: #555555;
+  margin-right: 15px;
+  margin-bottom: 0px;
+}
+
+.underlined-tab-selected {
+  color: #337ab7;
+}
+
+.underlined-box {
+  background: #337ab7;
+  width: 100%;
+  height: 3px;
+}
+
+.tf-parameter-title {
+  font-size: 12px;
+  margin-bottom: 0px;
+}
+
+.tf-parameter-subtitle-pubinfo {
+  margin-left: 13px;
+  margin-right: 3px;
+  font-size: 13px;
+  margin-top: 5px;
+  color: #616161;
+}
+
+.tf-var-block-bottom-area {
+  display: flex;
+  justify-content: flex-end;
+  padding-right: 10px;
+  padding-bottom: 5px;
+}
+
+.tf-param-title-background-neurons {
+  background: #fff1f8;
+}
+
+.tf-param-title-background-neurons:hover {
+  background: #f9e4ee;
+}
+
+.tf-param-title-background-topics {
+  background: #f0fcff;
+}
+
+.tf-param-title-background-topics:hover {
+  background: #c5e3e9;
+}
+
+.tf-param-title-background-variables {
+  background: #f9ffe8;
+}
+
+.tf-param-title-background-variables:hover {
+  background: #e6f3c6;
+}
+
+.tf-param-remove-tag-button {
+  margin: 4px;
+  font-size: 13px;
+  padding-top: 5px;
+  padding-bottom: 4px;
+}
+
+.tf-param-varblock {
+  font-size: 12px;
+  width: 100%;
+  padding: 10px;
+  padding-right: 10px;
+}
+
+.tf-param-tag-edit-block {
+  background: #f7f7f7;
+  padding: 10px;
+}
+.tf-param-varblock-label {
+  margin-top: 10px;
+  margin-bottom: 1px;
+}
+
+.tf-parameter-subtitle {
+  font-size: 11px;
+  color: #616161;
+  user-select: text;
+  margin-bottom: 5px;
+  margin-right: 5px;
+  margin-top: 5px;
+}
+
+.tf-param-title-block {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 12px;
+  padding-left: 10px;
+  padding-right: 2px;
+  padding-top: 2px;
+}
+
+.tf-parameter-section-title {
+  text-align: left;
+  font-size: 13px;
+  padding-top: 2px;
+}
+
+.tf-parameter-caret {
+  margin-right: 7px;
+  margin-top: 2px;
+}
+
+.very-small-button {
+  font-size: 12px;
+  padding: 6px;
+  min-width: 111px;
+  padding: 2px;
+}
+
+.small-button {
+  font-size: 12px;
+  padding: 6px;
+  min-width: 111px;
+}
+
+.parameter-small-button-label {
+  margin-left: 5px;
+  font-size: 12px;
+  min-width: 111px;
+}
+
+.tf-ed-header {
+  overflow: auto;
+  flex-shrink: 0;
+}
+
+.tf-box {
+  height: 100%;
+  border: 1px solid #dddddd;
+}
+
+.tf-content-box {
+  height: 100%;
+  padding-left: 20px;
+  padding-right: 20px;
+  border-right-color: rgb(221, 221, 221);
+  border-right-style: solid;
+  border-right-width: 1px;
+  flex-direction: column;
+  display: flex;
+}
+
+.tf-title-box {
+  display: flex;
+  justify-content: space-between;
+}
+
+.tf-small-icon-button-param {
+  margin-bottom: 2px;
+  font-size: 10px;
+  padding-top: 2px;
+  padding-bottom: 2px;
+  padding-right: 5px;
+  padding-left: 5px;
+}
+
+.tf-small-icon-button {
+  margin-bottom: 4px;
+  font-size: 11px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-right: 8px;
+  padding-left: 8px;
+}
+
+.CodeMirror {
+  height: 100%;
+}
+
+.tf-button-block {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+}
+
+.tf-param-title-background {
+  display: flex;
+  padding-left: 7px;
+  cursor: pointer;
+}
+
+.tf-param-border {
+  width: 100%;
+  overflow: hidden;
+  border: 1px solid #e6e6e6;
+  margin-bottom: 10px;
+}
+
+.tf-param-section-box {
+  margin-bottom: 10px;
+  list-style-type: none;
+  border-top-color: rgb(230, 230, 230);
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-right-style: none;
+  border-bottom-style: none;
+  border-left-style: none;
+  border-image-source: initial;
+  border-image-slice: initial;
+  border-image-width: initial;
+  border-image-outset: initial;
+  border-image-repeat: initial;
+  box-shadow: none;
+  margin-left: 0px;
+  margin-right: 0px;
+  padding-right: 0px;
+  padding-left: 0px;
+}
+
+.tf-apply-changes-dirty {
+  color: #159fc1;
+  animation: colorblink 2s infinite;
+}
+@keyframes colorblink {
+  0% {
+  }
+  50% {
+    color: #0c4e58;
+  }
 }

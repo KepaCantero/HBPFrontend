@@ -28,7 +28,7 @@
     '$location',
     '$stateParams',
     'experimentsFactory',
-    'collabConfigService',
+    'storageServer',
     '$window',
     'nrpUser',
     'environmentService',
@@ -39,7 +39,7 @@
       $location,
       $stateParams,
       experimentsFactory,
-      collabConfigService,
+      storageServer,
       $window,
       nrpUser,
       environmentService,
@@ -54,53 +54,116 @@
         loadingMessage: 'Loading list of experiments...'
       };
 
-      $scope.config.canCloneExperiments = !($scope.config.canLaunchExperiments =
-        !$scope.isPrivateExperiment || $scope.private);
+      $scope.config.canLaunchExperiments =
+        ($scope.isPrivateExperiment && $scope.private) ||
+        !$scope.isPrivateExperiment;
+
+      $scope.config.canCloneExperiments = $scope.isPrivateExperiment;
+
+      $scope.changeExpName = (newExpId, oldExpId) => {
+        return storageServer
+          .getFileContent(oldExpId, 'experiment_configuration.exc', true)
+          .then(file => {
+            if (!file.uuid) {
+              return $scope.throwCloningError({
+                data:
+                  'It seems like the experiment_configuration file is missing or is corrupted',
+                statusText: 504,
+                status: 504
+              });
+            }
+            function pad(n) {
+              return n < 10 ? '0' + n : n;
+            }
+            let xml = $.parseXML(file.data);
+            var name = xml.getElementsByTagNameNS('*', 'name')[0].textContent;
+            var currentDate = new Date();
+            var date = currentDate.getDate();
+            var month = currentDate.getMonth();
+            var year = currentDate.getFullYear();
+            var dateString = pad(date) + '-' + pad(month + 1) + '-' + year;
+            name +=
+              ' cloned ' +
+              dateString +
+              ' ' +
+              currentDate.getHours() +
+              ':' +
+              pad(currentDate.getMinutes()) +
+              ':' +
+              pad(currentDate.getSeconds());
+            xml.getElementsByTagNameNS('*', 'name')[0].textContent = name;
+
+            var xmlText = new XMLSerializer().serializeToString(xml);
+            return storageServer.setFileContent(
+              newExpId,
+              'experiment_configuration.exc',
+              xmlText,
+              true
+            );
+          });
+      };
+
+      $scope.clone = function(experiment) {
+        if (
+          $scope.config
+            .canLaunchExperiments /* means we are cloning a cloned experiment*/
+        ) {
+          $scope.cloneClonedExperiment(experiment.id);
+        } else {
+          $scope.cloneExperiment(experiment);
+        }
+      };
+
+      $scope.cloneClonedExperiment = function(experimentId) {
+        $scope.isCloneRequested = true;
+        storageServer
+          .cloneClonedExperiment(experimentId)
+          .then(newExp =>
+            $scope.changeExpName(newExp.clonedExp, newExp.originalExp)
+          )
+          .then(() => $scope.loadPrivateExperiments())
+          .catch(err => $scope.throwCloningError(err))
+          .finally(() => ($scope.isCloneRequested = false));
+      };
 
       $scope.cloneExperiment = function(experiment) {
         $scope.isCloneRequested = true;
-        collabConfigService
-          .clone(
-            null,
-            {
-              /* eslint-disable camelcase */
-              exp_configuration_path:
-                experiment.configuration.experimentConfiguration,
-              context_id: $stateParams.ctx
-              /* eslint-enable camelcase */
-            },
-            function() {
-              try {
-                $window.document
-                  .getElementById('clb-iframe-workspace')
-                  .contentWindow.parent.postMessage(
-                    {
-                      eventName: 'location',
-                      data: { url: window.location.href.split('?')[0] }
-                    },
-                    '*'
-                  );
-              } catch (err) {
-                //not in using collab website, do nothing
-              }
-            }
+        storageServer
+          .cloneTemplate(
+            experiment.configuration.experimentConfiguration,
+            $stateParams.ctx
           )
-          .$promise.then(() => {
-            $scope.loadPrivateExperiments();
+          .then(() => {
+            try {
+              $window.document
+                .getElementById('clb-iframe-workspace')
+                .contentWindow.parent.postMessage(
+                  {
+                    eventName: 'location',
+                    data: { url: window.location.href.split('?')[0] }
+                  },
+                  '*'
+                );
+            } catch (err) {
+              //not in using collab website, do nothing
+            }
           })
-          .catch(err => {
-            err = {
-              type: 'Error while cloning',
-              data: err.data,
-              message:
-                'Cloning operation failed. The cloning server might be unavailable',
-              code: err.statusText + ' ' + err.status
-            };
-            clbErrorDialog.open(err).then(() => {});
-          })
+          .then(() => $scope.loadPrivateExperiments())
+          .catch(err => $scope.throwCloningError(err))
           .finally(() => {
             $scope.isCloneRequested = false;
           });
+      };
+
+      $scope.throwCloningError = function(err) {
+        err = {
+          type: 'Error while cloning',
+          data: err.data,
+          message:
+            'Cloning operation failed. The cloning server might be unavailable',
+          code: err.statusText + ' ' + err.status
+        };
+        clbErrorDialog.open(err).then(() => {});
       };
 
       $scope.canStopSimulation = function(simul) {

@@ -31,9 +31,7 @@
     'clbErrorDialog',
     '$http',
     'newExperimentProxyService',
-    'collabConfigService',
     '$window',
-    '$stateParams',
     function(
       $q,
       storageServer,
@@ -41,13 +39,12 @@
       clbErrorDialog,
       $http,
       newExperimentProxyService,
-      collabConfigService,
       $window
     ) {
       return {
         templateUrl: 'views/esv/new-experiment-wizard.html',
         restrict: 'E',
-        replace: true,
+        replace: false,
         scope: true, // create a child scope for the directive and inherits the parent scope properties
         link: function($scope) {
           $scope.query = '';
@@ -96,7 +93,8 @@
             },
             uploadFromLocalEnv: function() {
               $scope.entityName = $scope.entityUploader.name;
-              $scope.createUploadModal('LocalEnv');
+
+              //$scope.createUploadModal('LocalEnv');
             }
           };
 
@@ -236,6 +234,60 @@
             $scope.destroyDialog();
           };
 
+          $scope.uploadFileClick = function(entityType) {
+            var input = $(
+              '<input type="file"  style=" display:none;" accept:".zip">'
+            );
+            document.body.appendChild(input[0]);
+            input.on('change', e =>
+              $scope.uploadModelZip(e.target.files[0], entityType)
+            );
+            input.click();
+            $(window).one('focus', () => {
+              if (input[0].files.length) $scope.uploadingModel = true;
+            });
+            document.body.removeChild(input[0]);
+          };
+
+          $scope.uploadModelZip = function(zip, entityType) {
+            if (zip.type !== 'application/zip') {
+              $scope.createErrorPopup(
+                'The file you uploaded is not a zip. Please provide a zipped model'
+              );
+              return $q.reject();
+            }
+
+            return $q(resolve => {
+              let textReader = new FileReader();
+              textReader.onload = e => resolve([zip.name, e.target.result]);
+              textReader.readAsArrayBuffer(zip);
+            })
+              .then(([filename, filecontent]) => {
+                $scope.destroyDialog();
+                return storageServer
+                  .setCustomModel(
+                    filename,
+                    (entityType += 's').toLowerCase(),
+                    filecontent
+                  )
+                  .catch(err => {
+                    $scope.destroyDialog();
+                    $scope.createErrorPopup(err.data);
+                    return $q.reject(err);
+                  })
+                  .then(() => {
+                    $scope.entityName = entityType;
+                    return $scope.entityUploader.uploadFromPrivateStorage();
+                  })
+                  .finally(() => ($scope.uploadingModel = false));
+              })
+              .catch(() => {
+                $scope.uploadingModel = false;
+                $scope.destroyDialog();
+              })
+              .finally(() => ($scope.uploadingModel = false));
+          };
+
           $scope.destroyDialog = function() {
             $scope.entityPageState = {};
             $scope.entityName = '';
@@ -251,6 +303,7 @@
             if (mode === 'LocalEnv') {
               var templateUrl = {
                 templateUrl: 'views/esv/entity-local-environment-upload.html',
+                size: 'lg',
                 closable: true,
                 scope: $scope
               };
@@ -322,25 +375,27 @@
           };
 
           $scope.cloneNewExperiment = function(experimentID) {
+            //prevent warning: to remove once code commented has been merged
+            $window, experimentID;
             $scope.isCloneRequested = true;
-            collabConfigService.clone(
-              { experimentId: experimentID },
-              {
-                experimentID: experimentID,
-                brainPath: $scope.paths.brainPath,
-                robotPath: $scope.paths.robotPath,
-                envPath: $scope.paths.environmentPath
-              },
-              function() {
-                $window.location.reload();
-                $window.parent.postMessage(
-                  {
-                    eventName: 'navigation.reload'
-                  },
-                  '*'
-                );
-              }
-            );
+            // collabConfigService.clone(
+            //   { experimentId: experimentID },
+            //   {
+            //     experimentID: experimentID,
+            //     brainPath: $scope.paths.brainPath,
+            //     robotPath: $scope.paths.robotPath,
+            //     envPath: $scope.paths.environmentPath
+            //   },
+            //  function() {
+            //    $window.location.reload();
+            //    $window.parent.postMessage(
+            //      {
+            //        eventName: 'navigation.reload'
+            //      },
+            //      '*'
+            //    );
+            //  }
+            // );
           };
         }
       };

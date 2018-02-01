@@ -29,14 +29,14 @@
     'nrpAnalytics',
     'editorToolbarService',
     'gz3dViewsService',
-    'userNavigationService',
+    'userInteractionSettingsService',
     function(
       CAMERA_SENSITIVITY_RANGE,
       gz3d,
       nrpAnalytics,
       editorToolbarService,
       gz3dViewsService,
-      userNavigationService
+      userInteractionSettingsService
     ) {
       return {
         templateUrl:
@@ -48,7 +48,13 @@
 
           scope.editorToolbarService = editorToolbarService;
           scope.gz3dViewsService = gz3dViewsService;
-          scope.userNavigationService = userNavigationService;
+          scope.userInteractionSettingsService = userInteractionSettingsService;
+
+          userInteractionSettingsService.settings.then(settings => {
+            scope.camSensitivityTranslation =
+              settings.camera.sensitivity.translation;
+            scope.camSensitivityRotation = settings.camera.sensitivity.rotation;
+          });
 
           //----------------------------------------------
           // Init the values
@@ -71,6 +77,15 @@
             }
           };
 
+          scope.uisSettingsToUI = function() {
+            if (editorToolbarService.isEnvironmentSettingsPanelActive) {
+              scope.camSensitivityTranslation =
+                userInteractionSettingsService.settingsData.camera.sensitivity.translation;
+              scope.camSensitivityRotation =
+                userInteractionSettingsService.settingsData.camera.sensitivity.rotation;
+            }
+          };
+
           scope.$watch(
             'editorToolbarService.showEnvironmentSettingsPanel',
             function() {
@@ -82,11 +97,27 @@
             scope.composerSettingsToUI();
           });
 
+          scope.$watch(
+            'userInteractionSettingsService.settingsData',
+            function() {
+              scope.uisSettingsToUI();
+            }
+          );
+
           //----------------------------------------------
           // UI to 3D scene
 
           scope.updateFrustumSettings = function() {
             gz3d.scene.applyComposerSettings();
+          };
+
+          scope.updateCameraSensitivity = function() {
+            userInteractionSettingsService.settingsData.camera.sensitivity.translation = parseFloat(
+              scope.camSensitivityTranslation
+            );
+            userInteractionSettingsService.settingsData.camera.sensitivity.rotation = parseFloat(
+              scope.camSensitivityRotation
+            );
           };
         }
       };

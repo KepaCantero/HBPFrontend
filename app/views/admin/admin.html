@@ -1,0 +1,29 @@
+
+<!-- build:css(.tmp) styles/esv/admin.css -->
+<link rel="stylesheet" href="styles/admin.css"/>
+<!-- endbuild -->
+
+<div class="alert alert-warning no-margin" ng-show="!$ctrl.adminRights">
+  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+  Sorry, you don't have administration rights
+</div>
+
+<div class="container">
+  <div class="row">
+
+    <div class="col-sm-12">
+      <div class="page-header">
+        <h1>Administration</h1>
+      </div>
+      <br/>
+    </div>
+
+    <div class="col-sm-12">
+      <label style="font-weight: 300;">
+        Maintenance mode:
+        <input type="checkbox" ng-disabled="!$ctrl.adminRights" ng-change="$ctrl.setMaintenanceMode($ctrl.status.maintenance)" ng-model="$ctrl.status.maintenance">
+      </label>
+    </div>
+
+  </div>
+</div>

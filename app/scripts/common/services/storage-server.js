@@ -47,10 +47,7 @@
       const FILE_REGEXP = /attachment; filename=(.*)/;
       let buildAction = action =>
         angular.merge(action, {
-          headers: { 'Context-Id': () => this.$stateParams.ctx },
-          interceptor: {
-            responseError: err => this.$q.reject(this.onError(err))
-          }
+          headers: { 'Context-Id': () => this.$stateParams.ctx }
         });
 
       let transformFileResponse = (data, header) => {
@@ -121,30 +118,41 @@
             url: `${this.STORAGE_BASE_URL}/:experimentId/:filename`,
             transformRequest: []
           }),
+          setClonedExperiment: buildAction({
+            method: 'POST',
+            url: `${this.STORAGE_BASE_URL}/clone/:experiment`,
+            transformRequest: []
+          }),
           getCustomModels: buildAction({
             method: 'GET',
             isArray: true,
             url: `${this.STORAGE_BASE_URL}/custommodels/:modelType`
+          }),
+          cloneTemplate: buildAction({
+            method: 'POST',
+            url: `${this.STORAGE_BASE_URL}/clone/`
+          }),
+          getMaintenanceMode: buildAction({
+            method: 'GET',
+            url: `${this.PROXY_URL}/maintenancemode`
+          }),
+          setCustomModel: buildAction({
+            method: 'POST',
+            headers: { 'Content-Type': 'application/octet-stream' },
+            url: `${this.STORAGE_BASE_URL}/custommodels/:modelType/:modelName`,
+            transformRequest: []
           })
         }
       );
     }
 
-    onError(err) {
-      let absoluteUrl = /^https?:\/\//i;
-      if (err.status === 302) {
-        //redirect
-        let url = err.data;
-        if (!absoluteUrl.test(url)) url = `${this.PROXY_URL}${url}`;
-        localStorage.removeItem(this.STORAGE_KEY);
-        this.$window.location.href = `${url}&client_id=${this
-          .CLIENT_ID}&redirect_uri=${encodeURIComponent(location.href)}`;
-      }
-      return this.$q.reject(err);
-    }
-
     getCustomModels(modelType) {
       return this.proxyRsc.getCustomModels({ modelType }).$promise;
+    }
+
+    setCustomModel(modelName, modelType, fileContent) {
+      return this.proxyRsc.setCustomModel({ modelName, modelType }, fileContent)
+        .$promise;
     }
 
     getExperiments(filter) {
@@ -232,6 +240,18 @@
     getCurrentUserGroups() {
       return this.proxyRsc.getCurrentUserGroups().$promise;
     }
+
+    cloneClonedExperiment(experiment) {
+      return this.proxyRsc.setClonedExperiment({ experiment }, null).$promise;
+    }
+
+    cloneTemplate(expPath, contextId) {
+      return this.proxyRsc.cloneTemplate({ expPath, contextId }).$promise;
+    }
+
+    getMaintenanceMode() {
+      return this.proxyRsc.getMaintenanceMode().$promise;
+    }
   }
 
   StorageServer.$$ngIsClass = true;
@@ -274,6 +294,10 @@
       this.$location.url(pathMinusAccessToken);
     }
 
+    clearStoredToken() {
+      localStorage.removeItem(this.STORAGE_KEY);
+    }
+
     getStoredToken() {
       let storedItem = localStorage.getItem(this.STORAGE_KEY);
       if (!storedItem) {
@@ -297,20 +321,5 @@
   angular
     .module('storageServer', ['ngResource', 'bbpConfig', 'ui.router'])
     .service('storageServer', StorageServer)
-    .service('storageServerTokenManager', StorageServerTokenManager)
-    .factory('storageServerRequestInterceptor', [
-      'storageServerTokenManager',
-      storageServerTokenManager => ({
-        request: function(requestConfig) {
-          var token = storageServerTokenManager.getStoredToken();
-          requestConfig.headers.Authorization = 'Bearer ' + token;
-          return requestConfig;
-        }
-      })
-    ])
-    .config([
-      '$httpProvider',
-      $httpProvider =>
-        $httpProvider.interceptors.push('storageServerRequestInterceptor')
-    ]);
+    .service('storageServerTokenManager', StorageServerTokenManager);
 })();

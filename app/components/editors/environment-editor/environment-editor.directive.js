@@ -127,7 +127,7 @@
               scope.categories[i].color.default =
                 'hsl(' +
                 (10 + i / (scope.categories.length + 1) * 360.0) +
-                ',90%,80%)';
+                ',95%,87%)';
               scope.categories[i].color.mouseover =
                 'hsl(' +
                 (10 + i / (scope.categories.length + 1) * 360.0) +

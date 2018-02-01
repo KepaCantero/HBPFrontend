@@ -48,6 +48,7 @@
       'simulationInfo',
       'roslib',
       'stateService',
+      'userInteractionSettingsService',
       function(
         $timeout,
         NAVIGATION_MODES,
@@ -56,7 +57,8 @@
         nrpUser,
         simulationInfo,
         roslib,
-        stateService
+        stateService,
+        userInteractionSettingsService
       ) {
         return {
           navigationMode: undefined,
@@ -75,8 +77,6 @@
           userReferenceROSCompliant: undefined,
           showHumanNavInfoDiv: false,
           initAsLookatRobot: false,
-          translationSensitivity: 1.0,
-          rotationSensitivity: 1.0,
 
           rosbridgeWebsocketUrl: undefined,
           roslib: undefined,
@@ -123,11 +123,14 @@
                   that.avatarControls = new THREE.AvatarControls(that, gz3d);
                   that.avatarControls.createAvatarTopics(that.avatarObjectName);
 
-                  if (that.initAsLookatRobot) {
-                    that.setLookatRobotCamera();
-                  } else {
-                    that.setModeFreeCamera();
-                  }
+                  userInteractionSettingsService.settings //.loadSettings()
+                    .then(function(settings) {
+                      if (settings.camera.defaultMode === 'lookatrobot') {
+                        that.setLookatRobotCamera();
+                      } else {
+                        that.setModeFreeCamera();
+                      }
+                    });
                 });
               }
             });
@@ -151,11 +154,13 @@
 
           update: function(tElapsed) {
             if (angular.isDefined(this.controls)) {
-              this.controls.update(
-                tElapsed,
-                this.translationSensitivity,
-                this.rotationSensitivity
-              );
+              userInteractionSettingsService.settings.then(settings => {
+                this.controls.update(
+                  tElapsed,
+                  settings.camera.sensitivity.translation,
+                  settings.camera.sensitivity.rotation
+                );
+              });
             }
           },
 

@@ -21,30 +21,9 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  * ---LICENSE-END**/
-
-(function() {
-  'use strict';
-
-  angular
-    .module('experimentExplorer')
-    .directive('experimentExplorer', () => ({
-      templateUrl:
-        'components/experiment-explorer/experiment-explorer.template.html',
-      restrict: 'E',
-      controller: 'ExperimentExplorerController',
-      controllerAs: 'vm',
-      link: scope => scope.vm.loadExperiments()
-    }))
-    .directive('experimentFolders', () => ({
-      restrict: 'E',
-      replace: true,
-      template:
-        '<div class="experiment-folders" ng-include src="\'experiment-explorer-folder.html\'"></div>',
-      scope: {
-        parent: '='
-      },
-      link: scope => {
-        scope.vm = scope.$parent.vm;
-      }
-    }));
-})();
+.btn-group-toggle .btn-secondary:not(.active) {
+  background-color: #e6e6e6;
+  background-image: none;
+  box-shadow: none;
+  outline: 0;
+}

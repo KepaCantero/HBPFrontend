@@ -18,59 +18,60 @@ describe('Directive: robotDocViewer', function() {
       },
       description:
         'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
-      website: 'http://wiki.ros.org/Robots/Husky',
-      sensors: {
-        sensor: [
-          { _name: 'Super camera', _type: 'camera' },
-          { _name: 'A funky lazer', _type: 'laser' }
+      documentation: {
+        sensors: {
+          sensor: [
+            { _name: 'Super camera', _type: 'camera' },
+            { _name: 'A funky lazer', _type: 'laser' }
+          ]
+        },
+        actuators: {
+          actuator: [
+            { _name: '4 wheels', _type: 'motor' },
+            { _name: 'Ball cannon', _type: 'pneumatic' }
+          ]
+        },
+        publication: [
+          {
+            _title:
+              'Semi-Supervised Spiking Neural Network for One-Shot Object Appearance Learning',
+            _authors:
+              'J. Kaiser, R. Stal, A. Subramoney, A. Roennau, R. Dillmann',
+            _url:
+              'https://link.springer.com/chapter/10.1007%2F978-3-662-54712-0_10'
+          },
+          {
+            _title:
+              'Scaling up liquid state machines to predict over address events from dynamic vision sensors',
+            _authors:
+              'I. Peric, R. Hangu, J. Kaiser, S. Ulbrich, A. Roennau, J. M. Zoellner, R. Dillman',
+            _url:
+              'https://www.frontiersin.org/articles/10.3389/fninf.2017.00007/full'
+          }
+        ],
+        youtube: [
+          {
+            _title: 'Tutorial - Overview of the HBP Neurorobotics Platform',
+            '_youtube-id': 'uAXzS7SPFG4'
+          },
+          {
+            _title: 'Third HBP Neurorobotics Workshop @TUM - Munich',
+            '_youtube-id': 'R0D82QooSs8'
+          }
+        ],
+        picture: [
+          {
+            _title: 'Home page',
+            _url:
+              'https://developer.humanbrainproject.eu/docs/projects/HBP%20Neurorobotics%20Platform/0.9/_images/gz3d-interact.png'
+          },
+          {
+            _title: 'Wizzard',
+            _url:
+              'https://developer.humanbrainproject.eu/docs/projects/HBP%20Neurorobotics%20Platform/1.2/_images/gz3d-env-editor.png'
+          }
         ]
-      },
-      actuators: {
-        actuator: [
-          { _name: '4 wheels', _type: 'motor' },
-          { _name: 'Ball cannon', _type: 'pneumatic' }
-        ]
-      },
-      publication: [
-        {
-          _title:
-            'Semi-Supervised Spiking Neural Network for One-Shot Object Appearance Learning',
-          _authors:
-            'J. Kaiser, R. Stal, A. Subramoney, A. Roennau, R. Dillmann',
-          _url:
-            'https://link.springer.com/chapter/10.1007%2F978-3-662-54712-0_10'
-        },
-        {
-          _title:
-            'Scaling up liquid state machines to predict over address events from dynamic vision sensors',
-          _authors:
-            'I. Peric, R. Hangu, J. Kaiser, S. Ulbrich, A. Roennau, J. M. Zoellner, R. Dillman',
-          _url:
-            'https://www.frontiersin.org/articles/10.3389/fninf.2017.00007/full'
-        }
-      ],
-      youtube: [
-        {
-          _title: 'Tutorial - Overview of the HBP Neurorobotics Platform',
-          '_youtube-id': 'uAXzS7SPFG4'
-        },
-        {
-          _title: 'Third HBP Neurorobotics Workshop @TUM - Munich',
-          '_youtube-id': 'R0D82QooSs8'
-        }
-      ],
-      picture: [
-        {
-          _title: 'Home page',
-          _url:
-            'https://developer.humanbrainproject.eu/docs/projects/HBP%20Neurorobotics%20Platform/0.9/_images/gz3d-interact.png'
-        },
-        {
-          _title: 'Wizzard',
-          _url:
-            'https://developer.humanbrainproject.eu/docs/projects/HBP%20Neurorobotics%20Platform/1.2/_images/gz3d-env-editor.png'
-        }
-      ]
+      }
     }
   };
 

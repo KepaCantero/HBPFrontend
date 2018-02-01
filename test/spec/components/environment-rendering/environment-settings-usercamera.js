@@ -6,6 +6,8 @@ describe('Directive: render settings user camera frustum', function() {
   beforeEach(module('exdFrontendApp'));
   beforeEach(module('exd.templates'));
 
+  beforeEach(module('userInteractionSettingsServiceMock'));
+
   beforeEach(
     module(function($provide) {
       gz3dMock = { scene: { composerSettings: {} } };

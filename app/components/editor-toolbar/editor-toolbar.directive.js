@@ -31,7 +31,28 @@
         restrict: 'E',
         scope: true,
         controller: 'EditorToolbarController',
-        controllerAs: 'vm'
+        controllerAs: 'vm',
+        link: (scope, element) => {
+          let editButtton = element.find('.hbp-toolbar-action');
+
+          // This is a fix for : [NRRPLT-6077] Edit button is disabled for unclear reason.
+          // Basically, it may happen that angular does not update the ng-class
+          // when the following conditions are met. For this reason, we apply the disable tag
+          // manually.
+
+          scope.$watch(
+            `vm.userContextService.editIsDisabled ||
+                       vm.editorsPanelService.loadingEditPanel ||
+                       (vm.stateService.currentState === vm.STATE.HALTED) ||
+                       (vm.stateService.currentState === vm.STATE.STOPPED) ||
+                       (vm.stateService.currentState === vm.STATE.FAILED)`,
+            value => {
+              value
+                ? editButtton.addClass('disabled')
+                : editButtton.removeClass('disabled');
+            }
+          );
+        }
       };
     }
   ]);

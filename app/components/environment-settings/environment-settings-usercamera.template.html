@@ -43,17 +43,19 @@
             </span>
       <div class="environment-settings-option-subblock">
         <div>
-          <label>Translation sensitivity: {{userNavigationService.translationSensitivity}}</label>
+          <label>Translation sensitivity: {{userInteractionSettingsService.settingsData.camera.sensitivity.translation}}</label>
           <input class="esv-envsettings-slider" type="range"
-                 ng-model="userNavigationService.translationSensitivity"
+                 ng-model="camSensitivityTranslation"
+                 ng-change="updateCameraSensitivity()"
                  value="1.0" step="0.05"
                  min="{{CAMERA_SENSITIVITY_RANGE.TRANSLATION_MIN}}"
                  max="{{CAMERA_SENSITIVITY_RANGE.TRANSLATION_MAX}}"
                  ng-mouseup="$event.stopPropagation(); focus('container');"/>
         </div>
-        <label>Rotation sensitivity: {{userNavigationService.rotationSensitivity}}</label>
+        <label>Rotation sensitivity: {{userInteractionSettingsService.settingsData.camera.sensitivity.rotation}}</label>
         <input class="esv-envsettings-slider" type="range"
-               ng-model="userNavigationService.rotationSensitivity"
+               ng-model="camSensitivityRotation"
+               ng-change="updateCameraSensitivity()"
                value="1.0" step="0.1"
                min="{{CAMERA_SENSITIVITY_RANGE.ROTATION_MIN}}"
                max="{{CAMERA_SENSITIVITY_RANGE.ROTATION_MAX}}"

@@ -690,6 +690,14 @@ def {0}(t):
               scope.transferFunctions = [];
               scope.refresh();
             });
+            // Population changed update
+            scope.$on('pynn.tfNeedsSave', function() {
+              loadTFs().then(function() {
+                refreshEditors();
+                refreshPopulations();
+                scope.saveTFIntoCollabStorage();
+              });
+            });
 
             saveErrorsService.registerCallback(DIRTY_TYPE, function(newTFs) {
               scope.transferFunctions = newTFs;

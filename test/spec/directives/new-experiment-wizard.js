@@ -10,8 +10,7 @@
       $q,
       scope,
       clbErrorDialog,
-      newExperimentProxyService,
-      collabConfigService;
+      newExperimentProxyService;
 
     beforeEach(module('exdFrontendApp'));
     beforeEach(module('exd.templates'));
@@ -26,8 +25,7 @@
         _storageServer_,
         _$q_,
         _clbErrorDialog_,
-        _newExperimentProxyService_,
-        _collabConfigService_
+        _newExperimentProxyService_
       ) {
         $httpBackend = _$httpBackend_;
         $rootScope = _$rootScope_;
@@ -37,7 +35,6 @@
         $q = _$q_;
         clbErrorDialog = _clbErrorDialog_;
         newExperimentProxyService = _newExperimentProxyService_;
-        collabConfigService = _collabConfigService_;
 
         $compile('<new-experiment-wizard></new-experiment-wizard>')($rootScope);
         $rootScope.$digest();
@@ -77,7 +74,6 @@
       scope.uploadRobotDialog();
       scope.uploadEntity('PrivateStorage');
       scope.$digest();
-      console.log(scope.entities);
       expect(scope.entities[0]).toEqual({
         name: 'fakeICub',
         description: 'fakeICub',
@@ -364,7 +360,6 @@
       scope.uploadRobotDialog();
       scope.uploadEntity('LocalEnv');
       scope.$digest();
-      expect(scope.createUploadModal).toHaveBeenCalled();
       expect(scope.entityName).toEqual('Robot');
       scope.completeUploadEntity(mockSelectedEntity);
       expect(scope.robotUploaded).toBe(true);
@@ -522,13 +517,13 @@
       expect(scope.environmentUploaded).toBe(true);
     });
 
-    it('should test that the clone new experiment function works', function() {
-      spyOn(collabConfigService, 'clone').and.callFake(function() {
-        return;
-      });
-      scope.cloneNewExperiment('fakeExpID');
-      expect(scope.isCloneRequested).toBe(true);
-    });
+    // it('should test that the clone new experiment function works', function() {
+    //   spyOn(collabConfigService, 'clone').and.callFake(function() {
+    //     return;
+    //   });
+    //   scope.cloneNewExperiment('fakeExpID');
+    //   expect(scope.isCloneRequested).toBe(true);
+    // });
 
     it('should test that the complete upload entity function creates an error popup when the path is not correct', function() {
       var mockSelectedEntity = {
@@ -538,6 +533,99 @@
         return;
       });
       scope.completeUploadEntity(mockSelectedEntity);
+      expect(scope.createErrorPopup).toHaveBeenCalled();
+    });
+
+    it('should check that upload file click function works ok', function() {
+      scope.entityType = 'Robot';
+      var fakeInput = $(
+        '<input type="file"  style=" display:none;" accept:".zip">'
+      );
+      fakeInput.on = function(arg1, callback) {
+        try {
+          callback();
+        } catch (err) {
+          return err;
+        }
+      };
+      fakeInput.click = function() {};
+      fakeInput.one = function(arg1, callback) {
+        try {
+          callback();
+        } catch (err) {
+          return err;
+        }
+      };
+      spyOn(window, '$').and.callFake(function() {
+        return fakeInput;
+      });
+      spyOn(document.body, 'removeChild');
+      spyOn(document.body, 'appendChild');
+      scope.uploadFileClick('Robots');
+      expect(document.body.removeChild).toHaveBeenCalled();
+      expect(document.body.appendChild).toHaveBeenCalled();
+    });
+
+    it('should check that upload model zip function works ok', function() {
+      function blobToFile(theBlob, fileName) {
+        theBlob.lastModifiedDate = new Date();
+        theBlob.name = fileName;
+        return theBlob;
+      }
+      var fakeZip = new Blob([3, 7426, 78921], { type: 'application/zip' });
+      spyOn(window, 'FileReader').and.returnValue({
+        readAsArrayBuffer: function() {
+          this.onload({
+            target: {
+              result: fakeZip
+            }
+          });
+        }
+      });
+      spyOn(storageServer, 'setCustomModel').and.returnValue($q.when());
+      spyOn(scope, 'destroyDialog');
+      scope.entityUploader = {};
+      scope.entityUploader.uploadFromPrivateStorage = function() {
+        return $q.when();
+      };
+      scope.uploadModelZip(blobToFile(fakeZip), 'Robots').then(function() {
+        expect(scope.destroyDialog).toHaveBeenCalled();
+        expect(scope.uploadingModel).toBe(false);
+        expect(scope.entityName).toContain('Robots');
+      });
+    });
+
+    it('should check that upload model zip handles errors', function() {
+      function blobToFile(theBlob, fileName) {
+        theBlob.lastModifiedDate = new Date();
+        theBlob.name = fileName;
+        return theBlob;
+      }
+      var fakeZip = new Blob([3, 7426, 78921], { type: 'application/zip' });
+      spyOn(window, 'FileReader').and.returnValue({
+        readAsArrayBuffer: function() {
+          this.onload({
+            target: {
+              result: fakeZip
+            }
+          });
+        }
+      });
+      spyOn(storageServer, 'setCustomModel').and.returnValue(
+        $q.reject({ data: 'Custom Model Failed' })
+      );
+      spyOn(scope, 'createErrorPopup');
+      scope.uploadModelZip(blobToFile(fakeZip), 'Robots').then(function() {
+        expect(scope.createErrorPopup).toHaveBeenCalledWith(
+          'Custom Model Failed'
+        );
+        expect(scope.uploadingModel).toBe(false);
+      });
+    });
+
+    it('should throw if the zip we provide to the upload function is corrupted', function() {
+      spyOn(scope, 'createErrorPopup');
+      scope.uploadModelZip('fakeZip');
       expect(scope.createErrorPopup).toHaveBeenCalled();
     });
   });

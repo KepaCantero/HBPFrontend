@@ -7,9 +7,17 @@
             <div class="h3">Select {{entityName}} </div>   
         </div>
         <hr class="list-separator">
-         <hbp-file-upload-area on-drop="handleFileUpload(files)" on-error="handleError(error)">
-         </hbp-file-upload-area>
-        <button type="button" class="btn btn-success btn-s" ng-click="completeUploadEntity()">
+        <div>
+            <label for="file">Choose {{entityName}} zip to upload</label>
+            <input type="file" id="file" name="file" accept=".zip">
+        </div>
+        
+        <div>
+            {{entityName}}
+            {{entity.description}}
+        </div>>
+        <!--button type="button" class="btn btn-success btn-s" ng-click="">
+          <input id="file-input" type="file" name="name" style="display: none;" />
           <span class="glyphicon glyphicon-upload"></span> Upload all
         </button>
         <button type="button" class="btn btn-warning btn-s" ng-click="">
@@ -17,9 +25,14 @@
         </button>
         <button type="button" class="btn btn-danger btn-s" ng-click="">
           <span class="glyphicon glyphicon-trash"></span> Remove all
-        </button>
+        </button-->
         <br>
         <br>
+        <div align="left">
+            <button class="btn btn-success btn-s" tooltip-trigger="mouseenter" tooltip-placement="top" ng-click="uploadModelZip()"
+                style="margin-left:20px;">Submit
+            </button>
+        </div>
         <div align="right">
             <button class="btn btn-default enable-tooltip" tooltip-trigger="mouseenter" tooltip-placement="top" ng-click="destroyDialog()"
                 style="margin-right:20px;">Cancel

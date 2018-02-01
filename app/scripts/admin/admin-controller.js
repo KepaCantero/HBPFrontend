@@ -21,30 +21,24 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  * ---LICENSE-END**/
-
 (function() {
   'use strict';
 
-  angular
-    .module('experimentExplorer')
-    .directive('experimentExplorer', () => ({
-      templateUrl:
-        'components/experiment-explorer/experiment-explorer.template.html',
-      restrict: 'E',
-      controller: 'ExperimentExplorerController',
-      controllerAs: 'vm',
-      link: scope => scope.vm.loadExperiments()
-    }))
-    .directive('experimentFolders', () => ({
-      restrict: 'E',
-      replace: true,
-      template:
-        '<div class="experiment-folders" ng-include src="\'experiment-explorer-folder.html\'"></div>',
-      scope: {
-        parent: '='
-      },
-      link: scope => {
-        scope.vm = scope.$parent.vm;
-      }
-    }));
+  class AdminPageCtrl {
+    constructor($scope, adminService, nrpUser) {
+      this.adminService = adminService;
+      this.adminRights = false;
+      nrpUser.isAdministrator().then(res => (this.adminRights = res));
+      this.status = adminService.getStatus();
+    }
+
+    setMaintenanceMode(maintenance) {
+      console.log(`maintenance: ${maintenance}`);
+      this.adminService.setStatus(maintenance);
+    }
+  }
+
+  AdminPageCtrl.$inject = ['$scope', 'adminService', 'nrpUser'];
+
+  angular.module('adminModule', []).controller('adminPageCtrl', AdminPageCtrl);
 })();

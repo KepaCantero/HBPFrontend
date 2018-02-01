@@ -87,20 +87,23 @@
 
 .list-entry-left {
   flex: 1;
-  min-width: 200px;
+  width: 200px;
+  height: 115px;
   padding-right: 15px;
   padding-left: 15px;
   transition: all cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.5s;
 }
 
 .list-entry-left.selected {
-  flex: 2;
-  min-width: 250px;
+  flex: 1.8;
+  height: 253px;
 }
 
 .list-entry-left > img {
   max-width: 100%;
   width: 100%;
+  object-fit: fill;
+  height: 100%;
 }
 
 .list-entry-middle {

@@ -7,6 +7,7 @@ describe('Directive: 3d settings', function() {
   beforeEach(module('exdFrontendApp'));
   beforeEach(module('exd.templates'));
   beforeEach(module('simulationInfoMock'));
+  beforeEach(module('userInteractionSettingsServiceMock'));
 
   beforeEach(
     module(function($provide) {

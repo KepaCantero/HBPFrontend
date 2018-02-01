@@ -24,34 +24,36 @@
 (function() {
   'use strict';
 
-  var module = angular.module('collabServices', [
-    'ngResource',
-    'bbpConfig',
-    'nrpErrorHandlers',
-    'ui.router',
-    'clb-storage'
-  ]);
+  class AdminService {
+    constructor($resource, bbpConfig) {
+      const STORAGE_BASE_URL = bbpConfig.get('api.proxy.url');
 
-  module.factory('collabConfigService', [
-    '$resource',
-    'serverError',
-    'bbpConfig',
-    function($resource, serverError, bbpConfig) {
-      var baseUrl = bbpConfig.get('api.collabContextManagement.url');
-      return $resource(
-        baseUrl + '/collab/configuration/:contextID',
+      this.proxyRsc = $resource(
+        STORAGE_BASE_URL,
         {},
         {
-          clone: {
-            method: 'PUT',
-            url: `${baseUrl}/experiment/clone`
+          setStatus: {
+            method: 'POST',
+            url: `${STORAGE_BASE_URL}/admin/status/:maintenance`
           },
-          get: {
+          getStatus: {
             method: 'GET',
-            interceptor: { responseError: serverError.displayHTTPError }
+            url: `${STORAGE_BASE_URL}/admin/status`
           }
         }
       );
     }
-  ]);
+
+    setStatus(maintenance) {
+      return this.proxyRsc.setStatus({ maintenance }, null);
+    }
+
+    getStatus() {
+      return this.proxyRsc.getStatus();
+    }
+  }
+
+  AdminService.$inject = ['$resource', 'bbpConfig'];
+
+  angular.module('adminModule').service('adminService', AdminService);
 })();

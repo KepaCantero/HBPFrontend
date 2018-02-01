@@ -293,6 +293,11 @@
             var restart = stateService.currentState === STATE.STARTED;
             scope.loading = true;
             var populations = objectifyPopulations(scope.populations);
+
+            if (changePopulation) {
+              scope.tfNeedsSave = true;
+            }
+
             backendInterfaceService.setBrain(
               scope.pynnScript.code,
               scope.stringsToLists(populations),
@@ -358,6 +363,11 @@
                 scope.isSavingToCollab = false;
                 scope.collabDirty = false;
                 autoSaveService.clearDirty(DIRTY_TYPE);
+
+                if (scope.tfNeedsSave) {
+                  scope.tfNeedsSave = false;
+                  $rootScope.$broadcast('pynn.tfNeedsSave');
+                }
               },
               function() {
                 // Failure callback

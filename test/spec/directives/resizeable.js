@@ -163,8 +163,8 @@ describe('Directive: resizeable', function() {
       var mouseDownPos = { x: 0, y: 0 };
       var mouseMoveDelta = { x: 400, y: 0 };
 
-      var expectedWidth = 97.7;
-      var expectedHeight = 97.7;
+      var expectedWidth = 84.17;
+      var expectedHeight = 84.17;
 
       resizeElement(resizeDiv, mouseDownPos, mouseMoveDelta);
 

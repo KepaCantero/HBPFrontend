@@ -36,20 +36,25 @@
     }
 
     $onInit() {
+      if (this.config.model.website) {
+        window.location.replace(this.config.model.website);
+        return;
+      }
       this.enforceArray(this.config.model.author, 'name');
       this.enforceArray(this.config.model.author, 'email');
-      this.enforceArray(this.config.model, 'picture');
-      this.enforceArray(this.config.model, 'youtube');
-      this.enforceArray(this.config.model, 'publication');
-      this.enforceArray(this.config.model.sensors, 'sensor');
-      this.enforceArray(this.config.model.actuators, 'actuator');
+      this.enforceArray(this.config.model.documentation, 'picture');
+      this.enforceArray(this.config.model.documentation, 'youtube');
+      this.enforceArray(this.config.model.documentation, 'publication');
+      this.enforceArray(this.config.model.documentation.sensors, 'sensor');
+      this.enforceArray(this.config.model.documentation.actuators, 'actuator');
 
-      if (this.config.model.youtube) {
-        for (let youtube of this.config.model.youtube)
+      if (this.config.model.documentation.youtube) {
+        for (let youtube of this.config.model.documentation.youtube)
           youtube.url = this.$sce.trustAsResourceUrl(
             'http://www.youtube.com/embed/' + youtube['_youtube-id']
           );
       }
+      this.show = true;
     }
   }
 
