@@ -48,6 +48,7 @@
       'simulationInfo',
       'userNavigationService',
       'NAVIGATION_MODES',
+      'environmentService',
       function(
         $timeout,
         EDIT_MODE,
@@ -60,7 +61,8 @@
         isNotARobotPredicate,
         simulationInfo,
         userNavigationService,
-        NAVIGATION_MODES
+        NAVIGATION_MODES,
+        environmentService
       ) {
         //var objectInspectorService = {
         function ObjectInspectorService() {
@@ -83,6 +85,7 @@
           this.lockTAxis = undefined;
           this.selectedTab = 0;
           this.robotMode = false;
+          this.devMode = environmentService.isDevMode();
 
           this.getSelectedObjectShape = function() {
             if (this.selectedObject) {
