@@ -30,7 +30,7 @@
       </uib-tab>
       <uib-tab heading="Transfer Functions V2 (beta)" index="tabindex.graphicalEditor"
            select="disableKeyBindings(); controls.graphicalEditor.refresh()"
-           ng-show="devMode"
+           disable="!devMode"
            deselect="reenableKeyBindings()">
         <graphical-editor topic="{{cleErrorTopic}}"  server="{{rosbridgeWebsocketUrl}}"
                           control="controls.graphicalEditor"/>
