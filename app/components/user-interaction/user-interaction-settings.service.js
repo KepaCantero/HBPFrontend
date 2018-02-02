@@ -46,15 +46,13 @@
         .then(fileContent => {
           this.settingsData = JSON.parse(fileContent);
           this.clampCameraSensitivity();
-
-          return this.settingsData;
         })
         .catch(() => {
           // error, set all defaults
           console.info(
             'UserInteractionSettingsService.loadSettings() - error during loadConfigFile()'
           );
-          this.settingsData = this.UIS_DEFAULTS;
+          this.settingsData = JSON.parse(JSON.stringify(this.UIS_DEFAULTS));
         });
     }
 
