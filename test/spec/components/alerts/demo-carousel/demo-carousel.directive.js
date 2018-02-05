@@ -4,13 +4,11 @@
   describe('Directive: demo-carousel-alert', function() {
     beforeEach(module('demoCarousel'));
     beforeEach(module('exd.templates'));
-    beforeEach(module('nrpUserMock'));
 
-    var scope, nrpUser, $window;
+    var scope, $window;
 
     beforeEach(
-      inject(function($rootScope, $compile, _nrpUser_, _$window_) {
-        nrpUser = _nrpUser_;
+      inject(function($rootScope, $compile, _$window_) {
         $window = _$window_;
         spyOn($window.sessionStorage, 'getItem').and.returnValue(null);
         spyOn($window.sessionStorage, 'setItem');
@@ -23,9 +21,8 @@
       })
     );
 
-    it('should call nrpUser.getCurrentUserInfo() once', function() {
-      expect(nrpUser.getCurrentUserInfo.calls.count()).toBe(1);
-      expect(scope.displayWatchDemosButton).toBe(true);
+    it('check demo banner is still disabled', function() {
+      expect(scope.displayWatchDemosButton).toBe(false);
     });
   });
 })();
