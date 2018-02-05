@@ -8,14 +8,14 @@ describe('Directive: simulation-timeout-extender', function() {
     $q,
     $compile,
     clbConfirmResponse,
-    backendInterfaceServiceExtendResponse;
+    backendInterfaceServiceExtendResponse,
+    $document;
 
   var backendInterfaceService = {
     extendTimeout: jasmine.createSpy('extendTimeout').and.callFake(function() {
       return backendInterfaceServiceExtendResponse;
     })
   };
-
   var clbConfirm = {
     open: jasmine.createSpy('open').and.callFake(function() {
       return clbConfirmResponse;
@@ -37,7 +37,8 @@ describe('Directive: simulation-timeout-extender', function() {
   );
 
   beforeEach(
-    inject(function(_$rootScope_, $httpBackend, _$compile_, _$q_) {
+    inject(function(_$rootScope_, $httpBackend, _$compile_, _$q_, _$document_) {
+      $document = _$document_;
       $rootScope = _$rootScope_;
       $compile = _$compile_;
       $q = _$q_;
@@ -45,10 +46,29 @@ describe('Directive: simulation-timeout-extender', function() {
       clbConfirmResponse = $q.when();
       backendInterfaceServiceExtendResponse = $q.when();
       $compile(
-        '<simulation-timeout-extender extent-timeout-condition="{{simTimeoutText < 300}}"></simulation-timeout-extender>'
+        '<simulation-timeout-extender extent-auto-condition= "{{simTimeoutText < 360}}" extent-timeout-condition="{{simTimeoutText < 300}}"></simulation-timeout-extender>'
       )($rootScope);
     })
   );
+
+  it('should not be automatic extended', function() {
+    spyOn($rootScope.$$childTail, 'unbind').and.callThrough();
+    spyOn($rootScope.$$childTail, 'extendTimeout').and.callThrough();
+    $document.triggerHandler({ type: 'mousemove', pageX: 10, pageY: 10 });
+    $rootScope.simTimeoutText = 299;
+    $rootScope.$$childTail.autoExtendTimeout = true;
+    $rootScope.$digest();
+    expect($rootScope.$$childTail.extendTimeout).toHaveBeenCalled();
+    expect($rootScope.$$childTail.unbind).toHaveBeenCalled();
+  });
+
+  it('should not be automatic extended', function() {
+    spyOn($rootScope.$$childTail, 'unbind').and.callThrough();
+    $rootScope.simTimeoutText = 299;
+    $rootScope.$digest();
+    expect($rootScope.$$childTail.unbind).toHaveBeenCalled();
+    expect($rootScope.$$childTail.autoExtendTimeout).toBe(false);
+  });
 
   it('should an exception if extend-timeout-condition undefined', function() {
     expect(function() {

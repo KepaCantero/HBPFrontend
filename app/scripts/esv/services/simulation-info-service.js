@@ -61,6 +61,8 @@
           thisService.contextID = contextID;
           thisService.experimentID = experimentID;
           thisService.experimentDetails = null;
+          thisService.simMaxTimeOutText = 300;
+          thisService.simMaxAutoTimeOutText = 360;
 
           return experimentProxyService
             .getServerConfig(thisService.serverID)
