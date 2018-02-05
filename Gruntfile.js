@@ -138,7 +138,7 @@ module.exports = function(grunt) {
       livereload: {
         options: {
           open: {
-            target: 'http://localhost:<%= connect.options.port %>/#/esv-web'
+            target: 'http://localhost:<%= connect.options.port %>/#/esv-private'
           },
           protocol: 'http'
         }
@@ -146,7 +146,8 @@ module.exports = function(grunt) {
       livereloadHttps: {
         options: {
           open: {
-            target: 'https://localhost:<%= connect.options.port %>/#/esv-web'
+            target:
+              'https://localhost:<%= connect.options.port %>/#/esv-private'
           },
           protocol: 'https'
         }
@@ -176,7 +177,7 @@ module.exports = function(grunt) {
       dist: {
         options: {
           open: {
-            target: 'http://localhost:<%= connect.options.port %>/#/esv-web'
+            target: 'http://localhost:<%= connect.options.port %>/#/esv-private'
           },
           middleware: null,
           base: '<%= yeoman.dist %>'
