@@ -19,7 +19,8 @@ describe('Directive: transferFunctionEditor', function() {
     DEFAULT_TF_CODE,
     codeEditorsServices,
     $q,
-    environmentService;
+    environmentService,
+    expectedTf1;
 
   var backendInterfaceServiceMock = {
     getPopulations: jasmine.createSpy('getPopulations'),
@@ -27,6 +28,13 @@ describe('Directive: transferFunctionEditor', function() {
       .createSpy('getTransferFunctions')
       .and.callFake(function() {
         return $q.when();
+      }),
+
+    setActivateTransferFunction: jasmine
+      .createSpy('setActivateTransferFunction')
+      .and.callFake(function() {
+        var callback = arguments[3];
+        return callback(arguments[4](), arguments[2]);
       }),
     editTransferFunction: jasmine.createSpy('editTransferFunction'),
     addTransferFunction: jasmine.createSpy('addTransferFunction'),
@@ -131,8 +139,31 @@ describe('Directive: transferFunctionEditor', function() {
       $scope.$digest();
       isolateScope = element.isolateScope();
       transferFunctions = isolateScope.transferFunctions;
+      isolateScope.editorsOptions = { tfname: { readOnly: false } };
+      isolateScope.transferFunctionsActive = { tfname: false };
+      expectedTf1 = new ScriptObject('tfname', null);
     })
   );
+
+  it('should set the Button to Disabled', function() {
+    isolateScope.initbuttonTFEnabledText(expectedTf1);
+    expect(expectedTf1.buttonTextTF).toEqual('Disabled');
+  });
+
+  it('should called setActivateTransferFunction', function() {
+    isolateScope.initbuttonTFEnabledText(expectedTf1);
+    isolateScope.toggleEnabledTF(expectedTf1);
+    expect(
+      backendInterfaceServiceMock.setActivateTransferFunction
+    ).toHaveBeenCalled();
+  });
+
+  it('should change text of buttonTFEnabledText', function() {
+    isolateScope.initbuttonTFEnabledText(expectedTf1);
+    expect(expectedTf1.buttonTextTF).toEqual('Disabled');
+    isolateScope.updateTFButton(expectedTf1, true);
+    expect(expectedTf1.buttonTextTF).toEqual('Enabled');
+  });
 
   it('should request transferFunctions on initialization', function() {
     expect(isolateScope.transferFunctions).toEqual([]);
@@ -223,7 +254,7 @@ describe('Directive: transferFunctionEditor', function() {
     isolateScope.collabDirty = true;
     isolateScope.transferFunctions = [1, 2, 3];
     isolateScope.refresh();
-    $rootScope.$digest();
+    //$rootScope.$digest();
     expect(codeEditorsServices.refreshAllEditors.calls.count()).toBe(1);
   });
 
@@ -257,7 +288,7 @@ describe('Directive: transferFunctionEditor', function() {
       '@customdecorator(toto)\ndef ' +
       tf2Name +
       '(var1, var2):\n\t#put your code here';
-    var response = { data: { tf1: tf1Code } };
+    var response = { active: { tf1: false }, data: { tf1: tf1Code } };
     var expectedTf1, expectedTf2, expected;
 
     beforeEach(function() {
@@ -275,6 +306,7 @@ describe('Directive: transferFunctionEditor', function() {
       spyOn(document, 'getElementById').and.returnValue({
         firstChild: { CodeMirror: editorMock }
       });
+      spyOn(isolateScope, 'updateCodeMirror').and.callThrough();
       backendInterfaceService.getTransferFunctions.calls
         .mostRecent()
         .args[0](response);
@@ -288,6 +320,7 @@ describe('Directive: transferFunctionEditor', function() {
 
       // The tfs should be refreshed on initialization
       expect(codeEditorsServices.refreshAllEditors).toHaveBeenCalled();
+      expect(isolateScope.updateCodeMirror).toHaveBeenCalled();
     });
 
     it('should remove retrieved transfer functions properly', function() {

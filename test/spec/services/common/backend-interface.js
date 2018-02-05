@@ -113,6 +113,28 @@ describe('Services: backendInterfaceService', function() {
     expect(callback).toHaveBeenCalled();
   });
 
+  it('should call the success callback when the setActivateTransferFunction POST request succeeds', function() {
+    $httpBackend
+      .expectPUT(
+        simulationInfo.serverBaseUrl +
+          '/simulation/' +
+          simulationInfo.simulationID +
+          '/transfer-functions/tfName/activation/true'
+      )
+      .respond(200);
+    var callbackError = jasmine.createSpy('callback');
+    var callbackSuccess = jasmine.createSpy('callback');
+    backendInterfaceService.setActivateTransferFunction(
+      'tfName',
+      {},
+      'true',
+      callbackSuccess,
+      callbackError
+    );
+    $httpBackend.flush();
+    expect(callbackSuccess).toHaveBeenCalled();
+  });
+
   it('should call the success callback when the addTransferFunction POST request succeeds', function() {
     $httpBackend.whenPOST(urlRegex).respond(200);
     var callback = jasmine.createSpy('callback');

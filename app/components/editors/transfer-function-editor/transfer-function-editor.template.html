@@ -64,9 +64,11 @@
     <h4><input type="text" readonly class="tf-name" ng-model="transferFunction.name" name="tfName"
                ng-pattern="transferFunction.regex"></h4>
     <div ng-attr-id="transfer-function-{{transferFunction.id}}"
-         ui-codemirror ui-codemirror-opts="editorOptions"
+         ui-codemirror ui-codemirror-opts="editorsOptions[transferFunction.id]"
+         ui-refresh='refreshCodemirror'
          ng-change="onTransferFunctionChange(transferFunction)"
-         ng-model="transferFunction.code">
+         ng-model="transferFunction.code"
+         >
     </div>
     <div ng-repeat="(type, error) in transferFunction.error">
       <div class="alert alert-danger" role="alert">
@@ -77,7 +79,7 @@
     <div>
       <button type="button" class="btn btn-default btn-md"
               owner-only
-              ng-disabled="!transferFunction.dirty || (stateService.currentState === STATE.INITIALIZED) || stateService.statePending || transferFunction.error.Input"
+              ng-disabled="!transferFunction.disableApplyButton||!transferFunction.dirty || (stateService.currentState === STATE.INITIALIZED) || stateService.statePending || transferFunction.error.Input"
               ng-click="update(transferFunction, false)"
               v-busy="transferFunction.dirty && stateService.statePending"
               v-busy-label="Applying changes"
@@ -90,6 +92,12 @@
               ng-click="delete(transferFunction)">
         <i class="glyphicon glyphicon-remove"></i><span> Delete</span>
       </button>
+      <button type="button" class="btn btn-default btn-md"
+              owner-only
+              ng-click="toggleEnabledTF(transferFunction)"
+              ng-init = "initbuttonTFEnabledText(transferFunction)">
+      <i ng-class="{true: 'glyphicon glyphicon-plus-sign', false:'glyphicon glyphicon-minus-sign'}[transferFunction.disableApplyButton]"></i><span> {{transferFunction.buttonTextTF}}</span>
+    </button>
     </div>
   </div>
   <hr>

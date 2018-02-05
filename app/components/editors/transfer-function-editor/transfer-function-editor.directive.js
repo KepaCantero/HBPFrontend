@@ -127,7 +127,6 @@ def {0}(t):
             scope.collabDirty = false;
 
             scope.editorOptions = codeEditorsServices.getDefaultEditorOptions();
-
             scope.editorOptions = codeEditorsServices.ownerOnlyOptions(
               scope.editorOptions
             );
@@ -137,9 +136,10 @@ def {0}(t):
             scope.ERROR = SIMULATION_FACTORY_CLE_ERROR;
             scope.SOURCE_TYPE = SOURCE_TYPE;
             var ScriptObject = pythonCodeHelper.ScriptObject;
-
+            scope.buttonTextTFActive = [];
+            scope.transferFunctionsActive = [];
+            scope.editorsOptions = [];
             scope.populations = [];
-
             scope.showPopulations = false;
             scope.togglePopulations = function() {
               scope.showPopulations = !scope.showPopulations;
@@ -272,13 +272,20 @@ def {0}(t):
                     transferFunction.local = false;
                   }
                 });
+
+                _.forEach(response.active, function(value, key) {
+                  scope.updateCodeMirror(key, !value);
+                });
+
+                if (response.active)
+                  scope.transferFunctionsActive = response.active;
+
                 for (var i = scope.transferFunctions.length - 1; i >= 0; i--) {
                   var tf = scope.transferFunctions[i];
                   if (tf.local && !tf.dirty) {
                     scope.transferFunctions.splice(i, 1);
                   }
                 }
-
                 scope.updateRegexPatterns();
               });
             }
@@ -376,12 +383,67 @@ def {0}(t):
               delete transferFunction.error[scope.ERROR.NO_OR_MULTIPLE_NAMES];
             };
 
+            scope.initbuttonTFEnabledText = function(transferFunction) {
+              if (transferFunction) {
+                var actualTFValue =
+                  scope.transferFunctionsActive[transferFunction.id];
+                transferFunction.buttonTextTF = actualTFValue
+                  ? 'Enabled'
+                  : 'Disabled';
+                transferFunction.disableApplyButton = actualTFValue;
+              }
+            };
+
+            scope.updateCodeMirror = function(id, value) {
+              var codeMirrorElementName =
+                'transfer-function-' + id + ' .CodeMirror';
+              var codeMirrorElement = $('#' + codeMirrorElementName);
+              if (value) codeMirrorElement.css('background-color', 'LightGrey');
+              else codeMirrorElement.css('background-color', 'white');
+
+              if (scope.editorsOptions[id]) {
+                scope.editorsOptions[id].readOnly = value;
+                scope.refreshCodemirror = true;
+              } else scope.editorsOptions[id] = scope.editorOptions;
+            };
+
+            scope.updateTFButton = function(transferFunction, newActiveValue) {
+              scope.transferFunctionsActive[
+                transferFunction.id
+              ] = newActiveValue;
+              transferFunction.buttonTextTF = newActiveValue
+                ? 'Enabled'
+                : 'Disabled';
+              scope.editorsOptions[
+                transferFunction.id
+              ].readOnly = !newActiveValue;
+              transferFunction.disableApplyButton = newActiveValue;
+              scope.updateCodeMirror(transferFunction.id, !newActiveValue);
+            };
+
+            scope.toggleEnabledTF = function(transferFunction) {
+              if (transferFunction) {
+                var oldValueActive =
+                  scope.transferFunctionsActive[transferFunction.id];
+                backendInterfaceService.setActivateTransferFunction(
+                  transferFunction.id,
+                  null,
+                  !oldValueActive,
+                  function() {
+                    scope.updateTFButton(transferFunction, !oldValueActive);
+                  },
+                  function(data) {
+                    scope.updateTFButton(transferFunction, oldValueActive);
+                    serverError.displayHTTPError(data);
+                  }
+                );
+              }
+            };
+
             scope.update = function(transferFunction, newTf) {
               cleanError(transferFunction, scope.ERROR.RUNTIME);
               delete transferFunction.error[scope.ERROR.LOADING];
-
               scope.updateRegexPatterns();
-
               if (newTf) {
                 backendInterfaceService.addTransferFunction(
                   transferFunction.code,
@@ -470,8 +532,9 @@ def {0}(t):
                 scope.transferFunctions.unshift(transferFunction);
               }
               addedTransferFunctionCount = addedTransferFunctionCount + 1;
-
+              scope.transferFunctionsActive[id] = true;
               scope.update(transferFunction, true);
+              scope.updateCodeMirror(id, false);
               scope.collabDirty = environmentService.isPrivateExperiment();
               autoSaveService.setDirty(DIRTY_TYPE, scope.transferFunctions);
             };
@@ -685,7 +748,8 @@ def {0}(t):
               }
             };
 
-            // Population changed update
+            // Population changed
+
             scope.$on('pynn.populationsChanged', function() {
               scope.transferFunctions = [];
               scope.refresh();
