@@ -40,20 +40,30 @@
         window.location.replace(this.config.model.website);
         return;
       }
-      this.enforceArray(this.config.model.author, 'name');
-      this.enforceArray(this.config.model.author, 'email');
-      this.enforceArray(this.config.model.documentation, 'picture');
-      this.enforceArray(this.config.model.documentation, 'youtube');
-      this.enforceArray(this.config.model.documentation, 'publication');
-      this.enforceArray(this.config.model.documentation.sensors, 'sensor');
-      this.enforceArray(this.config.model.documentation.actuators, 'actuator');
 
-      if (this.config.model.documentation.youtube) {
-        for (let youtube of this.config.model.documentation.youtube)
-          youtube.url = this.$sce.trustAsResourceUrl(
-            'http://www.youtube.com/embed/' + youtube['_youtube-id']
-          );
+      if (this.config.model && this.config.model.author) {
+        this.enforceArray(this.config.model.author, 'name');
+        this.enforceArray(this.config.model.author, 'email');
       }
+
+      if (this.config.model.documentation) {
+        this.enforceArray(this.config.model.documentation, 'picture');
+        this.enforceArray(this.config.model.documentation, 'youtube');
+        this.enforceArray(this.config.model.documentation, 'publication');
+        this.enforceArray(this.config.model.documentation.sensors, 'sensor');
+        this.enforceArray(
+          this.config.model.documentation.actuators,
+          'actuator'
+        );
+
+        if (this.config.model.documentation.youtube) {
+          for (let youtube of this.config.model.documentation.youtube)
+            youtube.url = this.$sce.trustAsResourceUrl(
+              'http://www.youtube.com/embed/' + youtube['_youtube-id']
+            );
+        }
+      }
+
       this.show = true;
     }
   }
