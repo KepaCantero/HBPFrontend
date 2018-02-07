@@ -25,16 +25,36 @@
   'use strict';
 
   class AdminPageCtrl {
+    static get SERVER_POLL_INTERVAL() {
+      return 5000;
+    }
+
     constructor($scope, adminService, nrpUser) {
       this.adminService = adminService;
       this.adminRights = false;
       nrpUser.isAdministrator().then(res => (this.adminRights = res));
       this.status = adminService.getStatus();
+
+      this.serversPolling$ = Rx.Observable
+        .timer(0, AdminPageCtrl.SERVER_POLL_INTERVAL)
+        .subscribe(() => (this.servers = adminService.getServers()));
+
+      // work around a but that prevents the $onDestroy from beeing called for controllers  instanticated by the router
+      //ie: https://github.com/angular/angular.js/issues/14376
+      $scope.$on('$destroy', () => this.$onDestroy());
     }
 
     setMaintenanceMode(maintenance) {
       console.log(`maintenance: ${maintenance}`);
       this.adminService.setStatus(maintenance);
+    }
+
+    restartServer(server) {
+      this.adminService.restartServer(server);
+    }
+
+    $onDestroy() {
+      this.serversPolling$.unsubscribe();
     }
   }
 
