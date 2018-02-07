@@ -150,9 +150,7 @@
           })
           .then(() => $scope.loadPrivateExperiments())
           .catch(err => $scope.throwCloningError(err))
-          .finally(() => {
-            $scope.isCloneRequested = false;
-          });
+          .finally(() => ($scope.isCloneRequested = false));
       };
 
       $scope.throwCloningError = function(err) {
