@@ -31,4 +31,22 @@ describe('Controller: admin-page.controller', function() {
     $httpBackend.flush();
     $httpBackend.verifyNoOutstandingExpectation();
   });
+
+  it('should call backend when restarting server', function() {
+    $httpBackend
+      .expectPOST('http://proxy/admin/restart/funky-server')
+      .respond({});
+    adminPageCtrl.restartServer({ server: 'funky-server' });
+    $rootScope.$apply();
+
+    $httpBackend.flush();
+    $httpBackend.verifyNoOutstandingExpectation();
+  });
+
+  it('should unsubscribe on controller destroy', function() {
+    spyOn(adminPageCtrl.serversPolling$, 'unsubscribe');
+    $rootScope.$destroy();
+    $rootScope.$apply();
+    expect(adminPageCtrl.serversPolling$.unsubscribe).toHaveBeenCalled();
+  });
 });

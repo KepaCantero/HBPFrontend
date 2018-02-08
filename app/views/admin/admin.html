@@ -1,6 +1,5 @@
-
 <!-- build:css(.tmp) styles/esv/admin.css -->
-<link rel="stylesheet" href="styles/admin.css"/>
+<link rel="stylesheet" href="styles/admin.css" />
 <!-- endbuild -->
 
 <div class="alert alert-warning no-margin" ng-show="!$ctrl.adminRights">
@@ -13,7 +12,7 @@
 
     <div class="col-sm-12">
       <div class="page-header">
-        <h1>Administration</h1>
+        <h1>Administration page</h1>
       </div>
       <br/>
     </div>
@@ -23,6 +22,51 @@
         Maintenance mode:
         <input type="checkbox" ng-disabled="!$ctrl.adminRights" ng-change="$ctrl.setMaintenanceMode($ctrl.status.maintenance)" ng-model="$ctrl.status.maintenance">
       </label>
+    </div>
+    <div class="col-sm-12">
+      <h3>Servers</h3>
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">Name</th>
+            <th scope="col">Health</th>
+            <th scope="col">Errors</th>
+            <th scope="col">Simulations</th>
+            <th scope="col">Running simulation</th>
+            <th scope="col">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat="server in $ctrl.servers">
+            <th scope="row">{{server.server}}</th>
+            <td>{{server.health.state}}</td>
+            <td>{{server.health.errors}}</td>
+            <td>{{server.health.simulations}}</td>
+            <td>
+              <div ng-if="server.runningSimulation">
+                <span>Owner:
+                  <i>{{server.runningSimulation.owner}}</i>
+                </span>
+                <br/>
+                <span>Uptime:
+                  <i>{{server.runningSimulation.creationDate | uptime | timeDDHHMMSS}}</i>
+                </span>
+                <br/>
+                <span>State:
+                  <i>{{server.runningSimulation.state}}</i>
+                </span>
+              </div>
+            </td>
+            <td>
+              <button type="button" ng-disabled="!$ctrl.adminRights || server.restarting"
+              v-busy="server.restarting"
+              v-pressable
+              v-busy-label="Restart"
+              class="btn" ng-class="{'btn-danger':$ctrl.adminRights}" ng-click="$ctrl.restartServer(server)">Restart</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
 
   </div>
