@@ -101,7 +101,7 @@ describe('Services: userInteractionSettingsService', function() {
       cb();
     });
     userInteractionSettingsService.loadSettings();
-    expect(userInteractionSettingsService.settingsData).toBe(UIS_DEFAULTS);
+    expect(userInteractionSettingsService.settingsData).toEqual(UIS_DEFAULTS);
   });
 
   it(' - saveSettings()', function() {
