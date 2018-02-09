@@ -38,25 +38,33 @@ describe('Services: applyForceService', function() {
 
 describe('Services: applyForceService', function() {
   var applyForceService;
-  var contextMenuState, gz3d; //, roslib, simulationInfo;
+
   var mockEvent, mockContainer, mockRosService;
-
   var eventDispatcherService;
-  var dynamicViewOverlayService, DYNAMIC_VIEW_CHANNELS;
-  var stateService, STATE;
-  var userNavigationService;
 
-  var mockModel = {
-    /* eslint-disable camelcase */
-    userData: {
-      is_static: false
-    },
-    add: jasmine.createSpy('add'),
-    remove: jasmine.createSpy('remove'),
-    worldToLocal: jasmine
-      .createSpy('worldToLocal')
-      .and.returnValue(new THREE.Vector3(0, 0, 0)),
-    quaternion: new THREE.Quaternion(0, 0, 0, 1)
+  var contextMenuState,
+    gz3d,
+    userNavigationService,
+    dynamicViewOverlayService,
+    stateService;
+  var DYNAMIC_VIEW_CHANNELS, STATE;
+
+  //var mockModel = {
+  //  /* eslint-disable camelcase */
+  //  userData: {
+  //    is_static: false
+  //  },
+  //  add: jasmine.createSpy('add'),
+  //  remove: jasmine.createSpy('remove'),
+  //  worldToLocal: jasmine
+  //    .createSpy('worldToLocal')
+  //    .and.returnValue(new THREE.Vector3(0, 0, 0)),
+  //  quaternion: new THREE.Quaternion(0, 0, 0, 1)
+  //};
+  var mockModel = new THREE.Object3D();
+  /* eslint-disable camelcase */
+  mockModel.userData = {
+    is_static: false
   };
   /* eslint-enable camelcase */
 
@@ -87,6 +95,7 @@ describe('Services: applyForceService', function() {
       _userNavigationService_
     ) {
       applyForceService = _applyForceService_;
+
       contextMenuState = _contextMenuState_;
       gz3d = _gz3d_;
       dynamicViewOverlayService = _dynamicViewOverlayService_;
@@ -151,6 +160,10 @@ describe('Services: applyForceService', function() {
     applyForceService.contextMenuItem.show(mockModel);
     expect(applyForceService.contextMenuItem.visible).toBe(true);
     expect(applyForceService.targetModel).toBe(mockModel);
+    // check with already defined target model
+    spyOn(applyForceService, 'detachGizmo').and.callThrough();
+    applyForceService.contextMenuItem.show(mockModel);
+    expect(applyForceService.detachGizmo).toHaveBeenCalled();
     /* eslint-enable camelcase */
 
     // hide()
@@ -166,7 +179,6 @@ describe('Services: applyForceService', function() {
     var container = (gz3d.scene.viewManager.mainUserView.container = document.createElement(
       'div'
     ));
-    console.info(container);
     spyOn(container, 'addEventListener').and.callThrough();
     spyOn(container, 'removeEventListener').and.callThrough();
 
@@ -195,7 +207,7 @@ describe('Services: applyForceService', function() {
       mockIntersection
     );
     // clicked and released mouse 0 button, apply force called and event listeners removed
-    eventDispatcherService.triggerMouseEvent(container, 'mouseup', 0, 0, 0);
+    eventDispatcherService.triggerMouseEvent(container, 'click', 0, 0, 0);
     applyForceService.OnApplyForce(); // fake that overlay button was pressed
 
     expect(applyForceService.applyForceToLink).toHaveBeenCalled();
@@ -211,7 +223,6 @@ describe('Services: applyForceService', function() {
     var container = (gz3d.scene.viewManager.mainUserView.container = document.createElement(
       'div'
     ));
-    console.info(container);
     spyOn(container, 'addEventListener').and.callThrough();
     spyOn(container, 'removeEventListener').and.callThrough();
 
@@ -246,6 +257,14 @@ describe('Services: applyForceService', function() {
     ).toHaveBeenCalledWith(DYNAMIC_VIEW_CHANNELS.APPLY_FORCE_CONFIGURATION);
     expect(applyForceService.applyForceToLink).not.toHaveBeenCalled();
     expect(container.removeEventListener).toHaveBeenCalled();
+
+    done();
+  });
+
+  it('should detach gizmo when attached', function(done) {
+    mockModel.add(applyForceService.gizmoRoot);
+    applyForceService.detachGizmo();
+    expect(applyForceService.gizmoRoot.parent).toBe(null);
 
     done();
   });
@@ -331,11 +350,17 @@ describe('Services: applyForceService', function() {
     done();
   });
 
-  describe('open a apply force widget', function() {
+  describe('open a apply force gizmo', function() {
     var container;
     var newStateCallback;
 
+    var mockLink;
+
     beforeEach(function() {
+      mockLink = new THREE.Object3D();
+      mockLink.parent = mockModel;
+      mockLink.userData = { gazeboType: 'link' };
+
       container = gz3d.scene.viewManager.mainUserView.container = document.createElement(
         'div'
       );
@@ -369,23 +394,37 @@ describe('Services: applyForceService', function() {
       ).toHaveBeenCalledWith(DYNAMIC_VIEW_CHANNELS.APPLY_FORCE_CONFIGURATION);
     });
 
-    it(' - RotationChanged() should update 3D widget', function() {
+    it(' - onUIChangeForceVector() should update 3D gizmo', function() {
       applyForceService.targetModel = mockModel;
-      var preWidgetRotation = applyForceService.widgetRoot.quaternion.clone();
+      var preGizmoRotation = applyForceService.gizmoRoot.quaternion.clone();
       applyForceService.forceVector.set(1, 1, 1);
-      applyForceService.RotationChanged();
-      expect(applyForceService.widgetRoot.quaternion).not.toEqual(
-        preWidgetRotation
+      applyForceService.onUIChangeForceVector();
+      expect(applyForceService.gizmoRoot.quaternion).not.toEqual(
+        preGizmoRotation
       );
     });
 
-    it(' should trigger a drag rotation when 3D widget toruses are clicked', function() {
+    it(' should change the cursor when hovering the gizmo toruses', function() {
       userNavigationService.controls.enabled = true;
       applyForceService.targetModel = mockModel;
-      spyOn(applyForceService, 'RotationChanged').and.callThrough();
+      applyForceService.domElementPointerBindings = container;
+
+      // Fake open overlay view
+      dynamicViewOverlayService
+        .isOverlayOpen(DYNAMIC_VIEW_CHANNELS.APPLY_FORCE_CONFIGURATION)
+        .then.and.callFake(function(fn) {
+          fn(false); // over lay view open
+        });
+
       var mockIntersections = [
+        // model link intersection
         {
-          object: applyForceService.widgetToruses
+          object: mockLink,
+          point: new THREE.Vector3()
+        },
+        // torus intersection
+        {
+          object: applyForceService.gizmoToruses
         }
       ];
 
@@ -396,11 +435,75 @@ describe('Services: applyForceService', function() {
       spyOn(THREE, 'Raycaster').and.returnValue(mockRaycaster);
       mockRaycaster.intersectObjects.and.returnValue(mockIntersections);
 
+      eventDispatcherService.triggerMouseEvent(container, 'click', 0, 0, 0);
+
+      // mouse move
+      eventDispatcherService.triggerMouseEvent(
+        container,
+        'mousemove',
+        0,
+        100,
+        100
+      );
+      expect(applyForceService.domElementPointerBindings.style.cursor).toBe(
+        'pointer'
+      );
+
+      // mouse off toruses
+      mockIntersections.pop(); // remove torus mock intersection
+      // mouse move
+      eventDispatcherService.triggerMouseEvent(
+        container,
+        'mousemove',
+        0,
+        100,
+        100
+      );
+      expect(applyForceService.domElementPointerBindings.style.cursor).toBe(
+        'default'
+      );
+    });
+
+    it(' should trigger a drag rotation when 3D gizmo toruses are clicked', function() {
+      userNavigationService.controls.enabled = true;
+      applyForceService.targetModel = mockModel;
+      applyForceService.domElementPointerBindings = container;
+
+      // Fake open overlay view
+      dynamicViewOverlayService
+        .isOverlayOpen(DYNAMIC_VIEW_CHANNELS.APPLY_FORCE_CONFIGURATION)
+        .then.and.callFake(function(fn) {
+          fn(false); // over lay view open
+        });
+
+      spyOn(applyForceService, 'onUIChangeForceVector').and.callThrough();
+      var mockIntersections = [
+        // model link intersection
+        {
+          object: mockLink,
+          point: new THREE.Vector3()
+        },
+        // torus intersection
+        {
+          object: applyForceService.gizmoToruses
+        }
+      ];
+
+      var mockRaycaster = {
+        setFromCamera: jasmine.createSpy('setFromCamera'),
+        intersectObjects: jasmine.createSpy('intersectObjects')
+      };
+      spyOn(THREE, 'Raycaster').and.returnValue(mockRaycaster);
+      mockRaycaster.intersectObjects.and.returnValue(mockIntersections);
+
+      eventDispatcherService.triggerMouseEvent(container, 'click', 0, 0, 0);
+
       // mouse down
       eventDispatcherService.triggerMouseEvent(container, 'mousedown', 0, 0, 0);
       expect(userNavigationService.controls.enabled).toBe(false);
 
       // mouse move
+      applyForceService.forceVector = new THREE.Vector3(0, 0, 1);
       var preForceVector = applyForceService.forceVector.clone();
       eventDispatcherService.triggerMouseEvent(
         container,
@@ -410,7 +513,7 @@ describe('Services: applyForceService', function() {
         100
       );
       expect(applyForceService.forceVector).not.toEqual(preForceVector);
-      expect(applyForceService.RotationChanged).toHaveBeenCalled();
+      expect(applyForceService.onUIChangeForceVector).toHaveBeenCalled();
 
       // mouse up
       eventDispatcherService.triggerMouseEvent(
@@ -421,6 +524,18 @@ describe('Services: applyForceService', function() {
         100
       );
       expect(userNavigationService.controls.enabled).toBe(true);
+    });
+
+    it(' - ESC should exit mode', function() {
+      spyOn(applyForceService, 'disableApplyForceMode').and.callThrough();
+      spyOn(applyForceService, 'detachGizmo').and.callThrough();
+      eventDispatcherService.triggerKeyEvent(
+        applyForceService.domElementKeyboardBindings,
+        'keyup',
+        'Escape'
+      );
+      expect(applyForceService.disableApplyForceMode).toHaveBeenCalled();
+      expect(applyForceService.detachGizmo).toHaveBeenCalled();
     });
   });
 });
