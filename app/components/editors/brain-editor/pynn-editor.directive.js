@@ -101,7 +101,6 @@
           scope.editorOptions = codeEditorsServices.ownerOnlyOptions(
             scope.editorOptions
           );
-
           scope.resetListenerUnbindHandler = scope.$on('RESET', function(
             event,
             resetType
@@ -128,7 +127,15 @@
             codeEditorsServices.refreshEditor(editor);
             if (reset) codeEditorsServices.resetEditor(editor);
           };
-
+          scope.applyEditorOptions = function() {
+            var editor = codeEditorsServices.getEditorChild(
+              'codeEditor',
+              element[0]
+            );
+            _.forOwn(scope.editorOptions, function(value, key) {
+              editor.setOption(key, value);
+            });
+          };
           //TODO: get this mess of upwards-downwards intertwined scope definition out and handle refreshing in here alone
           // refresh is called on:
           // * resize
@@ -191,6 +198,7 @@
               }
             );
             refreshEditor();
+            scope.applyEditorOptions();
           }, 300);
 
           /** Convert Populations Object into array and create for each population a unique
@@ -297,7 +305,6 @@
             if (changePopulation) {
               scope.tfNeedsSave = true;
             }
-
             backendInterfaceService.setBrain(
               scope.pynnScript.code,
               scope.stringsToLists(populations),
@@ -320,6 +327,7 @@
                 // Failure callback
                 scope.loading = false;
                 scope.clearError();
+
                 if (result.data.handle_population_change) {
                   clbConfirm
                     .open({

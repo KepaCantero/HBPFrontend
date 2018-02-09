@@ -181,6 +181,13 @@ describe('Directive: pynnEditor', function() {
       backendInterfaceService.setBrain.calls.reset();
     });
 
+    it('should apply editor options', function() {
+      spyOn(isolateScope, 'applyEditorOptions').and.callThrough();
+      $timeout.flush(310);
+      isolateScope.$apply();
+      expect(isolateScope.applyEditorOptions).toHaveBeenCalled();
+    });
+
     it('should handle the retrieved populations and pynn script properly', function() {
       // Mock getBrain Callback with data as return value
       backendInterfaceService.getBrain.and.callFake(function(f) {
