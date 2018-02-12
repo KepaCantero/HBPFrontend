@@ -58,27 +58,41 @@
 
 .list-entry-container {
   display: flex;
+  max-height: 144px;
+  min-height: 144px;
+}
+
+.list-entry-container.hover {
+  background: linear-gradient(to right, #ffffff 0%, #eeeeee 50%, #ffffff 100%);
+  max-height: 144px;
+  min-height: 144px;
 }
 
 .list-entry-container.selected {
   background: linear-gradient(to right, #ffffff 0%, #eeeeee 50%, #ffffff 100%);
+  max-height: 320px;
+  min-height: unset;
 }
 
 .list-entry-container.left-right {
   flex-direction: row;
+  min-height: unset;
 }
 
 .list-entry-container.up-down {
   flex-direction: column;
+  max-height: none;
 }
 
 .list-entry-container.title-line {
   align-items: baseline;
+  min-height: unset;
 }
 
 .list-entry-container.center {
   align-items: center;
   justify-content: center;
+  min-height: unset;
 }
 
 .list-entry-main {
@@ -88,7 +102,6 @@
 .list-entry-left {
   flex: 1;
   width: 200px;
-  height: 115px;
   padding-right: 15px;
   padding-left: 15px;
   transition: all cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.5s;
@@ -96,14 +109,18 @@
 
 .list-entry-left.selected {
   flex: 1.8;
-  height: 253px;
 }
 
 .list-entry-left > img {
-  max-width: 100%;
+  min-width: 130px;
   width: 100%;
-  object-fit: fill;
+  object-fit: contain;
   height: 100%;
+}
+
+.text-long-description {
+  overflow: auto;
+  max-height: 120px;
 }
 
 .list-entry-middle {

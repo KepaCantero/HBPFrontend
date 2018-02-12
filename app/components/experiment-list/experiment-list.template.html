@@ -7,7 +7,7 @@
     <div ng-show="experiments" ng-repeat="exp in filteredExperiments | orderBy:'configuration.name':false"
       class="experiment-box" ng-mouseenter="isHovered = true" ng-mouseleave="isHovered = false" ng-mouseup="isHovered = false"
       ng-click="selectExperiment(exp);" editable-experiment experiment-details="exp">
-      <div class="list-entry-container left-right" ng-class="{selected: (exp.id == pageState.selected) || isHovered}">
+      <div class="list-entry-container left-right" ng-class="{selected: (exp.id == pageState.selected),hover:isHovered && (exp.id != pageState.selected)}">
         <div class="list-entry-left" ng-class="{selected: exp.id == pageState.selected}">
           <img class="entity-thumbnail" ng-src="{{exp.imageUrl || ''}}" />
         </div>
@@ -26,8 +26,8 @@
             </form>
             <div ng-if="config.canLaunchExperiments && exp.joinableServers.length > 0" class="list-entry-running">({{exp.joinableServers.length}} simulation{{exp.joinableServers.length>1?'s':''}} running)</div>
           </div>
-          <div ng-if="exp.id == pageState.selected" ng-show="!isPrivateExperiment || (config.canCloneExperiments && !config.canLaunchExperiments)">{{exp.configuration.description}}</div>
-          <div ng-if="exp.id == pageState.selected" ng-hide="!private || (editing[descID] && !loadingEdit)">{{exp.configuration.description}}
+          <div ng-if="exp.id == pageState.selected" class ="text-long-description" ng-show="!isPrivateExperiment || (config.canCloneExperiments && !config.canLaunchExperiments)">{{exp.configuration.description}}</div>
+          <div ng-if="exp.id == pageState.selected" class ="text-long-description" ng-hide="!private || (editing[descID] && !loadingEdit)">{{exp.configuration.description}}
             <a style="font-size:15px;" name="edit-button" class="glyphicon glyphicon-pencil" href="javascript:void(0);" ng-show="isPrivateExperiment && (!editing[nameID] && !editing[descID]) && !pageState.deletingExperiment"
               v-busy="loadingEdit" ng-click="editExperiment(descID);"></a>
           </div>
