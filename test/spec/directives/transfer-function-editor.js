@@ -92,7 +92,9 @@ describe('Directive: transferFunctionEditor', function() {
     })
   );
 
-  var editorMock = {};
+  var editorMock = {
+    setOption: jasmine.createSpy('setOption')
+  };
   beforeEach(
     inject(function(
       _$rootScope_,
@@ -139,8 +141,6 @@ describe('Directive: transferFunctionEditor', function() {
       $scope.$digest();
       isolateScope = element.isolateScope();
       transferFunctions = isolateScope.transferFunctions;
-      isolateScope.editorsOptions = { tfname: { readOnly: false } };
-      isolateScope.transferFunctionsActive = { tfname: false };
       expectedTf1 = new ScriptObject('tfname', null);
     })
   );
@@ -152,6 +152,10 @@ describe('Directive: transferFunctionEditor', function() {
 
   it('should called setActivateTransferFunction', function() {
     isolateScope.initbuttonTFEnabledText(expectedTf1);
+    spyOn(codeEditorsServices, 'getEditor').and.returnValue(editorMock);
+    expectedTf1.editorsOptions = { tfname: { readOnly: false } };
+    expectedTf1.enabledApplyButton = false;
+    expectedTf1.id = 'tfname';
     isolateScope.toggleEnabledTF(expectedTf1);
     expect(
       backendInterfaceServiceMock.setActivateTransferFunction
@@ -159,6 +163,10 @@ describe('Directive: transferFunctionEditor', function() {
   });
 
   it('should change text of buttonTFEnabledText', function() {
+    spyOn(codeEditorsServices, 'getEditor').and.returnValue(editorMock);
+    expectedTf1.editorsOptions = { tfname: { readOnly: false } };
+    expectedTf1.enabledApplyButton = false;
+    expectedTf1.id = 'tfname';
     isolateScope.initbuttonTFEnabledText(expectedTf1);
     expect(expectedTf1.buttonTextTF).toEqual('Disabled');
     isolateScope.updateTFButton(expectedTf1, true);
@@ -306,7 +314,6 @@ describe('Directive: transferFunctionEditor', function() {
       spyOn(document, 'getElementById').and.returnValue({
         firstChild: { CodeMirror: editorMock }
       });
-      spyOn(isolateScope, 'updateCodeMirror').and.callThrough();
       backendInterfaceService.getTransferFunctions.calls
         .mostRecent()
         .args[0](response);
@@ -320,7 +327,6 @@ describe('Directive: transferFunctionEditor', function() {
 
       // The tfs should be refreshed on initialization
       expect(codeEditorsServices.refreshAllEditors).toHaveBeenCalled();
-      expect(isolateScope.updateCodeMirror).toHaveBeenCalled();
     });
 
     it('should remove retrieved transfer functions properly', function() {
@@ -727,6 +733,8 @@ describe('Directive: transferFunctionEditor', function() {
         target: { result: tfFileMock }
       };
       spyOn(window, 'FileReader').and.returnValue(fileReaderMock);
+      spyOn(codeEditorsServices, 'getEditor').and.returnValue(editorMock);
+
       backendInterfaceServiceMock.editTransferFunction.and.callFake(function(
         a,
         b,
