@@ -21,13 +21,19 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  * ---LICENSE-END**/
-
 (function() {
   'use strict';
 
-  angular.module('gz3dModule', []);
-  angular.module('environmentRenderingModule', [
-    'gz3dModule',
-    'tipTooltipModule'
-  ]);
+  class TipTooltipController {
+    constructor($scope, tipTooltipService) {
+      this.$scope = $scope;
+      this.tipTooltipService = tipTooltipService;
+    }
+  }
+
+  TipTooltipController.$inject = ['$scope', 'tipTooltipService'];
+
+  angular
+    .module('tipTooltipModule')
+    .controller('TipTooltipController', TipTooltipController);
 })();

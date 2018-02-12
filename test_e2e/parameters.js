@@ -1,7 +1,9 @@
 // Parameters needed for test_e2e/spec.js
 
+/* eslint-disable */
+
 var urlStartPage = 'http://' + browser.params.ipAddress + ':9000/#/';
-var urlEsvPage = urlStartPage + 'esv-web';
+var urlEsvPage = urlStartPage + 'esv-private';
 
 module.exports = {
 

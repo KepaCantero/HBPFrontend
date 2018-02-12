@@ -49,7 +49,7 @@
     });
 
     it('should set set access_token in storage when access_token in url', function() {
-      spyOn($location, 'url').and.returnValue('/esv-web&access_token=test');
+      spyOn($location, 'url').and.returnValue('/esv-private&access_token=test');
       spyOn(localStorage, 'setItem');
       storageServer.storageServerTokenManager.checkForNewTokenToStore();
       expect(localStorage.setItem).toHaveBeenCalledWith(

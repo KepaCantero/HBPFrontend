@@ -27,49 +27,57 @@
     '$scope',
     '$location',
     '$timeout',
-    'environmentService',
-    'storageServer',
-    'clbErrorDialog',
-    function(
-      $scope,
-      $location,
-      $timeout,
-      environmentService,
-      storageServer,
-      clbErrorDialog
-    ) {
-      $scope.reloadExperiments = privateExperiment => {
-        $scope.showExperiments = false;
-        $scope.loadPrivateExperiments = privateExperiment;
-        if (privateExperiment) $scope.cloningAnotherExperiement = false;
-        $timeout(() => ($scope.showExperiments = true));
+    'tipTooltipService',
+    'TIP_CODES',
+    function($scope, $location, $timeout, tipTooltipService, TIP_CODES) {
+      $scope.reloadMyExperiments = () => {
+        $scope.showMyExperiments = false;
+        $timeout(() => ($scope.showMyExperiments = true));
+        $scope.tabSelection = 'MyExperiments';
+        $scope.updateTip();
       };
 
-      $scope.reinit = () => {
-        if (environmentService.isPrivateExperiment()) {
-          storageServer
-            .getExperiments()
-            .then(response => $scope.reloadExperiments(!!response.length))
-            .catch(() =>
-              clbErrorDialog.open({
-                type: 'Private experiment error',
-                message: 'Failed to retrieve private experiments'
-              })
+      $scope.updateTip = () => {
+        var tabToTip = {
+          MyExperiments: TIP_CODES.MY_EXPERIMENTS,
+          ExperimentFiles: TIP_CODES.EXPERIMENT_FILES,
+          CloneExperiment: TIP_CODES.TEMPLATES,
+          RunningExperiments: TIP_CODES.RUNNING_SIMULATIONS
+        };
+
+        $scope.tipTooltipService.setCurrentTip(tabToTip[$scope.tabSelection]);
+      };
+
+      $scope.tabChanged = newTab => {
+        $scope.tabSelection = newTab;
+        $scope.updateTip();
+      };
+
+      $scope.showTips = () => {
+        tipTooltipService.toggleTip();
+        $scope.updateTip();
+      };
+
+      $scope.experimentEmpty = () => {
+        if ($scope.tabSelection === 'MyExperiments') {
+          if (!$scope.didRedirectToTemplate) {
+            $scope.didRedirectToTemplate = true;
+            $scope.tabSelection = 'CloneExperiment';
+            $scope.tipTooltipService.setCurrentTip(TIP_CODES.WELCOME);
+          } else {
+            $scope.tipTooltipService.setCurrentTip(
+              TIP_CODES.MY_EXPERIMENTS_EMTPY
             );
-        } else $scope.reloadExperiments(false);
+          }
+        }
       };
 
-      $scope.reinit();
-
-      $scope.cloneAnotherExperiment = () => {
-        $scope.reloadExperiments(false);
-        $scope.cloningAnotherExperiement = true;
-      };
-
-      $scope.directToExperimentsExplorer = () => {
-        let experimentExplorerPath = 'experiment-explorer';
-        $location.path(experimentExplorerPath);
-      };
+      $scope.showMyExperiments = true;
+      $scope.tabSelection = 'MyExperiments';
+      $scope.didRedirectToTemplate = false;
+      $scope.tipTooltipService = tipTooltipService;
+      $scope.tipTooltipService.setCurrentTip(TIP_CODES.MY_EXPERIMENTS);
+      $scope.tipTooltipService.startShowingTipIfRequired();
     }
   ]);
 })();

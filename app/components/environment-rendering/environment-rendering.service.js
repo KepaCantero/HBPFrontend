@@ -49,6 +49,7 @@
       'nrpAnalytics',
       'collab3DSettingsService',
       '$timeout',
+      'tipTooltipService',
       function(
         $q,
         STATE,
@@ -62,7 +63,8 @@
         assetLoadingSplash,
         nrpAnalytics,
         collab3DSettingsService,
-        $timeout
+        $timeout,
+        tipTooltipService
       ) {
         function EnvironmentRenderingService() {
           var that = this;
@@ -73,6 +75,7 @@
           this.sceneLoading = true;
           this.deferredSceneInitialized = $q.defer();
           this.scene3DSettingsReady = false;
+          this.tipTooltipService = tipTooltipService;
 
           this.sceneInitialized = function() {
             return this.deferredSceneInitialized.promise;
@@ -311,6 +314,7 @@
           this.onSceneReady = function() {
             delete this.assetLoadingSplashScreen;
             this.sceneLoading = false;
+            this.tipTooltipService.startShowingTipIfRequired();
           };
 
           // Init composer settings

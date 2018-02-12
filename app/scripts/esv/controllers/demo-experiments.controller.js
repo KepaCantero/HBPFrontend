@@ -83,7 +83,7 @@
             let simul = exp.joinableServers[0];
 
             let path =
-              'esv-web/experiment-view/' +
+              'esv-private/experiment-view/' +
               simul.server +
               '/' +
               exp.id +

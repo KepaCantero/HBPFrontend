@@ -22,86 +22,70 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  * ---LICENSE-END**/
 
-.toolbar-help-highlighted {
-  box-shadow: inset 0px 0px 30px 30px rgb(200, 255, 187),
-    0px 0px 40px 0px rgb(200, 255, 187);
+.tip-help-icon {
+  font-size: 30px;
+  margin-right: 20px;
+  margin-left: 5px;
 }
 
-.toolbar-help-highlighted:hover {
-  box-shadow: inset 0px 0px 30px 30px rgba(200, 255, 187, 0.8),
-    0px 0px 40px 0px rgba(200, 255, 187, 0.8);
+.tip-tooltip {
+  background-color: #fbffdb;
+  color: #796c54;
+  border-radius: 6px;
+  bottom: 150%;
+  position: relative;
+  width: 100%;
+  padding: 5px;
+  border: 2px solid #e0c178;
+  box-shadow: 2px 5px 11px 0px;
+  min-width: 300px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  font-size: 15px;
 }
 
-.toolbar-help-window {
-  position: absolute;
-  left: 0;
-  right: 0;
-  margin-left: auto;
-  margin-right: auto;
-  min-height: 180px;
-  bottom: 75px;
-  background: #eeffed;
-  width: 80%;
-  border-radius: 8px;
-  border-color: green;
-  border: 2px solid;
-  transition: 0.5s linear all;
-  opacity: 1;
-  div {
-    margin-left: 20px;
-    margin-right: 20px;
-    margin-bottom: 10px;
-  }
+.tip-tooltip-hide {
+  font-size: 11px;
+  cursor: pointer;
+  color: #fbffdb;
+  background-color: #796c54;
+  border-radius: 5px;
+  height: 16px;
+  margin-left: 20px;
+  padding-left: 5px;
+  padding-right: 7px;
+  min-width: 52px;
 }
 
-.toolbar-help-window.ng-hide {
-  opacity: 0;
+.tip-tooltip-button {
+  font-size: 11px;
+  cursor: pointer;
+  color: #fbffdb;
+  border-radius: 5px;
+  height: 16px;
+  margin-left: 5px;
+  padding-left: 5px;
+  padding-right: 7px;
+  width: 72px;
+  margin-top: 4px;
+  background-color: #796c54;
 }
 
-.help-title {
-  margin-top: 10px;
-  font-size: large;
-  font-weight: bold;
+.tip-tooltip-button-disabled {
+  background-color: #d0c3ad;
+  cursor: default;
 }
 
-.help-text {
-  font-size: medium;
+.tip-help-small-icon {
+  font-size: 18px;
+  margin-right: 10px;
+  margin-left: 5px;
+  margin-top: 1px;
 }
 
-.help-text.pre {
-  white-space: pre-line;
-}
-.help-text.prewrap {
-  white-space: pre-wrap;
-}
-
-.description-window {
-  position: absolute;
-  left: 0;
-  right: 0;
-  margin-left: auto;
-  margin-right: auto;
-  top: 10%;
-  max-height: 70%;
-  background: #d7efff;
-  width: 80%;
-  border-radius: 8px;
-  border-color: blue;
-  border: 2px solid;
-  transition: 0.5s linear all;
-  opacity: 1;
-  div {
-    margin-left: 20px;
-    margin-right: 20px;
-    margin-bottom: 10px;
-  }
-}
-
-.description-window.ng-hide {
-  opacity: 0;
-}
-
-.show-tips-button {
+.show-tip-button {
   font-size: 10px;
   cursor: pointer;
   color: #fbffdb;
@@ -114,4 +98,12 @@
   position: absolute;
   right: 2px;
   z-index: 100;
+}
+
+.tip-image {
+  vertical-align: middle;
+  width: 24px;
+  height: auto;
+  margin-right: 15px;
+  box-shadow: 0px 0px 1px 2px #ab853b;
 }

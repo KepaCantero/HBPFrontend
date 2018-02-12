@@ -69,9 +69,13 @@
 }
 
 .list-entry-container.selected {
-  background: linear-gradient(to right, #ffffff 0%, #eeeeee 50%, #ffffff 100%);
-  max-height: 320px;
+  max-height: unset;
   min-height: unset;
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0.8) 0%,
+    rgba(245, 245, 245, 0.8) 100%
+  );
 }
 
 .list-entry-container.left-right {
@@ -115,14 +119,10 @@
   min-width: 130px;
   width: 100%;
   object-fit: contain;
+  object-position: top;
   height: 100%;
+  max-height: 225px;
 }
-
-.text-long-description {
-  overflow: auto;
-  max-height: 120px;
-}
-
 .list-entry-middle {
   flex: 8;
 }
@@ -169,8 +169,14 @@
   }
 }
 
+.no-experiment-msg {
+  font-size: 20px;
+  margin-left: 20px;
+  color: #7a8fa9;
+  font-style: italic;
+}
+
 .server-icon {
-  position: absolute;
   height: 20px;
   width: 20px;
   -moz-border-radius: 15px;
@@ -178,6 +184,8 @@
   border-radius: 15px;
   padding: 2px;
   margin-left: 10px;
+  margin-top: 5px;
+  margin-bottom: 5px;
 }
 
 .modal-window {
@@ -191,4 +199,45 @@
 
 .cancel-clone-btn {
   background-color: #f3f3f3;
+}
+
+.underlined-tab-area {
+  display: flex;
+  margin-left: 17px;
+  margin-top: 42px;
+  min-width: 600px;
+}
+
+.underlined-tab {
+  font-size: 15px;
+  color: #555555;
+  margin-right: 30px;
+  margin-bottom: 0px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.underlined-tab-selected {
+  color: #337ab7;
+}
+
+.underlined-box {
+  background: #337ab7;
+  width: 100%;
+  height: 3px;
+}
+
+.neuro-title-box {
+  display: flex;
+  justify-content: flex-end;
+  background: linear-gradient(to right, #ffffff 0%, #d3e7ff 50%, #2c5677 100%);
+}
+
+.tip-tooltip-place {
+  background: linear-gradient(to top, rgba(255, 0, 0, 0), rgb(255, 255, 255));
+  width: calc(100% - 18px);
+  position: absolute;
+  height: 55px;
+  padding-left: 16px;
+  z-index: 100;
 }

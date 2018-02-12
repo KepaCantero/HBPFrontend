@@ -481,7 +481,7 @@
               .initConfigFiles(serverURL, simulation.simulationID)
               .then(function() {
                 deferred.resolve(
-                  'esv-web/experiment-view/' +
+                  'esv-private/experiment-view/' +
                     server +
                     '/' +
                     experimentID +

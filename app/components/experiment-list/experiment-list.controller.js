@@ -34,6 +34,7 @@
     'environmentService',
     'clbErrorDialog',
     'clbConfirm',
+    'tipTooltipService',
     function(
       $scope,
       $location,
@@ -44,11 +45,13 @@
       nrpUser,
       environmentService,
       clbErrorDialog,
-      clbConfirm
+      clbConfirm,
+      tipTooltipService
     ) {
       $scope.pageState = {};
       $scope.isPrivateExperiment = environmentService.isPrivateExperiment();
       $scope.devMode = environmentService.isDevMode();
+      $scope.tipTooltipService = tipTooltipService;
 
       $scope.config = {
         loadingMessage: 'Loading list of experiments...'
@@ -114,6 +117,16 @@
         }
       };
 
+      $scope.atLeastOneExperimentRunning = function() {
+        for (var exp in $scope.filteredExperiments) {
+          if ($scope.filteredExperiments[exp].joinableServers.length > 0) {
+            return true;
+          }
+        }
+
+        return false;
+      };
+
       $scope.cloneClonedExperiment = function(experimentId) {
         $scope.isCloneRequested = true;
         storageServer
@@ -121,7 +134,7 @@
           .then(newExp =>
             $scope.changeExpName(newExp.clonedExp, newExp.originalExp)
           )
-          .then(() => $scope.loadPrivateExperiments())
+          .then(() => $scope.reinit())
           .catch(err => $scope.throwCloningError(err))
           .finally(() => ($scope.isCloneRequested = false));
       };
@@ -183,6 +196,25 @@
           $scope.experiments = experiments;
           if (experiments.length === 1) {
             $scope.pageState.selected = experiments[0].id;
+          } else {
+            if ($scope.running) {
+              var total = 0;
+              var firstExp = null;
+              for (var exp in $scope.experiments) {
+                if ($scope.experiments[exp].joinableServers.length > 0) {
+                  firstExp = $scope.experiments[exp];
+                  total++;
+                }
+              }
+
+              if (total === 1) {
+                $scope.pageState.selected = firstExp.id;
+              }
+            }
+          }
+
+          if (experiments.length === 0) {
+            $scope.experimentEmpty();
           }
         });
 
@@ -210,6 +242,7 @@
             )
             .then(
               function(path) {
+                $scope.tipTooltipService.hidden = true;
                 $location.path(path);
               }, // succeeded
               function() {
@@ -261,7 +294,7 @@
 
         $scope.joinExperiment = function(simul, exp) {
           var path =
-            'esv-web/experiment-view/' +
+            'esv-private/experiment-view/' +
             simul.server +
             '/' +
             exp.id +
@@ -269,6 +302,7 @@
             environmentService.isPrivateExperiment() +
             '/' +
             simul.runningSimulation.simulationID;
+          $scope.tipTooltipService.hidden = true;
           $location.path(path);
         };
 

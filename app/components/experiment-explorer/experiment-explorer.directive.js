@@ -32,8 +32,7 @@
         'components/experiment-explorer/experiment-explorer.template.html',
       restrict: 'E',
       controller: 'ExperimentExplorerController',
-      controllerAs: 'vm',
-      link: scope => scope.vm.loadExperiments()
+      controllerAs: 'vm'
     }))
     .directive('experimentFolders', () => ({
       restrict: 'E',

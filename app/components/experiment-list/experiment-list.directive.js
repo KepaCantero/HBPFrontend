@@ -30,8 +30,10 @@
       restrict: 'E',
       scope: {
         private: '=',
+        running: '=',
         loadPrivateExperiments: '&',
         reinit: '&',
+        experimentEmpty: '&',
         query: '='
       },
       replace: true,

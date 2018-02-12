@@ -21,13 +21,52 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  * ---LICENSE-END**/
-
 (function() {
   'use strict';
 
-  angular.module('gz3dModule', []);
-  angular.module('environmentRenderingModule', [
-    'gz3dModule',
-    'tipTooltipModule'
-  ]);
+  class TipTooltipService {
+    constructor(TIP_CODES) {
+      this.TIP_CODES = TIP_CODES;
+
+      this.hidden = true;
+      this.currentTip = TIP_CODES.WELCOME;
+      this.tipListPos = 0;
+    }
+
+    showPrevious() {
+      if (this.tipListPos > 0) {
+        this.tipListPos--;
+      }
+    }
+
+    showNext() {
+      if (this.tipListPos < this.currentTip.tipList.length - 1) {
+        this.tipListPos++;
+      }
+    }
+
+    setCurrentTip(tip) {
+      this.currentTip = tip;
+      this.tipListPos = 0;
+    }
+
+    startShowingTipIfRequired() {
+      this.hidden = localStorage.getItem('TIP_TOOLTIP_HIDDEN') === 'true';
+    }
+
+    toggleTip() {
+      this.hidden = !this.hidden;
+      localStorage.setItem(
+        'TIP_TOOLTIP_HIDDEN',
+        this.hidden ? 'true' : 'false'
+      );
+    }
+  }
+
+  TipTooltipService.$$ngIsClass = true;
+  TipTooltipService.$inject = ['TIP_CODES'];
+
+  angular
+    .module('tipTooltipModule')
+    .service('tipTooltipService', TipTooltipService);
 })();

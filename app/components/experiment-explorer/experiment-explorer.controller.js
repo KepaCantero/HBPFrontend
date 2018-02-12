@@ -37,7 +37,8 @@
       clbErrorDialog,
       storageServer,
       clbConfirm,
-      experimentsFactory
+      experimentsFactory,
+      tipTooltipService
     ) {
       this.$scope = $scope;
       this.$window = $window;
@@ -49,6 +50,7 @@
       this.$uibModal = $uibModal;
       this.clbErrorDialog = clbErrorDialog;
       this.clbConfirm = clbConfirm;
+      this.tipTooltipService = tipTooltipService;
 
       this.experimentInput = $element.find('#experiment-input');
       this.experimentInput.on('change', e => this.uploadFile(e));
@@ -87,6 +89,10 @@
         }
       });
       return this.isExperimentRunning;
+    }
+
+    $onInit() {
+      this.loadExperiments();
     }
 
     loadExperiments() {
@@ -227,7 +233,8 @@
           this.storageServer
             .deleteExperiment(experiment.uuid)
             .then(() => {
-              this.$window.location.reload();
+              this.selectedParent = undefined;
+              this.loadExperimentList();
             })
             .catch(err => this.onError('Failed to delete experiment', err))
             .finally(() => (this.experimentList.deleting = false));
@@ -363,7 +370,8 @@
     'clbErrorDialog',
     'storageServer',
     'clbConfirm',
-    'experimentsFactory'
+    'experimentsFactory',
+    'tipTooltipService'
   ];
 
   angular

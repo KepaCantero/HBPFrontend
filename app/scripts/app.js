@@ -94,6 +94,7 @@
       'clusterReservation',
       'demoCarousel',
       'experimentExplorer',
+      'tipTooltipModule',
       'experimentList',
       'rosTerminalModule',
       'userInteractionModule',
@@ -119,7 +120,7 @@
         var experimentViewState = {
           name: 'experiment-view',
           url:
-            '/esv-web/experiment-view/:serverID/:experimentID/:privateExperiment/:simulationID?ctx',
+            '/esv-private/experiment-view/:serverID/:experimentID/:privateExperiment/:simulationID?ctx',
           templateUrl: 'views/esv/experiment-view.html',
           controller: 'experimentViewController as vm',
           controllerAs: 'vm',
@@ -161,27 +162,6 @@
               'userContextService',
               function(userContextService) {
                 return userContextService.initialized;
-              }
-            ]
-          }
-        };
-
-        var esvWebState = {
-          name: 'esv-web',
-          url: '/esv-web?ctx',
-          templateUrl: 'views/esv/esv-experiments.html',
-          controller: 'esvExperimentsCtrl',
-          resolve: {
-            currentUser: [
-              'storageServer',
-              function(storageServer) {
-                return storageServer.getCurrentUser();
-              }
-            ],
-            setCollabState: [
-              'environmentService',
-              function(environmentService) {
-                return environmentService.setPrivateExperiment(false);
               }
             ]
           }
@@ -292,7 +272,6 @@
             ]
           }
         };
-
         var supportState = {
           name: 'support',
           url: '/support',
@@ -323,14 +302,11 @@
           window.bbpConfig.demomode &&
           window.bbpConfig.demomode.demoCarousel
         ) {
-          esvWebState.controller = 'demoExperimentsController';
           esvPrivateState.controller = 'demoExperimentsController';
-          esvWebState.templateUrl = 'views/esv/demo-experiments.html';
           esvPrivateState.templateUrl = 'views/esv/demo-experiments.html';
         }
 
         var home = $stateProvider.state(homeState);
-        home.state(esvWebState);
         home.state(esvDemoWaiting);
         home.state(esvDemoIntroState);
         home.state(esvPrivateState);
@@ -347,7 +323,7 @@
 
         // Provide a default route.
         // (See https://github.com/angular-ui/ui-router/wiki/URL-Routing)
-        $urlRouterProvider.otherwise('/');
+        $urlRouterProvider.when('/esv-web', '/esv-private').otherwise('/');
 
         environmentServiceProvider.$get().initialize();
       }
