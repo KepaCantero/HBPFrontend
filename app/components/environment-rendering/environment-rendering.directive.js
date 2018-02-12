@@ -25,26 +25,6 @@
 (function() {
   'use strict';
 
-  angular.module('environmentRenderingModule').directive('ngRightclick', [
-    '$parse',
-    function($parse) {
-      return {
-        restrict: 'A',
-        compile: function(tElem, tAttrs) {
-          var fn = $parse(tAttrs.ngRightclick);
-          return function(scope, elem) {
-            elem.on('contextmenu', function(evt) {
-              scope.$apply(function() {
-                evt.preventDefault();
-                fn(scope, { $event: evt });
-              });
-            });
-          };
-        }
-      };
-    }
-  ]);
-
   angular
     .module('environmentRenderingModule')
     .directive('environmentRendering', [
