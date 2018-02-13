@@ -273,10 +273,6 @@ def {0}(t):
                   }
                 });
 
-                _.forEach(response.active, function(value, key) {
-                  scope.updateCodeMirror(key, !value);
-                });
-
                 if (response.active)
                   scope.transferFunctionsActive = response.active;
 
@@ -319,7 +315,6 @@ def {0}(t):
                 scope.refresh();
               }
             );
-
             // only start watching for changes after a little timeout
             // the flood of changes during compilation will cause angular to throw digest errors when watched
             $timeout(() => {
@@ -390,35 +385,59 @@ def {0}(t):
                 transferFunction.buttonTextTF = actualTFValue
                   ? 'Enabled'
                   : 'Disabled';
-                transferFunction.disableApplyButton = actualTFValue;
+                transferFunction.enabledApplyButton = actualTFValue;
               }
             };
 
-            scope.updateCodeMirror = function(id, value) {
-              var codeMirrorElementName =
-                'transfer-function-' + id + ' .CodeMirror';
-              var codeMirrorElement = $('#' + codeMirrorElementName);
-              if (value) codeMirrorElement.css('background-color', 'LightGrey');
-              else codeMirrorElement.css('background-color', 'white');
-
-              if (scope.editorsOptions[id]) {
-                scope.editorsOptions[id].readOnly = value;
-                scope.refreshCodemirror = true;
-              } else scope.editorsOptions[id] = scope.editorOptions;
+            scope.refreshCodeMirrorEditor = function(transferFunction) {
+              var editor = codeEditorsServices.getEditor(
+                'transfer-function-' + transferFunction.id
+              );
+              _.forEach(transferFunction.editorsOptions, function(value, key) {
+                editor.setOption(key, value);
+              });
             };
 
-            scope.updateTFButton = function(transferFunction, newActiveValue) {
-              scope.transferFunctionsActive[
-                transferFunction.id
-              ] = newActiveValue;
-              transferFunction.buttonTextTF = newActiveValue
-                ? 'Enabled'
-                : 'Disabled';
-              scope.editorsOptions[
-                transferFunction.id
-              ].readOnly = !newActiveValue;
-              transferFunction.disableApplyButton = newActiveValue;
-              scope.updateCodeMirror(transferFunction.id, !newActiveValue);
+            scope.initCodeMirror = function(transferFunction) {
+              $timeout(() => {
+                if (!transferFunction.editorsOptions)
+                  transferFunction.editorsOptions = scope.editorOptions;
+                transferFunction.editorsOptions.readOnly = !transferFunction.enabledApplyButton;
+                scope.setCodeEditorColor(transferFunction);
+                scope.refreshCodeMirrorEditor(transferFunction);
+              });
+            };
+
+            scope.setCodeEditorColor = function(transferFunction) {
+              var codeMirrorElementName =
+                'transfer-function-' + transferFunction.id + ' .CodeMirror';
+              var codeMirrorElement = angular.element(
+                '#' + codeMirrorElementName
+              );
+              var wrongLine = angular.element(
+                '#' +
+                  codeMirrorElementName +
+                  ' .CodeMirror-linebackground.alert-danger'
+              );
+              if (transferFunction.enabledApplyButton) {
+                codeMirrorElement.css('background-color', 'white');
+              } else {
+                codeMirrorElement.css('background-color', 'LightGrey');
+                wrongLine.css('background-color', 'LightGrey');
+              }
+            };
+
+            scope.updateCodeMirrorEditor = function(transferFunction) {
+              transferFunction.editorsOptions.readOnly = !transferFunction.enabledApplyButton;
+              scope.refreshCodeMirrorEditor(transferFunction);
+              scope.setCodeEditorColor(transferFunction);
+            };
+
+            scope.updateTFButton = function(transferFunction, value) {
+              scope.transferFunctionsActive[transferFunction.id] = value;
+              transferFunction.buttonTextTF = value ? 'Enabled' : 'Disabled';
+              transferFunction.enabledApplyButton = value;
+              scope.updateCodeMirrorEditor(transferFunction);
             };
 
             scope.toggleEnabledTF = function(transferFunction) {
@@ -439,7 +458,6 @@ def {0}(t):
                 );
               }
             };
-
             scope.update = function(transferFunction, newTf) {
               cleanError(transferFunction, scope.ERROR.RUNTIME);
               delete transferFunction.error[scope.ERROR.LOADING];
@@ -532,9 +550,12 @@ def {0}(t):
                 scope.transferFunctions.unshift(transferFunction);
               }
               addedTransferFunctionCount = addedTransferFunctionCount + 1;
+
               scope.transferFunctionsActive[id] = true;
               scope.update(transferFunction, true);
-              scope.updateCodeMirror(id, false);
+              transferFunction.enabledApplyButton = true;
+              scope.initCodeMirror(transferFunction);
+
               scope.collabDirty = environmentService.isPrivateExperiment();
               autoSaveService.setDirty(DIRTY_TYPE, scope.transferFunctions);
             };
