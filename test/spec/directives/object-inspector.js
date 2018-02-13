@@ -17,6 +17,7 @@ describe('Directive: object-inspector', function() {
   beforeEach(module('gz3dMock'));
   beforeEach(module('simulationInfoMock'));
   beforeEach(module('dynamicViewOverlayServiceMock'));
+  beforeEach(module('userNavigationServiceMock'));
   beforeEach(
     module(function($provide) {
       $provide.value('baseEventHandler', baseEventHandlerMock);
