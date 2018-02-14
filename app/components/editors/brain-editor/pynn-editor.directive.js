@@ -105,9 +105,13 @@
             event,
             resetType
           ) {
-            if (resetType !== RESET_TYPE.RESET_CAMERA_VIEW) {
+            if (
+              resetType === RESET_TYPE.RESET_FULL ||
+              resetType === RESET_TYPE.RESET_BRAIN
+            ) {
               scope.collabDirty = false;
               scope.localBrainDirty = false;
+              scope.pynnScript.error = {};
             }
           });
 
