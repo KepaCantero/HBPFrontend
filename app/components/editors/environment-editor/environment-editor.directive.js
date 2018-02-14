@@ -82,10 +82,6 @@
           scope.stateService = stateService;
           scope.STATE = STATE;
 
-          document.addEventListener('contextmenu', event =>
-            event.preventDefault()
-          );
-
           var serverConfig = simulationInfo.serverConfig;
           // Used by the view
           scope.assetsPath = serverConfig.gzweb.assets;
