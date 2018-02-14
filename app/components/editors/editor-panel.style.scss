@@ -25,7 +25,6 @@
 
 $editorPanelStartWidth: 750px;
 $editorPanelStartWidthLargeScreen: 950px;
-$editorPanelStartHeightLargeScreen: 700px;
 $editorPanelStartHeight: 520px;
 $editorPanelMinWidth: 400px;
 $editorPanelMinHeight: 400px;
@@ -89,13 +88,7 @@ $editorPanelHeadingHeightTotal: $editorPanelHeadingHeight + 2 *
   }
 }
 
-@media (min-height: 800px) {
-  .editor-panel-widget {
-    height: $editorPanelStartHeightLargeScreen;
-  }
-}
-
-@media (min-width: 1025px) {
+@media (min-width: 1024px) {
   .editor-panel-widget {
     width: $editorPanelStartWidthLargeScreen;
   }

@@ -96,8 +96,8 @@
         name: 'Brain Visualizer',
         directive: 'brainvisualizer-panel',
         overlayDefaultSize: {
-          widthPercent: 60,
-          heightPercent: 70
+          width: 950,
+          height: 700
         },
         isResizeable: true,
         allowMultipleViews: false
@@ -106,16 +106,16 @@
         name: 'Environment Rendering',
         directive: 'environment-rendering',
         overlayDefaultSize: {
-          widthPercent: 60,
-          heightPercent: 60
+          width: 500,
+          height: 500
         }
       },
       JOINT_PLOT: {
         name: 'Joint Plot',
         directive: 'joint-plot',
         overlayDefaultSize: {
-          widthPercent: 50,
-          heightPercent: 50
+          width: 800,
+          height: 500
         }
       },
       LOG_CONSOLE: {
@@ -123,8 +123,8 @@
         directive: 'log-console',
         allowMultipleViews: false, // default true
         overlayDefaultSize: {
-          widthPercent: 40,
-          heightPercent: 40
+          width: 500,
+          height: 250
         }
       },
       OBJECT_INSPECTOR: {
@@ -137,8 +137,8 @@
         name: 'Stream viewer',
         directive: 'video-stream',
         overlayDefaultSize: {
-          widthPercent: 40,
-          heightPercent: 40
+          width: 500,
+          height: 400
         }
       },
       SPIKE_TRAIN: {
@@ -146,8 +146,8 @@
         directive: 'spike-train',
         allowMultipleViews: false, // default true
         overlayDefaultSize: {
-          widthPercent: 40,
-          heightPercent: 40,
+          width: 800,
+          height: 250,
           minWidth: 700,
           minHeight: 200
         }
@@ -157,8 +157,8 @@
         directive: 'pynn-editor',
         allowMultipleViews: false, // default true
         overlayDefaultSize: {
-          widthPercent: 70,
-          heightPercent: 70,
+          width: 800,
+          height: 500,
           minWidth: 700,
           minHeight: 300
         }
@@ -168,8 +168,8 @@
         directive: 'smach-editor',
         allowMultipleViews: false, // default true
         overlayDefaultSize: {
-          widthPercent: 70,
-          heightPercent: 70,
+          width: 800,
+          height: 500,
           minWidth: 700,
           minHeight: 300
         }
@@ -179,8 +179,8 @@
         directive: 'environment-designer',
         allowMultipleViews: false, // default true
         overlayDefaultSize: {
-          widthPercent: 80,
-          heightPercent: 80,
+          width: 800,
+          height: 500,
           minWidth: 700,
           minHeight: 300
         }
@@ -190,8 +190,8 @@
         directive: 'transfer-function-editor',
         allowMultipleViews: false, // default true
         overlayDefaultSize: {
-          widthPercent: 70,
-          heightPercent: 70,
+          width: 800,
+          height: 500,
           minWidth: 700,
           minHeight: 300
         }
@@ -201,8 +201,8 @@
         directive: 'performance-monitor',
         allowMultipleViews: false, // default true
         overlayDefaultSize: {
-          widthPercent: 50,
-          heightPercent: 50,
+          width: 550,
+          height: 450,
           minWidth: 400,
           minHeight: 450
         }
@@ -212,8 +212,8 @@
         directive: 'ros-terminal',
         allowMultipleViews: false,
         overlayDefaultSize: {
-          widthPercent: 50,
-          heightPercent: 50
+          width: 700,
+          height: 450
         }
       },
       APPLY_FORCE_CONFIGURATION: {
