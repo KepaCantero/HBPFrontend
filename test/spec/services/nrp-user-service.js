@@ -27,12 +27,13 @@ describe('Services: nrpUser', function() {
     expect(storageServer.getUser.calls.count()).toBe(1);
   });
 
-  it('should call storageServer.getCurrentUser', function() {
+  it('should call storageServer.getCurrentUser and storageServer.getCurrentUserGroups', function() {
     storageServer.reset();
     nrpUser.getCurrentUserInfo();
     nrpUser.getCurrentUserInfo(); //second call should not increase underlying service call count due to memoization
     $rootScope.$digest();
     expect(storageServer.getCurrentUser.calls.count()).toBe(1);
+    expect(storageServer.getCurrentUserGroups.calls.count()).toBe(1);
   });
 
   it('should call storageServer.getCurrentUserGroups ', function() {
