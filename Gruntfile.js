@@ -120,7 +120,7 @@ module.exports = function(grunt) {
     // The actual grunt server settings
     connect: {
       options: {
-        port: 9000,
+        port: 9001,
         hostname: '*',
         livereload: 35729,
         middleware: function(connect) {
@@ -325,7 +325,7 @@ module.exports = function(grunt) {
           '!<%= yeoman.dist %>/img/esv/keyboard-control.svg',
           '!<%= yeoman.dist %>/img/common/intro-get-started.png',
           '!<%= yeoman.dist %>/img/common/intro-bg.jpg',
-          '!<%= yeoman.dist %>/img/3denv/**/*.{png,jpg,jpeg,gif,webp,svg}',
+          '!<%= yeoman.dist %>/img/3denv/**/*.{png,jpg,jpeg,gif,webp,svg,dae}',
           '!<%= yeoman.dist %>/img/brainvisualizer/**/*.{png,jpg,jpeg,gif,webp,svg}',
           '!<%= yeoman.dist %>/img/esv/objects/**/*.{png,jpg,jpeg,gif,webp,svg}',
           '!<%= yeoman.dist %>/img/esv/envsections/**/*.{png,jpg,jpeg,gif,webp,svg}'
@@ -401,7 +401,7 @@ module.exports = function(grunt) {
           {
             expand: true,
             cwd: '<%= yeoman.app %>/img',
-            src: '**/*.{png,jpg,jpeg,gif}',
+            src: '**/*.{png,jpg,jpeg,gif,dae}',
             dest: '<%= yeoman.dist %>/img'
           }
         ]
