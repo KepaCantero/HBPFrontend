@@ -478,6 +478,11 @@ def {0}(t):
                   }
                 );
               } else {
+                /* Clean compile errors: new ones, if any,
+                   are going to be received via ROS message
+                   during editTransferFunction call.
+                */
+                scope.cleanCompileError(transferFunction);
                 backendInterfaceService.editTransferFunction(
                   transferFunction.id,
                   transferFunction.code,
@@ -487,7 +492,6 @@ def {0}(t):
                     transferFunction.id = pythonCodeHelper.getFunctionName(
                       transferFunction.code
                     );
-                    scope.cleanCompileError(transferFunction);
                   },
                   function(data) {
                     serverError.displayHTTPError(data);
