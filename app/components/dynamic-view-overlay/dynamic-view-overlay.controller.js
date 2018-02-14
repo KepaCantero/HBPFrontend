@@ -79,10 +79,27 @@
         let overlayWrapper = this.$element[0].getElementsByClassName(
           this.dynamicViewOverlayService.OVERLAY_WRAPPER_CLASS
         )[0];
-        overlayWrapper.style.width =
-          this.channelType.overlayDefaultSize.width + 'px';
-        overlayWrapper.style.height =
-          this.channelType.overlayDefaultSize.height + 'px';
+
+        if (
+          this.channelType.overlayDefaultSize.widthPercent &&
+          this.channelType.overlayDefaultSize.heightPercent
+        ) {
+          overlayWrapper.style.width =
+            this.channelType.overlayDefaultSize.widthPercent *
+              window.innerWidth *
+              0.01 +
+            'px';
+          overlayWrapper.style.height =
+            this.channelType.overlayDefaultSize.heightPercent *
+              window.innerHeight *
+              0.01 +
+            'px';
+        } else {
+          overlayWrapper.style.width =
+            this.channelType.overlayDefaultSize.width + 'px';
+          overlayWrapper.style.height =
+            this.channelType.overlayDefaultSize.height + 'px';
+        }
 
         if (this.channelType.overlayDefaultSize.minWidth) {
           overlayWrapper.style.minWidth =
