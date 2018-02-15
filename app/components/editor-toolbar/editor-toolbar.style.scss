@@ -25,7 +25,6 @@
 .esv-overlay {
   width: 100%;
 }
-
 .hbp-toolbar {
   overflow-x: auto;
   height: 43px;
@@ -75,12 +74,5 @@
 }
 
 .exit-panel-right-button.btn-danger {
-  margin-right: 5px;
-}
-.fade {
-  transition: opacity 0.5s linear;
-}
-
-::ng-deep .tooltip.top.fade.top-right.in {
   margin-right: 5px;
 }
