@@ -60,7 +60,8 @@
       DYNAMIC_VIEW_CHANNELS,
       rosCommanderService,
       tipTooltipService,
-      TIP_CODES
+      TIP_CODES,
+      nrpModalService
     ) {
       this.backendInterfaceService = backendInterfaceService;
       this.clientLoggerService = clientLoggerService;
@@ -96,6 +97,7 @@
       this.$timeout = $timeout;
       this.$location = $location;
       this.$window = $window;
+      this.nrpModalService = nrpModalService;
 
       this.tipTooltipService.setCurrentTip(TIP_CODES.SIMULATIONS_TIPS);
 
@@ -196,6 +198,20 @@
               this.__resetButtonClickHandler(this.request)
             );
           });
+      };
+
+      this.openExitDialog = function() {
+        var exitSimulationTemplate = {
+          templateUrl:
+            'components/editor-toolbar/exit-simulation-dialog.template.html',
+          closable: true,
+          scope: $scope
+        };
+        this.nrpModalService.createModal(exitSimulationTemplate);
+      };
+
+      this.destroyDialog = function() {
+        this.nrpModalService.destroyModal();
       };
     }
 
@@ -670,7 +686,8 @@
     'DYNAMIC_VIEW_CHANNELS',
     'rosCommanderService',
     'tipTooltipService',
-    'TIP_CODES'
+    'TIP_CODES',
+    'nrpModalService'
   ];
 
   angular
@@ -678,7 +695,8 @@
       'helpTooltipModule',
       'clb-ui-dialog',
       'rosTerminalModule',
-      'tipTooltipModule'
+      'tipTooltipModule',
+      'modal'
     ])
     .controller('EditorToolbarController', EditorToolbarController);
 })();

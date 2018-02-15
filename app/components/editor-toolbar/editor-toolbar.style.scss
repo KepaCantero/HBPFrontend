@@ -43,3 +43,36 @@
 .hide-overflow {
   overflow: hidden;
 }
+
+.exit-panel-modal {
+  min-height: 200px;
+  padding: 10px;
+  margin-top: 0px;
+}
+
+.exit-panel-title {
+  padding: 10px;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.exit-panel-text {
+  padding: 10px;
+  border-bottom: 1px solid #e5e5e5;
+  font-size: medium;
+}
+
+.exit-panel-buttons {
+  margin-top: 20px;
+}
+
+.exit-panel-right-button {
+  float: right;
+}
+
+.exit-panel-left-button {
+  float: left;
+}
+
+.exit-panel-right-button.btn-danger {
+  margin-right: 5px;
+}

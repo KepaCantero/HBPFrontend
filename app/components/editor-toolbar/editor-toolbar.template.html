@@ -11,10 +11,6 @@
         <div ng-if="vm.userContextService.isOwner()" class="hbp-toolbar-action ng-hide" ng-disabled="vm.stateService.statePending" help-tooltip="PAUSE_BUTTON" ng-click="vm.simControlButtonHandler(vm.STATE.PAUSED)" ng-show="(vm.stateService.currentState === vm.STATE.STARTED)">
             <i class="glyphicon glyphicon-pause"></i>
         </div>
-        <div ng-if="vm.userContextService.isOwner()" class="hbp-toolbar-action ng-hide" ng-disabled="vm.stateService.statePending" help-tooltip="STOP_BUTTON" ng-click="vm.simControlButtonHandler(vm.STATE.STOPPED)" ng-show="(vm.stateService.currentState !== vm.STATE.STOPPED) &&
-                          (vm.stateService.currentState !== vm.STATE.FAILED)">
-            <i class="glyphicon glyphicon-stop"></i>
-        </div>
         <div ng-if="vm.userContextService.isOwner()" class="hbp-toolbar-action ng-hide" ng-disabled="vm.stateService.statePending" help-tooltip="RESET_BUTTON" ng-click="vm.resetButtonClickHandler()" ng-show="(vm.stateService.currentState !== vm.STATE.STOPPED) &&
                           (vm.stateService.currentState !== vm.STATE.HALTED) &&
                           (vm.stateService.currentState !== vm.STATE.FAILED)">
@@ -183,7 +179,9 @@
 
         <!-- #### The following will be aligned on the right side (in reverse order) #### -->
         <!-- exit button -->
-        <div class="hbp-toolbar-action right-align hide-overflow" help-tooltip="EXIT_BUTTON" ng-click="vm.exit(true)">
+        <div class="hbp-toolbar-action right-align hide-overflow"
+             help-tooltip="EXIT_BUTTON"
+             ng-click="vm.openExitDialog()">
             <i class="fa fa-sign-out fa-2x vertcenter"></i>
         </div>
         <!-- exit button -->

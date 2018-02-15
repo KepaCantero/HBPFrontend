@@ -27,7 +27,8 @@ describe('Controller: EditorToolbarController', function() {
     NAVIGATION_MODES,
     STATE,
     EDIT_MODE,
-    RESET_TYPE;
+    RESET_TYPE,
+    nrpModalService;
 
   // load the controller's module
   beforeEach(module('editorToolbarModule'));
@@ -50,6 +51,7 @@ describe('Controller: EditorToolbarController', function() {
   beforeEach(module('clientLoggerServiceMock'));
   beforeEach(module('dynamicViewOverlayServiceMock'));
   beforeEach(module('gz3dViewsServiceMock'));
+  beforeEach(module('nrpModalServiceMock'));
 
   var simulationStateObject = {
     update: jasmine.createSpy('update'),
@@ -140,7 +142,8 @@ describe('Controller: EditorToolbarController', function() {
       _STATE_,
       _NAVIGATION_MODES_,
       _EDIT_MODE_,
-      _RESET_TYPE_
+      _RESET_TYPE_,
+      _nrpModalService_
     ) {
       $controller = _$controller_;
       $rootScope = _$rootScope_;
@@ -168,6 +171,7 @@ describe('Controller: EditorToolbarController', function() {
       NAVIGATION_MODES = _NAVIGATION_MODES_;
       EDIT_MODE = _EDIT_MODE_;
       RESET_TYPE = _RESET_TYPE_;
+      nrpModalService = _nrpModalService_;
 
       userContextService.hasEditRights.and.callFake(function(entity) {
         return (
@@ -675,7 +679,7 @@ describe('Controller: EditorToolbarController', function() {
       spyOn($window.location, 'reload');
 
       environmentService.setPrivateExperiment(false);
-      editorToolbarController.exit();
+      editorToolbarController.exitSimulation(true);
       $timeout.flush();
       expect(location.path()).toEqual('/esv-private');
       expect($window.location.reload).toHaveBeenCalled();
@@ -751,7 +755,7 @@ describe('Controller: EditorToolbarController', function() {
     it('should go back to the esv-private page when a "ctx" parameter was in the url', function() {
       spyOn($window.location, 'reload');
 
-      editorToolbarController.exit();
+      editorToolbarController.exitSimulation(true);
       $timeout.flush();
       expect(location.path()).toEqual('/esv-private');
       expect(userContextService.deinit).toHaveBeenCalled();
@@ -761,9 +765,19 @@ describe('Controller: EditorToolbarController', function() {
     it('should clean up when exit is called', function() {
       spyOn(editorToolbarController, 'cleanUp').and.callThrough();
 
-      editorToolbarController.exit();
+      editorToolbarController.exitSimulation();
 
       expect(editorToolbarController.cleanUp).toHaveBeenCalled();
+    });
+
+    it('should call the create modal upon exit click', function() {
+      editorToolbarController.openExitDialog();
+      expect(nrpModalService.createModal).toHaveBeenCalled();
+    });
+
+    it('should call the destroy modal upon destroy dialog', function() {
+      editorToolbarController.destroyDialog();
+      expect(nrpModalService.destroyModal).toHaveBeenCalled();
     });
   });
 

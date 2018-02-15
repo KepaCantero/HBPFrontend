@@ -24,7 +24,7 @@
 (function() {
   'use strict';
 
-  angular.module('exdFrontendApp').service('nrpModalService', [
+  angular.module('modal', []).service('nrpModalService', [
     '$uibModal',
     function($uibModal) {
       var modal;
