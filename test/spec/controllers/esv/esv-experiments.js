@@ -226,6 +226,8 @@
       var template = $templateCache.get('views/esv/esv-experiments.html');
       var page = $compile(template)($rootScope);
 
+      if (!pageOptions.collab) $rootScope.tabSelection = 'CloneExperiment';
+
       $rootScope.$digest();
       $timeout.flush();
       $httpBackend.flush();
@@ -459,7 +461,7 @@
       var experimentID = Object.keys(defaultPageOptions.experiments)[0];
       var simulationID = defaultPageOptions.startExperiment.simulationID;
       var expectedLocation = [
-        'esv-web/experiment-view/' +
+        'esv-private/experiment-view/' +
           hostName +
           '/' +
           experimentID +
@@ -525,7 +527,7 @@
       var experimentID = Object.keys(defaultPageOptions.experiments)[0];
       var simulationID = defaultPageOptions.startExperiment.simulationID;
       var expectedLocation = [
-        'esv-web/experiment-view/' +
+        'esv-private/experiment-view/' +
           hostName +
           '/' +
           experimentID +
@@ -598,17 +600,6 @@
       beforeEach(function() {
         collabContextUrl = 'http://proxy/storage/experiments';
         $stateParams.ctx = ctx;
-      });
-
-      it('should set experiments to error when collab fails', function() {
-        $httpBackend.whenGET(collabContextUrl).respond(502, []);
-        spyOn(clbErrorDialog, 'open');
-        renderEsvWebPage({ collab: true });
-
-        expect(clbErrorDialog.open).toHaveBeenCalledWith({
-          type: 'Private experiment error',
-          message: 'Failed to retrieve private experiments'
-        });
       });
 
       describe('yet to clone', function() {
@@ -822,6 +813,7 @@
 
         it('should only show the launch button when the experiment exists in collab', function() {
           var page = renderEsvWebPage({ collab: true });
+
           page
             .find('.experiment-box')
             .first()

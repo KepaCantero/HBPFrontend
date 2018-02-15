@@ -25,9 +25,11 @@
 (function() {
   'use strict';
 
-  angular.module('gz3dModule', []);
-  angular.module('environmentRenderingModule', [
-    'gz3dModule',
-    'tipTooltipModule'
-  ]);
+  angular.module('tipTooltipModule').directive('tipTooltip', () => ({
+    templateUrl: 'components/tip-tooltip/tip-tooltip.template.html',
+    restrict: 'E',
+    controller: 'TipTooltipController',
+    controllerAs: 'vm',
+    scope: true
+  }));
 })();

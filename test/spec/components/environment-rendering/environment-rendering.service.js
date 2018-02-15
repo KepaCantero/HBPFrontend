@@ -1,6 +1,8 @@
 'use strict';
 
 describe('Services: environmentRenderingService', function() {
+  beforeEach(module('tipTooltipModule'));
+
   var STATE;
 
   var environmentRenderingService;

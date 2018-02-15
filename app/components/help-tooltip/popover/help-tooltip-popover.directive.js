@@ -37,12 +37,14 @@
       'stateService',
       'experimentService',
       'simulationInfo',
+      'tipTooltipService',
       function(
         STATE,
         helpTooltipService,
         stateService,
         experimentService,
-        simulationInfo
+        simulationInfo,
+        tipTooltipService
       ) {
         return {
           restrict: 'E',
@@ -55,6 +57,7 @@
             scope.stateService = stateService;
             scope.experimentService = experimentService;
             scope.simulationInfo = simulationInfo;
+            scope.tipTooltipService = tipTooltipService;
           }
         };
       }

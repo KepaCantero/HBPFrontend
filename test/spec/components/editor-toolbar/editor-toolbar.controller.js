@@ -32,6 +32,7 @@ describe('Controller: EditorToolbarController', function() {
   // load the controller's module
   beforeEach(module('editorToolbarModule'));
   beforeEach(module('helpTooltipModule'));
+  beforeEach(module('tipTooltipModule'));
   beforeEach(module('exdFrontendApp'));
   beforeEach(module('exd.templates')); // import html template
 
@@ -670,13 +671,13 @@ describe('Controller: EditorToolbarController', function() {
       expect(gz3d.iface.webSocket).not.toBeDefined();
     });
 
-    it('should go back to the esv-web page when no "ctx" parameter was in the url', function() {
+    it('should go back to the esv-private page when no "ctx" parameter was in the url', function() {
       spyOn($window.location, 'reload');
 
       environmentService.setPrivateExperiment(false);
       editorToolbarController.exit();
       $timeout.flush();
-      expect(location.path()).toEqual('/esv-web');
+      expect(location.path()).toEqual('/esv-private');
       expect($window.location.reload).toHaveBeenCalled();
     });
 
@@ -747,7 +748,7 @@ describe('Controller: EditorToolbarController', function() {
       });
     });
 
-    it('should go back to the esv-web page when a "ctx" parameter was in the url', function() {
+    it('should go back to the esv-private page when a "ctx" parameter was in the url', function() {
       spyOn($window.location, 'reload');
 
       editorToolbarController.exit();

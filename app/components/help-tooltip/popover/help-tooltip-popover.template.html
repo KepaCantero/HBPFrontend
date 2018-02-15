@@ -4,6 +4,16 @@
 
 <div show-on-top class="description-window panels ng-hide" ng-show="helpTooltipService.visible == helpTooltipService.INFO && (stateService.currentState != STATE.STOPPED)">
   <div>
+
+      <div ng-click="tipTooltipService.toggleTip()" ng-show="tipTooltipService.hidden" style="display:flex;justify-content: flex-end;">
+          <div class="show-tips-button">
+            <i class="fa fa-info-circle tip-help-small-icon"></i>
+            Tips
+          </div>
+        </div>
+
+
+
     <div class="help-title">{{experimentService.experimentName}}:</div>
     <div class="help-text pre">{{experimentService.experimentDescription}}</div>
     <div class="help-title">Version Information:</div>

@@ -58,7 +58,9 @@
       EDIT_MODE,
       RESET_TYPE,
       DYNAMIC_VIEW_CHANNELS,
-      rosCommanderService
+      rosCommanderService,
+      tipTooltipService,
+      TIP_CODES
     ) {
       this.backendInterfaceService = backendInterfaceService;
       this.clientLoggerService = clientLoggerService;
@@ -83,6 +85,7 @@
       this.demoMode = bbpConfig.get('demomode.demoCarousel', false);
       this.gz3dViewsService = gz3dViewsService;
       this.rosCommanderService = rosCommanderService;
+      this.tipTooltipService = tipTooltipService;
 
       this.DYNAMIC_VIEW_CHANNELS = DYNAMIC_VIEW_CHANNELS;
       this.EDIT_MODE = EDIT_MODE;
@@ -93,6 +96,8 @@
       this.$timeout = $timeout;
       this.$location = $location;
       this.$window = $window;
+
+      this.tipTooltipService.setCurrentTip(TIP_CODES.SIMULATIONS_TIPS);
 
       // Query the state of the simulation
       stateService.getCurrentState().then(() => {
@@ -148,7 +153,7 @@
         }
       );
 
-      const esvPages = new Set(['esv-private', 'esv-web']);
+      const esvPages = new Set(['esv-private']);
 
       // force page reload when navigating to esv pages, to discard experiment related context
       // valid for all navigation reasons: explicit $location.path, or browser nav button
@@ -341,14 +346,11 @@
       this.cleanUp();
 
       this.splash.splashScreen = null; // do not reopen splashscreen if further messages happen
-      if (this.environmentService.isPrivateExperiment()) {
-        this.$location.path('esv-private');
+
+      if (this.demoMode && !quitDemo) {
+        this.$location.path('esv-demo-wait');
       } else {
-        if (this.demoMode && !quitDemo) {
-          this.$location.path('esv-demo-wait');
-        } else {
-          this.$location.path('esv-web');
-        }
+        this.$location.path('esv-private');
       }
     }
 
@@ -666,14 +668,17 @@
     'EDIT_MODE',
     'RESET_TYPE',
     'DYNAMIC_VIEW_CHANNELS',
-    'rosCommanderService'
+    'rosCommanderService',
+    'tipTooltipService',
+    'TIP_CODES'
   ];
 
   angular
     .module('editorToolbarModule', [
       'helpTooltipModule',
       'clb-ui-dialog',
-      'rosTerminalModule'
+      'rosTerminalModule',
+      'tipTooltipModule'
     ])
     .controller('EditorToolbarController', EditorToolbarController);
 })();

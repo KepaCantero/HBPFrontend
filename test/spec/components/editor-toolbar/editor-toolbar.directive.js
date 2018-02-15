@@ -5,6 +5,7 @@
     var $compile, $rootScope, $scope;
     var element;
 
+    beforeEach(module('tipTooltipModule'));
     beforeEach(module('editorToolbarModule'));
     beforeEach(module('exd.templates')); // import html template
     beforeEach(module('contextMenuStateMock'));

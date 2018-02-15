@@ -25,9 +25,5 @@
 (function() {
   'use strict';
 
-  angular.module('gz3dModule', []);
-  angular.module('environmentRenderingModule', [
-    'gz3dModule',
-    'tipTooltipModule'
-  ]);
+  angular.module('tipTooltipModule', []);
 })();

@@ -58,7 +58,7 @@
                 simul.runningSimulation.state === STATE.PAUSED
               ) {
                 let path =
-                  '#/esv-web/experiment-view/' +
+                  '#/esv-private/experiment-view/' +
                   simul.server +
                   '/' +
                   exp.id +

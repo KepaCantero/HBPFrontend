@@ -222,7 +222,7 @@
       var experimentID = Object.keys(defaultPageOptions.experiments)[0];
       var simulationID = defaultPageOptions.startExperiment.simulationID;
       var expectedLocation = [
-        'esv-web/experiment-view/' +
+        'esv-private/experiment-view/' +
           hostName +
           '/' +
           experimentID +

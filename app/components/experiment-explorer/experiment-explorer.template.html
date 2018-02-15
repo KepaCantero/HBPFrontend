@@ -2,113 +2,116 @@
 <link rel="stylesheet" href="/components/experiment-explorer/experiment-explorer.style.css" />
 <!-- endbuild -->
 
-<script type="text/ng-template" id="experiment-explorer-folder-name.html">
-  <div class="modal-header">
-    <button type="button" class="close" ng-click="$dismiss()" aria-hidden="true">&times;</button>
-    <h4 class="modal-title">Create new folder</h4>
-  </div>
-  <div class="modal-body" style="display:flex">
-    <label>Enter the new folder name:</label>
-    <input ng-model="folderName" autofocus style="flex-grow: 1;margin: 0 10px;">
-  </div>
-  <div class="modal-footer">
-    <button class="btn" ng-click="$dismiss()">Cancel</button>
-    <button class="btn btn-default" ng-click="$close(folderName)">Create</button>
-  </div>
-</script>
 
-<script type="text/ng-template" id="experiment-explorer-folder.html">
-  <div disable-animate ng-repeat="folder in parent.folders | orderBy: 'name'">
-    <div class="experiment-folder" ng-click="vm.selectParent(folder)" ng-class="{'folder-selected':vm.selectedParent.uuid == folder.uuid}">
-      <i class="fa" ng-class="folder.selected?'fa-folder-open-o':'fa-folder-o'"></i>
-      <span class="experiment-label">{{folder.name}}</span>
-    </div>
-    <experiment-folders parent="folder"></experiment-folders>
-  </div>
-</script>
+<div ng-class="tipTooltipService.hidden?'explorer-full-size':'explorer-reduced-for-tip'">
 
-<div class="experiment-explorer-view">
-  <div class="container-with-navbar-margin">
-    <div class="list-container">
-      <div class="form-group form-inline col-xs-6">
-        <h1>Experiments explorer</h1>
+  <div  ng-show="!tipTooltipService.hidden">
+
+      <div class="tip-tooltip-place-explorer">
+      <tip-tooltip  style="display:block;margin-right:16px"></tip-tooltip>
       </div>
-      <div class="form-group form-inline col-xs-6">
-        <button style="float:right;margin-top:20px;" ng-click="vm.directToClonePage()" class="btn btn-default enable-tooltip"
-          uib-tooltip="See my cloned experiments" tooltip-trigger="mouseenter" tooltip-placement="bottom">
-         My experiments
-        </button>
-      </div>
+
+      <div style="padding-bottom: 60px;"></div>
+
     </div>
-  </div>
-  <input type="file" multiple id="experiment-input">
-  <div class="experiment-explorer">
-    <div class="left-panel">
-      <span class="title">Experiments</span>
-      <div class="experiment-list">
-        <div ng-if="!vm.experimentsLoaded" disable-animate class="experiment-files-loading">Loading...</div>
-        <div class="experiment" ng-if="vm.experimentsLoaded" ng-repeat="exp in vm.experimentList | orderBy: 'name'">
-          <div class="experiment-title" ng-click="vm.selectExperiment(exp)" disable-animate ng-class="{'exp-selected':vm.selectedExperiment.uuid == exp.uuid}">
-            <i class="fa" ng-class="vm.selectedExperiment.uuid == exp.uuid?'fa-folder-open-o':'fa-folder-o'"></i>
-            <span class="experiment-label">{{exp.name}}</span>
-            <span class="delete-exp-button" ng-click="!vm.isPrivateExperimentRunning(exp) && !vm.experimentList.deleting && vm.deleteExperiment(exp)">
-              <i ng-if="!vm.experimentList.deleting" disable-animate class="fa fa-remove" style="color:#e84539" title="Delete"></i>
-              <i ng-if="vm.experimentList.deleting" disable-animate class="fa fa-spinner fa-spin fa-1x fa-fw" title="Deleting..."></i>
-            </span>
-          </div>
-          <experiment-folders parent="exp"></experiment-folders>
-        </div>
-      </div>
+
+  <script type="text/ng-template" id="experiment-explorer-folder-name.html">
+    <div class="modal-header">
+      <button type="button" class="close" ng-click="$dismiss()" aria-hidden="true">&times;</button>
+      <h4 class="modal-title">Create new folder</h4>
     </div>
-    <div class="right-panel">
-      <div class="experiment-files-header">
-        <div class="exp-file-icon"></div>
-        <div class="exp-file-name">Name</div>
-        <div class="exp-file-type">Type</div>
-        <div class="exp-file-size">Size</div>
-        <div class="exp-file-date">Modified</div>
-        <div class="exp-file-actions" ng-show="vm.selectedParent">
-          <span class="action-button" ng-if="vm.selectedParent.parentFolder" ng-click="!vm.selectedParent.deleting && vm.deleteFolder(vm.selectedParent)">
-            <span class="delete-folder-button" ng-if="!vm.selectedParent.deleting && !vm.selectedParent.loadingFiles" disable-animate title="Delete folder">
-              <i class="fa fa-folder"></i>
-              <i class="fa fa-remove"></i>
-            </span>
-          <i ng-if="vm.selectedParent.deleting" disable-animate class="fa fa-spinner fa-pulse fa-1x fa-fw" title="Deleting..."></i>
-          </span>
-          <span class="action-button" ng-click="!vm.selectedParent.creating && vm.createFolder()">
-            <span class="create-folder-button" ng-if="!vm.selectedParent.creating && !vm.selectedParent.loadingFiles" disable-animate title="Create new folder">
-              <i class="fa fa-folder"></i>
-              <i class="fa fa-plus"></i>
-            </span>
-          <i ng-if="vm.selectedParent.creating" disable-animate class="fa fa-spinner fa-pulse fa-1x fa-fw" title="Creating folder..."></i>
-          </span>
-          <span class="action-button" ng-click="!vm.selectedParent.uploading && vm.uploadFileClick()">
-            <i ng-if="!vm.selectedParent.uploading && !vm.selectedParent.loadingFiles" disable-animate class="fa fa-upload" title="Upload file"></i>
-            <i ng-if="vm.selectedParent.uploading" disable-animate class="fa fa-spinner fa-pulse fa-1x fa-fw" title="Uploading..."></i>
-          </span>
-        </div>
+    <div class="modal-body" style="display:flex">
+      <label>Enter the new folder name:</label>
+      <input ng-model="folderName" autofocus style="flex-grow: 1;margin: 0 10px;">
+    </div>
+    <div class="modal-footer">
+      <button class="btn" ng-click="$dismiss()">Cancel</button>
+      <button class="btn btn-default" ng-click="$close(folderName)">Create</button>
+    </div>
+  </script>
+
+  <script type="text/ng-template" id="experiment-explorer-folder.html">
+    <div disable-animate ng-repeat="folder in parent.folders | orderBy: 'name'">
+      <div class="experiment-folder" ng-click="vm.selectParent(folder)" ng-class="{'folder-selected':vm.selectedParent.uuid == folder.uuid}">
+        <i class="fa" ng-class="folder.selected?'fa-folder-open-o':'fa-folder-o'"></i>
+        <span class="experiment-label">{{folder.name}}</span>
       </div>
-      <div ng-if="vm.selectedParent.loadingFiles" disable-animate class="experiment-files-loading">Loading...</div>
-      <div ng-if="!vm.selectedParent.loadingFiles" disable-animate class="experiment-files-list">
-        <div class="experiment-file" ng-class="{'exp-file-selected':vm.selectedFileId == file.uuid}" ng-repeat="file in vm.selectedParent.files | orderBy: 'name'"
-          ng-click="vm.selectFile(file.uuid)">
-          <div class="exp-file-icon"><i class="fa fa-{{file.icon}}"></i></div>
-          <div class="exp-file-name">{{file.name}}</div>
-          <div class="exp-file-type">{{file.typeDescription}}</div>
-          <div class="exp-file-size">{{file.size | bytes}}</div>
-          <div class="exp-file-date">{{file.modifiedDate}}</div>
-          <div class="exp-file-actions" ng-if="file.type != 'folder'">
-            <span class="action-button" ng-click="!file.deleting && vm.deleteFile(file)">
-              <i ng-if="!file.deleting" disable-animate class="fa fa-remove" style="color:#e84539" title="Delete file"></i>
-              <i ng-if="file.deleting" disable-animate class="fa fa-spinner fa-pulse fa-1x fa-fw" title="Deleting..."></i>
-            </span>
-            <span class="action-button" ng-click="!file.downloading && vm.downloadFile(file)">
-              <i ng-if="!file.downloading" disable-animate class="fa fa-download" title="Download file"></i>
-              <i ng-if="file.downloading" disable-animate class="fa fa-spinner fa-pulse fa-1x fa-fw" title="Downloading..."></i>
-            </span>
+      <experiment-folders parent="folder"></experiment-folders>
+    </div>
+  </script>
+
+  <div class="experiment-explorer-view">
+
+    <input type="file" multiple id="experiment-input">
+    <div class="experiment-explorer">
+      <div class="left-panel">
+        <span class="title">Experiments</span>
+        <div class="experiment-list">
+          <div ng-if="!vm.experimentsLoaded" disable-animate class="experiment-files-loading">Loading...</div>
+          <div class="experiment" ng-if="vm.experimentsLoaded" ng-repeat="exp in vm.experimentList | orderBy: 'name'">
+            <div class="experiment-title" ng-click="vm.selectExperiment(exp)" disable-animate ng-class="{'exp-selected':vm.selectedExperiment.uuid == exp.uuid}">
+              <i class="fa" ng-class="vm.selectedExperiment.uuid == exp.uuid?'fa-folder-open-o':'fa-folder-o'"></i>
+              <span class="experiment-label">{{exp.name}}</span>
+              <span class="delete-exp-button" ng-click="!vm.isPrivateExperimentRunning(exp) && !vm.experimentList.deleting && vm.deleteExperiment(exp)">
+                <i ng-if="!vm.experimentList.deleting" disable-animate class="fa fa-remove" style="color:#e84539" title="Delete"></i>
+                <i ng-if="vm.experimentList.deleting" disable-animate class="fa fa-spinner fa-spin fa-1x fa-fw" title="Deleting..."></i>
+              </span>
+            </div>
+            <experiment-folders parent="exp"></experiment-folders>
           </div>
         </div>
       </div>
+      <div class="right-panel">
+        <div class="experiment-files-header">
+          <div class="exp-file-icon"></div>
+          <div class="exp-file-name">Name</div>
+          <div class="exp-file-type">Type</div>
+          <div class="exp-file-size">Size</div>
+          <div class="exp-file-date">Modified</div>
+          <div class="exp-file-actions" ng-show="vm.selectedParent">
+            <span class="action-button" ng-if="vm.selectedParent.parentFolder" ng-click="!vm.selectedParent.deleting && vm.deleteFolder(vm.selectedParent)">
+              <span class="delete-folder-button" ng-if="!vm.selectedParent.deleting && !vm.selectedParent.loadingFiles" disable-animate title="Delete folder">
+                <i class="fa fa-folder"></i>
+                <i class="fa fa-remove"></i>
+              </span>
+            <i ng-if="vm.selectedParent.deleting" disable-animate class="fa fa-spinner fa-pulse fa-1x fa-fw" title="Deleting..."></i>
+            </span>
+            <span class="action-button" ng-click="!vm.selectedParent.creating && vm.createFolder()">
+              <span class="create-folder-button" ng-if="!vm.selectedParent.creating && !vm.selectedParent.loadingFiles" disable-animate title="Create new folder">
+                <i class="fa fa-folder"></i>
+                <i class="fa fa-plus"></i>
+              </span>
+            <i ng-if="vm.selectedParent.creating" disable-animate class="fa fa-spinner fa-pulse fa-1x fa-fw" title="Creating folder..."></i>
+            </span>
+            <span class="action-button" ng-click="!vm.selectedParent.uploading && vm.uploadFileClick()">
+              <i ng-if="!vm.selectedParent.uploading && !vm.selectedParent.loadingFiles" disable-animate class="fa fa-upload" title="Upload file"></i>
+              <i ng-if="vm.selectedParent.uploading" disable-animate class="fa fa-spinner fa-pulse fa-1x fa-fw" title="Uploading..."></i>
+            </span>
+          </div>
+        </div>
+        <div ng-if="vm.selectedParent.loadingFiles" disable-animate class="experiment-files-loading">Loading...</div>
+        <div ng-if="!vm.selectedParent.loadingFiles" disable-animate class="experiment-files-list">
+          <div class="experiment-file" ng-class="{'exp-file-selected':vm.selectedFileId == file.uuid}" ng-repeat="file in vm.selectedParent.files | orderBy: 'name'"
+            ng-click="vm.selectFile(file.uuid)">
+            <div class="exp-file-icon"><i class="fa fa-{{file.icon}}"></i></div>
+            <div class="exp-file-name">{{file.name}}</div>
+            <div class="exp-file-type">{{file.typeDescription}}</div>
+            <div class="exp-file-size">{{file.size | bytes}}</div>
+            <div class="exp-file-date">{{file.modifiedDate}}</div>
+            <div class="exp-file-actions" ng-if="file.type != 'folder'">
+              <span class="action-button" ng-click="!file.deleting && vm.deleteFile(file)">
+                <i ng-if="!file.deleting" disable-animate class="fa fa-remove" style="color:#e84539" title="Delete file"></i>
+                <i ng-if="file.deleting" disable-animate class="fa fa-spinner fa-pulse fa-1x fa-fw" title="Deleting..."></i>
+              </span>
+              <span class="action-button" ng-click="!file.downloading && vm.downloadFile(file)">
+                <i ng-if="!file.downloading" disable-animate class="fa fa-download" title="Download file"></i>
+                <i ng-if="file.downloading" disable-animate class="fa fa-spinner fa-pulse fa-1x fa-fw" title="Downloading..."></i>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
+
 </div>
