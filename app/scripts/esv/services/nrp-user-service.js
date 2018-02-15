@@ -51,15 +51,9 @@
           .catch(() => 'Unkwown');
 
       let getCurrentUserInfo = () =>
-        $q
-          .all([
-            storageServer.getCurrentUser(),
-            isGroupMember('hbp-sp10-user-edit-rights')
-          ])
-          .then(([{ id }, hasEditRights]) => ({
-            userID: id,
-            hasEditRights
-          }));
+        $q.all([storageServer.getCurrentUser()]).then(([{ id }]) => ({
+          userID: id
+        }));
 
       return {
         getCurrentUser: _.memoize(getCurrentUser),
