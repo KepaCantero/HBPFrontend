@@ -28,59 +28,89 @@
     'clbErrorDialog',
     'clbConfirm',
     'backendInterfaceService',
-    function(clbErrorDialog, clbConfirm, backendInterfaceService) {
+    '$document',
+    function(clbErrorDialog, clbConfirm, backendInterfaceService, $document) {
       return {
         restrict: 'E',
         scope: {
           extentTimeoutCondition: '@'
         },
         link: function(scope, element, attrs) {
+          scope.extendTimeout = function() {
+            return backendInterfaceService.extendTimeout().catch(function(err) {
+              timeoutExtendRefused = true;
+              if (err && err.status === 402) {
+                clbErrorDialog.open({
+                  type: 'AllocationError.',
+                  Message:
+                    'Your cluster job allocation cannot be extended further'
+                });
+              }
+            });
+          };
+          scope.unbind = function() {
+            $document.unbind(
+              'mousemove click mouseup mousedown keydown keypress keyup submit change mouseenter scroll resize dblclick'
+            );
+            scope.autoExtendTimeout = false;
+          };
           if (!attrs.extentTimeoutCondition)
             throw "Directive 'simulation-timeout-extender' requires 'extentTimeoutCondition' attribute to be defined";
 
+          scope.autoExtendTimeout = false;
           var timeoutExtendRefused = false,
             popupIsOpen = false;
 
+          scope.$watch(
+            function() {
+              return scope.$eval(attrs.extentAutoCondition);
+            },
+            function(extend) {
+              if (extend) {
+                $document.bind(
+                  'mousemove click mouseup mousedown keydown keypress keyup submit change mouseenter scroll resize dblclick',
+                  function() {
+                    scope.autoExtendTimeout = true;
+                  }
+                );
+              }
+            }
+          );
           scope.$watch(
             function() {
               return scope.$eval(attrs.extentTimeoutCondition);
             },
             function(extend) {
               if (extend && !timeoutExtendRefused && !popupIsOpen) {
-                popupIsOpen = true;
-                return clbConfirm
-                  .open({
-                    title: 'Your simulation will soon reach its timeout.',
-                    confirmLabel: 'Yes',
-                    cancelLabel: 'No',
-                    template:
-                      'Would you like to extend the simulation timeout?',
-                    closable: false
-                  })
-                  .then(function() {
-                    return backendInterfaceService
-                      .extendTimeout()
-                      .catch(function(err) {
-                        timeoutExtendRefused = true;
-
-                        if (err && err.status === 402) {
-                          clbErrorDialog.open({
-                            type: 'AllocationError.',
-                            message:
-                              'Your cluster job allocation cannot be extended further'
-                          });
-                        }
-                      });
-                  })
-                  .catch(function() {
-                    timeoutExtendRefused = true;
-                  })
-                  .finally(function() {
-                    popupIsOpen = false;
-                  });
+                if (scope.autoExtendTimeout) {
+                  scope.extendTimeout();
+                  scope.unbind();
+                } else {
+                  popupIsOpen = true;
+                  return clbConfirm
+                    .open({
+                      title: 'Your simulation will soon reach its timeout.',
+                      confirmLabel: 'Yes',
+                      cancelLabel: 'No',
+                      template:
+                        'Would you like to extend the simulation timeout?',
+                      closable: false
+                    })
+                    .then(function() {
+                      scope.extendTimeout();
+                    })
+                    .catch(function() {
+                      timeoutExtendRefused = true;
+                    })
+                    .finally(function() {
+                      popupIsOpen = false;
+                      scope.unbind();
+                    });
+                }
               }
             }
           );
+          scope.$on('$destroy', () => scope.unbind());
         }
       };
     }

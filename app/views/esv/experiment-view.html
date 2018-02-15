@@ -28,7 +28,7 @@
 
   <div class="ros-reconnecting" on-reconnect-timeout="vm.exit()"></div>
 
-  <simulation-timeout-extender extent-timeout-condition="{{vm.simulationInfo.simTimeoutText < 300}}" ng-if="vm.userContextService.isOwner()"></simulation-timeout-extender>
+  <simulation-timeout-extender extent-auto-condition= "{{vm.simulationInfo.simTimeoutText < vm.simulationInfo.simMaxAutoTimeOutText}}" extent-timeout-condition="{{vm.simulationInfo.simTimeoutText < vm.simulationInfo.simMaxTimeOutText}}" ng-if="vm.userContextService.isOwner()"></simulation-timeout-extender>
 
   <help-tooltip-popover></help-tooltip-popover>
 

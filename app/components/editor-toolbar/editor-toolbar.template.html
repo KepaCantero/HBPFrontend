@@ -28,12 +28,12 @@
                     <div>
                         <span>Simulation time:</span><br/>
                         <span>Real time:</span><br/>
-                        <span ng-style="{ color: vm.simulationInfo.simTimeoutText !== undefined && vm.simulationInfo.simTimeoutText < 300 ? 'red' : '' }">Timeout:</span>
+                        <span ng-style="{ color: vm.simulationInfo.simTimeoutText !== undefined && vm.simulationInfo.simTimeoutText < vm.simulationInfo.simMaxTimeOutText ? 'red' : '' }">Timeout:</span>
                     </div>
                     <div>
                         <span id="simTime">{{vm.simulationInfo.simulationTimeText | timeDDHHMMSS}}</span><br/>
                         <span id="realTime">{{vm.simulationInfo.realTimeText | timeDDHHMMSS}}</span><br/>
-                        <span ng-style="{ color: vm.simulationInfo.simTimeoutText !== undefined && vm.simulationInfo.simTimeoutText < 300 ? 'red' : '' }">{{vm.simulationInfo.simTimeoutText | timeDDHHMMSS}}</span>
+                        <span ng-style="{ color: vm.simulationInfo.simTimeoutText !== undefined && vm.simulationInfo.simTimeoutText < vm.simulationInfo.simMaxTimeOutText ? 'red' : '' }">{{vm.simulationInfo.simTimeoutText | timeDDHHMMSS}}</span>
                     </div>
                 </div>
                 <div ng-show="vm.stateService.currentState === vm.STATE.HALTED">
