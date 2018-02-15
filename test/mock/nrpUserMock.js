@@ -16,9 +16,7 @@
         .and.returnValue($q.when('ownerDisplayName'));
       this.getCurrentUserInfo = jasmine
         .createSpy('getCurrentUserInfo')
-        .and.returnValue(
-          $q.when({ userID: 'theUserID', hasEditRight: true, forceuser: false })
-        );
+        .and.returnValue($q.when({ userID: 'theUserID', forceuser: false }));
     }
   ]);
 })();

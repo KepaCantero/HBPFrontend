@@ -20,10 +20,7 @@
   'use strict';
 
   angular.module('demoCarousel', []).directive('demoCarouselAlert', [
-    '$window',
-    '$timeout',
-    'nrpUser',
-    ($window, $timeout, nrpUser) => {
+    () => {
       return {
         restrict: 'E',
         templateUrl:
@@ -33,10 +30,8 @@
           // Basic Users are invited to join the Demo Carousel
           var DEMO_MACHINE = '52.58.114.201';
           scope.demoCarouselUrl = 'http://' + DEMO_MACHINE + ':9000/#/esv-demo';
-
-          nrpUser.getCurrentUserInfo().then(function(response) {
-            scope.displayWatchDemosButton = !response.hasEditRights;
-          });
+          // TEMPORARY disabling of the banner
+          scope.displayWatchDemosButton = false;
         }
       };
     }
