@@ -419,6 +419,9 @@
           } else if (stage === 'production') {
             /* global ga: false */
             ga('create', 'UA-62512653-3', 'auto');
+          } else if (stage === 'demo') {
+            /* global ga: false */
+            ga('create', 'UA-62512653-5', 'auto');
           }
         }
 
