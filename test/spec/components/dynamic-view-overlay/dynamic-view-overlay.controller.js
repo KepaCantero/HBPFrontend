@@ -113,20 +113,32 @@ describe('Controller: DynamicViewOverlayController', function() {
     var mockWrapper = { style: { width: '20px', height: '10px' } };
     spyOn(element[0], 'getElementsByClassName').and.returnValue([mockWrapper]);
 
-    overlayController.channelType = DYNAMIC_VIEW_CHANNELS.SPIKE_TRAIN;
+    var dynamicViewChannelMock = {
+      name: 'SMACH Editor',
+      directive: 'smach-editor',
+      allowMultipleViews: false, // default true
+      overlayDefaultSize: {
+        width: 700,
+        height: 500,
+        minWidth: 700,
+        minHeight: 300
+      }
+    };
+
+    overlayController.channelType = dynamicViewChannelMock;
     overlayController.applyChannelDefaults();
 
     expect(mockWrapper.style.width).toBe(
-      DYNAMIC_VIEW_CHANNELS.SPIKE_TRAIN.overlayDefaultSize.width + 'px'
+      dynamicViewChannelMock.overlayDefaultSize.width + 'px'
     );
     expect(mockWrapper.style.height).toBe(
-      DYNAMIC_VIEW_CHANNELS.SPIKE_TRAIN.overlayDefaultSize.height + 'px'
+      dynamicViewChannelMock.overlayDefaultSize.height + 'px'
     );
     expect(mockWrapper.style.minWidth).toBe(
-      DYNAMIC_VIEW_CHANNELS.SPIKE_TRAIN.overlayDefaultSize.minWidth + 'px'
+      dynamicViewChannelMock.overlayDefaultSize.minWidth + 'px'
     );
     expect(mockWrapper.style.minHeight).toBe(
-      DYNAMIC_VIEW_CHANNELS.SPIKE_TRAIN.overlayDefaultSize.minHeight + 'px'
+      dynamicViewChannelMock.overlayDefaultSize.minHeight + 'px'
     );
   });
 
