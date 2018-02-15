@@ -804,6 +804,22 @@
           expect(scope.pageState.selected).toBeDefined(scope.experiments[0].id);
         });
 
+        it('should check if at least one experiment is running', function() {
+          var page = renderEsvWebPage({
+            experiments: { matureExperiment: matureExperiment }
+          });
+          var scope = getExperimentListScope(page);
+          expect(scope.atLeastOneExperimentRunning()).toBe(true);
+        });
+
+        it('should check if at least one experiment is not running', function() {
+          var page = renderEsvWebPage({
+            experiments: {}
+          });
+          var scope = getExperimentListScope(page);
+          expect(scope.atLeastOneExperimentRunning()).toBe(false);
+        });
+
         it('should not select an experiment if multiple experiments are shown', function() {
           $httpBackend.whenGET(collabContextUrl).respond(200, {});
           var page = renderEsvWebPage();
