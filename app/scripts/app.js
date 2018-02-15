@@ -99,7 +99,8 @@
       'rosTerminalModule',
       'userInteractionModule',
       'robotDocumentation',
-      'adminModule'
+      'adminModule',
+      'modal'
     ])
     // Routes
     .config([

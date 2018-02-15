@@ -1,0 +1,35 @@
+<div class="container-with-navbar-margin exit-panel-modal">
+    <div class="list-container">
+        <div class="exit-panel-title">
+            <button type="button"
+                    class="close"
+                    ng-click="vm.destroyDialog()"
+                    aria-hidden="true">x</button>
+            <h4 style="font-size: 20px;">Exit menu</h4>
+        </div>
+        <div class="exit-panel-text">
+            <p>Would you like to leave or stop the simulation?</p>
+        </div>
+        <div class="exit-panel-buttons">
+            <button class="btn btn-default btn-cancel exit-panel-left-button"
+                tooltip-trigger="mouseenter"
+                tooltip-placement="top"
+                ng-click="vm.destroyDialog()">Cancel
+            </button>
+            <button class="btn btn-default btn-leave exit-panel-right-button"
+                tooltip-trigger="mouseenter"
+                tooltip-placement="top"
+                ng-click="vm.destroyDialog();vm.exit(true)">Leave
+            </button>
+            <button class="btn btn-default btn-danger exit-panel-right-button"
+                ng-if="vm.userContextService.isOwner()"
+                ng-disabled="vm.stateService.statePending"
+                tooltip-trigger="mouseenter"
+                tooltip-placement="top"
+                ng-click="vm.destroyDialog();vm.simControlButtonHandler(vm.STATE.STOPPED)"
+                ng-show="(vm.stateService.currentState !== vm.STATE.STOPPED) &&
+                          (vm.stateService.currentState !== vm.STATE.FAILED)">Stop
+            </button>
+        </div>
+    </div>
+</div>
