@@ -354,6 +354,15 @@
                       'Please remove all references to the population in the transfer functions and try again.',
                     data: { error: result.data.error_message }
                   });
+                } else if (
+                  result.data.error_line === -2 &&
+                  result.data.error_column === -2
+                ) {
+                  // if error_line == error_column == -2 then show the error message returned from the backend
+                  clbErrorDialog.open({
+                    type: 'Impossible to apply changes',
+                    message: result.data.error_message
+                  });
                 } else {
                   scope.markError(
                     result.data.error_message,
