@@ -244,6 +244,7 @@
           url: '/esv-private?ctx',
           templateUrl: 'views/esv/esv-experiments.html',
           controller: 'esvExperimentsCtrl',
+          controllerAs: '$ctrl',
           resolve: {
             currentUser: [
               'storageServer',

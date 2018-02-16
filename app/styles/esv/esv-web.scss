@@ -204,7 +204,7 @@
 .underlined-tab-area {
   display: flex;
   margin-left: 17px;
-  margin-top: 42px;
+  margin-top: 22px;
   min-width: 600px;
 }
 
@@ -233,6 +233,24 @@
   background: linear-gradient(to right, #ffffff 0%, #d3e7ff 50%, #2c5677 100%);
 }
 
+.neuro-title-buttons {
+  display: flex;
+  justify-content: flex-end;
+  margin-right: 4px;
+
+  > * {
+    font-size: 10px;
+    cursor: pointer;
+    color: white;
+    border-radius: 5px;
+    height: 20px;
+    margin: 5px;
+    margin-right: 1px;
+    right: 2px;
+    z-index: 100;
+  }
+}
+
 .tip-tooltip-place {
   background: linear-gradient(to top, rgba(255, 0, 0, 0), rgb(255, 255, 255));
   width: calc(100% - 18px);
@@ -240,4 +258,17 @@
   height: 55px;
   padding-left: 16px;
   z-index: 100;
+}
+
+.title-top-button {
+  width: 82px;
+  background-color: #3f6686;
+  user-select: none;
+}
+
+.title-top-button-icon {
+  font-size: 18px;
+  margin-right: 10px;
+  margin-left: 5px;
+  margin-top: 1px;
 }

@@ -7,14 +7,19 @@
   <img style="height: 50px;" ng-src="img/esv/nrp-black-ontransp.png" />
 </div>
 
-<div ng-click="showTips()" ng-show="tipTooltipService.hidden" style="display:flex;justify-content: flex-end;">
-  <div class="show-tip-button">
-    <i class="fa fa-info-circle tip-help-small-icon"></i>
+<div class="neuro-title-buttons">
+  <div ng-click="showTips()" ng-show="tipTooltipService.hidden" class="title-top-button">
+    <i class="fa fa-info-circle title-top-button-icon"></i>
     Tips
   </div>
+  <div ng-click="$ctrl.logout()" class="title-top-button">
+    <i class="fa fa-sign-out title-top-button-icon"></i>
+    Logout
+  </div>
+
 </div>
 
-<div class="container-with-navbar-margin" style="height: calc(100% - 145px);">
+<div class="container-with-navbar-margin" style="height: calc(100% - 155px);">
 
   <div style="display: flex; justify-content: space-between; max-height: 65px;">
 
@@ -52,8 +57,8 @@
 
     <div ng-show="tabSelection!=='ExperimentFiles'">
       <div style="display:flex; position: relative;">
-        <i class="fa fa-search" style="margin-top: 40px; margin-right: 5px;"></i>
-        <input ng-model="query" style="width:auto;margin-top: 35px;font-size: 11px;  height: 25px;" type="text" class="top-buttons form-control input-sm"
+        <i class="fa fa-search" style="margin-top: 20px; margin-right: 5px;"></i>
+        <input ng-model="query" style="width:auto;margin-top: 15px;font-size: 11px;  height: 25px;" type="text" class="top-buttons form-control input-sm"
           placeholder="Experiment Filter...">
         <i ng-click="query =''" ng-show="query && query.length" class="fa fa-times-circle" style="    margin-top: 40px;
         margin-left: 2px;
@@ -73,7 +78,7 @@
   <div style="overflow-y: auto; height: 100%;">
     <experiment-list ng-if="tabSelection=='MyExperiments' && showMyExperiments" query="query" experiment-empty="experimentEmpty()"
       reinit="reloadMyExperiments()" running="false" private="true"></experiment-list>
-    <div ng-if="tabSelection=='ExperimentFiles'"   style="height: 100%;">
+    <div ng-if="tabSelection=='ExperimentFiles'" style="height: 100%;">
       <experiment-explorer></experiment-explorer>
     </div>
     <experiment-list ng-if="tabSelection=='CloneExperiment'" query="query" running="false" experiment-empty="experimentEmpty()"
