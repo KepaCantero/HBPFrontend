@@ -98,7 +98,7 @@
             <!-- global lights -->
 
             <!-- camera translation tool -->
-            <div class="hbp-toolbar-item hidden-xs hidden-sm esv-remove-from-touchscreen hbp-camera-tool-container" help-tooltip="CAMERA_TRANSLATION">
+            <div class="hbp-toolbar-item esv-remove-from-touchscreen hbp-camera-tool-container" help-tooltip="CAMERA_TRANSLATION">
                 <div class="hbp-camera-tool-controls"
                      uib-tooltip="Move camera. Click on the arrows, or the (WASD),(RF,Page-Up,Page-Down) keys. Reset the position by clicking in the center"
                      tooltip-placement="top"
@@ -120,7 +120,7 @@
             <!-- camera translation tool -->
 
             <!-- camera rotation tool -->
-            <div class="hbp-toolbar-item hidden-xs hidden-sm esv-remove-from-touchscreen hbp-camera-tool-container" help-tooltip="CAMERA_ROTATION">
+            <div class="hbp-toolbar-item esv-remove-from-touchscreen hbp-camera-tool-container" help-tooltip="CAMERA_ROTATION">
                 <div class="hbp-camera-tool-controls"
                      uib-tooltip="Orientate camera. Click on the arrow keys or drag the mouse. Reset the orientation by clicking in the center"
                      tooltip-placement="top"
@@ -180,7 +180,7 @@
                  tooltip-placement="top"
                  tooltip-popup-delay="2000"
                  tooltip-popup-close-delay="300"
-                 
+
                  ng-show="(vm.stateService.currentState === vm.STATE.STARTED) || (vm.stateService.currentState === vm.STATE.PAUSED) || (vm.stateService.currentState === vm.STATE.INITIALIZED)">
                 <i class="fa fa-eye fa-2x vertcenter"></i>
             </div>
@@ -238,7 +238,7 @@
                  tooltip-placement="top"
                  tooltip-popup-delay="2000"
                  tooltip-popup-close-delay="300"
-                 
+
                  v-busy="vm.editorsPanelService.loadingEditPanel"
                  v-busy-label="Loading the edit panel">
                 <i class="fa fa-pencil-square-o fa-2x vertcenter"></i>
