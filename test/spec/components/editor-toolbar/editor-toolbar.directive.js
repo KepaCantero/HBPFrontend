@@ -3,7 +3,7 @@
 
   describe('Directive: EditorToolbar', function() {
     var $compile, $rootScope, $scope;
-    var element;
+    var element, $timeout;
 
     beforeEach(module('tipTooltipModule'));
     beforeEach(module('editorToolbarModule'));
@@ -28,9 +28,10 @@
     beforeEach(module('gz3dViewsServiceMock'));
 
     beforeEach(
-      inject(function(_$rootScope_, _$compile_) {
+      inject(function(_$rootScope_, _$compile_, _$timeout_) {
         $rootScope = _$rootScope_;
         $compile = _$compile_;
+        $timeout = _$timeout_;
       })
     );
 
@@ -43,6 +44,17 @@
 
     it('should have a controller defined as vm', function() {
       expect($scope.vm).toBeDefined();
+    });
+
+    it('should have a controller defined as vm', function() {
+      spyOn(window, '$').and.returnValue({
+        delay: function() {
+          return { fadeOut: function() {} };
+        }
+      });
+      $scope.vm.hideTooltip();
+      $timeout.flush();
+      expect(window.$).toHaveBeenCalledWith('.tooltip');
     });
   });
 })();

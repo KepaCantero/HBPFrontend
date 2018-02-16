@@ -214,7 +214,6 @@
         this.nrpModalService.destroyModal();
       };
     }
-
     /**
      * Notify the widgets the reset events occurred on the backend side, e.g., from VirtualCoach
      * Hide the editor if visible, reset the UI
@@ -399,6 +398,14 @@
       if (this.objectInspectorService !== null) {
         this.objectInspectorService.removeEventListeners();
       }
+    }
+
+    hideTooltip() {
+      this.$timeout(() => {
+        $('.tooltip')
+          .delay(700)
+          .fadeOut('slow');
+      });
     }
 
     setEditMode(newMode) {
