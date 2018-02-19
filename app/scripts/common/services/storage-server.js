@@ -254,7 +254,6 @@
     }
   }
 
-  StorageServer.$$ngIsClass = true;
   StorageServer.$inject = [
     '$resource',
     '$window',

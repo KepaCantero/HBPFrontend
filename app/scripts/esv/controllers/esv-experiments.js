@@ -27,9 +27,19 @@
     '$scope',
     '$location',
     '$timeout',
+    '$window',
     'tipTooltipService',
     'TIP_CODES',
-    function($scope, $location, $timeout, tipTooltipService, TIP_CODES) {
+    'storageServerTokenManager',
+    function(
+      $scope,
+      $location,
+      $timeout,
+      $window,
+      tipTooltipService,
+      TIP_CODES,
+      storageServerTokenManager
+    ) {
       $scope.reloadMyExperiments = () => {
         $scope.showMyExperiments = false;
         $timeout(() => ($scope.showMyExperiments = true));
@@ -56,6 +66,11 @@
       $scope.showTips = () => {
         tipTooltipService.toggleTip();
         $scope.updateTip();
+      };
+
+      this.logout = () => {
+        storageServerTokenManager.clearStoredToken();
+        $window.location.reload();
       };
 
       $scope.experimentEmpty = () => {
