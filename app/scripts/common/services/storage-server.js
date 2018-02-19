@@ -132,6 +132,10 @@
             method: 'POST',
             url: `${this.STORAGE_BASE_URL}/clone/`
           }),
+          cloneNew: buildAction({
+            method: 'POST',
+            url: `${this.STORAGE_BASE_URL}/clonenew/`
+          }),
           getMaintenanceMode: buildAction({
             method: 'GET',
             url: `${this.PROXY_URL}/maintenancemode`
@@ -247,6 +251,10 @@
 
     cloneTemplate(expPath, contextId) {
       return this.proxyRsc.cloneTemplate({ expPath, contextId }).$promise;
+    }
+
+    cloneNew(modelsPaths, contextId) {
+      return this.proxyRsc.cloneNew({ modelsPaths, contextId }).$promise;
     }
 
     getMaintenanceMode() {
