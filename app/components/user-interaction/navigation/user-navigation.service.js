@@ -22,6 +22,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  * ---LICENSE-END**/
 /* global THREE: false */
+
 (function() {
   'use strict';
 
@@ -113,9 +114,7 @@
                   that.removeAvatar();
 
                   // set up controls
-                  that.freeCameraControls = new THREE.FirstPersonControls(
-                    gz3d.scene.viewManager.mainUserView
-                  );
+                  that.freeCameraControls = new THREE.FirstPersonControls(gz3d);
                   that.lookatRobotControls = new THREE.LookatRobotControls(
                     gz3d.scene.viewManager.mainUserView,
                     gz3d.scene.getByName('robot')

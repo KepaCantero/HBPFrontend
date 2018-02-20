@@ -96,17 +96,24 @@ describe('FirstPersonControls', function() {
   var userView;
   var firstPersonControls;
 
+  var gz3d;
+
+  beforeEach(module('gz3dMock'));
+
+  beforeEach(
+    inject(function(_gz3d_) {
+      gz3d = _gz3d_;
+    })
+  );
+
   beforeEach(function() {
-    userView = {
-      camera: new THREE.PerspectiveCamera(),
-      container: document.createElement('dummyElement')
-    };
+    userView = gz3d.scene.viewManager.mainUserView;
 
     spyOn(userView.container, 'addEventListener').and.callThrough();
     spyOn(userView.container, 'setAttribute').and.callThrough();
     spyOn(document, 'addEventListener').and.callThrough();
 
-    firstPersonControls = new THREE.FirstPersonControls(userView);
+    firstPersonControls = new THREE.FirstPersonControls(gz3d);
     firstPersonControls.attachEventListeners();
 
     spyOn(firstPersonControls, 'onKeyDown').and.callThrough();
@@ -123,7 +130,7 @@ describe('FirstPersonControls', function() {
     'should get initialized',
     inject(function() {
       /* normal init from beforeEach */
-      expect(firstPersonControls.userView).toEqual(userView);
+      expect(firstPersonControls.camera).toEqual(userView.camera);
       expect(firstPersonControls.domElementPointerBindings).toEqual(
         userView.container
       );
@@ -131,7 +138,7 @@ describe('FirstPersonControls', function() {
 
       /* undefined element */
       userView.container = undefined;
-      firstPersonControls = new THREE.FirstPersonControls(userView);
+      firstPersonControls = new THREE.FirstPersonControls(gz3d);
       firstPersonControls.attachEventListeners();
       expect(firstPersonControls.domElementPointerBindings).toEqual(document);
     })
@@ -211,7 +218,7 @@ describe('FirstPersonControls', function() {
       triggerKeyEvent(document, 'keydown', 'ArrowRight');
       triggerKeyEvent(document, 'keydown', 'PageUp');
       triggerKeyEvent(document, 'keydown', 'PageDown');
-      expect(firstPersonControls.shiftHold).toEqual(false);
+      expect(firstPersonControls.input.keyboard.shift).toEqual(false);
       expect(firstPersonControls.rotateUp).toEqual(true);
       expect(firstPersonControls.rotateLeft).toEqual(true);
       expect(firstPersonControls.rotateDown).toEqual(true);
@@ -247,7 +254,7 @@ describe('FirstPersonControls', function() {
       triggerKeyEventWithShift(document, 'keydown', 'PageUp');
       triggerKeyEventWithShift(document, 'keydown', 'PageDown');
 
-      expect(firstPersonControls.shiftHold).toEqual(true);
+      expect(firstPersonControls.input.keyboard.shift).toEqual(true);
       expect(firstPersonControls.rotateUp).toEqual(true);
       expect(firstPersonControls.rotateLeft).toEqual(true);
       expect(firstPersonControls.rotateDown).toEqual(true);
@@ -262,7 +269,7 @@ describe('FirstPersonControls', function() {
       triggerKeyEvent(document, 'keyup', 'PageUp');
       triggerKeyEvent(document, 'keyup', 'PageDown');
 
-      expect(firstPersonControls.shiftHold).toEqual(false);
+      expect(firstPersonControls.input.keyboard.shift).toEqual(false);
       expect(firstPersonControls.rotateUp).toEqual(false);
       expect(firstPersonControls.rotateLeft).toEqual(false);
       expect(firstPersonControls.rotateDown).toEqual(false);
@@ -279,7 +286,7 @@ describe('FirstPersonControls', function() {
       userView.camera.lookAt(new THREE.Vector3(0, 0, 0));
       var posStart = new THREE.Vector3();
 
-      expect(firstPersonControls.enabled).toBe(true);
+      expect(firstPersonControls.input.mouse.enabled).toBe(true);
 
       posStart.copy(userView.camera.position);
       firstPersonControls.moveForward = true;
@@ -289,14 +296,14 @@ describe('FirstPersonControls', function() {
 
       posStart.copy(userView.camera.position);
       firstPersonControls.moveForward = true;
-      firstPersonControls.shiftHold = true;
+      firstPersonControls.input.keyboard.shift = true;
       firstPersonControls.update(undefined, 1, 1);
       firstPersonControls.moveForward = false;
-      firstPersonControls.shiftHold = false;
+      firstPersonControls.input.keyboard.shift = false;
       var posDiffWithShift = Math.abs(userView.camera.position.z - posStart.z);
 
       expect(posDiffWithShift / posDiffNoShift).toBeCloseTo(
-        firstPersonControls.speedUpFactor
+        firstPersonControls.speedFactors.shift
       );
     })
   );
@@ -309,7 +316,7 @@ describe('FirstPersonControls', function() {
       var posStart = new THREE.Vector3(),
         posEnd = new THREE.Vector3();
 
-      expect(firstPersonControls.enabled).toBe(true);
+      expect(firstPersonControls.input.mouse.enabled).toBe(true);
 
       posStart.copy(userView.camera.position);
       firstPersonControls.moveForward = true;
@@ -363,7 +370,7 @@ describe('FirstPersonControls', function() {
       var rotStart = new THREE.Euler(),
         rotEnd = new THREE.Euler();
 
-      expect(firstPersonControls.enabled).toBe(true);
+      expect(firstPersonControls.input.mouse.enabled).toBe(true);
 
       rotStart.copy(userView.camera.rotation);
       firstPersonControls.rotateUp = true;
@@ -411,6 +418,13 @@ describe('FirstPersonControls', function() {
     inject(function() {
       spyOn(firstPersonControls, 'updateSphericalAngles').and.callThrough();
 
+      // disabled mouse controls
+      firstPersonControls.input.mouse.enabled = false;
+      triggerMouseEvent(userView.container, 'mousedown', 0, 10, 20);
+      expect(firstPersonControls.updateSphericalAngles).not.toHaveBeenCalled();
+
+      // enabled mouse controls
+      firstPersonControls.input.mouse.enabled = true;
       userView.camera.position.copy(new THREE.Vector3(0, 0, 0));
       userView.camera.lookAt(new THREE.Vector3(1, 0, 0));
       userView.camera.up = new THREE.Vector3(0, 0, 1);
@@ -419,17 +433,17 @@ describe('FirstPersonControls', function() {
       triggerMouseEvent(userView.container, 'mousedown', 0, 10, 20);
 
       expect(firstPersonControls.updateSphericalAngles).toHaveBeenCalled();
-      expect(firstPersonControls.azimuth).toEqual(Math.PI * 2);
-      expect(firstPersonControls.zenith).toBeCloseTo(Math.PI / 2, 5);
-      expect(firstPersonControls.azimuthOnMouseDown).toEqual(
-        firstPersonControls.azimuth
+      expect(firstPersonControls.azimuth.current).toEqual(Math.PI * 2);
+      expect(firstPersonControls.zenith.current).toBeCloseTo(Math.PI / 2, 5);
+      expect(firstPersonControls.azimuth.atPointerDown).toEqual(
+        firstPersonControls.azimuth.current
       );
-      expect(firstPersonControls.zenithOnMouseDown).toBeCloseTo(
-        firstPersonControls.zenith,
+      expect(firstPersonControls.zenith.atPointerDown).toBeCloseTo(
+        firstPersonControls.zenith.current,
         5
       );
-      expect(firstPersonControls.mousePosOnKeyDown.x).toEqual(10);
-      expect(firstPersonControls.mousePosOnKeyDown.y).toEqual(20);
+      expect(firstPersonControls.pointerPos.atPointerDown.x).toEqual(10);
+      expect(firstPersonControls.pointerPos.atPointerDown.y).toEqual(20);
       expect(firstPersonControls.mouseRotate).toEqual(true);
     })
   );
@@ -439,8 +453,14 @@ describe('FirstPersonControls', function() {
     inject(function() {
       firstPersonControls.mouseRotate = true;
 
+      // disabled mouse
+      firstPersonControls.input.mouse.enabled = false;
       triggerMouseEvent(userView.container, 'mouseup', 0, 10, 20);
+      expect(firstPersonControls.mouseRotate).toEqual(true);
 
+      // enabled mouse
+      firstPersonControls.input.mouse.enabled = true;
+      triggerMouseEvent(userView.container, 'mouseup', 0, 10, 20);
       expect(firstPersonControls.mouseRotate).toEqual(false);
     })
   );
@@ -448,23 +468,34 @@ describe('FirstPersonControls', function() {
   it(
     'should handle mousemove events',
     inject(function() {
+      firstPersonControls.pointerPos.current.x = 0;
+      firstPersonControls.pointerPos.current.y = 0;
+
+      // disabled mouse
+      firstPersonControls.input.mouse.enabled = false;
+      triggerMouseEvent(userView.container, 'mousemove', 0, 10, 20);
+      expect(firstPersonControls.pointerPos.current.x).toEqual(0);
+      expect(firstPersonControls.pointerPos.current.y).toEqual(0);
+
+      // enabled mouse
+      firstPersonControls.input.mouse.enabled = true;
       triggerMouseEvent(userView.container, 'mousemove', 0, 10, 20);
 
-      expect(firstPersonControls.mousePosCurrent.x).toEqual(10);
-      expect(firstPersonControls.mousePosCurrent.y).toEqual(20);
+      expect(firstPersonControls.pointerPos.current.x).toEqual(10);
+      expect(firstPersonControls.pointerPos.current.y).toEqual(20);
     })
   );
 
   it(
     'should handle mousemove events when no button was pressed',
     inject(function() {
-      firstPersonControls.mousePosCurrent.x = 0;
-      firstPersonControls.mousePosCurrent.y = 0;
+      firstPersonControls.pointerPos.current.x = 0;
+      firstPersonControls.pointerPos.current.y = 0;
 
       triggerMouseEvent(userView.container, 'mousemove', -1, 10, 20);
 
-      expect(firstPersonControls.mousePosCurrent.x).toEqual(0);
-      expect(firstPersonControls.mousePosCurrent.y).toEqual(0);
+      expect(firstPersonControls.pointerPos.current.x).toEqual(0);
+      expect(firstPersonControls.pointerPos.current.y).toEqual(0);
     })
   );
 
@@ -479,14 +510,14 @@ describe('FirstPersonControls', function() {
 
       var startAzimuth = Math.PI;
       var startZenith = Math.PI / 2;
-      expect(firstPersonControls.azimuth).toEqual(startAzimuth * 2);
-      expect(firstPersonControls.zenith).toBeCloseTo(startZenith, 5);
+      expect(firstPersonControls.azimuth.current).toEqual(startAzimuth * 2);
+      expect(firstPersonControls.zenith.current).toBeCloseTo(startZenith, 5);
 
       var mouseDeltaX = Math.PI / 4;
       var mouseDeltaY = Math.PI / 8;
       firstPersonControls.mouseRotate = true;
-      firstPersonControls.mousePosOnKeyDown = new THREE.Vector2(0, 0);
-      firstPersonControls.mousePosCurrent = new THREE.Vector2(
+      firstPersonControls.pointerPos.atPointerDown = new THREE.Vector2(0, 0);
+      firstPersonControls.pointerPos.current = new THREE.Vector2(
         mouseDeltaX,
         mouseDeltaY
       );
@@ -494,14 +525,17 @@ describe('FirstPersonControls', function() {
       firstPersonControls.update(undefined, 1, 1);
 
       var expectedAzimuth =
-        (firstPersonControls.azimuthOnMouseDown -
-          mouseDeltaX * firstPersonControls.lookSpeed) %
+        (firstPersonControls.azimuth.atPointerDown -
+          mouseDeltaX * firstPersonControls.speedFactors.baseMouseRotation) %
         (2 * Math.PI);
-      expect(firstPersonControls.azimuth).toBeCloseTo(expectedAzimuth, 5);
+      expect(firstPersonControls.azimuth.current).toBeCloseTo(
+        expectedAzimuth,
+        5
+      );
       var expectedZenith =
-        firstPersonControls.zenithOnMouseDown +
-        mouseDeltaY * firstPersonControls.lookSpeed;
-      expect(firstPersonControls.zenith).toBeCloseTo(expectedZenith, 5);
+        firstPersonControls.zenith.atPointerDown +
+        mouseDeltaY * firstPersonControls.speedFactors.baseMouseRotation;
+      expect(firstPersonControls.zenith.current).toBeCloseTo(expectedZenith, 5);
     })
   );
 
@@ -521,17 +555,17 @@ describe('FirstPersonControls', function() {
       triggerOneTouchEvent(userView.container, 'touchstart', 10, 20);
 
       expect(firstPersonControls.updateSphericalAngles).toHaveBeenCalled();
-      expect(firstPersonControls.azimuth).toEqual(Math.PI * 2);
-      expect(firstPersonControls.zenith).toBeCloseTo(Math.PI / 2, 5);
-      expect(firstPersonControls.azimuthOnMouseDown).toEqual(
-        firstPersonControls.azimuth
+      expect(firstPersonControls.azimuth.current).toEqual(Math.PI * 2);
+      expect(firstPersonControls.zenith.current).toBeCloseTo(Math.PI / 2, 5);
+      expect(firstPersonControls.azimuth.atPointerDown).toEqual(
+        firstPersonControls.azimuth.current
       );
-      expect(firstPersonControls.zenithOnMouseDown).toBeCloseTo(
-        firstPersonControls.zenith,
+      expect(firstPersonControls.zenith.atPointerDown).toBeCloseTo(
+        firstPersonControls.zenith.current,
         5
       );
-      expect(firstPersonControls.touchPosOnStart.x).toEqual(10);
-      expect(firstPersonControls.touchPosOnStart.y).toEqual(20);
+      expect(firstPersonControls.pointerPos.atPointerDown.x).toEqual(10);
+      expect(firstPersonControls.pointerPos.atPointerDown.y).toEqual(20);
       expect(firstPersonControls.touchRotate).toEqual(true);
     })
   );
@@ -552,8 +586,8 @@ describe('FirstPersonControls', function() {
     inject(function() {
       triggerOneTouchEvent(userView.container, 'touchmove', 20, 30);
 
-      expect(firstPersonControls.touchPosCurrent.x).toEqual(20);
-      expect(firstPersonControls.touchPosCurrent.y).toEqual(30);
+      expect(firstPersonControls.pointerPos.current.x).toEqual(20);
+      expect(firstPersonControls.pointerPos.current.y).toEqual(30);
     })
   );
 
@@ -580,12 +614,17 @@ describe('FirstPersonControls', function() {
       firstPersonControls.update(undefined, 1, 1);
 
       var expectedAzimuth =
-        (Math.PI * 2 + mouseDeltaX * firstPersonControls.lookSpeed) %
+        (Math.PI * 2 +
+          mouseDeltaX * firstPersonControls.speedFactors.baseMouseRotation) %
         (2 * Math.PI);
-      expect(firstPersonControls.azimuth).toBeCloseTo(expectedAzimuth, 5);
+      expect(firstPersonControls.azimuth.current).toBeCloseTo(
+        expectedAzimuth,
+        5
+      );
       var expectedZenith =
-        Math.PI / 2 - mouseDeltaY * firstPersonControls.lookSpeed;
-      expect(firstPersonControls.zenith).toBeCloseTo(expectedZenith, 5);
+        Math.PI / 2 -
+        mouseDeltaY * firstPersonControls.speedFactors.baseMouseRotation;
+      expect(firstPersonControls.zenith.current).toBeCloseTo(expectedZenith, 5);
     })
   );
 
@@ -660,7 +699,7 @@ describe('FirstPersonControls', function() {
       expect(firstPersonControls.touchRotate).toEqual(false);
       expect(userView.camera.position).toEqual(
         new THREE.Vector3(
-          (100 - 10) * firstPersonControls.touchSensitivity,
+          (100 - 10) * firstPersonControls.speedFactors.baseTouch,
           0,
           0
         )
@@ -690,7 +729,11 @@ describe('FirstPersonControls', function() {
 
       expect(firstPersonControls.touchRotate).toEqual(false);
       expect(userView.camera.position).toEqual(
-        new THREE.Vector3(0, +50 * firstPersonControls.touchSensitivity, 0)
+        new THREE.Vector3(
+          0,
+          +50 * firstPersonControls.speedFactors.baseTouch,
+          0
+        )
       );
     })
   );
@@ -700,9 +743,9 @@ describe('FirstPersonControls', function() {
     inject(function() {
       userView.camera.position.set(0, -1, 0);
       userView.camera.lookAt(new THREE.Vector3(0, 0, 0));
-      firstPersonControls.mouseDragOn = true;
-      firstPersonControls.mousePosOnKeyDown = new THREE.Vector2(0, 0);
-      firstPersonControls.mousePosCurrent = new THREE.Vector2(
+      //firstPersonControls.mouseDragOn = true;
+      firstPersonControls.pointerPos.atPointerDown = new THREE.Vector2(0, 0);
+      firstPersonControls.pointerPos.current = new THREE.Vector2(
         Math.PI / 2,
         Math.PI / 4
       );
@@ -724,19 +767,16 @@ describe('FirstPersonControls', function() {
       expect(userView.camera.quaternion.y).toEqual(cameraQuat.y);
       expect(userView.camera.quaternion.z).toEqual(cameraQuat.z);
       expect(userView.camera.quaternion.w).toEqual(cameraQuat.w);
-
-      /* freeze */
-      firstPersonControls.enabled = true;
-      firstPersonControls.freeze = true;
-      firstPersonControls.update();
-
-      expect(userView.camera.position.x).toEqual(cameraPos.x);
-      expect(userView.camera.position.y).toEqual(cameraPos.y);
-      expect(userView.camera.position.z).toEqual(cameraPos.z);
-      expect(userView.camera.quaternion.x).toEqual(cameraQuat.x);
-      expect(userView.camera.quaternion.y).toEqual(cameraQuat.y);
-      expect(userView.camera.quaternion.z).toEqual(cameraQuat.z);
-      expect(userView.camera.quaternion.w).toEqual(cameraQuat.w);
     })
   );
+
+  it('should detach event listeners correctly', function() {
+    firstPersonControls.domElementPointerBindings = {
+      removeEventListener: jasmine.createSpy('removeEventListener')
+    };
+    firstPersonControls.detachEventListeners();
+    expect(
+      firstPersonControls.domElementPointerBindings.removeEventListener
+    ).toHaveBeenCalled();
+  });
 });

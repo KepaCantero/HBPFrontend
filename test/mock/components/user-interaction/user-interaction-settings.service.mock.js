@@ -6,7 +6,8 @@
       sensitivity: {
         translation: 0.123,
         rotation: 0.456
-      }
+      },
+      defaultMode: 'free-camera'
     }
   };
 

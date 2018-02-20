@@ -13,12 +13,17 @@ describe('Services: userNavigationService', function() {
     avatarControls,
     firstPersonControls,
     lookatRobotControls;
-  var storageServer, simulationInfo, userProfile, roslib, stateService;
+  var simulationInfo,
+    userProfile,
+    roslib,
+    stateService,
+    userInteractionSettingsService,
+    nrpUser;
 
   beforeEach(module('simulationInfoMock'));
   beforeEach(module('userNavigationModule'));
-  beforeEach(module('storageServerMock'));
   beforeEach(module('userInteractionSettingsServiceMock'));
+  beforeEach(module('nrpUserMock'));
 
   // provide mock objects
   beforeEach(
@@ -136,16 +141,16 @@ describe('Services: userNavigationService', function() {
       _avatarControls_,
       _firstPersonControls_,
       _lookatRobotControls_,
-      _storageServer_,
       _simulationInfo_,
       _roslib_,
-      _stateService_
+      _stateService_,
+      _userInteractionSettingsService_,
+      _nrpUser_
     ) {
       userNavigationService = _userNavigationService_;
       NAVIGATION_MODES = _NAVIGATION_MODES_;
       STATE = _STATE_;
       gz3d = _gz3d_;
-      storageServer = _storageServer_;
       $rootScope = _$rootScope_;
 
       camera = _camera_;
@@ -156,6 +161,8 @@ describe('Services: userNavigationService', function() {
       simulationInfo = _simulationInfo_;
       roslib = _roslib_;
       stateService = _stateService_;
+      userInteractionSettingsService = _userInteractionSettingsService_;
+      nrpUser = _nrpUser_;
     });
 
     spyOn(THREE, 'FirstPersonControls').and.returnValue(firstPersonControls);
@@ -190,7 +197,6 @@ describe('Services: userNavigationService', function() {
       'user_avatar_basic_no-collision'
     );
     stateService.currentSate = STATE.STARTED;
-    console.info(stateService.currentSate);
 
     userNavigationService.init();
     $rootScope.$digest();
@@ -205,24 +211,22 @@ describe('Services: userNavigationService', function() {
       jasmine.any(Function)
     );
 
-    expect(storageServer.getCurrentUser).toHaveBeenCalled();
+    expect(nrpUser.getCurrentUser).toHaveBeenCalled();
     expect(userNavigationService.setUserData).toHaveBeenCalledWith(
-      storageServer.currentUser
+      nrpUser.currentUser
     );
     expect(userNavigationService.avatarObjectName).toBe(
-      userNavigationService.avatarNameBase + '_' + storageServer.currentUser.id
+      userNavigationService.avatarNameBase + '_' + nrpUser.currentUser.id
     );
     expect(userNavigationService.userDisplayName).toBe(
-      storageServer.currentUser.displayName
+      nrpUser.currentUser.displayName
     );
 
     expect(userNavigationService.removeAvatar).toHaveBeenCalled();
 
     // check free camera control settings are set as default
     expect(userNavigationService.freeCameraControls).toBe(firstPersonControls);
-    expect(THREE.FirstPersonControls).toHaveBeenCalledWith(
-      gz3d.scene.viewManager.mainUserView
-    );
+    expect(THREE.FirstPersonControls).toHaveBeenCalledWith(gz3d);
     expect(THREE.AvatarControls).toHaveBeenCalledWith(
       userNavigationService,
       gz3d
@@ -236,10 +240,113 @@ describe('Services: userNavigationService', function() {
     expect(gz3d.scene.controls).toBe(userNavigationService.freeCameraControls);
   });
 
+  it(' - init() should establish connection if not connected', function() {
+    stateService.currentSate = STATE.STARTED;
+    let modelInfoTopic = gz3d.iface.modelInfoTopic;
+    gz3d.iface.modelInfoTopic = undefined;
+    let connectionCallback = null;
+    gz3d.iface.emitter.on.and.callFake(function(event, fn) {
+      connectionCallback = fn;
+    });
+
+    userNavigationService.init();
+
+    expect(gz3d.iface.emitter.on).toHaveBeenCalledWith(
+      'connection',
+      jasmine.any(Function)
+    );
+    gz3d.iface.modelInfoTopic = modelInfoTopic;
+    connectionCallback();
+    expect(gz3d.iface.modelInfoTopic.subscribe).toHaveBeenCalledWith(
+      jasmine.any(Function)
+    );
+  });
+
+  it(' - init() should set camera mode according to settings file', function(
+    done
+  ) {
+    stateService.currentSate = STATE.STARTED;
+    let mockSettingsData = {
+      camera: {
+        sensitivity: {
+          translation: 0.123,
+          rotation: 0.456
+        },
+        defaultMode: 'lookatrobot'
+      }
+    };
+    userInteractionSettingsService.settings.then.and.callFake(function(fn) {
+      fn(mockSettingsData);
+    });
+
+    var fakeUserProfile = {
+      id: {
+        replace: jasmine.createSpy('replace')
+      }
+    };
+    nrpUser.getCurrentUser.and.returnValue({
+      then: jasmine.createSpy('then').and.callFake(function(fn) {
+        fn(fakeUserProfile);
+      })
+    });
+
+    userNavigationService.init();
+
+    expect(userNavigationService.setLookatRobotCamera).toHaveBeenCalled();
+    done();
+  });
+
   it(' - deinit()', function() {
     userNavigationService.deinit();
 
     expect(userNavigationService.removeAvatar).toHaveBeenCalled();
+  });
+
+  it(' - update()', function() {
+    userNavigationService.controls = {
+      update: jasmine.createSpy('update')
+    };
+
+    userNavigationService.update(1.2);
+
+    expect(userNavigationService.controls.update).toHaveBeenCalled();
+  });
+
+  it(' - displayHumanNavInfo()', function() {
+    userNavigationService.init();
+
+    stateService.currentState = STATE.PAUSED;
+    userNavigationService.showHumanNavInfoDiv = false;
+    userNavigationService.displayHumanNavInfo();
+
+    expect(userNavigationService.showHumanNavInfoDiv).toBe(true);
+  });
+
+  it(' - isUserAvatar()', function() {
+    userNavigationService.avatarObjectName = 'my_avatar';
+
+    let mockAvatarEntitity = {
+      name: 'some_avatar'
+    };
+    expect(userNavigationService.isUserAvatar(mockAvatarEntitity)).toBe(false);
+    mockAvatarEntitity.name = 'my_avatar';
+    expect(userNavigationService.isUserAvatar(mockAvatarEntitity)).toBe(true);
+  });
+
+  it(' - isActiveNavigationMode()', function() {
+    userNavigationService.navigationMode = NAVIGATION_MODES.FREE_CAMERA;
+
+    expect(
+      userNavigationService.isActiveNavigationMode(
+        NAVIGATION_MODES.LOOKAT_ROBOT
+      )
+    ).toBe(false);
+    expect(
+      userNavigationService.isActiveNavigationMode(NAVIGATION_MODES.HUMAN_BODY)
+    ).toBe(false);
+    expect(
+      userNavigationService.isActiveNavigationMode(NAVIGATION_MODES.FREE_CAMERA)
+    ).toBe(true);
   });
 
   it(' - setUserData()', function() {

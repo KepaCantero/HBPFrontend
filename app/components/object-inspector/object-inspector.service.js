@@ -276,7 +276,6 @@
                 case EDIT_MODE.VIEW:
                   this.removeEventListeners();
                   gz3d.scene.setManipulationMode(mode);
-                  userNavigationService.controls.enabled = true;
                   break;
                 case EDIT_MODE.TRANSLATE:
                 case EDIT_MODE.SCALE:
@@ -308,8 +307,6 @@
                     this.onMouseMove,
                     false
                   );
-
-                  userNavigationService.controls.enabled = false;
 
                   break;
               }

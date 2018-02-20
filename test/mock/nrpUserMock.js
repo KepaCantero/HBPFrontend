@@ -4,9 +4,13 @@
   angular.module('nrpUserMock', []).service('nrpUser', [
     '$q',
     function($q) {
+      this.currentUser = {
+        displayName: 'mockUser',
+        id: 'mockUserID'
+      };
       this.getCurrentUser = jasmine
         .createSpy('getCurrentUser')
-        .and.returnValue($q.when('theUser'));
+        .and.returnValue($q.when(this.currentUser));
       this.getReservation = jasmine.createSpy('getReservation');
       this.isMemberOfClusterReservationGroup = jasmine
         .createSpy('isMemberOfClusterReservationGroup')
