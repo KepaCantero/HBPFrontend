@@ -335,7 +335,7 @@
         .click();
 
       var selectServer = page.find('select[ng-model="exp.devServer"]');
-      expect(selectServer.length).toBe(1);
+      expect(selectServer.length).toBe(0);
     });
 
     it('should show version numbers in dev mode', function() {
@@ -347,7 +347,7 @@
         .click();
 
       var versionLink = page.find('a[name="versionLink"]');
-      expect(versionLink.length).toBe(1);
+      expect(versionLink.length).toBe(0);
     });
 
     it('should not show version numbers in dev mode', function() {
@@ -369,9 +369,8 @@
         .toArray()
         .map(function(elem) {
           return elem.textContent.trim();
-        })
-        .slice(1)
-        .slice(-2);
+        });
+      experimentTitles.pop();
 
       var sortedExperimentNames = _.map(
         defaultPageOptions.experiments,
@@ -406,7 +405,7 @@
         .find('.experiment-box')
         .last()
         .click();
-      checkButtonVisibility(page, 'Launch', 1);
+      checkButtonVisibility(page, 'Launch', 0);
     });
 
     it('should NOT allow launching when NO available server', function() {
@@ -623,10 +622,10 @@
             .first()
             .click();
           checkNewExperimentButtonsVisibility(page, {
-            environment: 1,
+            environment: 0,
             robot: 0,
-            brain: 1,
-            cloneNew: 1
+            brain: 0,
+            cloneNew: 0
           });
         });
 

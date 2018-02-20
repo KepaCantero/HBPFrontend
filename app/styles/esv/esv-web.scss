@@ -81,6 +81,24 @@
   );
 }
 
+.list-entry-container.hover-wizard {
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0.8) 0%,
+    rgba(230, 239, 255, 0.8) 100%
+  );
+}
+
+.list-entry-container.selected-wizard {
+  max-height: unset;
+  min-height: unset;
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0.8) 0%,
+    rgba(230, 239, 255, 0.8) 100%
+  );
+}
+
 .list-entry-container.left-right {
   flex-direction: row;
   min-height: unset;
