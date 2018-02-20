@@ -1,6 +1,6 @@
 <div class="experiment-box" id="newExpWizard" ng-mouseenter="isHovered = true" ng-mouseleave="isHovered = false" ng-mouseup="isHovered = false"
     ng-click="selectNewExperiment();" ng-class="devMode" ng-if="devMode">
-    <div class="list-entry-container left-right" ng-class="{selected: pageState.selected == newExperiment || isHovered}">
+    <div class="list-entry-container left-right" ng-class="{'selected-wizard': pageState.selected == newExperiment, 'hover-wizard':isHovered}">
         <!-- image div -->
         <div class="list-entry-left" ng-class="{selected: pageState.selected == newExperiment}">
             <img src="img/esv/newexp.png">
@@ -35,7 +35,7 @@
                                 <i ng-style="{'color':brainUploaded? 'darkseagreen': ''}" ng-class="{true: 'fa fa-check', false:'fa fa-upload'}[brainUploaded]"></i> Choose Brain
                                 </button>
                                 <br>
-                                <br>                            
+                                <br>
                                 <!-- clone button -->
                                 <div align="center">
                                      <div uib-collapse="!isCloneRequested">
