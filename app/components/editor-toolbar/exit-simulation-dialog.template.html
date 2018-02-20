@@ -16,19 +16,19 @@
                 tooltip-placement="top"
                 ng-click="vm.destroyDialog()">Cancel
             </button>
+            <button class="btn btn-default btn-danger exit-panel-right-button"
+            ng-if="vm.userContextService.isOwner()"
+            ng-disabled="vm.stateService.statePending"
+            tooltip-trigger="mouseenter"
+            tooltip-placement="top"
+            ng-click="vm.destroyDialog();vm.simControlButtonHandler(vm.STATE.STOPPED)"
+            ng-show="(vm.stateService.currentState !== vm.STATE.STOPPED) &&
+                      (vm.stateService.currentState !== vm.STATE.FAILED)">Stop
+            </button>
             <button class="btn btn-default btn-leave exit-panel-right-button"
                 tooltip-trigger="mouseenter"
                 tooltip-placement="top"
                 ng-click="vm.destroyDialog();vm.exit(true)">Leave
-            </button>
-            <button class="btn btn-default btn-danger exit-panel-right-button"
-                ng-if="vm.userContextService.isOwner()"
-                ng-disabled="vm.stateService.statePending"
-                tooltip-trigger="mouseenter"
-                tooltip-placement="top"
-                ng-click="vm.destroyDialog();vm.simControlButtonHandler(vm.STATE.STOPPED)"
-                ng-show="(vm.stateService.currentState !== vm.STATE.STOPPED) &&
-                          (vm.stateService.currentState !== vm.STATE.FAILED)">Stop
             </button>
         </div>
     </div>
