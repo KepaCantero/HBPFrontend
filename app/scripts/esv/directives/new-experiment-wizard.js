@@ -72,11 +72,6 @@
                 .getTemplateModels('robots')
                 .then(robots => {
                   $scope.entities = $scope.parseEntityList(robots.data);
-                  $scope.entities.map(
-                    entity =>
-                      !entity.thumbnail &&
-                      (entity.thumbnail = 'img/esv/robotbody.png')
-                  );
                 });
               $scope.createUploadModal('PrivateStorage');
             },
@@ -86,11 +81,6 @@
                 .getCustomModels('robots')
                 .then(robots => {
                   $scope.entities = $scope.parseEntityList(robots);
-                  $scope.entities.map(
-                    entity =>
-                      !entity.thumbnail &&
-                      (entity.thumbnail = 'img/esv/robotbody.png')
-                  );
                 })
                 .catch(err => {
                   $scope.createErrorPopup(err);
@@ -108,11 +98,6 @@
                 .getTemplateModels('environments')
                 .then(envs => {
                   $scope.entities = $scope.parseEntityList(envs.data);
-                  $scope.entities.map(
-                    entity =>
-                      !entity.thumbnail &&
-                      (entity.thumbnail = 'img/esv/environment.png')
-                  );
                 });
               $scope.createUploadModal('PrivateStorage');
             },
@@ -122,11 +107,6 @@
                 .getCustomModels('environments')
                 .then(environments => {
                   $scope.entities = $scope.parseEntityList(environments);
-                  $scope.entities.map(
-                    entity =>
-                      !entity.thumbnail &&
-                      (entity.thumbnail = 'img/esv/environment.png')
-                  );
                 })
                 .catch(error => {
                   $scope.createErrorPopup(error);
@@ -144,11 +124,6 @@
                 .getTemplateModels('brains')
                 .then(brains => {
                   $scope.entities = $scope.parseEntityList(brains.data);
-                  $scope.entities.map(
-                    entity =>
-                      !entity.thumbnail &&
-                      (entity.thumbnail = 'img/esv/brain.png')
-                  );
                 });
               $scope.createUploadModal('PrivateStorage');
             },
@@ -159,11 +134,6 @@
                 .then(brains => {
                   brains.map(brain => (brain.id = brain.name));
                   $scope.entities = brains;
-                  $scope.entities.map(
-                    entity =>
-                      !entity.thumbnail &&
-                      (entity.thumbnail = 'img/esv/brain.png')
-                  );
                 })
                 .catch(err => {
                   $scope.createErrorPopup(err);

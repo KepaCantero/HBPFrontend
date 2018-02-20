@@ -83,7 +83,7 @@
           id: 'fakeICub',
           thumbnail: ''
         },
-        thumbnail: 'img/esv/robotbody.png',
+        thumbnail: '',
         path: undefined
       });
       expect(scope.entities[1].name).toBe('fakeHusky');
@@ -113,7 +113,7 @@
         name: 'fake3DSpace',
         description: 'fake3DSpace',
         id: { name: 'fake3DSpace', description: 'fake3DSpace', thumbnail: '' },
-        thumbnail: 'img/esv/environment.png',
+        thumbnail: '',
         path: undefined
       });
       expect(scope.entities[1].name).toBe('fakeFZIGround');
@@ -143,7 +143,7 @@
       expect(scope.entities[0]).toEqual({
         name: 'fakeBraitenberg',
         description: 'fakeBraitenberg',
-        thumbnail: 'img/esv/brain.png',
+        thumbnail: '',
         id: 'fakeBraitenberg'
       });
       expect(scope.entities[1].name).toBe('fakeIdleBrain');
@@ -244,7 +244,7 @@
 
       expect(scope.entities[0].name).toEqual('Arm robot force based version');
       expect(scope.entities[1].description).toEqual('First Hollie arm model.');
-      expect(scope.entities[2].thumbnail).toBe('img/esv/robotbody.png');
+      expect(scope.entities[2].thumbnail).toBe('');
       expect(scope.entities.length).toBe(4);
       var mockSelectedEntity = mockProxyResponse.data[0];
       scope.completeUploadEntity(mockSelectedEntity);
@@ -293,7 +293,7 @@
       expect(scope.entityName).toEqual('Environment');
       expect(scope.entities[0].name).toEqual('Fake environment1');
       expect(scope.entities[1].description).toEqual('Fake Description2');
-      expect(scope.entities[2].thumbnail).toBe('img/esv/environment.png');
+      expect(scope.entities[2].thumbnail).toBe('');
       expect(scope.entities.length).toBe(4);
       var mockSelectedEntity = mockProxyResponse.data[0];
       scope.completeUploadEntity(mockSelectedEntity);
@@ -348,7 +348,7 @@
         'This brain is fake, which means that a zombie can get confused while trying to eat it'
       );
       expect(scope.entities[1].name).toEqual('FakeBrain2');
-      expect(scope.entities[1].thumbnail).toBe('img/esv/brain.png');
+      expect(scope.entities[1].thumbnail).toBe('');
       expect(scope.entities.length).toBe(4);
       var mockSelectedEntity = mockProxyResponse.data[0];
       scope.completeUploadEntity(mockSelectedEntity);
