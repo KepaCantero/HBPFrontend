@@ -64,6 +64,10 @@ describe('Directive: smachEditor', function() {
     }
   };
 
+  let downloadFileServiceMock = {
+    downloadFile: jasmine.createSpy()
+  };
+
   var roslibMock = {};
   var returnedConnectionObject = {};
   returnedConnectionObject.subscribe = jasmine.createSpy('subscribe');
@@ -85,6 +89,7 @@ describe('Directive: smachEditor', function() {
       $provide.value('roslib', roslibMock);
       $provide.value('autoSaveService', autoSaveServiceMock);
       $provide.value('saveErrorsService', saveErrorsServiceMock);
+      $provide.value('downloadFileService', downloadFileServiceMock);
     })
   );
 
@@ -222,7 +227,6 @@ describe('Directive: smachEditor', function() {
       );
       backendInterfaceService.deleteStateMachine.calls.mostRecent().args[1]();
       expect(stateMachines.indexOf(sm0)).toBe(-1);
-
       var sm1 = stateMachines[0];
       sm1.local = true;
       isolateScope.delete(sm1);
@@ -234,8 +238,6 @@ describe('Directive: smachEditor', function() {
     });
 
     it('should save state machine code to a file', function() {
-      spyOn(document.body, 'appendChild').and.callThrough();
-      spyOn(document.body, 'removeChild').and.callThrough();
       spyOn(window, 'Blob').and.returnValue({});
       var URLMock = { createObjectURL: jasmine.createSpy('createObjectURL') };
       window.URL = URLMock;
@@ -247,9 +249,7 @@ describe('Directive: smachEditor', function() {
       expect(window.Blob.calls.mostRecent().args[0]).not.toContain(
         'stateMachineName'
       );
-      var link = document.body.appendChild.calls.mostRecent().args[0];
-      expect(link.download).toBe('stateMachines.exd');
-      expect(document.body.removeChild).toHaveBeenCalledWith(link);
+      expect(downloadFileServiceMock.downloadFile).toHaveBeenCalled();
     });
 
     it('should save state machine code to collab', function() {
@@ -285,7 +285,6 @@ describe('Directive: smachEditor', function() {
         { id: '1', code: 'code', error: { errorMsg: 'an error message' } }
       ];
       expect(isolateScope.isSavingToCollab).toEqual(false);
-
       isolateScope.saveSMIntoCollabStorage();
       $rootScope.$digest();
       expect(
@@ -295,12 +294,10 @@ describe('Directive: smachEditor', function() {
       expect(saveErrorsServiceMock.saveDirtyData).toHaveBeenCalled();
       expect(autoSaveServiceMock.clearDirty).toHaveBeenCalled();
       isolateScope.isSavingToCollab = true;
-
       saveErrorsServiceMock.saveDirtyData.calls.reset();
       autoSaveServiceMock.clearDirty.calls.reset();
       backendInterfaceServiceMock.saveStateMachines.calls.reset();
       userResponse = $q.reject(); // no
-
       isolateScope.saveSMIntoCollabStorage();
       $rootScope.$digest();
       expect(
@@ -440,7 +437,6 @@ describe('Directive: smachEditor', function() {
       expect(
         autoSaveServiceMock.registerFoundAutoSavedCallback.calls.count()
       ).toBe(1);
-
       autoSaveServiceMock.registerFoundAutoSavedCallback.calls
         .mostRecent()
         .args[1](autosavedData, false);
@@ -449,7 +445,6 @@ describe('Directive: smachEditor', function() {
       expect(
         backendInterfaceServiceMock.getStateMachines
       ).not.toHaveBeenCalled();
-
       autoSaveServiceMock.registerFoundAutoSavedCallback.calls
         .mostRecent()
         .args[1](autosavedData, true);
@@ -459,7 +454,6 @@ describe('Directive: smachEditor', function() {
       // expect(isolateScope.agreeAction).toHaveBeenCalled();
     });
   });
-
   describe('Editing state machines', function() {
     it('should create state machines properly', function() {
       var numberOfNewStateMachines = 3;
@@ -513,7 +507,6 @@ describe('Directive: smachEditor', function() {
       spyOn(window, 'FileReader').and.returnValue(fileReaderMock);
       spyOn(Date, 'now').and.returnValue(666);
       spyOn(codeEditorsServices, 'getEditor').and.returnValue(editorMock);
-
       isolateScope.loadStateMachine('someFile');
       expect(window.FileReader).toHaveBeenCalled();
       expect(readAsTextSpy).toHaveBeenCalled();
@@ -534,7 +527,6 @@ describe('Directive: smachEditor', function() {
         readAsText: readAsTextSpy
       };
       spyOn(window, 'FileReader').and.returnValue(fileReaderMock);
-
       isolateScope.loadStateMachine({ $error: 'some error' });
       expect(window.FileReader).not.toHaveBeenCalled();
     });

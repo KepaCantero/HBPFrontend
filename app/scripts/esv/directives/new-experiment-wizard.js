@@ -26,6 +26,7 @@
 
   angular.module('exdFrontendApp').directive('newExperimentWizard', [
     '$q',
+    '$window',
     'storageServer',
     'nrpModalService',
     'clbErrorDialog',
@@ -34,6 +35,7 @@
     '$stateParams',
     function(
       $q,
+      $window,
       storageServer,
       nrpModalService,
       clbErrorDialog,
@@ -325,7 +327,7 @@
             $scope.isCloneRequested = true;
             storageServer
               .cloneNew($scope.paths, $stateParams.ctx)
-              .then(() => window.location.reload())
+              .then(() => $window.location.reload())
               .catch(err => $scope.createErrorPopup(err.data))
               .finally(() => ($scope.isCloneRequested = false));
           };

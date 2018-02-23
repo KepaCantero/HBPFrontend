@@ -25,7 +25,6 @@ describe('Services: roslib-angular', function() {
       spyOn(console, 'error');
       var mockToken =
         '[{"access_token":"mockaccesstoken","token_type":"Bearer","state":"mockstate","expires_in":"172799","id_token":"mockidtoken","expires":1432803024,"scopes":["openid"]}]';
-      window.localStorage = {};
       window.localStorage.getItem = jasmine
         .createSpy('getItem')
         .and.returnValue(mockToken);

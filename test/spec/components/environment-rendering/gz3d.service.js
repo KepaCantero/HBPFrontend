@@ -9,7 +9,6 @@ describe('testing the gz3d service', function() {
   var gz3d;
 
   //Mock the javascript document
-  document = {};
   document.getElementById = function() {
     var element = {};
     element.appendChild = function() {};

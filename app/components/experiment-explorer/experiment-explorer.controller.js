@@ -258,7 +258,7 @@
           let link = document.createElement('a');
           link.style.display = 'none';
           document.body.appendChild(link);
-          link.href = window.URL.createObjectURL(response.data);
+          link.href = URL.createObjectURL(response.data);
           link.download = response.filename;
           link.click();
           document.body.removeChild(link);

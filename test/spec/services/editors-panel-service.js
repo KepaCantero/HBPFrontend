@@ -78,7 +78,6 @@ describe('Services: editorsPanelService', function() {
     });
 
     it(' - onLockChanged()', function() {
-      spyOn($window, 'alert').and.callThrough();
       spyOn(editorsPanelService, 'toggleEditors').and.callThrough();
 
       var lockChange = {
@@ -95,7 +94,6 @@ describe('Services: editorsPanelService', function() {
     });
 
     it(' - onTryAddLock()', function() {
-      spyOn($window, 'alert').and.callThrough();
       spyOn(editorsPanelService, 'showEditorsPanel').and.callThrough();
 
       // test failure

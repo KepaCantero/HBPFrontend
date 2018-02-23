@@ -6,7 +6,6 @@ describe('Controller: ExperimentViewController', function() {
     scope,
     log,
     timeout,
-    window,
     stateService,
     simulationInfo,
     contextMenuState,
@@ -83,7 +82,6 @@ describe('Controller: ExperimentViewController', function() {
       $rootScope,
       _$log_,
       _$timeout_,
-      _$window_,
       _simulationInfo_,
       _stateService_,
       _contextMenuState_,
@@ -100,8 +98,6 @@ describe('Controller: ExperimentViewController', function() {
       scope = $rootScope.$new();
       timeout = _$timeout_;
       q = _$q_;
-      window = _$window_;
-      window.location.reload = function() {};
       simulationInfo = _simulationInfo_;
       stateService = _stateService_;
       contextMenuState = _contextMenuState_;

@@ -4,6 +4,9 @@
 (function() {
   'use strict';
 
+  beforeEach(module('exd.templates')); // import html template
+  beforeEach(module('$windowMock'));
+
   angular
     .module('exdFrontendApp')
     .config([

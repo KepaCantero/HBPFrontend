@@ -111,7 +111,7 @@
               });
             };
           }
-          originalSub.call(that, finalCb);
+          originalSub && originalSub.call(that, finalCb);
           return finalCb;
         };
       })(ROSLIB.Topic.prototype.subscribe);

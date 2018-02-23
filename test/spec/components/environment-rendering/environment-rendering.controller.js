@@ -8,7 +8,6 @@ describe('Controller: EnvironmentRenderingController', function() {
     $scope,
     $rootScope,
     log,
-    window,
     stateService,
     gz3d,
     userNavigationService,
@@ -139,7 +138,6 @@ describe('Controller: EnvironmentRenderingController', function() {
       _$element_,
       _$log_,
       _$timeout_,
-      _$window_,
       _simulationInfo_,
       _stateService_,
       _contextMenuState_,
@@ -161,8 +159,6 @@ describe('Controller: EnvironmentRenderingController', function() {
       $rootScope = _$rootScope_;
       log = _$log_;
       $scope = $rootScope.$new();
-      window = _$window_;
-      window.location.reload = function() {};
       stateService = _stateService_;
       gz3d = _gz3d_;
       userNavigationService = _userNavigationService_;

@@ -610,22 +610,23 @@ module.exports = function(grunt) {
     // Test settings
     karma: {
       options: {
-        browsers: ['PhantomJS'],
         configFile: 'test/karma.conf.js',
         singleRun: true,
         browserNoActivityTimeout: 30000,
-        browserDisconnectTolerance: 2
+        browserDisconnectTolerance: 2,
+        specReporter: { failFast: true }
       },
       unit: {
         logLevel: 'ERROR'
       },
       debug: {
-        logLevel: 'DEBUG'
+        logLevel: 'INFO'
       },
       chrome: {
         browsers: ['Chrome'],
         singleRun: false,
-        logLevel: 'OFF'
+        logLevel: 'OFF',
+        specReporter: { failFast: false }
       }
     },
 

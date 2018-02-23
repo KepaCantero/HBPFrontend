@@ -293,7 +293,7 @@ describe('Controller: ExperimentExplorerController', function() {
           MOCKED_DATA.experimentFiles[0].uuid +
           '?byname=false'
       )
-      .respond(200);
+      .respond(new Blob());
 
     controller.downloadFile(MOCKED_DATA.experimentFiles[0]);
 

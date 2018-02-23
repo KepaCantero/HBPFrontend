@@ -93,7 +93,6 @@
       roslib,
       experimentsFactory,
       SERVER_POLL_INTERVAL,
-      $window,
       storageServer,
       $q,
       clbErrorDialog,
@@ -145,7 +144,6 @@
         _roslib_,
         _experimentsFactory_,
         _SERVER_POLL_INTERVAL_,
-        _$window_,
         _storageServer_,
         _$q_,
         _clbErrorDialog_,
@@ -166,7 +164,6 @@
         experimentsFactory = _experimentsFactory_;
         SERVER_POLL_INTERVAL = _SERVER_POLL_INTERVAL_;
         proxyUrl = bbpConfig.get('api.proxy.url');
-        $window = _$window_;
         storageServer = _storageServer_;
         $q = _$q_;
         clbErrorDialog = _clbErrorDialog_;
@@ -635,7 +632,6 @@
             .find('.experiment-box')
             .last()
             .click();
-          spyOn($window.location, 'reload');
           $httpBackend.whenPUT(collabContextlessUrl).respond(200, {});
           page.find('[analytics-event="Clone"]').click();
         });
@@ -792,7 +788,7 @@
           );
           $httpBackend
             .whenGET('http://proxy/storage/fakeUUID/thumbnail.png?byname=true')
-            .respond(200);
+            .respond(new Blob());
         });
 
         it('should select first experiment if only one experiment is shown', function() {

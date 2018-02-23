@@ -291,7 +291,7 @@
 
           // Clean up on leaving
           scope.$on('$destroy', function() {
-            brain3D.terminate();
+            brain3D && brain3D.terminate();
 
             spikeListenerService.stopListening(onNewSpikesMessageReceived);
           });

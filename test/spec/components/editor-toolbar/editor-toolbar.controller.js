@@ -676,8 +676,6 @@ describe('Controller: EditorToolbarController', function() {
     });
 
     it('should go back to the esv-private page when no "ctx" parameter was in the url', function() {
-      spyOn($window.location, 'reload');
-
       environmentService.setPrivateExperiment(false);
       editorToolbarController.exitSimulation(true);
       $timeout.flush();
@@ -753,8 +751,6 @@ describe('Controller: EditorToolbarController', function() {
     });
 
     it('should go back to the esv-private page when a "ctx" parameter was in the url', function() {
-      spyOn($window.location, 'reload');
-
       editorToolbarController.exitSimulation(true);
       $timeout.flush();
       expect(location.path()).toEqual('/esv-private');

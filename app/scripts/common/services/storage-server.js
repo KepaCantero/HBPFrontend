@@ -314,7 +314,7 @@
 
       try {
         let tokens = JSON.parse(storedItem);
-        return tokens[tokens.length - 1].access_token;
+        return tokens.length ? tokens[tokens.length - 1].access_token : null;
       } catch (e) {
         // this token will be rejected by the server and the client will get a proper auth error
         return 'malformed-token';

@@ -81,7 +81,6 @@ describe('Controller: demo-waiting', function() {
     experiments.developementExperiment.joinableServers = [
       { server: 'server', runningSimulation: { state: STATE.PAUSED } }
     ];
-    $httpBackend.flush();
     $timeout.flush(10000);
 
     expect(windowMock.location.href).toContain('experiment-view');

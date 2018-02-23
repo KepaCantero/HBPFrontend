@@ -9,6 +9,7 @@ describe('Panel directives', function() {
   var $rootScope, $compile, httpBackend;
 
   beforeEach(module('exdFrontendApp'));
+  beforeEach(module('simulationInfoMock'));
   beforeEach(
     inject(function(_$rootScope_, _$compile_, _$httpBackend_) {
       $rootScope = _$rootScope_;

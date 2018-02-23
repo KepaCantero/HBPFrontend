@@ -40,6 +40,12 @@
     }
   }
 
+  ApplyForceViewController.$inject = [
+    '$scope',
+    'baseEventHandler',
+    'applyForceService'
+  ];
+
   /**
    * @ngdoc function
    * @name userInteractionModule.controller:ApplyForceViewController
@@ -49,10 +55,5 @@
    */
   angular
     .module('userInteractionModule')
-    .controller('ApplyForceViewController', [
-      '$scope',
-      'baseEventHandler',
-      'applyForceService',
-      (...args) => new ApplyForceViewController(...args)
-    ]);
+    .controller('ApplyForceViewController', ApplyForceViewController);
 })();

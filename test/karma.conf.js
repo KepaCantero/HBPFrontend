@@ -3,6 +3,8 @@
 // Generated on 2014-10-10 using
 // generator-karma 0.8.3
 
+process.env.CHROME_BIN = require('puppeteer').executablePath();
+
 module.exports = function(config) {
   'use strict';
 
@@ -15,7 +17,6 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-      'node_modules/babel-polyfill/dist/polyfill.js',
       'node_modules/chart.js/dist/Chart.min.js',
       'node_modules/rxjs/bundles/Rx.min.js',
 
@@ -95,7 +96,6 @@ module.exports = function(config) {
       'node_modules/d3/d3.min.js',
       'node_modules/n3-charts/build/LineChart.js',
       'test/support/**/*.js',
-      './node_modules/phantomjs-polyfill-find/find-polyfill.js', //phantomjs polyfill forArray.find
       'app/components/**/*.modules.js', // files defining modules first
       'app/scripts/common/filters/time-filters.js', // Make sure modules used in different files are loaded before they are used
       'app/scripts/**/*.js',
@@ -113,26 +113,10 @@ module.exports = function(config) {
       // source files, that you want to generate coverage for
       // do not include tests or libraries
       // (these files will be instrumented by Istanbul)
-      'app/scripts/*/**/*.js': ['babel', 'coverage'],
-      'app/components/**/*.js': ['babel', 'coverage'],
-      'bower_components/gz3d-hbp/gz3d/build/gz3d.js': ['babel'],
+      'app/scripts/*/**/*.js': ['coverage'],
+      'app/components/**/*.js': ['coverage'],
       'app/components/**/*.html': ['ng-html2js'],
       'app/views/**/*.html': ['ng-html2js']
-    },
-
-    babelPreprocessor: {
-      options: {
-        babelrc: false,
-        presets: ['es2015'],
-        sourceMap: 'inline',
-        plugins: ['transform-new-target']
-      },
-      filename: function(file) {
-        return file.originalPath.replace(/\.js$/, '.es5.js');
-      },
-      sourceFileName: function(file) {
-        return file.originalPath;
-      }
     },
 
     ngHtml2JsPreprocessor: {
@@ -149,27 +133,33 @@ module.exports = function(config) {
     // web server port
     port: 9002,
 
-    // Start these browsers, currently available:
-    // - Chrome
-    // - ChromeCanary
-    // - Firefox
-    // - Opera
-    // - Safari (only Mac)
-    // - PhantomJS
-    // - IE (only Windows)
-    browsers: ['Chrome', 'PhantomJS'],
+    browsers: ['ChromeHeadlessNoSandbox'],
     reporters: ['progress', 'junit', 'coverage'],
+    customLaunchers: {
+      ChromeHeadlessNoSandbox: {
+        base: 'ChromeHeadless',
+        flags: ['--no-sandbox']
+      }
+    },
 
     // Which plugins to enable
     plugins: [
-      'karma-phantomjs-launcher',
       'karma-chrome-launcher',
       'karma-jasmine',
-      'karma-babel-preprocessor',
       'karma-coverage',
       'karma-junit-reporter',
-      'karma-ng-html2js-preprocessor'
+      'karma-ng-html2js-preprocessor',
+      'karma-spec-reporter'
     ],
+
+    specReporter: {
+      maxLogLines: 5, // limit number of lines logged per test
+      suppressErrorSummary: false, // do not print error summary
+      suppressFailed: false, // do not print information about failed tests
+      suppressPassed: true, // do not print information about passed tests
+      suppressSkipped: true, // do not print information about skipped tests
+      showSpecTiming: true // print the time elapsed for each spec
+    },
 
     junitReporter: {
       outputDir: 'reports/coverage/',
