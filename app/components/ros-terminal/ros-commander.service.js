@@ -50,6 +50,10 @@
       return this.rosResponsesObservable$;
     }
 
+    completeCommand(cmd) {
+      this.rosConnection.roscmd({ cmd: 'COMPLETE', args: cmd });
+    }
+
     sendCommand(cmd, cmdArgs) {
       this.rosConnection.roscmd({ cmd: cmd, args: cmdArgs });
     }

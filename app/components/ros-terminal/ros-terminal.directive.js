@@ -30,8 +30,11 @@
   const AUTO_SCROLL_MAX_DISTANCE = 50;
 
   const AVAILABLE_COMMANDS = {
-    rostopic: 'Prints information about ROS Topics',
-    rosservice: 'Prints information about ROS Services'
+    rostopic: 'Prints information about ROS Topics.',
+    rosservice: 'Prints information about ROS Services.',
+    rosmsg: '\tPrints information about ROS Message types.',
+    rossrv: '\tPrints information about ROS Service types.',
+    rosnode: '\tPrints information about ROS Nodes.'
   };
   const HEADER_COMMAND = 'Enter "help" for more information.';
   const HELP_COMMAND = [
@@ -109,10 +112,12 @@
               rosCommanderService.sendCommand(cmd, cmdArgs);
             } else if (cmd === 'help') {
               //help command
-              newResponsesReceived(HELP_COMMAND);
+              newResponsesReceived(
+                HELP_COMMAND.map(l => ({ type: 'stdout', data: l }))
+              );
             } else {
-              //unknow cmd
-              addCmd({ type: 'error', data: `Unknown command '${cmd}'` });
+              //unknown cmd
+              addCmd({ type: 'stderr', data: `Unknown command '${cmd}'` });
             }
           };
 
@@ -138,8 +143,60 @@
             });
           };
 
+          let handleCompletionLine = l => {
+            if (l.data.length == 0)
+              //no completion suggestion => do nothing
+              return [];
+
+            let cmds = [];
+            let cmdLine = rosCommandLine.val();
+            if (l.data.length > 1) {
+              //more than one completion suggestion => display suggestions
+              cmds.push({ type: 'cmd', data: cmdLine });
+              for (let suggest of l.data)
+                cmds.push({ type: 'stdout', data: suggest });
+            }
+
+            let calculateCommonPart = arr => {
+              //returns the common part of the strings in the array
+              if (arr.length == 1) return arr[0];
+              arr = [...arr].sort();
+              let a = arr[0],
+                b = arr[arr.length - 1];
+              let i = 0;
+              //we compare 'a' and 'b', the most distinct elements in arr
+              while (i < a.length && a[i] == b[i]) i++;
+              return a.slice(0, i);
+            };
+
+            let commonPart =
+              calculateCommonPart(l.data) + (l.data.length == 1 ? ' ' : '');
+            if (commonPart) {
+              if (cmdLine.endsWith(' '))
+                //new option comes after current cmdLine
+                scope.cmdLine = cmdLine + commonPart;
+              else {
+                //new option replaces last partial word
+                let parts = cmdLine.split(' ');
+                scope.cmdLine =
+                  parts.slice(0, parts.length - 1).join(' ') +
+                  (parts.length > 1 ? ' ' : '') +
+                  commonPart;
+              }
+            }
+
+            return cmds;
+          };
+
           let newResponsesReceived = lines => {
-            addCmd(lines.map(l => ({ type: 'response', data: l })));
+            let cmds = [];
+
+            lines.forEach(l => {
+              if (l.type == 'completion')
+                cmds = [...cmds, ...handleCompletionLine(l)];
+              else cmds.push({ type: l.type, data: l.data });
+            });
+            if (cmds.length) addCmd(cmds);
           };
 
           let click$ = Rx.Observable
@@ -205,11 +262,22 @@
               );
             });
 
+          let completeCommand = () => {
+            rosCommanderService.completeCommand(rosCommandLine.val());
+          };
           //stop current execution on ctrl+c
           let ctrlC$ = Rx.Observable
             .fromEvent($document, 'keydown')
             .filter(e => e.which === 67 && e.ctrlKey) //ctrl+c only
             .subscribe(() => rosCommanderService.stopCurrentExecution());
+
+          let tabKey$ = Rx.Observable
+            .fromEvent(rosCommandLine, 'keydown')
+            .filter(e => e.which === 9) //tab key
+            .subscribe(e => {
+              e.preventDefault();
+              completeCommand();
+            });
 
           //new ros-response received
           let rosResponses$ = rosCommanderService.rosResponses$.subscribe(
@@ -225,6 +293,7 @@
             ctrlC$.unsubscribe();
             rosResponses$.unsubscribe();
             upDownPress$.unsubscribe();
+            tabKey$.unsubscribe();
 
             editorToolbarService.showRosTerminal = false;
           });

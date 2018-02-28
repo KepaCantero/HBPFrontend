@@ -89,7 +89,7 @@ describe('Directive: ros-terminal', function() {
     rosCommandLine.trigger($.Event('keypress', { which: 13 }));
     expect(childScope.commands.length).toBe(3);
     expect(childScope.commands[2]).toEqual({
-      type: 'error',
+      type: 'stderr',
       data: "Unknown command 'wrondcmd'"
     });
   });
@@ -98,7 +98,14 @@ describe('Directive: ros-terminal', function() {
     expect(childScope.commands.length).toBe(1);
     rosCommandLine.val('help');
     rosCommandLine.trigger($.Event('keypress', { which: 13 }));
-    expect(childScope.commands.length).toBe(8);
+    expect(childScope.commands.length).toBe(11);
+  });
+
+  it("should trigger completion on 'tab' keydown", function() {
+    spyOn(rosCommanderService, 'completeCommand').and.callThrough();
+    rosCommandLine.val('rost ');
+    rosCommandLine.trigger($.Event('keydown', { which: 9 }));
+    expect(rosCommanderService.completeCommand).toHaveBeenCalledWith('rost ');
   });
 
   it('should stopCurrentExecution on ctrl+c', function() {
@@ -119,10 +126,10 @@ describe('Directive: ros-terminal', function() {
   beforeEach(module('exd.templates')); // import html template
   beforeEach(module('simulationInfoMock'));
 
-  var $rootScope, $timeout, childScope;
+  let $rootScope, $timeout, childScope, rosResponseObs, rosCommandLine;
 
-  var rosCommanderServiceMock = {
-    rosResponses$: Rx.Observable.of([{ data: ['Server response'] }, true])
+  let rosCommanderServiceMock = {
+    rosResponses$: Rx.Observable.create(obs => (rosResponseObs = obs))
   };
 
   beforeEach(
@@ -140,14 +147,72 @@ describe('Directive: ros-terminal', function() {
       var element = $compile('<ros-terminal></ros-terminal>')($rootScope);
       $rootScope.$digest();
       childScope = element.isolateScope();
+      rosCommandLine = element.find('.ros-command-line');
     })
   );
 
   it('test new message received adds new cmd', function() {
+    rosResponseObs.next([
+      { data: [{ type: 'stdout', data: 'Server response' }] },
+      true
+    ]);
+
     $timeout.flush();
     $rootScope.$digest();
 
     expect(childScope.commands.length).toBe(2);
     expect(childScope.commands[1].data).toBe('Server response');
+  });
+
+  it('should replace command on single response completion', function() {
+    rosCommandLine.val('ros');
+    rosResponseObs.next([
+      { data: [{ type: 'completion', data: ['rostopic'] }] },
+      true
+    ]);
+
+    $timeout.flush();
+    $rootScope.$digest();
+
+    expect(childScope.cmdLine).toBe('rostopic ');
+    expect(childScope.commands.length).toBe(1);
+  });
+
+  it('should replace option on single response completion', function() {
+    rosCommandLine.val('rostopic ');
+    rosResponseObs.next([
+      { data: [{ type: 'completion', data: ['list'] }] },
+      true
+    ]);
+
+    $timeout.flush();
+    $rootScope.$digest();
+
+    expect(childScope.cmdLine).toBe('rostopic list ');
+    expect(childScope.commands.length).toBe(1);
+  });
+
+  it('should showa options on multiple response completion', function() {
+    rosCommandLine.val((childScope.cmdLine = 'rostopic '));
+    rosResponseObs.next([
+      { data: [{ type: 'completion', data: ['list', 'info'] }] },
+      true
+    ]);
+
+    $timeout.flush();
+    $rootScope.$digest();
+
+    expect(childScope.cmdLine).toBe('rostopic ');
+    expect(angular.toJson(childScope.commands)).toEqual(
+      angular.toJson([
+        {
+          type: 'response',
+          data: 'Enter "help" for more information.'
+        },
+        { type: 'cmd', data: 'rostopic ' },
+        { type: 'stdout', data: 'list' },
+        { type: 'stdout', data: 'info' }
+      ])
+    );
   });
 });
