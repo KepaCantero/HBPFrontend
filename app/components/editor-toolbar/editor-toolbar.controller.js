@@ -87,6 +87,8 @@
       this.gz3dViewsService = gz3dViewsService;
       this.rosCommanderService = rosCommanderService;
       this.tipTooltipService = tipTooltipService;
+      this.toolbarMinimized =
+        localStorage.getItem('toolbarMinimized') == 'true';
 
       this.DYNAMIC_VIEW_CHANNELS = DYNAMIC_VIEW_CHANNELS;
       this.EDIT_MODE = EDIT_MODE;
@@ -179,6 +181,14 @@
 
       this.notifyResetToWidgets = function(resetType) {
         $rootScope.$broadcast('RESET', resetType);
+      };
+
+      this.toggleMinimizeToolbar = function() {
+        this.toolbarMinimized = !this.toolbarMinimized;
+        localStorage.setItem(
+          'toolbarMinimized',
+          this.toolbarMinimized ? 'true' : 'false'
+        );
       };
 
       this.resetButtonClickHandler = function() {

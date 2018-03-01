@@ -212,6 +212,13 @@ describe('Controller: EditorToolbarController', function() {
       expect(editorsPanelService.toggleEditors).not.toHaveBeenCalled();
     });
 
+    it('should toggle minize toolbar', function() {
+      editorToolbarController.toolbarMinimized = false;
+      editorToolbarController.toggleMinimizeToolbar();
+
+      expect(editorToolbarController.toolbarMinimized).toBe(true);
+    });
+
     it('should ensure that the state is PAUSED when resetting', function() {
       editorToolbarController.resetButtonClickHandler();
 
