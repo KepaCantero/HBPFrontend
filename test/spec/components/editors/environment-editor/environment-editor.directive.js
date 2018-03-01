@@ -268,6 +268,14 @@ describe('Directive: environment-designer', function() {
     expect($scope.addModel).toHaveBeenCalledWith('box');
   });
 
+  it('should update visible models when toggling category', function() {
+    spyOn($scope, 'updateVisibleModels');
+
+    $scope.toggleVisibleCategory({ visible: true });
+
+    expect($scope.updateVisibleModels).toHaveBeenCalled();
+  });
+
   it('should not spawn models when in INITIALIZED state', function() {
     spyOn($scope, 'addModel');
     spyOn(window.guiEvents, 'emit');

@@ -2,7 +2,7 @@
 
 describe('Services: contextMenuState', function() {
   var contextMenuState, gz3d;
-
+  var dummyModel, dummyItemGroup;
   var gzInitializationMock = {};
   gzInitializationMock.Initialize = jasmine.createSpy('Initialize');
   gzInitializationMock.deInitialize = jasmine.createSpy('deInitialize');
@@ -31,6 +31,26 @@ describe('Services: contextMenuState', function() {
     gz3d.scene = {};
     gz3d.scene.radialMenu = {};
     gz3d.scene.radialMenu.showing = false;
+
+    dummyModel = { name: 'dummyModel' };
+
+    dummyItemGroup = {
+      label: 'Sample',
+      visible: false,
+      items: [
+        {
+          text: 'sampleButton1',
+          callback: function() {
+            return true;
+          },
+          visible: true
+        }
+      ],
+      show: function() {
+        this.visible = true;
+        return true;
+      }
+    };
   });
 
   // check to see if it has the expected function
@@ -49,33 +69,26 @@ describe('Services: contextMenuState', function() {
   });
 
   it('should show menu when calling toggleContextMenu(true)', function() {
-    var dummyModel = { name: 'dummyModel' };
-
-    var dummyItemGroup = {
-      label: 'Sample',
-      visible: false,
-      items: [
-        {
-          text: 'sampleButton1',
-          callback: function() {
-            return true;
-          },
-          visible: true
-        }
-      ],
-      show: function() {
-        this.visible = true;
-        return true;
-      }
-    };
-
     contextMenuState.pushItemGroup(dummyItemGroup); //add a menuItem
 
-    var dummyEvent = { clientX: 0, clientY: 0 };
+    var dummyEvent = {
+      clientX: 0,
+      clientY: 0,
+      view: { innerWidth: 1024, innerHeight: 800 }
+    };
 
     spyOn(contextMenuState, '_getModelUnderMouse').and.returnValue(dummyModel);
 
     gz3d.scene.selectEntity = jasmine.createSpy('selectEntity');
+
+    spyOn(document, 'getElementById').and.callFake(function() {
+      var newElement = document.createElement('div');
+      newElement.style.width = '200px';
+      newElement.style.height = '200px';
+      document.body.appendChild(newElement);
+
+      return newElement;
+    });
 
     //call the function under test
     contextMenuState.toggleContextMenu(true, dummyEvent);
@@ -86,6 +99,35 @@ describe('Services: contextMenuState', function() {
 
     expect(contextMenuState.contextMenuTop).toBe(dummyEvent.clientY);
     expect(contextMenuState.contextMenuLeft).toBe(dummyEvent.clientX);
+  });
+
+  it('should align menu when near the right/bottom of container', function() {
+    contextMenuState.pushItemGroup(dummyItemGroup); //add a menuItem
+
+    var dummyEvent = {
+      clientX: 0,
+      clientY: 0,
+      view: { innerWidth: 0, innerHeight: 0 }
+    };
+
+    spyOn(contextMenuState, '_getModelUnderMouse').and.returnValue(dummyModel);
+
+    gz3d.scene.selectEntity = jasmine.createSpy('selectEntity');
+
+    spyOn(document, 'getElementById').and.callFake(function() {
+      var newElement = document.createElement('div');
+      newElement.style.width = '200px';
+      newElement.style.height = '200px';
+      document.body.appendChild(newElement);
+
+      return newElement;
+    });
+
+    //call the function under test
+    contextMenuState.toggleContextMenu(true, dummyEvent);
+
+    expect(contextMenuState.contextMenuTop).toBe(-200);
+    expect(contextMenuState.contextMenuLeft).toBe(-200);
   });
 
   it('should get the model under the current mouse position', function() {

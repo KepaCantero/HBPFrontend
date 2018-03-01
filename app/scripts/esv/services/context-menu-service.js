@@ -30,7 +30,8 @@
     .factory('contextMenuState', [
       'gz3d',
       'nrpAnalytics',
-      function(gz3d, nrpAnalytics) {
+      '$timeout',
+      function(gz3d, nrpAnalytics, $timeout) {
         return {
           //whether the context menu should be displayed
           isShown: false,
@@ -133,8 +134,41 @@
                 this.isShown = gz3d.scene.radialMenu.showing =
                   model.name !== '' && model.name !== 'plane' && needsRefresh;
 
-                this.contextMenuTop = event.clientY;
-                this.contextMenuLeft = event.clientX;
+                this.checkForContextMenuPosition = () => {
+                  var target = document.getElementById('contextmenu');
+
+                  if (this.isShown) {
+                    if (!target.clientHeight) {
+                      $timeout(this.checkForContextMenuPosition);
+                    } else {
+                      if (
+                        event.clientY + target.clientHeight >
+                        event.view.innerHeight - 10
+                      ) {
+                        this.contextMenuTop =
+                          event.clientY - target.clientHeight;
+                      } else {
+                        this.contextMenuTop = event.clientY;
+                      }
+
+                      if (
+                        event.clientX + target.clientWidth >
+                        event.view.innerWidth - 10
+                      ) {
+                        this.contextMenuLeft =
+                          event.clientX - target.clientWidth;
+                      } else {
+                        this.contextMenuLeft = event.clientX;
+                      }
+                    }
+                  }
+                };
+
+                this.contextMenuTop = -10000; // Need to wait for angular to compute the clientHeight before we can find the best position
+                this.contextMenuLeft = -10000; // (see checkForContextMenuPosition)
+
+                this.checkForContextMenuPosition();
+
                 gz3d.scene.selectEntity(model);
               }
             } else {
