@@ -37,7 +37,7 @@
                     <i class="glyphicon glyphicon glyphicon-repeat"></i>
                 </div>
 
-                <div class="hbp-toolbar-action" help-tooltip="EXIT_BUTTON" ng-click="vm.hideTooltip();vm.openExitDialog()" uib-tooltip="Leave the simulation"
+                <div class="hbp-toolbar-action" help-tooltip="EXIT_BUTTON" ng-click="vm.demoMode ? vm.exit() : vm.exitDialog()" uib-tooltip="Leave the simulation"
                     tooltip-placement="top-right" tooltip-popup-delay="2000" tooltip-popup-close-delay="300">
                     <i class="fa fa-sign-out fa-2x vertcenter"></i>
                 </div>
