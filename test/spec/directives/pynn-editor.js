@@ -527,13 +527,19 @@ describe('Directive: pynnEditor', function() {
       ).toEqual('pynnBrain.py');
     });
 
-    it('should set the pynnScript when one uploads a file', function(done) {
+    it('should set the pynnScript when one uploads a file', () => {
+      spyOn(window, 'FileReader').and.callFake(() => {
+        let fileReader = {
+          readAsText: text => fileReader.onload({ target: { result: text } })
+        };
+
+        return fileReader;
+      });
+
       var newPynnScript = 'new_pynn_script';
-      isolateScope.uploadFile(new Blob([newPynnScript]));
-      setTimeout(function() {
-        expect(isolateScope.pynnScript.code).toBe(newPynnScript);
-        done();
-      }, 100);
+      isolateScope.uploadFile(newPynnScript);
+
+      expect(isolateScope.pynnScript.code).toBe(newPynnScript);
     });
   });
 });
