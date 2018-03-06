@@ -36,7 +36,8 @@
     "angular-deferred-bootstrap": "0.1.9",
     "angular-moment": "1.0.1",
     "hello": "1.14.0",
-    "three.js": "0.89"
+    "three.js": "0.89",
+    "angular-tree-control": "0.2.28"
   },
   "overrides": {
     "angular-hbp-collaboratory": {

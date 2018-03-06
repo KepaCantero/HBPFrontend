@@ -90,6 +90,7 @@ module.exports = function(config) {
       'bower_components/angular-bootstrap/ui-bootstrap-tpls.js',
       'bower_components/hello/dist/hello.all.js',
       'bower_components/angular-hbp-collaboratory/angular-hbp-collaboratory.js',
+      'bower_components/angular-tree-control/angular-tree-control.js',
       'bower_components/angular-mocks/angular-mocks.js',
       // endbower
 

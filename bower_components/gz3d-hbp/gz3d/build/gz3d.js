@@ -6340,6 +6340,8 @@ GZ3D.GZIface.prototype.createSensorFromMsg = function(sensor,modelName)
 {
   var sensorObj = new THREE.Object3D();
   sensorObj.name = sensor.name;
+  sensorObj.userData.gazeboType = 'sensor';
+  sensorObj.userData.sensorType = sensor.type;
   sensorObj._sensorSource = sensor;
 
   if (sensor.pose) {
