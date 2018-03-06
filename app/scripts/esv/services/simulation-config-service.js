@@ -71,9 +71,7 @@
                   .getFileContent(simulationInfo.experimentID, filename, true)
                   .then(
                     file =>
-                      file.uuid
-                        ? file.data
-                        : getBackendConfigFile(response.file)
+                      file.uuid ? file.data : $q.reject(`${filename} not found`)
                   );
               } else {
                 return getBackendConfigFile(response.file);

@@ -27,11 +27,25 @@
   angular.module('exdFrontendApp').controller('brainvisualizerPanelCtrl', [
     '$rootScope',
     '$scope',
+    '$timeout',
     'simulationInfo',
     'editorToolbarService',
-    function($rootScope, $scope, simulationInfo, editorToolbarService) {
+    function(
+      $rootScope,
+      $scope,
+      $timeout,
+      simulationInfo,
+      editorToolbarService
+    ) {
       $scope.simulationID = simulationInfo.simulationID;
       $scope.serverBaseUrl = simulationInfo.serverBaseUrl;
+
+      this.showBrainVisualiser = true;
+
+      this.reloadBrainVisuzalizer = () => {
+        this.showBrainVisualiser = false;
+        $timeout(() => (this.showBrainVisualiser = true));
+      };
 
       $scope.$on(
         '$destroy',

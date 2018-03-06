@@ -8,16 +8,22 @@ describe('Controller: brainvisualizerPanelCtrl', function() {
   beforeEach(module('gz3dMock'));
   beforeEach(module('simulationInfoMock'));
 
-  var scope, rootScope, editorToolbarService;
+  let scope, rootScope, editorToolbarService, controller, $timeout;
 
   // Initialize the controller and a mock scope
   beforeEach(
-    inject(function($controller, $rootScope, _editorToolbarService_) {
+    inject(function(
+      $controller,
+      $rootScope,
+      _$timeout_,
+      _editorToolbarService_
+    ) {
       rootScope = $rootScope;
+      $timeout = _$timeout_;
       scope = $rootScope.$new();
       editorToolbarService = _editorToolbarService_;
 
-      $controller('brainvisualizerPanelCtrl', {
+      controller = $controller('brainvisualizerPanelCtrl', {
         $rootScope: rootScope,
         $scope: scope
       });
@@ -35,5 +41,14 @@ describe('Controller: brainvisualizerPanelCtrl', function() {
     rootScope.$digest();
 
     expect(editorToolbarService.isBrainVisualizerActive).toBeFalsy();
+  });
+
+  it('Should toggle showBrainVisualiser value', () => {
+    expect(controller.showBrainVisualiser).toBe(true);
+    controller.reloadBrainVisuzalizer();
+    expect(controller.showBrainVisualiser).toBe(false);
+
+    $timeout.flush();
+    expect(controller.showBrainVisualiser).toBe(true);
   });
 });
