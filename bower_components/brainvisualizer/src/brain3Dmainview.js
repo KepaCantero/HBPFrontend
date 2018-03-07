@@ -206,7 +206,7 @@ BRAIN3D.MainView.prototype.initUserData = function (userData) // Init user data,
             for (i = 0; i < userData['brain_lod'].length; i++)
             {
                 var lod = (userData['brain_lod'][i]);
-                if ('positions' in lod && lod['positions'])                    
+                if ('positions' in lod && lod['positions'])
                 {
                     sortedLodLength.push(lod['positions'].length);
                 }
@@ -222,7 +222,7 @@ BRAIN3D.MainView.prototype.initUserData = function (userData) // Init user data,
                     for (j = 0; j < userData['brain_lod'].length; j++)
                     {
                         var lod = (userData['brain_lod'][j]);
-                        if ('positions' in lod && lod['positions'] && lod['positions'].length === sortedLodLength[i])                    
+                        if ('positions' in lod && lod['positions'] && lod['positions'].length === sortedLodLength[i])
                         {
                             this.userData = lod;
                             break;
@@ -290,40 +290,19 @@ BRAIN3D.MainView.prototype.normalizeUserShapeSize = function () // If user provi
         }
         else if (this.userData.populations)
         {
-            var maxLength2 = 0;
-            var k, populationNames = Object.keys(this.userData.populations);
+            // maxLength2 = max(n.x^2 + n.y^2 + n.z^2) for n in neuros
+            let maxLength2 = _.reduce(this.userData.populations, (max, pop) => {
+              let neuronsMax = _.reduce(pop.neurons, (max, n) => Math.max(max, n.pos.reduce((a, p)=>a+Math.pow(p, 2), 0)), 0);
+              return Math.max(max, neuronsMax);
+            }, 0) / (3* (this.userData.scale || 1));
 
-            for (k = 0; k < populationNames.length; k++)
-            {
-                var pos = this.userData.populations[populationNames[k]].positions;
-
-                for (var i = 0; i < pos.length; i++)
-                {
-                    var p = pos[i];
-                    var l2 = p[0] * p[0] + p[1] * p[1] + p[2] * p[2];
-
-                    if (l2 > maxLength2)
-                    {
-                        maxLength2 = l2;
-                    }
-                }
-            }
-
-            if (maxLength2 > 0.0)
+            if (maxLength2>0)
             {
                 maxLength2 = Math.sqrt(maxLength2);
 
-                for (k = 0; k < populationNames.length; k++)
-                {
-                    var pos = this.userData.populations[populationNames[k]].positions;
-
-                    for (var i = 0; i < pos.length; i++)
-                    {
-                        pos[i][0] /= maxLength2;
-                        pos[i][1] /= maxLength2;
-                        pos[i][2] /= maxLength2;
-                    }
-                }
+                _.forEach(this.userData.populations, pop =>
+                    _.forEach(pop.neurons, n =>  n.pos = n.pos.map(p=>p/=maxLength2))
+                );
             }
         }
     }
@@ -548,15 +527,16 @@ BRAIN3D.MainView.prototype.init3DBrain = function ()     // Init brain 3D object
     }
 
     if (this.userData && this.userData.populations)
-    {        
+    {
         defaultDist = BRAIN3D.REP_DISTRIBUTION_DISTRIBUTE;
     }
-        
+
 
     this.neuronRepresentation = new BRAIN3D.NeuroRepresentation(this, defaultShape, defaultDist);
 
     this.resetCameraZoom();
     this.updateInnerMasks();
+    this.updatePopulationVisibility();
 };
 
 BRAIN3D.MainView.prototype.initImages = function ()        // Init images
@@ -830,7 +810,6 @@ BRAIN3D.MainView.prototype.setColorMap = function (colormap)
     this.colormap = colormap;
     this.updateParticleColors();
     this.setDisplayType(this.displayType);  // Force a display type update
-    this.updatePopulationVisibility();
 };
 
 BRAIN3D.MainView.prototype.setDistribution = function (distribution)
@@ -851,6 +830,12 @@ BRAIN3D.MainView.prototype.setDistribution = function (distribution)
 BRAIN3D.MainView.prototype.setShape = function (shape)
 {
     this.neuronRepresentation.setShape(shape);
+    this.updatePopulationVisibility();
+
+    if (this.displayType === BRAIN3D.DISPLAY_TYPE_BLENDED)
+    {
+        this.updateInnerMasks();
+    }
 };
 
 BRAIN3D.MainView.prototype.setDisplayType = function (st)
@@ -918,6 +903,23 @@ BRAIN3D.MainView.prototype.accDecCurve = function (pos)
     }
 
     return pos;
+}
+
+BRAIN3D.MainView.prototype.getCurrentUserdata = function ()
+{
+    let populations = {};
+    for (let p of this.particles) {
+        do {
+            if (!(pop =populations[p.population.name]))
+                pop = populations[p.population.name] = {neurons:{}, color: p.population.color};
+
+            pop.neurons[p.index]={ pos:[p.x, p.y, p.z] , size: p.size};
+            //pop.positions.push([p.x, p.y, p.z])
+            p = p.nextlevel;
+        } while(p);
+    }
+
+    return {populations, scale:1};
 }
 
 BRAIN3D.MainView.prototype.processAnimation = function ()
@@ -1157,19 +1159,30 @@ BRAIN3D.MainView.prototype.updateInnerMasks = function ()
     var doMasks = this.neuronRepresentation.distrib === BRAIN3D.REP_DISTRIBUTION_OVERLAP &&
         this.colormap !== BRAIN3D.COLOR_MAP_USER;
 
-    for (var i = 0; i < this.particles.length; i++)
-    {
-        var p = this.particles[i];
-        while (p)
-        {
-            var c = p.population.color3D;
+        if (this.neuronRepresentation.shape == BRAIN3D.REP_SHAPE_USER){
+            //set all masks to 1(ring mode), except for the smallest neuron per position
+            this.geometry.attributes.innermask.array = this.geometry.attributes.innermask.array.map(()=>1)
+            let groups = _.groupBy(this.particles.map((p, i)=>({p,i})), ({p})=>p.tx+"."+p.ty+"."+p.tz);
+            _.forEach(groups, g=>{
+                g.sort((a, b)=>a.p.userSize-b.p.userSize)
+                this.geometry.attributes.innermask.array[g[0].i] = 0;
+            });
 
-            this.geometry.attributes.innermask.array[buffi] = p.nextlevel !== null ? doMasks : 0.0;
+        }else{
+            for (var i = 0; i < this.particles.length; i++)
+            {
+                var p = this.particles[i];
+                while (p)
+                {
+                    var c = p.population.color3D;
 
-            p = p.nextlevel;
-            buffi += 1;
+                    this.geometry.attributes.innermask.array[buffi] =  p.nextlevel !== null ? doMasks : 0.0;
+
+                    p = p.nextlevel;
+                    buffi += 1;
+                }
+            }
         }
-    }
 
     this.geometry.attributes.innermask.needsUpdate = true;
 };
@@ -1265,6 +1278,8 @@ BRAIN3D.MainView.prototype.updatePopulationVisibility = function ()
 {
     this.needsAnimationPass = true;
 
+    let userSize = this.neuronRepresentation && this.neuronRepresentation.shape == BRAIN3D.REP_SHAPE_USER;
+
     for (var i = 0; i < this.particles.length; i++)
     {
         var p = this.particles[i];
@@ -1276,7 +1291,10 @@ BRAIN3D.MainView.prototype.updatePopulationVisibility = function ()
 
             if (p.population.visible)
             {
-                nsize = 1.0 - ((level - 1.0) * BRAIN3D.OVERLAPPING_NEURONS_RESIZE_FACTOR);
+                if (userSize)
+                    nsize = p.userSize;
+                else
+                    nsize = 1.0 - ((level - 1.0) * BRAIN3D.OVERLAPPING_NEURONS_RESIZE_FACTOR);
                 level++;
             }
             else

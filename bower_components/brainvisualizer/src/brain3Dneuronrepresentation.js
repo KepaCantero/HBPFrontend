@@ -83,7 +83,7 @@ BRAIN3D.NeuroRepresentation.prototype.updateRadius = function ()
     {
         var f;
 
-        f = this.mainView.particles.length / (partEnd - partStart);            
+        f = this.mainView.particles.length / (partEnd - partStart);
 
         this.radius = minRadius + (f * (maxRadius - minRadius));
     }
@@ -147,6 +147,9 @@ BRAIN3D.NeuroRepresentation.prototype.setDistribution = function (distrib)
         {
             newPartList = newPartList.concat(partperpop[popnames[p]]);
         }
+
+        if (this.shape == BRAIN3D.REP_SHAPE_USER)
+            newPartList.sort((a, b)=>b.userSize-a.userSize);
     }
 
 
@@ -166,7 +169,7 @@ BRAIN3D.NeuroRepresentation.prototype.setShape = function (shape)
 {
     this.shape = shape;
 
-    if (this.mainView.particles.length <= 4)    // Special case for low number of particles
+    if (this.mainView.particles.length <= 4 && shape !=  BRAIN3D.REP_SHAPE_USER)    // Special case for low number of particles
     {
         this.applyLowNeuronShape();
         return;
@@ -193,7 +196,7 @@ BRAIN3D.NeuroRepresentation.prototype.setShape = function (shape)
         case BRAIN3D.REP_SHAPE_USER:
             this.applyUserShape();
             break;
-            
+
     }
 
 };
@@ -756,39 +759,48 @@ BRAIN3D.NeuroRepresentation.prototype.applyUserShape = function ()
     }
     else
     {
-        var popnames = Object.getOwnPropertyNames(this.mainView.populations);
-        var p;
-
-        for (p = 0; p < popnames.length; p++)
-        {
-            var pop = this.mainView.populations[popnames[p]];
-
+        if(this.mainView.populations)
             if (userPosPerPop)
-            {
-                userPos = userPosPerPop[popnames[p]].positions;
-            }
-
-            for (var i = 0; i < particles.length; i++)
-            {
-                var pa = particles[i];
-                if (pa.population === pop)
-                {
-                    var dx = userPos[pa.index][0] * this.radius;
-                    var dy = userPos[pa.index][1] * this.radius;
-                    var dz = userPos[pa.index][2] * this.radius;
-    
+                for (let pa of particles) {
                     do
                     {
-                        pa.tx = dx;
-                        pa.ty = dy;
-                        pa.tz = dz;
-                        pa.xyzInterpolant = 0;
+                        let pop  = userPosPerPop[pa.population.name];
+                        if (pop){
+                            let neuron = pop.neurons[pa.index]
+                            if (neuron){
+                                pa.tx = neuron.pos[0] * this.radius;
+                                pa.ty = neuron.pos[1] * this.radius;
+                                pa.tz = neuron.pos[2] * this.radius;
+                                pa.userSize = neuron.size || 1;
+                                //pa.sizeInterpolant = 1;
+                                pa.xyzInterpolant = 0;
+                            }
+                        }
                         pa = pa.nextlevel;
-                    }
-                    while (pa);
+                    }while (pa);
+
                 }
-            }
-        }
+            else
+                _.forEach(this.mainView.populations, pop =>{
+                    for (let pa of particles) {
+                        if (pa.population === pop)
+                        {
+                            var dx = userPos[pa.index][0] * this.radius;
+                            var dy = userPos[pa.index][1] * this.radius;
+                            var dz = userPos[pa.index][2] * this.radius;
+
+                            do
+                            {
+                                pa.tx = dx;
+                                pa.ty = dy;
+                                pa.tz = dz;
+                                pa.xyzInterpolant = 0;
+                                pa = pa.nextlevel;
+                            }
+                            while (pa);
+                        }
+                    }
+                });
     }
 };
 

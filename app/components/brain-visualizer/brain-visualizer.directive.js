@@ -40,11 +40,14 @@
           'components/brain-visualizer/brain-visualizer.template.html',
         restrict: 'E',
         scope: {
-          data: '='
+          data: '=',
+          reload: '&'
         },
         link: function(scope, element) {
           var brain3D;
           var brainContainer = element.find('.esv-brainvisualizer-main');
+
+          scope.BRAIN3D = BRAIN3D;
 
           scope.initializing = true;
           scope.minMaxClippingSliderValue = 0;
@@ -86,7 +89,7 @@
             if (brain3D) {
               brain3D.updateData(data);
             } else {
-              brain3D = new BRAIN3D.MainView(
+              scope.brain3D = brain3D = new BRAIN3D.MainView(
                 brainContainer[0],
                 data,
                 'img/brainvisualizer/brain3dballsimple256.png',
@@ -105,6 +108,17 @@
             scope.initializing = false;
           };
 
+          scope.exportNeuronsPositions = () => {
+            let userdata = brain3D.getCurrentUserdata();
+            simulationConfigService
+              .saveConfigFile(
+                'brainvisualizer',
+                JSON.stringify(userdata, null, '\t')
+              )
+              .then(() => scope.reload())
+              .catch(err => alert(`Failed to save settings: \n${err}`));
+          };
+
           scope.initWithPopulations = function() {
             backendInterfaceService.getPopulations(function(response) {
               if (response.populations) {
@@ -116,14 +130,20 @@
                 for (var i in response.populations) {
                   if (response.populations.hasOwnProperty(i)) {
                     var pop = response.populations[i];
+                    let userPopColor =
+                      data.userData &&
+                      data.userData.populations &&
+                      data.userData.populations[pop.name] &&
+                      data.userData.populations[pop.name].color;
                     var newPop = {};
                     newPop.list = pop.indices;
                     newPop.gids = pop.gids;
 
                     newPop.color =
+                      userPopColor ||
                       'hsl(' +
-                      i / (response.populations.length + 1) * 360.0 +
-                      ',100%,80%)';
+                        i / (response.populations.length + 1) * 360.0 +
+                        ',100%,80%)';
                     newPop.name = pop.name;
                     newPop.visible = true;
 
@@ -137,13 +157,6 @@
                 scope.userFile = brain3D.userData;
 
                 if (scope.userFile) {
-                  if (
-                    scope.shapes[scope.shapes.length - 1] !==
-                    BRAIN3D.REP_SHAPE_USER
-                  ) {
-                    scope.shapes.push(BRAIN3D.REP_SHAPE_USER);
-                  }
-
                   scope.currentValues.currentShape = BRAIN3D.REP_SHAPE_USER;
 
                   if (scope.userFile.populations) {
@@ -172,9 +185,14 @@
                   simulationConfigService
                     .loadConfigFile('brainvisualizer')
                     .then(function(file) {
-                      var brainVisualizerUserData = JSON.parse(file);
-                      scope.userFile = brainVisualizerUserData;
-
+                      try {
+                        if (file) {
+                          var brainVisualizerUserData = JSON.parse(file);
+                          scope.userFile = brainVisualizerUserData;
+                        }
+                      } finally {
+                        angular.noop;
+                      }
                       scope.initWithPopulations();
                     })
                     .catch(function() {

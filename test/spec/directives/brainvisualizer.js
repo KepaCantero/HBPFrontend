@@ -4,7 +4,9 @@ describe('Directive: brainvisualizer', function() {
   var $rootScope, RESET_TYPE;
 
   var spikeListenerServiceMock = {};
+
   var simulationConfigServiceMock = {};
+
   var backendInterfaceServiceMock = {};
 
   beforeEach(module('exdFrontendApp'));
@@ -141,6 +143,7 @@ describe('Directive: brainvisualizer', function() {
             setPaused: function(p) {
               _$rootScope_.pausedState = p;
             },
+            getCurrentUserdata: () => {},
             setDistribution: function(p) {
               _$rootScope_.distribution = p;
             },
@@ -277,6 +280,15 @@ describe('Directive: brainvisualizer', function() {
       $rootScope.$digest();
 
       expect(window.BRAIN3D.MainView).toHaveBeenCalled();
+    });
+
+    it('export neurons position', function() {
+      simulationConfigServiceMock.saveConfigFile = jasmine
+        .createSpy('saveConfigFile')
+        .and.returnValue(window.$q.resolve());
+      $rootScope.$digest();
+      $rootScope.$$childTail.exportNeuronsPositions();
+      expect(simulationConfigServiceMock.saveConfigFile).toHaveBeenCalled();
     });
   });
 
