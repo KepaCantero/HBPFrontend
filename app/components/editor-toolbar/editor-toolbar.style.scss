@@ -24,16 +24,37 @@
 
 .esv-overlay {
   width: 100%;
+  height: auto;
 }
 
 .hbp-toolbar {
-  overflow-x: auto;
-  height: 43px;
-  box-sizing: content-box;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  border: 2px solid #f3f3f3;
+  box-shadow: 2px 5px 11px 0px;
+  border-radius: 6px;
+  background: linear-gradient(to right bottom, #e2e2e2, #eaeaea);
+  min-width: 165px;
+}
+
+.hbp-top-bar-button {
+  width: 15;
+  height: 16;
+  font-size: 17px;
+  margin-right: 2px;
+  color: #868686;
+  cursor: pointer;
 }
 
 .hbp-toolbar-action {
-  position: relative;
+  flex-grow: 1;
+  border-right: none;
+  border: 1px solid #9c9c9c;
+  border-radius: 4px;
+  margin: 1px;
+  background: linear-gradient(to right bottom, white, #ececec);
+  width: 50px;
 }
 
 .vertcenter {
@@ -83,4 +104,20 @@
 
 ::ng-deep .tooltip.top.fade.top-right.in {
   margin-right: 5px;
+}
+
+.hbp-toolbar-topbar {
+  height: 20px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.hbp-toolbar-camera-popup {
+  position: fixed;
+  width: 52px;
+  margin-top: -170px;
+  margin-left: -2px;
+  background-color: #848484;
+  z-index: 400;
+  box-shadow: 0px 0px 30px #000000;
 }
