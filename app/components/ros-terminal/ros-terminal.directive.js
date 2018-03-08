@@ -25,7 +25,7 @@
 (function() {
   'use strict';
 
-  const MAX_VISIBLE_LINES = 200;
+  const MAX_VISIBLE_LINES = 2000;
   const MAX_CMD_HISTORY = 100;
   const AUTO_SCROLL_MAX_DISTANCE = 50;
 
@@ -36,7 +36,6 @@
     rossrv: '\tPrints information about ROS Service types.',
     rosnode: '\tPrints information about ROS Nodes.'
   };
-  const HEADER_COMMAND = 'Enter "help" for more information.';
   const HELP_COMMAND = [
     'The ROS terminal is a shell where you can execute ROS commands.',
     'Supported commands: ',
@@ -60,8 +59,7 @@
           close: '&closeFn'
         },
         link: (scope, $element) => {
-          //initial command
-          scope.commands = [{ type: 'response', data: HEADER_COMMAND }];
+          scope.commands = [];
 
           const commandList = $element.find('.ros-command-list')[0];
           const rosCommandLine = $element.find('.ros-command-line');
@@ -83,7 +81,7 @@
             } catch (e) {
               angular.noop();
             }
-            return ['help', 'rostopic']; //default cmd history
+            return ['help']; //default cmd history
           };
 
           let cmdHistory = loadhistory();
@@ -97,6 +95,8 @@
           };
 
           let handleCommand = cmdLine => {
+            if (!cmdLine.trim()) return;
+
             addCmd({ type: 'cmd', data: cmdLine });
             scope.cmdLine = '';
             cmdLine = cmdLine.trim();
@@ -132,6 +132,8 @@
             scope.commands.push(...cmds);
             //remove extra cmds
             scope.commands.splice(0, scope.commands.length - MAX_VISIBLE_LINES);
+
+            rosCommanderService.setSessionLog(scope.commands);
 
             $timeout(() => {
               //set vertical scroll to bottom
@@ -270,6 +272,9 @@
             .fromEvent($document, 'keydown')
             .filter(e => e.which === 67 && e.ctrlKey) //ctrl+c only
             .subscribe(() => rosCommanderService.stopCurrentExecution());
+
+          //initial command
+          addCmd(rosCommanderService.getSessionLog());
 
           let tabKey$ = Rx.Observable
             .fromEvent(rosCommandLine, 'keydown')

@@ -25,8 +25,11 @@
 (function() {
   'use strict';
 
+  const HEADER_COMMAND = 'Enter "help" for more information.';
+
   class RosCommanderService {
     constructor(roslib, simulationInfo) {
+      this.sessionLog = [{ type: 'response', data: HEADER_COMMAND }];
       let server = simulationInfo.serverConfig.rosbridge.websocket;
       this.rosConnection = roslib.getOrCreateConnectionTo(server);
 
@@ -48,6 +51,14 @@
 
     get rosResponses$() {
       return this.rosResponsesObservable$;
+    }
+
+    setSessionLog(cmdsLog) {
+      this.sessionLog = cmdsLog;
+    }
+
+    getSessionLog() {
+      return this.sessionLog;
     }
 
     completeCommand(cmd) {

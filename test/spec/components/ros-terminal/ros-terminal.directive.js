@@ -55,13 +55,9 @@ describe('Directive: ros-terminal', function() {
   it('should up/down keys should brose cmd history', function() {
     expect(childScope.cmdLine).toBe('');
     rosCommandLine.trigger($.Event('keydown', { which: 38 })); // navigate to 1st item in cmd history
-    expect(childScope.cmdLine).toBe('rostopic');
-    rosCommandLine.trigger($.Event('keydown', { which: 38 })); // navigate to 2nd item in cmd history
     expect(childScope.cmdLine).toBe('help');
     rosCommandLine.trigger($.Event('keydown', { which: 38 })); // already at the top of history, no change
     expect(childScope.cmdLine).toBe('help');
-    rosCommandLine.trigger($.Event('keydown', { which: 40 })); // navigate to 1st item
-    expect(childScope.cmdLine).toBe('rostopic');
     rosCommandLine.trigger($.Event('keydown', { which: 40 })); // navigate to new cmdline
     expect(childScope.cmdLine).toBe('');
     rosCommandLine.trigger($.Event('keydown', { which: 40 })); // already new cmdline, no change
@@ -129,7 +125,13 @@ describe('Directive: ros-terminal', function() {
   let $rootScope, $timeout, childScope, rosResponseObs, rosCommandLine;
 
   let rosCommanderServiceMock = {
-    rosResponses$: Rx.Observable.create(obs => (rosResponseObs = obs))
+    rosResponses$: Rx.Observable.create(obs => (rosResponseObs = obs)),
+    setSessionLog: jasmine.createSpy('setSessionLog'),
+    getSessionLog: jasmine
+      .createSpy('getSessionLog')
+      .and.returnValue([
+        { type: 'response', data: 'Enter "help" for more information.' }
+      ])
   };
 
   beforeEach(
