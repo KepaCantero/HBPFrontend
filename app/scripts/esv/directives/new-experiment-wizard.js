@@ -33,6 +33,7 @@
     '$http',
     'newExperimentProxyService',
     '$stateParams',
+    '$timeout',
     function(
       $q,
       $window,
@@ -41,7 +42,8 @@
       clbErrorDialog,
       $http,
       newExperimentProxyService,
-      $stateParams
+      $stateParams,
+      $timeout
     ) {
       return {
         templateUrl: 'views/esv/new-experiment-wizard.html',
@@ -82,6 +84,9 @@
               storageServer
                 .getCustomModels('robots')
                 .then(robots => {
+                  robots.map(
+                    robot => (robot.path = decodeURIComponent(robot.path))
+                  );
                   $scope.entities = $scope.parseEntityList(robots);
                 })
                 .catch(err => {
@@ -103,12 +108,23 @@
                 });
               $scope.createUploadModal('PrivateStorage');
             },
-            uploadFromPrivateStorage: function() {
+            uploadFromPrivateStorage: function(customModel = undefined) {
               delete $scope.entities;
               storageServer
                 .getCustomModels('environments')
                 .then(environments => {
+                  environments.map(env => {
+                    env.path = decodeURIComponent(env.path);
+                    env.custom = true;
+                  });
                   $scope.entities = $scope.parseEntityList(environments);
+                  if (customModel) {
+                    let selectedModel = {};
+                    selectedModel.id = environments.filter(item =>
+                      item.path.includes(customModel)
+                    )[0];
+                    $scope.selectEntity(selectedModel);
+                  }
                 })
                 .catch(error => {
                   $scope.createErrorPopup(error);
@@ -134,8 +150,10 @@
               storageServer
                 .getCustomModels('brains')
                 .then(brains => {
-                  brains.map(brain => (brain.id = brain.name));
-                  $scope.entities = brains;
+                  brains.map(
+                    brain => (brain.path = decodeURIComponent(brain.path))
+                  );
+                  $scope.entities = $scope.parseEntityList(brains);
                 })
                 .catch(err => {
                   $scope.createErrorPopup(err);
@@ -182,16 +200,25 @@
           };
 
           $scope.completeUploadEntity = function(selectedEntity) {
-            if ($scope.entityName === 'Environment') {
-              $scope.paths.environmentPath = selectedEntity.path;
+            if ($scope.entityName.startsWith('Environment')) {
+              $scope.paths.environmentPath = {
+                path: selectedEntity.path,
+                custom: selectedEntity.custom ? selectedEntity.custom : false
+              };
               $scope.environmentUploaded = true;
             }
-            if ($scope.entityName === 'Robot') {
-              $scope.paths.robotPath = selectedEntity.path;
+            if ($scope.entityName.startsWith('Robot')) {
+              $scope.paths.robotPath = {
+                path: selectedEntity.path,
+                custom: selectedEntity.custom ? selectedEntity.custom : false
+              };
               $scope.robotUploaded = true;
             }
-            if ($scope.entityName === 'Brain') {
-              $scope.paths.brainPath = selectedEntity.path;
+            if ($scope.entityName.startsWith('Brain')) {
+              $scope.paths.brainPath = {
+                path: selectedEntity.path,
+                custom: selectedEntity.custom ? selectedEntity.custom : false
+              };
               $scope.brainUploaded = true;
             }
             $scope.destroyDialog();
@@ -199,7 +226,7 @@
 
           $scope.uploadFileClick = function(entityType) {
             var input = $(
-              '<input type="file"  style=" display:none;" accept:".zip">'
+              '<input type="file" style="display:none;" accept:".zip">'
             );
             document.body.appendChild(input[0]);
             input.on('change', e =>
@@ -213,42 +240,45 @@
           };
 
           $scope.uploadModelZip = function(zip, entityType) {
-            if (zip.type !== 'application/zip') {
-              $scope.createErrorPopup(
-                'The file you uploaded is not a zip. Please provide a zipped model'
-              );
-              return $q.reject();
-            }
-
-            return $q(resolve => {
-              let textReader = new FileReader();
-              textReader.onload = e => resolve([zip.name, e.target.result]);
-              textReader.readAsArrayBuffer(zip);
-            })
-              .then(([filename, filecontent]) => {
-                $scope.destroyDialog();
-                return storageServer
-                  .setCustomModel(
-                    filename,
-                    (entityType += 's').toLowerCase(),
-                    filecontent
-                  )
-                  .catch(err => {
-                    $scope.destroyDialog();
-                    $scope.createErrorPopup(err.data);
-                    return $q.reject(err);
-                  })
-                  .then(() => {
-                    $scope.entityName = entityType;
-                    return $scope.entityUploader.uploadFromPrivateStorage();
-                  })
-                  .finally(() => ($scope.uploadingModel = false));
+            $scope.destroyDialog();
+            return $timeout(() => {
+              if (zip.type !== 'application/zip') {
+                $scope.createErrorPopup(
+                  'The file you uploaded is not a zip. Please provide a zipped model'
+                );
+                return $q.reject();
+              }
+              return $q(resolve => {
+                let textReader = new FileReader();
+                textReader.onload = e => resolve([zip.name, e.target.result]);
+                textReader.readAsArrayBuffer(zip);
               })
-              .catch(() => {
-                $scope.uploadingModel = false;
-                $scope.destroyDialog();
-              })
-              .finally(() => ($scope.uploadingModel = false));
+                .then(([filename, filecontent]) => {
+                  return storageServer
+                    .setCustomModel(
+                      filename,
+                      (entityType += 's').toLowerCase(),
+                      filecontent
+                    )
+                    .catch(err => {
+                      $scope.destroyDialog();
+                      $scope.createErrorPopup(err.data);
+                      return $q.reject(err);
+                    })
+                    .then(() => {
+                      $scope.entityName = entityType;
+                      return $scope.entityUploader.uploadFromPrivateStorage(
+                        filename
+                      );
+                    })
+                    .finally(() => ($scope.uploadingModel = false));
+                })
+                .catch(() => {
+                  $scope.uploadingModel = false;
+                  $scope.destroyDialog();
+                })
+                .finally(() => ($scope.uploadingModel = false));
+            }, 1000);
           };
 
           $scope.destroyDialog = function() {
@@ -315,11 +345,12 @@
           $scope.parseEntityList = entityArray =>
             entityArray.map(entity => {
               return {
+                path: entity.path ? entity.path : undefined,
                 name: entity.name,
+                custom: entity.custom ? entity.custom : false,
                 description: entity.description,
                 id: entity,
-                thumbnail: entity.thumbnail,
-                path: entity.path ? decodeURIComponent(entity.path) : undefined
+                thumbnail: entity.thumbnail
               };
             });
 
