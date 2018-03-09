@@ -22,14 +22,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  * ---LICENSE-END**/
 
-.toolbar-help-highlighted {
+[help-tooltip].toolbar-help-highlighted {
   box-shadow: inset 0px 0px 30px 30px rgb(200, 255, 187),
     0px 0px 40px 0px rgb(200, 255, 187);
-}
-
-.toolbar-help-highlighted:hover {
-  box-shadow: inset 0px 0px 30px 30px rgba(200, 255, 187, 0.8),
-    0px 0px 40px 0px rgba(200, 255, 187, 0.8);
+  :hover {
+    box-shadow: inset 0px 0px 30px 30px rgba(200, 255, 187, 0.8),
+      0px 0px 40px 0px rgba(200, 255, 187, 0.8);
+  }
 }
 
 .toolbar-help-window {

@@ -550,6 +550,22 @@
       }
     }
 
+    isOneRobotViewOpen() {
+      if (!this.gz3dViewsService.hasCameraView()) {
+        return false;
+      }
+
+      var allHidden = true;
+
+      this.gz3dViewsService.views.forEach(view => {
+        if (view.name !== 'main_view' && view.container !== undefined) {
+          allHidden = false;
+        }
+      });
+
+      return !allHidden;
+    }
+
     // robot view
     robotViewButtonClickHandler() {
       if (!this.gz3dViewsService.hasCameraView()) {
