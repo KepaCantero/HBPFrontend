@@ -210,6 +210,11 @@
           });
       };
 
+      this.exitDialog = function() {
+        this.hideTooltip();
+        this.openExitDialog();
+      };
+
       this.openExitDialog = function() {
         var exitSimulationTemplate = {
           templateUrl:
@@ -363,17 +368,17 @@
       this.stateService.stopListeningForStatusInformation();
     }
 
-    exit(quitDemo) {
-      this.exitSimulation(quitDemo);
+    exit() {
+      this.exitSimulation();
     }
 
-    exitSimulation(quitDemo) {
+    exitSimulation() {
       this.cleanUp();
 
       this.splash.splashScreen = null; // do not reopen splashscreen if further messages happen
 
-      if (this.demoMode && !quitDemo) {
-        this.$location.path('esv-demo-wait');
+      if (this.demoMode) {
+        this.$location.path('esv-demo');
       } else {
         this.$location.path('esv-private');
       }

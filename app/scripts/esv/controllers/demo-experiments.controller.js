@@ -31,17 +31,18 @@
       experimentsFactory,
       timeout,
       location,
-      environmentService
+      environmentService,
+      $window
     ) {
       scope.vm = this;
 
       this.demoExperiments = [
         {
-          image: 'img/demo/thumbnails/ExDBraitenbergHuskySBC_Anim.gif',
+          image: 'img/demo/thumbnails/ExDBraitenbergHusky_Anim.gif',
           id: 0
         },
         {
-          image: 'img/demo/thumbnails/ExDBraitenbergMouseLab_Anim.gif',
+          image: 'img/demo/thumbnails/ExDDemoManipulation_Anim.gif',
           id: 1
         },
         {
@@ -49,7 +50,7 @@
           id: 2
         },
         {
-          image: 'img/demo/thumbnails/ExDBraitenbergMouseLab_Anim.gif',
+          image: 'img/demo/thumbnails/TwoICubsWaving_Anim.gif',
           id: 3
         }
       ];
@@ -60,7 +61,8 @@
       this.stopWatching = false;
       this.environmentService = environmentService;
       this.experimentsFactory = experimentsFactory;
-
+      this.$window = $window;
+      this.location.path('esv-demo');
       scope.$on('$destroy', () => {
         this.stopWatching = true;
         if (this.experimentsService) {
@@ -92,7 +94,9 @@
               '/' +
               simul.runningSimulation.simulationID;
             this.location.path(path);
-
+            this.timeout(() => {
+              this.$window.location.reload();
+            }, 1000);
             return;
           }
         }
@@ -132,7 +136,8 @@
     'experimentsFactory',
     '$timeout',
     '$location',
-    'environmentService'
+    'environmentService',
+    '$window'
   ];
 
   angular

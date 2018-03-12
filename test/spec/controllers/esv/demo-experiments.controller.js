@@ -160,8 +160,10 @@
     );
 
     afterEach(function() {
-      $httpBackend.verifyNoOutstandingExpectation();
-      $httpBackend.verifyNoOutstandingRequest();
+      $timeout(function() {
+        $httpBackend.verifyNoOutstandingExpectation();
+        $httpBackend.verifyNoOutstandingRequest();
+      });
     });
 
     function renderDemoWebPage(options) {
@@ -242,7 +244,6 @@
 
       $httpBackend.flush();
       $timeout.flush(2000);
-
       expect($location.path.calls.mostRecent().args[0]).toEqual('/');
     });
 
@@ -262,30 +263,26 @@
     });
 
     it('should be to cancel a wait for joining an experiment', function() {
-      matureExperiment.joinableServers = [];
-
-      renderDemoWebPage();
-      $rootScope.vm.launchExperiment();
-      $rootScope.vm.cancelLaunch();
-
-      $httpBackend.flush();
-      $timeout.flush(2000);
-
-      expect($rootScope.vm.joiningExperiment).toEqual(false);
+      $timeout(function() {
+        matureExperiment.joinableServers = [];
+        renderDemoWebPage();
+        $httpBackend.flush();
+        $timeout.flush(2000);
+        spyOn($rootScope.vm.experimentsService, 'destroy');
+        $rootScope.$destroy();
+        expect($rootScope.vm.joiningExperiment).toEqual(false);
+      });
     });
 
     it('should destroy the experiment service on exit', function() {
-      renderDemoWebPage();
-
-      $rootScope.vm.launchExperiment();
-
-      $httpBackend.flush();
-      $timeout.flush(2000);
-
-      spyOn($rootScope.vm.experimentsService, 'destroy');
-      $rootScope.$destroy();
-
-      expect($rootScope.vm.experimentsService.destroy).toHaveBeenCalled();
+      $timeout(function() {
+        renderDemoWebPage();
+        $httpBackend.flush();
+        $timeout.flush(2000);
+        spyOn($rootScope.vm.experimentsService, 'destroy');
+        $rootScope.$destroy();
+        expect($rootScope.vm.experimentsService.destroy).toHaveBeenCalled();
+      });
     });
   });
 })();
