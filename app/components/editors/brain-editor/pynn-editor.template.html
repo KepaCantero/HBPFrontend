@@ -3,13 +3,13 @@
   <link rel="stylesheet" href="components/editors/brain-editor/pynn-editor.style.css" />
   <!-- endbuild -->
   <h3>PyNN Brain Editor</h3>
-  <p><a target="_blank" href="http://neuralensemble.org/PyNN/">PyNN</a> (pronounced 'pine') is a simulator-independent
-    language for building neuronal network models.
-    Network model scripts may use the PyNN API to load a network, but the network must not be executed.
-    However, there are <a target="_blank"
-                          href="{{platformDocumentationURL}}/nrp/user_manual/simulation_setup/hard_reset.html">a few
-      points</a> that should be taken into consideration when changing neuronal networks during a simulation.
-  </p>
+  <div class="alert alert-info">
+    <p>
+      Network scripts use <a target="_blank" href="http://neuralensemble.org/PyNN/"><b>PyNN</b></a> API 
+      for loading a network in the simulation. Browse our <a target="_blank" href="{{platformDocumentationURL}}/nrp/user_manual/simulation_setup/hard_reset.html">
+      <b>User Manual</b></a> to see how a neural network can be changed at run time.
+    </p>
+  </div>
   <div ng-show="pynnScript === undefined" class="alert alert-info" role="alert">
     There is no PyNN script available for this experiment.
   </div>
