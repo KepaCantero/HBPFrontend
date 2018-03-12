@@ -138,7 +138,6 @@
 
             let saveBrainVisu = _.throttle(
               () => {
-                console.log('saving brainvisualiser...');
                 scope.currentValues.savedSettings = true;
                 localStorage.setItem(
                   'brainvisualiser.' + simulationInfo.experimentID,
