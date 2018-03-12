@@ -201,13 +201,13 @@ describe('Directive: brainvisualizer', function() {
     });
 
     it('should handle spike scaler', function() {
-      $rootScope.$$childTail.spikeScaler = 1.0;
+      $rootScope.$$childTail.currentValues.spikeScaler = 1.0;
       $rootScope.$digest();
       $rootScope.$$childTail.updateSpikeScaler();
 
       expect($rootScope.spikefactor).toBe(1.0);
 
-      $rootScope.$$childTail.spikeScaler = 0.0;
+      $rootScope.$$childTail.currentValues.spikeScaler = 0.0;
       $rootScope.$digest();
       $rootScope.$$childTail.updateSpikeScaler();
       expect($rootScope.spikefactor).toBe(0.0);
@@ -316,6 +316,7 @@ describe('Directive: brainvisualizer', function() {
             setShape: function(p) {
               _$rootScope_.shape = p;
             },
+            setColorMap: jasmine.createSpy('setColorMap'),
             displaySpikes: jasmine.createSpy('displaySpikes'),
             updatePopulationVisibility: angular.noop,
             terminate: jasmine.createSpy('terminate'),

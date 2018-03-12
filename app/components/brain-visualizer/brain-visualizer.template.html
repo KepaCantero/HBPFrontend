@@ -44,7 +44,7 @@
 
         </div>
 
-        <div class="esv-brainvisualizer-box" ng-hide="currentValues.userCoordMode">
+        <div class="esv-brainvisualizer-box" ng-hide="settings.userCoordMode">
 
             <div class="esv-brainvisualizer-box-title">
                 Distribution
@@ -84,7 +84,7 @@
 
             <div>
 
-                <input type="range" ng-change="updateSpikeScaler()" ng-model="spikeScaler" step="0.01" min="0" max="1.0" ng-mouseup="$event.stopPropagation(); focus('container');"
+                <input type="range" ng-change="updateSpikeScaler()" ng-model="currentValues.spikeScaler" step="0.01" min="0" max="1.0" ng-mouseup="$event.stopPropagation(); focus('container');"
                     class="esv-brainvisualizer-slider" />
 
             </div>
@@ -108,7 +108,7 @@
         </div>
 
 
-        <div class="esv-brainvisualizer-box" ng-hide="currentValues.userColorsMode">
+        <div class="esv-brainvisualizer-box" ng-hide="settings.userColorsMode">
 
             <div class="esv-brainvisualizer-box-title">
                 Populations

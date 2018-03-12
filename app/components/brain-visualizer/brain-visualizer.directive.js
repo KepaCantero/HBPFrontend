@@ -29,11 +29,13 @@
     'backendInterfaceService',
     'RESET_TYPE',
     'spikeListenerService',
+    'simulationInfo',
     function(
       simulationConfigService,
       backendInterfaceService,
       RESET_TYPE,
-      spikeListenerService
+      spikeListenerService,
+      simulationInfo
     ) {
       return {
         templateUrl:
@@ -57,7 +59,6 @@
             BRAIN3D.COLOR_MAP_POLULATIONS,
             BRAIN3D.COLOR_MAP_USER
           ];
-          scope.spikeScaler = 0;
           scope.shapes = [
             BRAIN3D.REP_SHAPE_SPHERICAL,
             BRAIN3D.REP_SHAPE_CUBIC,
@@ -74,11 +75,15 @@
             BRAIN3D.DISPLAY_TYPE_BLENDED
           ];
           scope.currentValues = {
+            spikeScaler: 0,
             currentShape: BRAIN3D.REP_SHAPE_SPHERICAL,
             currentDistribution: BRAIN3D.REP_DISTRIBUTION_OVERLAP,
             currentDisplay: BRAIN3D.DISPLAY_TYPE_POINT,
+            displayColorMaps: false
+          };
+
+          scope.settings = {
             currentColorMap: BRAIN3D.COLOR_MAP_POLULATIONS,
-            displayColorMaps: false,
             userCoordMode: false
           };
 
@@ -119,7 +124,41 @@
               .catch(err => alert(`Failed to save settings: \n${err}`));
           };
 
+          let initBrainSettings = () => {
+            try {
+              let brainvisualiserSettings = localStorage.getItem(
+                'brainvisualiser.' + simulationInfo.experimentID
+              );
+              if (brainvisualiserSettings) {
+                scope.currentValues = JSON.parse(brainvisualiserSettings);
+              }
+            } finally {
+              angular.noop();
+            }
+
+            let saveBrainVisu = _.throttle(
+              () => {
+                console.log('saving brainvisualiser...');
+                scope.currentValues.savedSettings = true;
+                localStorage.setItem(
+                  'brainvisualiser.' + simulationInfo.experimentID,
+                  JSON.stringify(scope.currentValues)
+                );
+              },
+              200,
+              { leading: false }
+            );
+
+            scope.$watchCollection('currentValues', saveBrainVisu);
+            scope.$watchCollection(
+              'currentValues.disabledPopulations',
+              saveBrainVisu
+            );
+          };
+
           scope.initWithPopulations = function() {
+            initBrainSettings();
+
             backendInterfaceService.getPopulations(function(response) {
               if (response.populations) {
                 var data = { populations: {} };
@@ -145,7 +184,11 @@
                         i / (response.populations.length + 1) * 360.0 +
                         ',100%,80%)';
                     newPop.name = pop.name;
-                    newPop.visible = true;
+                    if (scope.currentValues.disabledPopulations)
+                      newPop.visible = !scope.currentValues.disabledPopulations[
+                        pop.name
+                      ];
+                    else newPop.visible = true;
 
                     scope.populations.push(newPop);
                     data.populations[pop.name] = newPop;
@@ -157,19 +200,32 @@
                 scope.userFile = brain3D.userData;
 
                 if (scope.userFile) {
-                  scope.currentValues.currentShape = BRAIN3D.REP_SHAPE_USER;
+                  if (!scope.currentValues.savedSettings)
+                    scope.currentValues.currentShape = BRAIN3D.REP_SHAPE_USER;
 
                   if (scope.userFile.populations) {
-                    scope.currentValues.userCoordMode = true;
+                    scope.settings.userCoordMode = true;
                   } else {
                     if (scope.userFile.colors) {
-                      scope.currentValues.displayColorMaps = true;
-                      scope.currentValues.userColorsMode = true;
-                      scope.currentValues.userCoordMode = true;
-                      scope.currentValues.currentColorMap =
-                        BRAIN3D.COLOR_MAP_USER;
+                      if (!scope.currentValues.savedSettings) {
+                        scope.currentValues.displayColorMaps = true;
+                        scope.currentValues.currentColorMap =
+                          BRAIN3D.COLOR_MAP_USER;
+                      }
+                      scope.settings.userColorsMode = true;
+                      scope.settings.userCoordMode = true;
                     }
                   }
+                }
+
+                if (scope.currentValues.savedSettings) {
+                  scope.setShape(scope.currentValues.currentShape);
+                  scope.setDistribution(
+                    scope.currentValues.currentDistribution
+                  );
+                  scope.setDisplay(scope.currentValues.currentDisplay);
+                  scope.setColorMap(scope.currentValues.currentColorMap);
+                  scope.updateSpikeScaler();
                 }
               }
             });
@@ -209,22 +265,21 @@
 
           scope.togglePopulationVisibility = function(pop) {
             pop.visible = !pop.visible;
+            if (!scope.currentValues.disabledPopulations)
+              scope.currentValues.disabledPopulations = {};
+            if (pop.visible)
+              delete scope.currentValues.disabledPopulations[pop.name];
+            else scope.currentValues.disabledPopulations[pop.name] = true;
             brain3D.updatePopulationVisibility();
           };
-
-          scope.initContent();
 
           var onNewSpikesMessageReceived = function(message) {
             brain3D.displaySpikes(message.spikes);
           };
 
-          if (scope.spikeScaler > 0) {
-            spikeListenerService.startListening(onNewSpikesMessageReceived);
-          }
-
           scope.updateSpikeScaler = function() {
             if (brain3D) {
-              if (scope.spikeScaler > 0) {
+              if (scope.currentValues.spikeScaler > 0) {
                 spikeListenerService.startListening(onNewSpikesMessageReceived);
               } else {
                 spikeListenerService.stopListening(onNewSpikesMessageReceived);
@@ -233,7 +288,7 @@
                 }
               }
 
-              brain3D.setSpikeScaleFactor(scope.spikeScaler);
+              brain3D.setSpikeScaleFactor(scope.currentValues.spikeScaler);
             }
           };
 
@@ -253,10 +308,9 @@
 
           scope.setShape = function(shape) {
             if (brain3D) {
-              scope.currentValues.userCoordMode =
-                shape === BRAIN3D.REP_SHAPE_USER;
+              scope.settings.userCoordMode = shape === BRAIN3D.REP_SHAPE_USER;
 
-              if (scope.currentValues.userCoordMode) {
+              if (scope.settings.userCoordMode) {
                 if (scope.userFile.populations) {
                   if (
                     scope.currentValues.currentDistribution !==
@@ -287,8 +341,7 @@
           scope.setColorMap = function(cmap) {
             if (brain3D) {
               scope.currentValues.currentColorMap = cmap;
-              scope.currentValues.userColorsMode =
-                cmap === BRAIN3D.COLOR_MAP_USER;
+              scope.settings.userColorsMode = cmap === BRAIN3D.COLOR_MAP_USER;
               brain3D.setColorMap(cmap);
             }
           };
@@ -313,6 +366,8 @@
 
             spikeListenerService.stopListening(onNewSpikesMessageReceived);
           });
+
+          scope.initContent();
         }
       };
     }
