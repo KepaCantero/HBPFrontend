@@ -32,12 +32,14 @@ $objectInspectorMinHeight: 40px;
 
   margin: 0px 0px 5px 5px;
   width: $objectInspectorMinWidth;
+  max-height: 800px;
 }
 
 .robot-doc-link {
   text-align: center;
   width: 100%;
   display: inline-block;
+  margin-top: 10px;
 }
 
 #header {
@@ -204,4 +206,11 @@ $objectInspectorMinHeight: 40px;
 .btn-rounded:active,
 .btn-rounded.active {
   box-shadow: inset 3px 3px 10px 0px rgba(0, 0, 0, 0.3);
+}
+
+.very-small-button {
+  font-size: 11px;
+  padding: 6px;
+  padding: 2px;
+  min-width: 130px;
 }

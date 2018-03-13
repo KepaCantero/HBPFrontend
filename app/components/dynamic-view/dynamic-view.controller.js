@@ -131,7 +131,9 @@
         name: 'Object Inspector',
         directive: 'object-inspector',
         isResizeable: false, // default true
-        allowMultipleViews: false // default true
+        allowMultipleViews: false, // default true
+        maxHeight: '100%',
+        overflowY: 'auto'
       },
       STREAM_VIEWER: {
         name: 'Stream viewer',

@@ -88,6 +88,19 @@ describe('Controller: RobotTreeViewController', function() {
     );
   });
 
+  it(' - setTreeSelection()', function() {
+    gz3d.scene.robotInfoObject = {
+      _labelOwner: { children: [{ userData: {} }] }
+    };
+
+    $scope.onSelectionChange = jasmine.createSpy('onSelectionChange');
+    $scope.setTreeSelection();
+
+    expect(robotTreeViewController.selectedObject).toBe(
+      gz3d.scene.robotInfoObject
+    );
+  });
+
   it(' - filterThreeJSTree()', function() {
     expect($scope.filterThreeJSTree).toBeDefined();
 

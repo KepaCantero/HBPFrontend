@@ -83,11 +83,21 @@
           this.lockTAxis = undefined;
           this.selectedTab = 0;
           this.robotMode = false;
+          this.selectedRobotComponent = null;
 
           this.getSelectedObjectShape = function() {
             if (this.selectedObject) {
               return this.selectedObject.getShapeName();
             }
+          };
+
+          this.isSelectedRobotComponentTopic = function() {
+            return (
+              this.selectedRobotComponent &&
+              this.selectedRobotComponent.userData &&
+              this.selectedRobotComponent.userData.gazeboType &&
+              this.selectedRobotComponent.userData.gazeboType === 'topic'
+            );
           };
 
           this.isRobot = function() {
@@ -478,8 +488,10 @@
           this.setRobotMode = function(robotMode) {
             if (this.robotMode !== robotMode) {
               this.robotMode = robotMode;
+
               if (this.robotMode) {
                 this.robotObject = this.selectedObject;
+                gz3d.scene.lockSelectedIdentity = true;
 
                 this.previousNavigationMode =
                   userNavigationService.navigationMode;
@@ -491,7 +503,7 @@
                 userNavigationService.lookatRobotControls.setLookatTarget(null);
                 userNavigationService.setLookatRobotCamera();
                 userNavigationService.lookatRobotControls.setDistance(
-                  userNavigationService.lookatRobotControls.minDistance * 1.5
+                  userNavigationService.lookatRobotControls.minDistance + 1.3
                 );
 
                 gz3d.scene.setViewAs(
@@ -499,8 +511,10 @@
                   OBJECT_VIEW_MODE.TRANSPARENT
                 );
 
-                gz3d.scene.setRobotInfoVisible(this.selectedObject, true);
+                gz3d.scene.setLabelInfoVisible(this.selectedObject, true);
               } else {
+                gz3d.scene.lockSelectedIdentity = false;
+
                 userNavigationService.userCamera.position.copy(
                   this.previousCameraPosition
                 );
@@ -510,7 +524,7 @@
                 userNavigationService.userCamera.updateMatrixWorld(true);
 
                 gz3d.scene.setViewAs(this.robotObject, OBJECT_VIEW_MODE.NORMAL);
-                gz3d.scene.setRobotInfoVisible(this.robotObject, false);
+                gz3d.scene.setLabelInfoVisible(this.robotObject, false);
 
                 if (this.previousNavigationMode) {
                   switch (this.previousNavigationMode) {
@@ -543,6 +557,12 @@
           this.update = function() {
             // update selected object
             that.selectedObject = gz3d.scene.selectedEntity;
+            if (
+              that.selectedObject &&
+              that.currentDisplayedObject !== that.selectedObject
+            ) {
+              that.currentDisplayedObject = that.selectedObject;
+            }
 
             that.isARobot = !isNotARobotPredicate(that.selectedObject);
 

@@ -82,6 +82,7 @@
       selectedEntity: undefined,
       manipulationMode: undefined,
       setViewAs: jasmine.createSpy('setViewAs'),
+      setLabelInfoVisible: jasmine.createSpy('setLabelInfoVisible'),
 
       controls: {
         onMouseDownManipulator: jasmine.createSpy('onMouseDownManipulator'),

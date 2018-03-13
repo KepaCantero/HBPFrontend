@@ -56,6 +56,32 @@
       this.overlayIDCount = 0;
     }
 
+    applyAttributesToOverlay(overlayWrapper, dynamicViewChannel) {
+      // set resizeable
+      if (typeof dynamicViewChannel.isResizeable !== 'undefined') {
+        overlayWrapper.setAttribute(
+          'resizeable',
+          dynamicViewChannel.isResizeable.toString()
+        );
+      }
+
+      if (typeof dynamicViewChannel.maxWidth !== 'undefined') {
+        overlayWrapper.style.maxWidth = dynamicViewChannel.maxWidth;
+      }
+
+      if (typeof dynamicViewChannel.maxHeight !== 'undefined') {
+        overlayWrapper.style.maxHeight = dynamicViewChannel.maxHeight;
+      }
+
+      if (typeof dynamicViewChannel.overflowX !== 'undefined') {
+        overlayWrapper.style.overflowX = dynamicViewChannel.overflowX;
+      }
+
+      if (typeof dynamicViewChannel.overflowY !== 'undefined') {
+        overlayWrapper.style.overflowY = dynamicViewChannel.overflowY;
+      }
+    }
+
     createOverlay(dynamicViewChannel, parentElement = null) {
       if (!angular.isDefined(parentElement) || parentElement === null) {
         parentElement = this.getOverlayParentElement()[0];
@@ -83,13 +109,7 @@
           this.OVERLAY_WRAPPER_CLASS
         )[0];
         if (overlayWrapper) {
-          // set resizeable
-          if (typeof dynamicViewChannel.isResizeable !== 'undefined') {
-            overlayWrapper.setAttribute(
-              'resizeable',
-              dynamicViewChannel.isResizeable.toString()
-            );
-          }
+          this.applyAttributesToOverlay(overlayWrapper, dynamicViewChannel);
         }
         overlay.show();
       });
