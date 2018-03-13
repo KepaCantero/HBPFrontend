@@ -7,14 +7,14 @@
   <div class="ed-header">
 
     <h3>Environment Editor</h3>
-    <p>The Neurorobotics Platform is built on top of <a target="_blank" href="http://gazebosim.org/">Gazebo</a> <img
-            src="img/common/gazebo-logo.png"/>. Any environment created for Gazebo (and made of simple primitives or Collada
-      objects) is therefore compatible with the platform.
-      Gazebo uses the <a target="_blank" href="http://sdformat.org/">SDF format</a>.
-      If you want your environments to be
-      available, <a href="mailto:neurorobotics@humanbrainproject.eu" target="_top">get in contact with us!</a> (we only need the
-      corresponding SDF file(s) and
-      assets).
+      <div class="alert alert-info">
+      <p> Environments created for <a target="_blank" href="http://gazebosim.org/"><b>Gazebo</b></a> <img
+        src="img/common/gazebo-logo.png"/> and using 
+        <a target="_blank" href="http://sdformat.org/"><b>SDF format</b></a> 
+        are compatible with the Neurorobotics platform.
+      </p>
+    </div>
+
     <div ng-show="(stateService.currentState === STATE.INITIALIZED)" class="alert alert-warning" role="alert">The simulation is in initialized state. It has to be started (or started and paused) to enable environment edition.</div>
     <hr>
 
