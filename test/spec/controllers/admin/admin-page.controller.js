@@ -4,12 +4,13 @@ describe('Controller: admin-page.controller', function() {
   beforeEach(module('exdFrontendApp'));
   beforeEach(module('bbpStubFactory'));
 
-  var $rootScope, $httpBackend, adminPageCtrl;
+  let $rootScope, $httpBackend, adminPageCtrl, adminService;
 
   beforeEach(
-    inject(function(_$rootScope_, _$httpBackend_, $controller) {
+    inject(function(_$rootScope_, _$httpBackend_, $controller, _adminService_) {
       $rootScope = _$rootScope_;
       $httpBackend = _$httpBackend_;
+      adminService = _adminService_;
 
       $httpBackend.whenGET('http://proxy/identity/me/groups').respond([]);
 
@@ -17,9 +18,13 @@ describe('Controller: admin-page.controller', function() {
         .whenGET('http://proxy/admin/status')
         .respond({ maintenance: false });
 
+      $httpBackend.whenGET('http://proxy/admin/servers').respond([]);
+
       adminPageCtrl = $controller('adminPageCtrl', {
         $scope: $rootScope
       });
+      $httpBackend.flush();
+      $rootScope.$apply();
     })
   );
 
@@ -32,6 +37,14 @@ describe('Controller: admin-page.controller', function() {
     $httpBackend.verifyNoOutstandingExpectation();
   });
 
+  it('should show error msg when failed to setting status', () => {
+    spyOn(adminService, 'setStatus').and.returnValue(window.$q.reject());
+    spyOn(adminPageCtrl.clbErrorDialog, 'open');
+    adminPageCtrl.setMaintenanceMode(true);
+    $rootScope.$apply();
+    expect(adminPageCtrl.clbErrorDialog.open).toHaveBeenCalled();
+  });
+
   it('should call backend when restarting server', function() {
     $httpBackend
       .expectPOST('http://proxy/admin/restart/funky-server')
@@ -41,6 +54,14 @@ describe('Controller: admin-page.controller', function() {
 
     $httpBackend.flush();
     $httpBackend.verifyNoOutstandingExpectation();
+  });
+
+  it('should show error msg when failed to restart server', () => {
+    spyOn(adminService, 'restartServer').and.returnValue(window.$q.reject());
+    spyOn(adminPageCtrl.clbErrorDialog, 'open');
+    adminPageCtrl.restartServer();
+    $rootScope.$apply();
+    expect(adminPageCtrl.clbErrorDialog.open).toHaveBeenCalled();
   });
 
   it('should unsubscribe on controller destroy', function() {
