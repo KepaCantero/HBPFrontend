@@ -96,7 +96,7 @@
               this.selectedRobotComponent &&
               this.selectedRobotComponent.userData &&
               this.selectedRobotComponent.userData.gazeboType &&
-              this.selectedRobotComponent.userData.gazeboType === 'topic'
+              this.selectedRobotComponent.userData.gazeboType === 'rostopic'
             );
           };
 

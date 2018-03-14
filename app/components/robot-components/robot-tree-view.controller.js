@@ -26,11 +26,13 @@
   'use strict';
 
   class RobotTreeViewController {
-    constructor($scope, gz3d, roslib, simulationInfo) {
+    constructor($scope, gz3d, robotComponentsService) {
       $scope.$on('$destroy', () => {});
 
       $scope.selected = null;
       $scope.expandedNodes = [];
+
+      robotComponentsService.initialize();
 
       $scope.setTreeSelection = () => {
         this.selectedObject = gz3d.scene.robotInfoObject;
@@ -45,7 +47,7 @@
           for (let i = 0; i < $scope.selected.children.length; i++) {
             let child = $scope.selected.children[i];
 
-            if (isTopic(child)) {
+            if (isRosTopic(child)) {
               $scope.selected = child;
               break;
             }
@@ -64,18 +66,21 @@
 
       gz3d.gui.guiEvents.on('setTreeSelection', $scope.setTreeSelection);
 
-      $scope.showSelected = node => {
-        $scope.onSelectionChange({ $selectedObject: node });
-      };
-
       $scope.filterThreeJSTree = node => {
         return (
-          node === this.robot ||
+          node === robotComponentsService.robot ||
           isSensor(node) ||
-          isTopic(node) ||
+          isRosTopic(node) ||
           isRobotLink(node) ||
           isInfo(node)
         );
+      };
+
+      $scope.onNodeSelection = (node, selected) => {
+        // selected = true if newly selected, selected = false if deselected
+        if (selected) {
+          $scope.onSelectionChange({ $selectedObject: node });
+        }
       };
 
       let isRobotLink = node => {
@@ -91,7 +96,7 @@
 
         let isRobotChild = false;
         node.traverseAncestors(ancestor => {
-          if (ancestor === this.robot) {
+          if (ancestor === robotComponentsService.robot) {
             isRobotChild = true;
           }
         });
@@ -110,11 +115,11 @@
         }
       };
 
-      let isTopic = node => {
+      let isRosTopic = node => {
         if (
           node.userData &&
           node.userData.gazeboType &&
-          node.userData.gazeboType === 'topic'
+          node.userData.gazeboType === 'rostopic'
         ) {
           return true;
         } else {
@@ -126,7 +131,7 @@
         if (
           node.userData &&
           node.userData.gazeboType &&
-          node.userData.gazeboType === 'info'
+          node.userData.gazeboType === 'robotComponentsTreeInfo'
         ) {
           return true;
         } else {
@@ -134,115 +139,15 @@
         }
       };
 
-      let hasSensorChildren = node => {
-        let result = false;
-        node.traverse(child => {
-          if (isSensor(child)) {
-            result = true;
-          }
-        });
-        return result;
-      };
-
       let isRobotComponentLeaf = node => {
-        return isTopic(node) || isInfo(node);
+        return isRosTopic(node);
       };
-
-      let getRobotModelProperties = () => {
-        // model property service
-        this.rosWebsocketURL = simulationInfo.serverConfig.rosbridge.websocket;
-        this.rosWebsocket = roslib.getOrCreateConnectionTo(
-          this.rosWebsocketURL
-        );
-        this.rosModelPropertyService = new roslib.Service({
-          ros: this.rosWebsocket,
-          name: '/gazebo/get_model_properties',
-          serviceType: 'GetModelProperties'
-        });
-
-        /* eslint-disable camelcase */
-        var request = new roslib.ServiceRequest({
-          model_name: 'robot'
-        });
-        /* eslint-enable camelcase */
-
-        this.rosModelPropertyService.callService(
-          request,
-          success => {
-            parseSensorProperties(success);
-          },
-          failure => {
-            console.info(failure);
-          }
-        );
-      };
-
-      let parseSensorProperties = rosRobotProperties => {
-        /* eslint-disable camelcase */
-        this.cameras = [];
-        for (let i = 0; i < rosRobotProperties.sensor_names.length; i = i + 1) {
-          if (rosRobotProperties.sensor_types[i] === 'camera') {
-            let sensorName = rosRobotProperties.sensor_names[i];
-            let cameraName =
-              rosRobotProperties.camera_names[this.cameras.length];
-            let topicURL = getCameraTopicURL(
-              rosRobotProperties.rostopic_camera_urls,
-              cameraName
-            );
-
-            let sensorModelHierarchy = sensorName.split('::');
-            let sensorObject = this.robot.getObjectByName(
-              sensorModelHierarchy[sensorModelHierarchy.length - 1]
-            );
-            let topicObject = new THREE.Object3D();
-            topicObject.name = 'ROS: /' + topicURL;
-            topicObject.userData.gazeboType = 'topic';
-            sensorObject.add(topicObject);
-
-            this.cameras.push({
-              modelHierarchyString: sensorName,
-              cameraName: cameraName,
-              topicURL: topicURL,
-              topicObject: topicObject
-            });
-          }
-        }
-        /* eslint-enable camelcase */
-
-        // add "no sensors" to links without sensor children
-        this.robot.traverse(child => {
-          if (
-            child.userData.gazeboType === 'link' &&
-            !hasSensorChildren(child)
-          ) {
-            let noSensorObject = new THREE.Object3D();
-            noSensorObject.name = 'no sensors available';
-            noSensorObject.userData.gazeboType = 'info';
-            child.add(noSensorObject);
-          }
-        });
-      };
-
-      let getCameraTopicURL = (cameraTopicURLS, cameraName) => {
-        let topicURL = undefined;
-        cameraTopicURLS.forEach(topic => {
-          if (topic.indexOf(cameraName) === 0) {
-            // topic begins with camera name
-            topicURL = topic;
-          }
-        });
-        return topicURL;
-      };
-
-      this.robot = gz3d.scene.scene.getObjectByName('robot');
 
       $scope.treeData = gz3d.scene.scene;
       $scope.treeOptions = {
         dirSelectable: false,
         isLeaf: isRobotComponentLeaf
       };
-
-      getRobotModelProperties();
     }
   }
 
@@ -258,8 +163,7 @@
     .controller('RobotTreeViewController', [
       '$scope',
       'gz3d',
-      'roslib',
-      'simulationInfo',
+      'robotComponentsService',
       function(...args) {
         return new RobotTreeViewController(...args);
       }

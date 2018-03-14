@@ -6,7 +6,7 @@
 <div class="robot-tree-wrapper">
   <treecontrol class="tree-light" tree-model="treeData" options="treeOptions"
                selected-node="selected" expanded-nodes="expandedNodes"
-               filter-expression="filterThreeJSTree" on-selection="showSelected(node)">
+               filter-expression="filterThreeJSTree" on-selection="onNodeSelection(node, selected)">
     {{node.name}}
   </treecontrol>
 </div>
