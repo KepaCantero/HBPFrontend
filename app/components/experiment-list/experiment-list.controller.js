@@ -190,7 +190,9 @@
         ));
         experimentsService.initialize();
         experimentsService.experiments.then(function(experiments) {
-          $scope.experiments = experiments;
+          $scope.experiments = experiments.filter(
+            exp => exp.id != 'TemplateNew'
+          );
           if (experiments.length === 1) {
             $scope.pageState.selected = experiments[0].id;
           } else {

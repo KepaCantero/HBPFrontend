@@ -10,7 +10,8 @@
       $q,
       scope,
       clbErrorDialog,
-      newExperimentProxyService;
+      newExperimentProxyService,
+      $timeout;
 
     beforeEach(module('exdFrontendApp'));
     beforeEach(module('exd.templates'));
@@ -25,7 +26,8 @@
         _storageServer_,
         _$q_,
         _clbErrorDialog_,
-        _newExperimentProxyService_
+        _newExperimentProxyService_,
+        _$timeout_
       ) {
         $httpBackend = _$httpBackend_;
         $rootScope = _$rootScope_;
@@ -35,6 +37,7 @@
         $q = _$q_;
         clbErrorDialog = _clbErrorDialog_;
         newExperimentProxyService = _newExperimentProxyService_;
+        $timeout = _$timeout_;
 
         $compile('<new-experiment-wizard></new-experiment-wizard>')($rootScope);
         $rootScope.$digest();
@@ -81,10 +84,12 @@
           name: 'fakeICub',
           description: 'fakeICub',
           id: 'fakeICub',
-          thumbnail: ''
+          thumbnail: '',
+          path: 'undefined'
         },
         thumbnail: '',
-        path: undefined
+        path: 'undefined',
+        custom: false
       });
       expect(scope.entities[1].name).toBe('fakeHusky');
     });
@@ -112,9 +117,16 @@
       expect(scope.entities[0]).toEqual({
         name: 'fake3DSpace',
         description: 'fake3DSpace',
-        id: { name: 'fake3DSpace', description: 'fake3DSpace', thumbnail: '' },
+        id: {
+          name: 'fake3DSpace',
+          description: 'fake3DSpace',
+          thumbnail: '',
+          path: 'undefined',
+          custom: true
+        },
         thumbnail: '',
-        path: undefined
+        path: 'undefined',
+        custom: true
       });
       expect(scope.entities[1].name).toBe('fakeFZIGround');
     });
@@ -144,7 +156,14 @@
         name: 'fakeBraitenberg',
         description: 'fakeBraitenberg',
         thumbnail: '',
-        id: 'fakeBraitenberg'
+        id: {
+          name: 'fakeBraitenberg',
+          description: 'fakeBraitenberg',
+          thumbnail: '',
+          path: 'undefined'
+        },
+        custom: false,
+        path: 'undefined'
       });
       expect(scope.entities[1].name).toBe('fakeIdleBrain');
     });
@@ -463,13 +482,24 @@
           });
         }
       });
-      spyOn(storageServer, 'setCustomModel').and.returnValue($q.when());
+      spyOn(storageServer, 'setCustomModel').and.returnValue($q.when({}));
       spyOn(scope, 'destroyDialog');
-      scope.entityUploader = {};
-      scope.entityUploader.uploadFromPrivateStorage = function() {
-        return $q.when();
-      };
-      scope.uploadModelZip(blobToFile(fakeZip), 'Robots').then(function() {
+      spyOn(storageServer, 'getCustomModels').and.returnValue(
+        $q.when([
+          {
+            name: 'testEnv',
+            custom: true,
+            path: 'testPath',
+            description: 'testDescription',
+            thumbnail: 'testThumbnail'
+          }
+        ])
+      );
+      scope.uploadEnvironmentDialog();
+      var res = scope.uploadModelZip(blobToFile(fakeZip, 'test.zip'), 'Robots');
+      $timeout.flush();
+      $timeout.verifyNoPendingTasks();
+      res.then(function() {
         expect(scope.destroyDialog).toHaveBeenCalled();
         expect(scope.uploadingModel).toBe(false);
         expect(scope.entityName).toContain('Robots');
@@ -496,7 +526,10 @@
         $q.reject({ data: 'Custom Model Failed' })
       );
       spyOn(scope, 'createErrorPopup');
-      scope.uploadModelZip(blobToFile(fakeZip), 'Robots').then(function() {
+      var res = scope.uploadModelZip(blobToFile(fakeZip), 'Robots');
+      $timeout.flush();
+      $timeout.verifyNoPendingTasks();
+      res.then(function() {
         expect(scope.createErrorPopup).toHaveBeenCalledWith(
           'Custom Model Failed'
         );
@@ -507,6 +540,8 @@
     it('should throw if the zip we provide to the upload function is corrupted', function() {
       spyOn(scope, 'createErrorPopup');
       scope.uploadModelZip('fakeZip');
+      $timeout.flush();
+      $timeout.verifyNoPendingTasks();
       expect(scope.createErrorPopup).toHaveBeenCalled();
     });
 

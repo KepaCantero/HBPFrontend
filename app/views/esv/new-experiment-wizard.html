@@ -50,7 +50,7 @@
                                                 <i>Uploading model to the storage.This might take some time, so please be patient...</i>
                                             </div>
                                     </div>
-                                    <button analytics-on analytics-event="CloneNewExperiment" ng-if="pageState.selected == newExperiment" ng-disabled="!brainUploaded || !environmentUploaded || !robotUploaded"
+                                    <button analytics-on analytics-event="CloneNewExperiment" ng-if="pageState.selected == newExperiment" ng-disabled="isCloneRequested || !brainUploaded || !environmentUploaded || !robotUploaded"
                                         class="btn btn-default enable-tooltip" tooltip-trigger="mouseenter" tooltip-placement="top" ng-click="cloneNewExperiment('newExperiment')">
                                         <i class="fa fa-pencil"></i> Clone
                                         </button>
