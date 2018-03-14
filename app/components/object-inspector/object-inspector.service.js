@@ -84,6 +84,12 @@
           this.selectedTab = 0;
           this.robotMode = false;
           this.selectedRobotComponent = null;
+          this.angleMode =
+            localStorage.getItem('OBJECT_INSP_ANGLE_FORMAT') || 'DEG';
+
+          if (this.angleMode == 'RAD') {
+            this.floatPrecision = 6;
+          }
 
           this.getSelectedObjectShape = function() {
             if (this.selectedObject) {
@@ -98,6 +104,24 @@
               this.selectedRobotComponent.userData.gazeboType &&
               this.selectedRobotComponent.userData.gazeboType === 'topic'
             );
+          };
+
+          this.toggleAngleMode = function() {
+            this.angleMode = this.angleMode == 'DEG' ? 'RAD' : 'DEG';
+            if (this.angleMode == 'DEG') {
+              this.rotationEuler.x *= 180 / Math.PI;
+              this.rotationEuler.y *= 180 / Math.PI;
+              this.rotationEuler.z *= 180 / Math.PI;
+              this.floatPrecision = 3;
+            } else {
+              this.rotationEuler.x *= Math.PI / 180;
+              this.rotationEuler.y *= Math.PI / 180;
+              this.rotationEuler.z *= Math.PI / 180;
+              this.floatPrecision = 6;
+            }
+
+            this.roundToPrecisionVector3(this.rotationEuler);
+            localStorage.setItem('OBJECT_INSP_ANGLE_FORMAT', this.angleMode);
           };
 
           this.isRobot = function() {
@@ -660,12 +684,14 @@
             that.roundToPrecisionVector3(that.scaling);
           };
           // - rotation
-          this.updateInspectorFunctions[TRANSFORM_TYPES.ROTATE] = function() {
-            that.rotationEuler.copy(that.selectedObject.rotation);
-            that.rotationEuler.x *= 180 / Math.PI;
-            that.rotationEuler.y *= 180 / Math.PI;
-            that.rotationEuler.z *= 180 / Math.PI;
-            that.roundToPrecisionVector3(that.rotationEuler);
+          this.updateInspectorFunctions[TRANSFORM_TYPES.ROTATE] = () => {
+            this.rotationEuler.copy(that.selectedObject.rotation);
+            if (this.angleMode == 'DEG') {
+              this.rotationEuler.x *= 180 / Math.PI;
+              this.rotationEuler.y *= 180 / Math.PI;
+              this.rotationEuler.z *= 180 / Math.PI;
+            }
+            this.roundToPrecisionVector3(that.rotationEuler);
           };
           // - all
           this.updateInspectorFunctions[TRANSFORM_TYPES.ALL] = function() {
@@ -695,9 +721,11 @@
           ] = function() {
             var radRotation = that.rotationEuler.clone();
 
-            radRotation.x *= Math.PI / 180;
-            radRotation.y *= Math.PI / 180;
-            radRotation.z *= Math.PI / 180;
+            if (that.angleMode == 'DEG') {
+              radRotation.x *= Math.PI / 180;
+              radRotation.y *= Math.PI / 180;
+              radRotation.z *= Math.PI / 180;
+            }
 
             that.selectedObject.rotation.copy(radRotation);
           };
