@@ -378,6 +378,8 @@ GZ3D.VisualMuscleModel = function(scene, robotName) {
   this.scene = scene;
   this.cylinderShapes = {};
   this.robotName = robotName;
+  this.last_muscle_count = -1;
+  this.radius = 1;
 };
 
 // Helper function for creating a cylinder mesh between two given points
@@ -406,17 +408,29 @@ GZ3D.VisualMuscleModel.prototype.cylinderMesh = function(pointX, pointY, radius,
 
 GZ3D.VisualMuscleModel.prototype.updateVisualization = function(message) {
   if (message.robot_name === this.robotName) {
+    if (this.last_muscle_count !== message.muscle.length)
+    {
+      // Compute the radius as fraction of the average length of all muscles.
+      var total_length = 0;
+      for (var k1 = 0; k1 < message.muscle.length; ++k1) {
+        total_length += message.muscle[k1].length;
+      }
+      this.radius = 0.05 * total_length / message.muscle.length;
+      this.last_muscle_count = message.muscle.length;
+    }
+
     for (var k = 0; k < message.muscle.length; ++k) {
       var cylinder = null;
       var cq = 0;
       var cylinderEndPoint_1 = null;
       var cylinderEndPoint_2 = null;
-      var radius = message.muscle[k].length * 0.05;
+      var radius = this.radius;
       var activation = message.muscle[k].activation;
       var color = new THREE.Color(activation, 0.0, 1.0-activation);
 
-      if (!(message.muscle[k].name in this.cylinderShapes)) {
-        this.cylinderShapes[message.muscle[k].name] = {};
+      if (!(k in this.cylinderShapes)) {
+        // TODO: This is not going to work when the number of segments changes.
+        this.cylinderShapes[k] = {};
         for (cq = 0; cq < message.muscle[k].pathPoint.length - 1; ++cq) {
           cylinderEndPoint_1 = new THREE.Vector3(message.muscle[k].pathPoint[cq].x, message.muscle[k].pathPoint[cq].y, message.muscle[k].pathPoint[cq].z);
           cylinderEndPoint_2 = new THREE.Vector3(message.muscle[k].pathPoint[cq + 1].x, message.muscle[k].pathPoint[cq + 1].y, message.muscle[k].pathPoint[cq + 1].z);
@@ -428,46 +442,48 @@ GZ3D.VisualMuscleModel.prototype.updateVisualization = function(message) {
           }));
           this.scene.add(cylinder);
 
-          this.cylinderShapes[message.muscle[k].name][cq] = cylinder;
+          this.cylinderShapes[k][cq] = cylinder;
         }
       }
       else {
         for (cq = 0; cq < message.muscle[k].pathPoint.length - 1; ++cq) {
           cylinderEndPoint_1 = new THREE.Vector3(message.muscle[k].pathPoint[cq].x, message.muscle[k].pathPoint[cq].y, message.muscle[k].pathPoint[cq].z);
           cylinderEndPoint_2 = new THREE.Vector3(message.muscle[k].pathPoint[cq + 1].x, message.muscle[k].pathPoint[cq + 1].y, message.muscle[k].pathPoint[cq + 1].z);
-          cylinder = this.cylinderShapes[message.muscle[k].name][cq];
+          cylinder = this.cylinderShapes[k][cq];
+          if (cylinder)
+          {
+            var cylinder_direction = new THREE.Vector3().subVectors(cylinderEndPoint_2, cylinderEndPoint_1);
+            cylinder.geometry.height = cylinder_direction.length();
+            cylinder.geometry.radiusTop = radius;
+            cylinder.geometry.radiusBottom = radius;
+            cylinder.material.color = color;
 
-          var cylinder_direction = new THREE.Vector3().subVectors(cylinderEndPoint_2, cylinderEndPoint_1);
-          cylinder.geometry.height = cylinder_direction.length();
-          cylinder.geometry.radiusTop = radius;
-          cylinder.geometry.radiusBottom = radius;
-          cylinder.material.color = color;
+            // Reset to default position
+            cylinder.position.set(0, 0, 0);
+            cylinder.scale.set(1, 1, 1);
+            cylinder.rotation.set(0, 0, 0);
+            cylinder.updateMatrix();
 
-          // Reset to default position
-          cylinder.position.set(0, 0, 0);
-          cylinder.scale.set(1, 1, 1);
-          cylinder.rotation.set(0, 0, 0);
-          cylinder.updateMatrix();
+            // Then update to new muscle path
+            var cylinder_orientation = new THREE.Matrix4();
+            cylinder_orientation.lookAt(cylinderEndPoint_1, cylinderEndPoint_2, new THREE.Object3D().up);
+            var cylinder_rotation_matrix = new THREE.Matrix4();
 
-          // Then update to new muscle path
-          var cylinder_orientation = new THREE.Matrix4();
-          cylinder_orientation.lookAt(cylinderEndPoint_1, cylinderEndPoint_2, new THREE.Object3D().up);
-          var cylinder_rotation_matrix = new THREE.Matrix4();
+            cylinder_rotation_matrix.set(1, 0, 0, 0,
+              0, 0, 1, 0,
+              0, -1, 0, 0,
+              0, 0, 0, 1);
 
-          cylinder_rotation_matrix.set(1, 0, 0, 0,
-            0, 0, 1, 0,
-            0, -1, 0, 0,
-            0, 0, 0, 1);
+            cylinder_orientation.multiply(cylinder_rotation_matrix);
+            cylinder.applyMatrix(cylinder_orientation);
 
-          cylinder_orientation.multiply(cylinder_rotation_matrix);
-          cylinder.applyMatrix(cylinder_orientation);
+            cylinder.position.x = (cylinderEndPoint_2.x + cylinderEndPoint_1.x) / 2;
+            cylinder.position.y = (cylinderEndPoint_2.y + cylinderEndPoint_1.y) / 2;
+            cylinder.position.z = (cylinderEndPoint_2.z + cylinderEndPoint_1.z) / 2;
 
-          cylinder.position.x = (cylinderEndPoint_2.x + cylinderEndPoint_1.x) / 2;
-          cylinder.position.y = (cylinderEndPoint_2.y + cylinderEndPoint_1.y) / 2;
-          cylinder.position.z = (cylinderEndPoint_2.z + cylinderEndPoint_1.z) / 2;
-
-          cylinder.updateMatrix();
-          cylinder.geometry.verticesNeedUpdate = true;
+            cylinder.updateMatrix();
+            cylinder.geometry.verticesNeedUpdate = true;
+          }
         }
       }
     }
@@ -5983,6 +5999,25 @@ var getShapeName = function(object3D) {
 
 };
 
+GZ3D.GZIface.prototype.loadCollisionVisuals = function(object)
+{
+  if (object._pendingCollisionVisuals)
+  {
+    for(var i=0;i<object._pendingCollisionVisuals.length; i++)
+    {
+      var collDef = object._pendingCollisionVisuals[i];
+
+      var collisionVisualObj = this.createVisualFromMsg(collDef.collisionVisual, collDef.modelScale);
+      if (collisionVisualObj && !collisionVisualObj.parent)
+      {
+        object.add(collisionVisualObj);
+      }
+    }
+
+    object._pendingCollisionVisuals = undefined;
+  }
+};
+
 GZ3D.GZIface.prototype.createModelFromMsg = function(model)
 {
   var modelObj = new THREE.Object3D();
@@ -6047,11 +6082,13 @@ GZ3D.GZIface.prototype.createModelFromMsg = function(model)
         for (var m = 0; m < link.collision[l].visual.length; ++m)
         {
           var collisionVisual = link.collision[l].visual[m];
-          var collisionVisualObj = this.createVisualFromMsg(collisionVisual, model.scale);
-          if (collisionVisualObj && !collisionVisualObj.parent)
+
+          if (!linkObj._pendingCollisionVisuals)
           {
-            linkObj.add(collisionVisualObj);
+            linkObj._pendingCollisionVisuals = [];
           }
+
+          linkObj._pendingCollisionVisuals.push( {'collisionVisual':collisionVisual, 'modelScale':model.scale} );
         }
       }
     }
@@ -6346,6 +6383,8 @@ GZ3D.GZIface.prototype.createGeom = function(geom, material, parent, modelScale)
       rootModel = rootModel.parent;
     }
 
+    var isCollModel = rootModel.name.indexOf('COLLISION_VISUAL') >= 0 ;
+
     // find model from database, download the mesh if it exists
     // var manifestXML;
     // var manifestURI = GAZEBO_MODEL_DATABASE_URI + '/manifest.xml';
@@ -6394,10 +6433,16 @@ GZ3D.GZIface.prototype.createGeom = function(geom, material, parent, modelScale)
         }
 
         var modelUri = uriPath + '/' + modelName;
+        var modelCacheKey = modelUri;
 
-        if (modelUri in this.scene.cachedModels)
+        if (isCollModel)
         {
-          var cachedData = this.scene.cachedModels[modelUri];
+          modelCacheKey += '__COLLISION_VISUAL__';
+        }
+
+        if (modelCacheKey in this.scene.cachedModels)
+        {
+          var cachedData = this.scene.cachedModels[modelCacheKey];
 
           if (cachedData.referenceObject)
           {
@@ -6411,7 +6456,7 @@ GZ3D.GZIface.prototype.createGeom = function(geom, material, parent, modelScale)
         }
         else
         {
-          this.scene.cachedModels[modelUri] =
+          this.scene.cachedModels[modelCacheKey] =
           {
             referenceObject:null,
             objects:[parent]
@@ -6450,7 +6495,7 @@ GZ3D.GZIface.prototype.createGeom = function(geom, material, parent, modelScale)
                     }
                   }
 
-                  cachedData = that.scene.cachedModels[modelUri];
+                  cachedData = that.scene.cachedModels[modelCacheKey];
                   cachedData.referenceObject = dae;
                   for(var i = 0; i<cachedData.objects.length; i++)
                   {
@@ -6556,7 +6601,7 @@ GZ3D.GZIface.prototype.createGeom = function(geom, material, parent, modelScale)
           allChildren[c].castShadow = false;
           allChildren[c].receiveShadow = false;
 
-          allChildren[c].visible = that.scene.showCollisions;
+          allChildren[c].visible = that.scene.showCollisions || visualObj.visible;
         }
       }
     }
@@ -6660,9 +6705,12 @@ GZ3D.GZIface.prototype.parseMaterial = function(material)
 
               if (diffuse)
               {
-                diffuse[0] *= color[0];
-                diffuse[1] *= color[1];
-                diffuse[2] *= color[2];
+                if (Math.abs(diffuse[0]-diffuse[1])< Number.EPSILON && Math.abs(diffuse[1]-diffuse[2])< Number.EPSILON)
+                {
+                  diffuse[0] *= color[0];
+                  diffuse[1] *= color[1];
+                  diffuse[2] *= color[2];
+                }
               }
               else
               {
