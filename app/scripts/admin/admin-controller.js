@@ -29,7 +29,8 @@
       return 5000;
     }
 
-    constructor($scope, adminService, nrpUser) {
+    constructor($scope, adminService, nrpUser, clbErrorDialog) {
+      this.clbErrorDialog = clbErrorDialog;
       this.adminService = adminService;
       this.adminRights = false;
       nrpUser.isAdministrator().then(res => (this.adminRights = res));
@@ -44,13 +45,19 @@
       $scope.$on('$destroy', () => this.$onDestroy());
     }
 
+    handleError() {
+      this.clbErrorDialog.open({
+        type: 'Execution error.',
+        message:
+          'Failed to execute action. Please reload the page and try again.'
+      });
+    }
     setMaintenanceMode(maintenance) {
-      console.log(`maintenance: ${maintenance}`);
-      this.adminService.setStatus(maintenance);
+      this.adminService.setStatus(maintenance).catch(() => this.handleError());
     }
 
     restartServer(server) {
-      this.adminService.restartServer(server);
+      this.adminService.restartServer(server).catch(() => this.handleError());
     }
 
     $onDestroy() {
@@ -58,7 +65,12 @@
     }
   }
 
-  AdminPageCtrl.$inject = ['$scope', 'adminService', 'nrpUser'];
+  AdminPageCtrl.$inject = [
+    '$scope',
+    'adminService',
+    'nrpUser',
+    'clbErrorDialog'
+  ];
 
   angular.module('adminModule', []).controller('adminPageCtrl', AdminPageCtrl);
 })();
