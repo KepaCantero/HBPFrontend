@@ -130,21 +130,6 @@ describe('Services: objectInspectorService', function() {
     );
   });
 
-  it('should toggle angle mode', function() {
-    objectInspectorService.angleMode = 'DEG';
-    objectInspectorService.floatPrecision = 3;
-
-    objectInspectorService.toggleAngleMode();
-
-    expect(objectInspectorService.angleMode).toBe('RAD');
-    expect(objectInspectorService.floatPrecision).toBe(6);
-
-    objectInspectorService.toggleAngleMode();
-
-    expect(objectInspectorService.angleMode).toBe('DEG');
-    expect(objectInspectorService.floatPrecision).toBe(3);
-  });
-
   it('should be able to round numbers to displayable precisions', function() {
     var number = 1.23456789;
     var rounded = objectInspectorService.roundToPrecision(number);

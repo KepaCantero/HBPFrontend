@@ -84,13 +84,7 @@
 
               <!-- sub-section - numerical rotation, collapsible -->
               <li class="sub-section-item" ng-show="!collapsedTransform">
-
-                <div style="display:flex; justify-content: space-between;">
-
-                  <h6>Rotation</h6>
-
-                </div>
-
+                <h6>Rotation (degrees)</h6>
                 <ol class="vec3-num-input-list" ng-show="objectInspectorService.selectedObject.rotation">
                   <li class="vec3-num-input-item">
                     <input interactive id="oi-rot-euler-x" type="number" name="rotate-x" class="vec3-num-input" ng-model="objectInspectorService.rotationEuler.x"
@@ -103,14 +97,6 @@
                   <li class="vec3-num-input-item">
                     <input interactive id="oi-rot-euler-z" type="number" name="rotate-z" class="vec3-num-input" ng-model="objectInspectorService.rotationEuler.z"
                       ng-keydown="suppressKeyPress($event)" ng-change="objectInspectorService.onRotationChange('z')" style="{{objectInspectorService.selectedStyle['RZ']}}">
-                  </li>
-
-                  <li class="vec3-num-input-item">
-                    <div style="position:relative">
-                      <div type="button" class="btn btn-default btn-degrees" ng-click="objectInspectorService.toggleAngleMode()">
-                        {{objectInspectorService.angleMode}}
-                      </div>
-                    </div>
                   </li>
                 </ol>
               </li>
