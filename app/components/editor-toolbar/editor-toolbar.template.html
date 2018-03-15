@@ -171,7 +171,7 @@
                     <div class="hbp-toolbar-action ng-hide" ng-class="{'active': vm.editorToolbarService.isNavigationModeMenuActive}" ng-click="vm.hideTooltip();vm.navigationModeMenuClickHandler()"
                         help-tooltip="USER_NAVIGATION" ng-show="(vm.stateService.currentState === vm.STATE.STARTED) || (vm.stateService.currentState === vm.STATE.PAUSED) || (vm.stateService.currentState === vm.STATE.INITIALIZED)"
                         uib-tooltip="User navigation sub-menu: Camera Button - Freeflying Camera / Character Button - Character bound physical presence"
-                        tooltip-placement="top" tooltip-popup-delay="2000" tooltip-popup-close-delay="300">
+                        tooltip-placement="bottom" tooltip-popup-delay="2000" tooltip-popup-close-delay="300">
                         <i class="fa fa-compass fa-2x vertcenter"></i>
                         <div show-on-top ng-show="vm.editorToolbarService.isNavigationModeMenuActive"
                         class="hbp-toolbar-camera-popup">
