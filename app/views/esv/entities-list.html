@@ -16,9 +16,9 @@
         <div ng-repeat="entity in entities | filter:query" class="experiment-box" ng-mouseenter="isHovered = true" ng-mouseleave="isHovered = false" ng-mouseup="isHovered = false" ng-click="selectEntity(entity)">
             <div class="list-entry-container left-right" ng-show="entity.thumbnail!==''" ng-class="{selected: (entity.id == entityPageState.selected) || isHovered}">
                 <div class="list-entry-left" ng-class="{selected: entity.id == entityPageState.selected}">
-                    <img ng-if="!entity.thumbnail && entityName == 'Robot'" class="entity-thumbnail" src="img/esv/robotbody.png"/>
-                    <img ng-if="!entity.thumbnail && entityName == 'Environment'" class="entity-thumbnail" src="img/esv/environment.png"/>
-                    <img ng-if="!entity.thumbnail && entityName == 'Brain'" class="entity-thumbnail" src="img/esv/brain.png"/>
+                    <img ng-if="!entity.thumbnail && (entityName == 'Robot' || entityName == 'Robots')" class="entity-thumbnail" src="img/esv/robotbody.png"/>
+                    <img ng-if="!entity.thumbnail && (entityName == 'Environments' || entityName == 'Environment')" class="entity-thumbnail" src="img/esv/environment.png"/>
+                    <img ng-if="!entity.thumbnail && (entityName == 'Brain' || entityName == 'Brains')" class="entity-thumbnail" src="img/esv/brain.png"/>
                     <img ng-if="entity.thumbnail" class="entity-thumbnail" ng-src="{{entity.thumbnail}}"/>
                 </div>
                 <div class="list-entry-middle list-entry-container up-down">
