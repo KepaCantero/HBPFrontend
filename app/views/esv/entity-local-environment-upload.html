@@ -4,14 +4,14 @@
                 <span aria-hidden="true">&times;</span>
             </button>
         <div class="list-entry-container left-right title-line">
-            <div class="h3">Select {{entityName}} </div>   
+            <div class="h3">Select {{entityName}} </div>
         </div>
         <hr class="list-separator">
         <div>
             <label for="file">Choose {{entityName}} zip to upload</label>
             <input type="file" id="file" name="file" accept=".zip">
         </div>
-        
+
         <div>
             {{entityName}}
             {{entity.description}}
@@ -29,12 +29,12 @@
         <br>
         <br>
         <div align="left">
-            <button class="btn btn-success btn-s" tooltip-trigger="mouseenter" tooltip-placement="top" ng-click="uploadModelZip()"
+            <button class="btn btn-success btn-s" ng-click="uploadModelZip()"
                 style="margin-left:20px;">Submit
             </button>
         </div>
         <div align="right">
-            <button class="btn btn-default enable-tooltip" tooltip-trigger="mouseenter" tooltip-placement="top" ng-click="destroyDialog()"
+            <button class="btn btn-default enable-tooltip" ng-click="destroyDialog()"
                 style="margin-right:20px;">Cancel
             </button>
         </div>

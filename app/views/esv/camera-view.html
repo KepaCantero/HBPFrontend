@@ -10,8 +10,8 @@
 <div class="camera-view-label">{{cameraName}}</div>
 
 <div class="camera-icons">
-  <span class="glyphicon glyphicon-modal-window camera-frustum" ng-class="{'camera-icon-enabled' : showFrustum}" uib-tooltip="Show frustum" tooltip-placement="bottom"
+  <span class="glyphicon glyphicon-modal-window camera-frustum" ng-class="{'camera-icon-enabled' : showFrustum}" title="Show frustum"
     ng-click="onShowFrustumChanged()" aria-hidden="true"></span>
-  <i class="fa fa-video-camera camera-server-stream" ng-class="{'camera-icon-enabled' : showServerStream}" ng-show="videoUrl" uib-tooltip="Stream&nbsp;server&nbsp;image"
-    tooltip-placement="bottom" ng-click="toggleServerStream()" aria-hidden="true"></i>
+  <i class="fa fa-video-camera camera-server-stream" ng-class="{'camera-icon-enabled' : showServerStream}" ng-show="videoUrl" title="Stream&nbsp;server&nbsp;image"
+    ng-click="toggleServerStream()" aria-hidden="true"></i>
 </div>

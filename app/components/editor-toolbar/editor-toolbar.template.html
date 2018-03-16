@@ -21,24 +21,24 @@
 
                 <div ng-if="vm.userContextService.isOwner() && vm.stateService.currentState === vm.STATE.PAUSED" class="hbp-toolbar-action"
                     ng-disabled="vm.stateService.statePending" help-tooltip="PLAY_BUTTON" ng-click="vm.hideTooltip();vm.simControlButtonHandler(vm.STATE.STARTED)"
-                    uib-tooltip="Play" tooltip-placement="top" tooltip-popup-delay="2000" tooltip-popup-close-delay="300">
+                    title="Play">
                     <i class="glyphicon glyphicon-play"></i>
                 </div>
                 <div ng-if="vm.userContextService.isOwner()" class="hbp-toolbar-action ng-hide" ng-disabled="vm.stateService.statePending"
                     help-tooltip="PAUSE_BUTTON" ng-click="vm.hideTooltip(); vm.simControlButtonHandler(vm.STATE.PAUSED)" ng-show="(vm.stateService.currentState === vm.STATE.STARTED)"
-                    uib-tooltip="Pause" tooltip-placement="top" tooltip-popup-delay="2000" tooltip-popup-close-delay="300">
+                    title="Pause">
                     <i class="glyphicon glyphicon-pause"></i>
                 </div>
                 <div ng-if="vm.userContextService.isOwner()" class="hbp-toolbar-action ng-hide" ng-disabled="vm.stateService.statePending"
                     help-tooltip="RESET_BUTTON" ng-click="vm.resetButtonClickHandler()" ng-show="(vm.stateService.currentState !== vm.STATE.STOPPED) &&
                             (vm.stateService.currentState !== vm.STATE.HALTED) &&
-                            (vm.stateService.currentState !== vm.STATE.FAILED)" uib-tooltip="Reset" tooltip-placement="top"
-                    tooltip-popup-delay="2000" tooltip-popup-close-delay="300">
+                            (vm.stateService.currentState !== vm.STATE.FAILED)" title="Reset"
+                   >
                     <i class="glyphicon glyphicon glyphicon-repeat"></i>
                 </div>
 
-                <div class="hbp-toolbar-action" help-tooltip="EXIT_BUTTON" ng-click="vm.demoMode ? vm.exit() : vm.exitDialog()" uib-tooltip="Leave the simulation"
-                    tooltip-placement="top-right" tooltip-popup-delay="2000" tooltip-popup-close-delay="300">
+                <div class="hbp-toolbar-action" help-tooltip="EXIT_BUTTON" ng-click="vm.demoMode ? vm.exit() : vm.exitDialog()" title="Leave the simulation"
+                   >
                     <i class="fa fa-sign-out fa-2x vertcenter"></i>
                 </div>
 
@@ -46,8 +46,8 @@
 
             <div class="hbp-toolbar-large-tool hbp-time-display default-cursor" ng-class="{ 'disabled': (vm.stateService.currentState === vm.STATE.HALTED) ||
         (vm.stateService.currentState === vm.STATE.STOPPED) ||
-        (vm.stateService.currentState === vm.STATE.FAILED)}" help-tooltip="TIME_DISPLAY" uib-tooltip="'Simulation time' as opposed to real time. Simulation will be terminated once the 'Timeout' is reached"
-                tooltip-placement="top" tooltip-popup-delay="2000" tooltip-popup-close-delay="300" ng-click="vm.hideTooltip()">
+        (vm.stateService.currentState === vm.STATE.FAILED)}" help-tooltip="TIME_DISPLAY" title="'Simulation time' as opposed to real time. Simulation will be terminated once the 'Timeout' is reached"
+                ng-click="vm.hideTooltip()">
                 <div ng-show="(vm.stateService.currentState === vm.STATE.INITIALIZED) || (vm.stateService.currentState === vm.STATE.STARTED) || (vm.stateService.currentState === vm.STATE.PAUSED)">
                     <div>
                         <span>Simulation time:</span>
@@ -79,8 +79,8 @@
 
                     <!-- camera translation tool -->
                     <div class="hbp-toolbar-item esv-remove-from-touchscreen hbp-camera-tool-container hbp-toolbar-action" help-tooltip="CAMERA_TRANSLATION">
-                        <div class="hbp-camera-tool-controls" uib-tooltip="Move camera. Click on the arrows, or the (WASD),(RF,Page-Up,Page-Down) keys. Reset the position by clicking in the center"
-                            tooltip-placement="top" tooltip-popup-delay="2000" tooltip-popup-close-delay="300">
+                        <div class="hbp-camera-tool-controls" title="Move camera. Click on the arrows, or the (WASD),(RF,Page-Up,Page-Down) keys. Reset the position by clicking in the center"
+                           >
                             <div class="hbp-camera-tool-controls-overlay" ng-click="vm.hideTooltip()">
                                 <img src="img/esv/translation_icon.png" width=32 height=32>
                             </div>
@@ -124,8 +124,8 @@
 
                     <!-- camera rotation tool -->
                     <div class="hbp-toolbar-item esv-remove-from-touchscreen hbp-camera-tool-container hbp-toolbar-action" help-tooltip="CAMERA_ROTATION">
-                        <div class="hbp-camera-tool-controls" uib-tooltip="Orientate camera. Click on the arrow keys or drag the mouse. Reset the orientation by clicking in the center"
-                            tooltip-placement="top" tooltip-popup-delay="2000" tooltip-popup-close-delay="300">
+                        <div class="hbp-camera-tool-controls" title="Orientate camera. Click on the arrow keys or drag the mouse. Reset the orientation by clicking in the center"
+                           >
                             <div class="hbp-camera-tool-controls-overlay" ng-click="vm.hideTooltip()">
                                 <img src="img/esv/rotation_icon.png" width=32 height=32>
                             </div>
@@ -170,8 +170,8 @@
                     <!-- navigation mode -->
                     <div class="hbp-toolbar-action ng-hide" ng-class="{'active': vm.editorToolbarService.isNavigationModeMenuActive}" ng-click="vm.hideTooltip();vm.navigationModeMenuClickHandler()"
                         help-tooltip="USER_NAVIGATION" ng-show="(vm.stateService.currentState === vm.STATE.STARTED) || (vm.stateService.currentState === vm.STATE.PAUSED) || (vm.stateService.currentState === vm.STATE.INITIALIZED)"
-                        uib-tooltip="User navigation sub-menu: Camera Button - Freeflying Camera / Character Button - Character bound physical presence"
-                        tooltip-placement="bottom" tooltip-popup-delay="2000" tooltip-popup-close-delay="300">
+                        title="User navigation sub-menu: Camera Button - Freeflying Camera / Character Button - Character bound physical presence"
+                       >
                         <i class="fa fa-compass fa-2x vertcenter"></i>
                         <div show-on-top ng-show="vm.editorToolbarService.isNavigationModeMenuActive"
                         class="hbp-toolbar-camera-popup">
@@ -203,8 +203,8 @@
                     <!-- toggle spiketrain -->
                     <div class="hbp-toolbar-action ng-hide" ng-class="{'active': vm.editorToolbarService.isSpikeTrainActive}" help-tooltip="SPIKE_TRAIN"
                         ng-click="vm.hideTooltip();vm.editorToolbarService.toggleSpikeTrain()" ng-show="(vm.stateService.currentState === vm.STATE.STARTED) || (vm.stateService.currentState === vm.STATE.PAUSED) || (vm.stateService.currentState === vm.STATE.INITIALIZED)"
-                        uib-tooltip="Toggle spike-train visualization (Available only if a neuron monitor is defined)" tooltip-placement="top"
-                        tooltip-popup-delay="2000" tooltip-popup-close-delay="300">
+                        title="Toggle spike-train visualization (Available only if a neuron monitor is defined)"
+                       >
                         <img src="img/esv/spiketrain_logo.png">
                     </div>
                     <!-- toggle spiketrain -->
@@ -212,7 +212,7 @@
                     <!-- toggle jointPlot -->
                     <div class="hbp-toolbar-action ng-hide" ng-click="vm.hideTooltip();vm.dynamicViewOverlayService.createDynamicOverlay(vm.DYNAMIC_VIEW_CHANNELS.JOINT_PLOT)"
                         help-tooltip="JOINT_PLOT" ng-show="(vm.stateService.currentState === vm.STATE.STARTED) || (vm.stateService.currentState === vm.STATE.PAUSED) || (vm.stateService.currentState === vm.STATE.INITIALIZED)"
-                        uib-tooltip="Open robot joints plot" tooltip-placement="top" tooltip-popup-delay="2000" tooltip-popup-close-delay="300">
+                        title="Open robot joints plot">
                         <img src="img/esv/jointplot_logo.png">
                     </div>
                     <!-- toggle jointPlot -->
@@ -222,8 +222,8 @@
                               'disabled': (vm.stateService.currentState === vm.STATE.HALTED) ||
                                           (vm.stateService.currentState === vm.STATE.STOPPED) ||
                                           (vm.stateService.currentState === vm.STATE.FAILED)}" ng-click="vm.hideTooltip();vm.editorToolbarService.toggleBrainvisualizer()"
-                        help-tooltip="BRAIN_VISUALIZER" uib-tooltip="Toggle the brain visualizer" tooltip-placement="top" tooltip-popup-delay="2000"
-                        tooltip-popup-close-delay="300">
+                        help-tooltip="BRAIN_VISUALIZER" title="Toggle the brain visualizer"
+                       >
                         <img src="img/esv/brainvisualizer.png" width=32 height=32>
                     </div>
                     <!-- brain visualizer icon-->
@@ -234,8 +234,8 @@
 
                     <!-- toggle robot camera view -->
                     <div class="hbp-toolbar-action hide-overflow ng-hide" ng-class="{'disabled-image-with-events': !vm.gz3dViewsService.hasCameraView()}"
-                        ng-click="vm.hideTooltip();vm.robotViewButtonClickHandler()" help-tooltip="ROBOT_VIEW" uib-tooltip="See through the robot's cameras (Disabled if no camera is available)"
-                        tooltip-placement="top" tooltip-popup-delay="2000" tooltip-popup-close-delay="300" ng-show="(vm.stateService.currentState === vm.STATE.STARTED) || (vm.stateService.currentState === vm.STATE.PAUSED) || (vm.stateService.currentState === vm.STATE.INITIALIZED)">
+                        ng-click="vm.hideTooltip();vm.robotViewButtonClickHandler()" help-tooltip="ROBOT_VIEW" title="See through the robot's cameras (Disabled if no camera is available)"
+                        ng-show="(vm.stateService.currentState === vm.STATE.STARTED) || (vm.stateService.currentState === vm.STATE.PAUSED) || (vm.stateService.currentState === vm.STATE.INITIALIZED)">
                         <i class="fa fa-eye fa-2x vertcenter"></i>
                     </div>
                     <!-- toggle robot camera view -->
@@ -243,8 +243,8 @@
                     <!-- video streams icon -->
                     <div class="hbp-toolbar-action hide-overflow" ng-class="{  'active': vm.showVideoStreams,
                                     'disabled-image-with-events': !vm.editorToolbarService.videoStreamsAvailable}" ng-click="vm.hideTooltip();vm.videoStreamsToggle()"
-                        help-tooltip="SERVER_VIDEO_STREAM" uib-tooltip="Open the video stream (Disabled if no stream is available)"
-                        tooltip-placement="top" tooltip-popup-delay="2000" tooltip-popup-close-delay="300">
+                        help-tooltip="SERVER_VIDEO_STREAM" title="Open the video stream (Disabled if no stream is available)"
+                       >
                         <img src="img/esv/videostream_icon.png" width=31 height=31>
                     </div>
                     <!-- video streams icon -->
@@ -253,7 +253,7 @@
                     <div class="hbp-toolbar-action hide-overflow ng-hide" ng-class="{'active': vm.editorToolbarService.isPerformanceViewActive}"
                         ng-click="vm.hideTooltip();vm.editorToolbarService.togglePerformanceView()" help-tooltip="PERFORMANCE_VIEW"
                         ng-show="(vm.stateService.currentState === vm.STATE.STARTED) || (vm.stateService.currentState === vm.STATE.PAUSED)"
-                        uib-tooltip="Toggle the performance monitor" tooltip-placement="top" tooltip-popup-delay="2000" tooltip-popup-close-delay="300">
+                        title="Toggle the performance monitor">
                         <img src="img/esv/performance-monitor.png" width=27 height=27>
                     </div>
                     <!-- toggle performance monitor view -->
@@ -265,8 +265,8 @@
 
                     <!-- log console icon -->
                     <div class="hbp-toolbar-action hide-overflow" ng-class="{'active': vm.editorToolbarService.isLogConsoleActive}" ng-click="vm.hideTooltip();vm.editorToolbarService.toggleLogConsole()"
-                        help-tooltip="LOG_CONSOLE" uib-tooltip="Toggle the log console (Logs are defined in transfer functions)"
-                        tooltip-placement="top" tooltip-popup-delay="2000" tooltip-popup-close-delay="300" style="position:relative">
+                        help-tooltip="LOG_CONSOLE" title="Toggle the log console (Logs are defined in transfer functions)"
+                        style="position:relative">
                         <i class="fa fa-terminal fa-2x vertcenter"></i>
                         <div ng-if="vm.clientLoggerService.missedConsoleLogs" class="missed-console-badge missed-console-number-{{vm.clientLoggerService.missedConsoleLogs<=9}}"
                             ng-class="'missed-console-badge-count-'+(vm.clientLoggerService.missedConsoleLogs%2)">
@@ -278,15 +278,15 @@
 
                     <!-- ROS terminal -->
                     <div class="hbp-toolbar-action hide-overflow" help-tooltip="ROS_TERMINAL" ng-class="{'active': vm.editorToolbarService.isRosTerminalVisible}"
-                        ng-click="vm.hideTooltip();vm.editorToolbarService.toggleRosTerminal()" uib-tooltip="Toggle ROS terminal"
-                        tooltip-placement="top" tooltip-popup-delay="2000" tooltip-popup-close-delay="300">
+                        ng-click="vm.hideTooltip();vm.editorToolbarService.toggleRosTerminal()" title="Toggle ROS terminal"
+                       >
                         <i class="vertcenter" style="font-weight: bold;">ROS</i>
                     </div>
 
                     <!-- code editor icon -->
                     <div class="hbp-toolbar-action hide-overflow" ng-class="{ 'active': vm.editorsPanelService.showEditorPanel }" ng-click="vm.hideTooltip();vm.codeEditorButtonClickHandler()"
-                        help-tooltip="CODE_EDITOR" uib-tooltip="Toggle experiment editors (Unavailable if another user is editing)"
-                        tooltip-placement="top" tooltip-popup-delay="2000" tooltip-popup-close-delay="300" v-busy="vm.editorsPanelService.loadingEditPanel"
+                        help-tooltip="CODE_EDITOR" title="Toggle experiment editors (Unavailable if another user is editing)"
+                        v-busy="vm.editorsPanelService.loadingEditPanel"
                         v-busy-label="Loading the edit panel">
                         <i class="fa fa-pencil-square-o fa-2x vertcenter"></i>
                     </div>
@@ -315,8 +315,8 @@
 
                         <div ng-if="vm.userContextService.isOwner()" class="hbp-toolbar-light-icon vertcenter hbp-toolbar-item" ng-class="{'disabled': (vm.stateService.currentState === vm.STATE.HALTED) ||
                                                             (vm.stateService.currentState === vm.STATE.STOPPED) ||
-                                                            (vm.stateService.currentState === vm.STATE.FAILED)}" uib-tooltip="Increase/decrease the global brightness of the scene"
-                            tooltip-placement="top" tooltip-popup-delay="2000" tooltip-popup-close-delay="300" style="display:flex; font-size: 11px;">
+                                                            (vm.stateService.currentState === vm.STATE.FAILED)}" title="Increase/decrease the global brightness of the scene"
+                            style="display:flex; font-size: 11px;">
 
                             <div class="hbp-toolbar-light-left-click" style="display:flex; justify-content: space-around;" help-tooltip="DECREASE_LIGHT" ng-click="vm.hideTooltip();vm.modifyLightClickHandler(-1)">
                                 <i ng-class="{'disabled-image': vm.gz3d.isGlobalLightMinReached()}" style="line-height: 34px;" class="hbp-toolbar-light-min fa fa-lightbulb-o fa-1x vertcenter"></i>
@@ -339,13 +339,13 @@
 
                     <!-- toolbar help icon -->
                     <div class="hbp-toolbar-action right-align hide-overflow " ng-click="vm.hideTooltip();vm.helpTooltipService.toggleHelp()"
-                        uib-tooltip="Click on another button to get a helpful description" tooltip-placement="top-right" tooltip-popup-delay="2000"
-                        tooltip-popup-close-delay="300">
+                        title="Click on another button to get a helpful description"
+                       >
                         <i class="fa fa-question-circle fa-2x vertcenter" ng-class="{active: vm.helpTooltipService.visible == helpTooltipService.HELP}"></i>
                     </div>
 
                     <div class="hbp-toolbar-action right-align hide-overflow" help-tooltip="INFO_BUTTON" dont-stop-propagation ng-click="vm.hideTooltip();vm.helpTooltipService.toggleInfo()"
-                        uib-tooltip="Information about the simulation" tooltip-placement="top" tooltip-popup-delay="2000" tooltip-popup-close-delay="300">
+                        title="Information about the simulation">
                         <i class="fa fa-info-circle fa-2x vertcenter" ng-class="{active: vm.helpTooltipService.visible == helpTooltipService.INFO}"></i>
                     </div>
                     <!-- toolbar help icon -->
@@ -354,7 +354,7 @@
                     <div class="hbp-toolbar-action right-align hide-overflow" ng-class="{'active': vm.editorToolbarService.isEnvironmentSettingsPanelActive, disabled: vm.environmentRenderingService.loadingEnvironmentSettingsPanel}"
                         ng-click="vm.hideTooltip();vm.environmentSettingsClickHandler()" help-tooltip="ENVIRONMENT_SETTINGS"
                         v-busy="vm.environmentRenderingService.loadingEnvironmentSettingsPanel" v-busy-label="Loading the environment settings panel"
-                        uib-tooltip="Toggle 3D environment settings" tooltip-placement="top" tooltip-popup-delay="2000" tooltip-popup-close-delay="300">
+                        title="Toggle 3D environment settings">
                         <img src="img/esv/settings.png" width=28 height=28>
                     </div>
                     <!-- environment settings panel -->

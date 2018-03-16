@@ -64,7 +64,7 @@
             <span ng-if="devMode && config.canLaunchExperiments">
           <i>Available backends:</i>
           <i  class="label-availability"
-              uib-tooltip="A backend VM is required to control the simulation">
+              title="A backend VM is required to control the simulation">
              {{exp.availableServers.length}}
           </i>
           <br/>
@@ -79,7 +79,7 @@
           </div>
         <br>
         <i>Cluster availability: </i>
-        <i class="label-availability" uib-tooltip="A cluster node is required to run the robot simulation" ng-class="clusterAvailability.free < CLUSTER_THRESHOLDS.AVAILABLE ? (clusterAvailability.free < CLUSTER_THRESHOLDS.UNAVAILABLE ? 'label-danger' : 'label-warning') : 'label-success' ">
+        <i class="label-availability" title="A cluster node is required to run the robot simulation" ng-class="clusterAvailability.free < CLUSTER_THRESHOLDS.AVAILABLE ? (clusterAvailability.free < CLUSTER_THRESHOLDS.UNAVAILABLE ? 'label-danger' : 'label-warning') : 'label-success' ">
           {{clusterAvailability.free}} / {{clusterAvailability.total}}
         </i>
         <br/>
@@ -107,14 +107,14 @@
             <div class="btn-group" role="group" ng-hide="editing[nameID] || editing[descID] || loadingEdit">
               <!-- Servers are available and the user has edit rights: launch button enabled -->
               <button analytics-on analytics-event="Launch" analytics-category="Experiment" ng-if="config.canLaunchExperiments && exp.availableServers.length > 0"
-                class="btn btn-default" tooltip-trigger="mouseenter" ng-click="pageState.startingExperiment == exp.id || startNewExperiment(exp, false);"
+                class="btn btn-default" ng-click="pageState.startingExperiment == exp.id || startNewExperiment(exp, false);"
                 ng-disabled="pageState.startingExperiment == exp.id || pageState.deletingExperiment">
             <i class="fa fa-plus"></i> Launch
           </button>
 
           <!-- No server available but the user has edit rights: launch button disabled -->
           <button ng-if="config.canLaunchExperiments && exp.availableServers.length == 0" class="btn btn-default disabled enable-tooltip"
-                uib-tooltip="Sorry, no available servers." tooltip-trigger="mouseenter" tooltip-placement="top">
+                title="Sorry, no available servers.">
             <i class="fa fa-plus"></i> Launch
           </button>
 
@@ -125,7 +125,7 @@
           </button>
 
           <button analytics-on analytics-event="Launch" analytics-category="Experiment" ng-if="isPrivateExperiment && config.canLaunchExperiments"
-            class="btn btn-default" tooltip-trigger="mouseenter" ng-click="deleteExperiment(exp.id)" ng-disabled = "pageState.deletingExperiment || pageState.startingExperiment == exp.id  || (config.canLaunchExperiments && exp.joinableServers.length > 0)">
+            class="btn btn-default" ng-click="deleteExperiment(exp.id)" ng-disabled = "pageState.deletingExperiment || pageState.startingExperiment == exp.id  || (config.canLaunchExperiments && exp.joinableServers.length > 0)">
            <i class="fa fa-times"></i> Delete
           </button>
 
@@ -173,8 +173,8 @@
                   <i class="fa fa-spinner fa-spin" ng-if="simul.stopping"></i> Stop
                 </a>
                     <!-- No edit rights: stop button disabled -->
-                    <a type="button" class="btn btn-default disabled enable-tooltip" uib-tooltip="Sorry, you don't have sufficient rights to stop the simulation."
-                      tooltip-trigger="mouseenter" tooltip-placement="top" ng-if="!canStopSimulation(simul)"> Stop
+                    <a type="button" class="btn btn-default disabled enable-tooltip" title="Sorry, you don't have sufficient rights to stop the simulation."
+                      ng-if="!canStopSimulation(simul)"> Stop
               </a>
                   </td>
                 </tr>
