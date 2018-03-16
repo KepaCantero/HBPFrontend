@@ -232,6 +232,9 @@
         };
 
         $scope.startNewExperiment = function(experiment, launchSingleMode) {
+          storageServer.logActivity('simulation_start', {
+            experiment: experiment.id
+          });
           $scope.pageState.startingExperiment = experiment.id;
           experimentsService
             .startExperiment(
