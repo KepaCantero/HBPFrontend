@@ -62,7 +62,7 @@
     }
 
     getServers() {
-      return this.proxyRsc.getServers();
+      return this.proxyRsc.getServers().$promise;
     }
 
     restartServer(serverStatus) {

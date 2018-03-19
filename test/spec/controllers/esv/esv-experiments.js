@@ -96,7 +96,8 @@
       storageServer,
       $q,
       clbErrorDialog,
-      clbConfirm;
+      clbConfirm,
+      $window;
 
     var serverErrorMock = {
       displayHTTPError: jasmine
@@ -138,6 +139,7 @@
         _$compile_,
         _$stateParams_,
         _$interval_,
+        _$window_,
         _environmentService_,
         _$location_,
         _bbpConfig_,
@@ -159,6 +161,7 @@
         $stateParams = _$stateParams_;
         $interval = _$interval_;
         $location = _$location_;
+        $window = _$window_;
         bbpConfig = _bbpConfig_;
         roslib = _roslib_;
         experimentsFactory = _experimentsFactory_;
@@ -212,7 +215,7 @@
         .respond(200, pageOptions.groups);
       $httpBackend.whenGET(/api\/collab\/configuration/).respond(200);
 
-      $controller('esvExperimentsCtrl', {
+      let $ctrl = $controller('esvExperimentsCtrl', {
         $rootScope: $rootScope,
         $scope: $rootScope,
         environmentService: environmentService,
@@ -220,6 +223,7 @@
         clbErrorDialog: clbErrorDialog
       });
 
+      $rootScope.$ctrl = $ctrl;
       var template = $templateCache.get('views/esv/esv-experiments.html');
       var page = $compile(template)($rootScope);
 
@@ -243,6 +247,23 @@
         .element(page.find('[load-private-experiments]'))
         .isolateScope();
     }
+
+    it('should reload on logout', () => {
+      $window.location.reload.calls.reset();
+      var page = renderEsvWebPage();
+      page
+        .find('.fa-sign-out')
+        .first()
+        .click();
+      expect($window.location.reload).toHaveBeenCalled();
+    });
+
+    it('should upload tip on tabChanged', () => {
+      renderEsvWebPage();
+      spyOn($rootScope, 'updateTip');
+      $rootScope.tabChanged();
+      expect($rootScope.updateTip).toHaveBeenCalled();
+    });
 
     it('should show only mature experiments in normal mode', function() {
       var page = renderEsvWebPage();

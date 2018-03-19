@@ -33,16 +33,23 @@
       this.clbErrorDialog = clbErrorDialog;
       this.adminService = adminService;
       this.adminRights = false;
+      this.servers = {};
       nrpUser.isAdministrator().then(res => (this.adminRights = res));
       this.status = adminService.getStatus();
 
       this.serversPolling$ = Rx.Observable
         .timer(0, AdminPageCtrl.SERVER_POLL_INTERVAL)
-        .subscribe(() => (this.servers = adminService.getServers()));
+        .subscribe(() =>
+          adminService.getServers().then(servers => this.updateServers(servers))
+        );
 
-      // work around a but that prevents the $onDestroy from beeing called for controllers  instanticated by the router
+      // work around a but that prevents the $onDestroy from beeing called for controllers  instantiated by the router
       //ie: https://github.com/angular/angular.js/issues/14376
       $scope.$on('$destroy', () => this.$onDestroy());
+    }
+
+    updateServers(servers) {
+      _.merge(this.servers, _.keyBy(servers, 'server'));
     }
 
     handleError() {
