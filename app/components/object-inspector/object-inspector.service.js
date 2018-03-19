@@ -48,6 +48,7 @@
       'simulationInfo',
       'userNavigationService',
       'NAVIGATION_MODES',
+      'noiseModelService',
       function(
         $timeout,
         EDIT_MODE,
@@ -60,7 +61,8 @@
         isNotARobotPredicate,
         simulationInfo,
         userNavigationService,
-        NAVIGATION_MODES
+        NAVIGATION_MODES,
+        noiseModelService
       ) {
         //var objectInspectorService = {
         function ObjectInspectorService() {
@@ -105,6 +107,16 @@
               this.selectedRobotComponent.userData.gazeboType === 'rostopic' &&
               this.selectedRobotComponent.userData.rosTopic
             );
+          };
+
+          this.addNoiseButtonClicked = function() {
+            if (this.selectedRobotComponent.userData.type == 'sensor') {
+              noiseModelService.setDataNoiseModel(
+                'robot',
+                this.selectedRobotComponent.sensorname,
+                this.selectedRobotComponent.sensortype
+              );
+            }
           };
 
           this.toggleAngleMode = function() {

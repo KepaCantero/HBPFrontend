@@ -87,6 +87,7 @@
       'dynamicViewModule',
       'dynamicViewOverlayModule',
       'videoStreamModule',
+      'noiseModelModule',
       'showOnTop',
       'clientLoggerModule',
       'environmentRenderingModule',

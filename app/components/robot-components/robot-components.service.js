@@ -101,6 +101,7 @@
             let sensorName = rosRobotProperties.sensor_names[i];
             // (Luc) The logic below is flawed as a DVS sensor is no references in
             // sensor_names_ROS and sensor_ros_message_type, but only in sensor_types
+            let sensorType = rosRobotProperties.sensor_types[i];
             let cameraName =
               rosRobotProperties.sensor_names_ROS[this.sensors.cameras.length];
             let topicURL = this.getCameraTopicURL(
@@ -114,6 +115,8 @@
             );
             let topicObject = new THREE.Object3D();
             topicObject.name = 'ROS: /' + topicURL;
+            topicObject.sensorname = sensorName;
+            topicObject.sensortype = sensorType;
             topicObject.userData.gazeboType = 'rostopic';
             topicObject.userData.rosTopic = '/' + topicURL;
             topicObject.userData.type = 'sensor';

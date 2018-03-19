@@ -1,0 +1,44 @@
+<div class="noise-model-popup">
+    <!-- build:css(.tmp) styles/esv/noise-models.css -->
+    <link rel="stylesheet" href="styles/esv/noise-models.css" />
+    <!-- endbuild -->
+    <div class="get-noise-value">
+       Sensor: <b class="showmess" align="center">{{selSensorName}}</b> 
+    </div>
+    <li class="sub-section-item">
+      <h6>Noise Type</h6>
+      <ul class="input-list">
+         <li class="input-listitem">
+                <input id="oigaussian" type="radio" name="space-gaussian" class="input-radio-checkbox" ng-click="setNoiseModel('gaussian')">Gaussian
+         </li>
+         <li class="input-listitem">
+                <input id="oigamma" type="radio" name="space-Gamma" class="input-radio-checkbox" ng-click="setNoiseModel('gamma')" >Generic - Gamma function
+         </li>
+         <li class="input-listitem">
+                <input id="oicauchy" type="radio" name="space-cauchy" class="input-radio-checkbox" ng-click="setNoiseModel('cauchy')" >Generic - Cauchy function
+         </li>
+         <li class="input-listitem">
+                <input id="oilognormal" type="radio" name="space-lognormal" class="input-radio-checkbox" ng-click="setNoiseModel('lognormal')" >Generic - Lognormal function
+         </li>
+         <li class="input-listitem">
+                <input id="oifisher" type="radio" name="space-fisher" class="input-radio-checkbox" ng-click="setNoiseModel('fisher')" >Generic - Fisher function
+         </li>
+         <li class="input-listitem">
+                <input id="oisquared" type="radio" name="space-squared" class="input-radio-checkbox" ng-click="setNoiseModel('squared')" >Generic - Squared function
+         </li>
+         <li class="input-listitem">
+                <input id="oilibnoise" type="radio" name="space-libnoise" class="input-radio-checkbox" ng-click="setNoiseModel('libnoise')" ng-show="showLibnoise" >{{LibnoisePerlin}}</input>
+         </li>
+       </ul>
+    </li>
+
+    <div class="set-noise-value">
+        Mean: <input interactive  type="number" class="noiseParameter" ng-keydown="suppressKeyPress($event)" ng-model="mean" style="{{selectedStyleMean}}" ng-change="onMeanParameterChanged()" ng-disabled="disabledMean"><br>
+        Standard Deviation: <input interactive type="number" class="noiseParameter" ng-keydown="suppressKeyPress($event)" ng-model="stddev" style="{{selectedStyleStddev}}" ng-change="onStdDevParameterChanged()"  ng-disabled="disabledStddev"><br>
+
+        <button type="button" ng-click="resetValueClicked()" style="width:100%; margin-bottom: 5px;">
+                <span>Reset Value</span>
+        </button>
+    </div>
+</div>
+
