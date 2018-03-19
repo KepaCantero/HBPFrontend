@@ -96,7 +96,8 @@
               this.selectedRobotComponent &&
               this.selectedRobotComponent.userData &&
               this.selectedRobotComponent.userData.gazeboType &&
-              this.selectedRobotComponent.userData.gazeboType === 'rostopic'
+              this.selectedRobotComponent.userData.gazeboType === 'rostopic' &&
+              this.selectedRobotComponent.userData.rosTopic
             );
           };
 
