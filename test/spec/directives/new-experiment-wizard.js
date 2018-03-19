@@ -80,16 +80,9 @@
       expect(scope.entities[0]).toEqual({
         name: 'fakeICub',
         description: 'fakeICub',
-        id: {
-          name: 'fakeICub',
-          description: 'fakeICub',
-          id: 'fakeICub',
-          thumbnail: '',
-          path: 'undefined'
-        },
         thumbnail: '',
         path: 'undefined',
-        custom: false
+        custom: true
       });
       expect(scope.entities[1].name).toBe('fakeHusky');
     });
@@ -117,13 +110,6 @@
       expect(scope.entities[0]).toEqual({
         name: 'fake3DSpace',
         description: 'fake3DSpace',
-        id: {
-          name: 'fake3DSpace',
-          description: 'fake3DSpace',
-          thumbnail: '',
-          path: 'undefined',
-          custom: true
-        },
         thumbnail: '',
         path: 'undefined',
         custom: true
@@ -156,13 +142,7 @@
         name: 'fakeBraitenberg',
         description: 'fakeBraitenberg',
         thumbnail: '',
-        id: {
-          name: 'fakeBraitenberg',
-          description: 'fakeBraitenberg',
-          thumbnail: '',
-          path: 'undefined'
-        },
-        custom: false,
+        custom: true,
         path: 'undefined'
       });
       expect(scope.entities[1].name).toBe('fakeIdleBrain');
@@ -412,28 +392,9 @@
       expect(storageServer.getFileContent).toHaveBeenCalled();
     });
 
-    it('should test the createEntitiesListFromBrainFiles success', function() {
-      spyOn(storageServer, 'getFileContent').and.returnValue(
-        window.$q.when({ uuid: 'fakeuuid', data: '"""test"""' })
-      );
-      var files = [
-        {
-          name: 'fakeName',
-          uuid: 'fakeuuid'
-        }
-      ];
-
-      var result = scope.createEntitiesListFromBrainFiles(files);
-      result.then(function(brainFiles) {
-        expect(storageServer.getFileContent).toHaveBeenCalledWith('fakeuuid');
-        expect(brainFiles[0].name).toEqual('fakeName');
-        expect(brainFiles[0].description).toEqual('test');
-      });
-    });
-
     it('should select new experiment', function() {
       scope.selectEntity({ id: 1 });
-      expect(scope.entityPageState.selected).toEqual(1);
+      expect(scope.entityPageState.selected).toEqual({ id: 1 });
     });
 
     it('should check that upload file click function works ok', function() {
@@ -466,7 +427,7 @@
       expect(document.body.appendChild).toHaveBeenCalled();
     });
 
-    it('should check that upload model zip function works ok', function() {
+    it('should check that upload environment zip function works ok', function() {
       function blobToFile(theBlob, fileName) {
         theBlob.lastModifiedDate = new Date();
         theBlob.name = fileName;
@@ -491,11 +452,56 @@
             custom: true,
             path: 'testPath',
             description: 'testDescription',
-            thumbnail: 'testThumbnail'
+            thumbnail: 'testThumbnail',
+            fileName: 'test'
           }
         ])
       );
       scope.uploadEnvironmentDialog();
+      var res = scope.uploadModelZip(
+        blobToFile(fakeZip, 'test.zip'),
+        'Environments'
+      );
+      $timeout.flush();
+      $timeout.verifyNoPendingTasks();
+      res.then(function() {
+        expect(scope.destroyDialog).toHaveBeenCalled();
+        expect(scope.uploadingModel).toBe(false);
+        expect(scope.entityName).toContain('Environments');
+      });
+    });
+
+    it('should check that upload robot zip function works ok', function() {
+      function blobToFile(theBlob, fileName) {
+        theBlob.lastModifiedDate = new Date();
+        theBlob.name = fileName;
+        return theBlob;
+      }
+      var fakeZip = new Blob([3, 7426, 78921], { type: 'application/zip' });
+      spyOn(window, 'FileReader').and.returnValue({
+        readAsArrayBuffer: function() {
+          this.onload({
+            target: {
+              result: fakeZip
+            }
+          });
+        }
+      });
+      spyOn(storageServer, 'setCustomModel').and.returnValue($q.when({}));
+      spyOn(scope, 'destroyDialog');
+      spyOn(storageServer, 'getCustomModels').and.returnValue(
+        $q.when([
+          {
+            name: 'testRobot',
+            custom: true,
+            path: 'testPath',
+            description: 'testDescription',
+            thumbnail: 'testThumbnail',
+            fileName: 'test'
+          }
+        ])
+      );
+      scope.uploadRobotDialog();
       var res = scope.uploadModelZip(blobToFile(fakeZip, 'test.zip'), 'Robots');
       $timeout.flush();
       $timeout.verifyNoPendingTasks();
@@ -503,6 +509,47 @@
         expect(scope.destroyDialog).toHaveBeenCalled();
         expect(scope.uploadingModel).toBe(false);
         expect(scope.entityName).toContain('Robots');
+      });
+    });
+
+    it('should check that upload brain zip function works ok', function() {
+      function blobToFile(theBlob, fileName) {
+        theBlob.lastModifiedDate = new Date();
+        theBlob.name = fileName;
+        return theBlob;
+      }
+      var fakeZip = new Blob([3, 7426, 78921], { type: 'application/zip' });
+      spyOn(window, 'FileReader').and.returnValue({
+        readAsArrayBuffer: function() {
+          this.onload({
+            target: {
+              result: fakeZip
+            }
+          });
+        }
+      });
+      spyOn(storageServer, 'setCustomModel').and.returnValue($q.when({}));
+      spyOn(scope, 'destroyDialog');
+      spyOn(storageServer, 'getCustomModels').and.returnValue(
+        $q.when([
+          {
+            name: 'testBrain',
+            custom: true,
+            path: 'testPath',
+            description: 'testDescription',
+            thumbnail: 'testThumbnail',
+            fileName: 'test'
+          }
+        ])
+      );
+      scope.uploadBrainDialog();
+      var res = scope.uploadModelZip(blobToFile(fakeZip, 'test.zip'), 'Brains');
+      $timeout.flush();
+      $timeout.verifyNoPendingTasks();
+      res.then(function() {
+        expect(scope.destroyDialog).toHaveBeenCalled();
+        expect(scope.uploadingModel).toBe(false);
+        expect(scope.entityName).toContain('Brains');
       });
     });
 
