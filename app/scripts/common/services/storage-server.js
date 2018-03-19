@@ -145,6 +145,11 @@
             headers: { 'Content-Type': 'application/octet-stream' },
             url: `${this.STORAGE_BASE_URL}/custommodels/:modelType/:modelName`,
             transformRequest: []
+          }),
+          logActivity: buildAction({
+            method: 'POST',
+            url: `${this.PROXY_URL}/activity_log/:activity`,
+            transformRequest: []
           })
         }
       );
@@ -259,6 +264,11 @@
 
     getMaintenanceMode() {
       return this.proxyRsc.getMaintenanceMode().$promise;
+    }
+
+    logActivity(activity, logObject) {
+      return this.proxyRsc.logActivity({ activity }, JSON.stringify(logObject))
+        .$promise;
     }
   }
 

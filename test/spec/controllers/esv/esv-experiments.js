@@ -449,6 +449,10 @@
       $httpBackend
         .whenGET(proxyUrl + '/server/' + hostName)
         .respond(200, defaultPageOptions.server);
+      //simulation_start activity log
+      $httpBackend
+        .whenPOST(proxyUrl + '/activity_log/simulation_start')
+        .respond(200);
       //start experiment
       var startUrl =
         defaultPageOptions.server.gzweb['nrp-services'] + '/simulation';
