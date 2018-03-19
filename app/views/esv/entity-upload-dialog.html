@@ -10,24 +10,24 @@
         <hr>
         <!-- button group div -->
         <!-- Public env library button -->
-        <button class="btn btn-block" tooltip-trigger="mouseenter" ng-click="uploadEntity('PublicEnv')" ng-disabled="pageState.startingExperiment == true">
+        <button class="btn btn-block" ng-click="uploadEntity('PublicEnv')" ng-disabled="pageState.startingExperiment == true">
                   From the template models library
             </button>
         <br>
         <!--Private Library button -->
-        <button class="btn btn-block" tooltip-trigger="mouseenter" ng-click="uploadEntity('PrivateStorage')" ng-disabled="pageState.startingExperiment == true">
+        <button class="btn btn-block" ng-click="uploadEntity('PrivateStorage')" ng-disabled="pageState.startingExperiment == true">
                   From your private storage
             </button>
         <br>
         <!-- Local environment , i.e. file system button -->
-        <button class="btn btn-block" tooltip-trigger="mouseenter" ng-click="uploadFileClick(entityName)" ng-disabled="pageState.startingExperiment == true">
+        <button class="btn btn-block" ng-click="uploadFileClick(entityName)" ng-disabled="pageState.startingExperiment == true">
                   Upload from your computer
             </button>
         <br>
         <br>
         <!-- close button -->
         <div align="right">
-            <button class="btn btn-default enable-tooltip" tooltip-trigger="mouseenter" tooltip-placement="top" ng-click="destroyDialog()">Cancel</button>
+            <button class="btn btn-default enable-tooltip" ng-click="destroyDialog()">Cancel</button>
         </div>
         <br>
     </div>
