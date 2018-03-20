@@ -10,7 +10,7 @@
     </button>
   </div>
 
-  <div>
+  <div style="flex-shrink: 0;">
     <h4 class="selected-object-name">{{objectInspectorService.selectedObject ? objectInspectorService.selectedObject.name : 'nothing selected'}}</h4>
   </div>
 
@@ -227,7 +227,7 @@
         </uib-tab>
 
         <uib-tab heading="Robot" index="1" disable="!objectInspectorService.isRobot()" select="objectInspectorService.setRobotMode(true);">
-          <div style="max-height: calc(100% - 50px); margin-top: 30px; overflow-y: auto;">
+          <div style="max-height: calc(100% - 130px); margin-top: 30px; overflow-y: auto;">
             <robot-tree-view on-selection-change="objectInspectorService.selectedRobotComponent = $selectedObject"></robot-tree-view>
           </div>
           <hr>

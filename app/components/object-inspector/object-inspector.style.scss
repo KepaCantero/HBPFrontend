@@ -26,13 +26,17 @@
 $objectInspectorMinWidth: 280px;
 $objectInspectorMinHeight: 40px;
 
+object-inspector {
+  display: flex;
+  flex-direction: column;
+}
+
 .object-inspector-widget {
   display: flex;
   flex-direction: column;
 
   margin: 0px 0px 5px 5px;
   width: $objectInspectorMinWidth;
-  max-height: 800px;
 }
 
 .robot-doc-link {
@@ -48,6 +52,7 @@ $objectInspectorMinHeight: 40px;
   width: 100%;
   justify-content: flex-end;
   //align-items: center;
+  flex-shrink: 0;
 
   #window-buttons {
     user-select: none;

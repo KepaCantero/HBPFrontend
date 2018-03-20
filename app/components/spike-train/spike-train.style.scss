@@ -29,6 +29,10 @@ $spikeTrainMargin: 5px;
 $spikeTrainMinWidth: 700px;
 $spikeTrainMinHeight: 160px;
 
+spike-train {
+  height: 100%;
+}
+
 .spikegraph {
   display: flex;
   height: 100%;

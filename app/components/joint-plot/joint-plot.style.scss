@@ -27,6 +27,10 @@ $jointPlotPadding: 10px;
 $jointPlotMinWidth: 700px;
 $jointPlotMinHeight: 200px;
 
+joint-plot {
+  height: 100%;
+}
+
 .jointplot-wrapper {
   display: flex;
   height: 100%;
