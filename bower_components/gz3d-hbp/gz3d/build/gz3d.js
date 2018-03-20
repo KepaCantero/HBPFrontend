@@ -417,20 +417,13 @@ GZ3D.VisualMuscleModel.prototype.updateVisualization = function(message) {
       // NOTE: The case were the number of muscles decreases is not handled.
       // It would result in superfluous visible geometry.
       if (!(k in this.cylinderShapes)) {
-        this.cylinderShapes[k] = [];
+        this.cylinderShapes[k] = {
+          cylinders : [],
+          spheres : []
+        };
       }
-      let cylinders = this.cylinderShapes[k];
-
+      let cylinders = this.cylinderShapes[k].cylinders;
       for (cq = 0; cq < num_segments; ++cq) {
-        cylinderEndPoint_1 = new THREE.Vector3(
-          message.muscle[k].pathPoint[cq].x,
-          message.muscle[k].pathPoint[cq].y,
-          message.muscle[k].pathPoint[cq].z);
-        cylinderEndPoint_2 = new THREE.Vector3(
-          message.muscle[k].pathPoint[cq + 1].x,
-          message.muscle[k].pathPoint[cq + 1].y,
-          message.muscle[k].pathPoint[cq + 1].z);
-
         // Create new cylinder on demand.
         if (cylinders.length <= cq) {
           let edgeGeometry = new THREE.CylinderGeometry(1, 1, 1, 8, 1);
@@ -443,9 +436,17 @@ GZ3D.VisualMuscleModel.prototype.updateVisualization = function(message) {
           cylinders.push(cylinder);
         }
 
-        cylinder = this.cylinderShapes[k][cq];
+        let cylinder = cylinders[cq];
         cylinder.visible = true; // In case less segments were needed the last frame.
         // Align and scale the cylinder.
+        cylinderEndPoint_1 = new THREE.Vector3(
+          message.muscle[k].pathPoint[cq].x,
+          message.muscle[k].pathPoint[cq].y,
+          message.muscle[k].pathPoint[cq].z);
+        cylinderEndPoint_2 = new THREE.Vector3(
+          message.muscle[k].pathPoint[cq + 1].x,
+          message.muscle[k].pathPoint[cq + 1].y,
+          message.muscle[k].pathPoint[cq + 1].z);
         let cylinder_direction = new THREE.Vector3().subVectors(cylinderEndPoint_2, cylinderEndPoint_1);
         cylinder.material.color = color;
         cylinder.scale.y = cylinder_direction.length();
@@ -459,10 +460,39 @@ GZ3D.VisualMuscleModel.prototype.updateVisualization = function(message) {
       } // end for path points
       // I don't bother tracking how many segments were needed last time.
       // Simply loop over all superfluous segments and turn them all off.
-      for(; cq < cylinders.length; ++cq)
-      {
-        let to_remove = cylinders[cq];
-        to_remove.visible = false;
+      for(; cq < cylinders.length; ++cq) {
+        cylinders[cq].visible = false;
+      }
+      // Now the spheres!
+      let spheres = this.cylinderShapes[k].spheres;
+      for (cq = 0; cq < message.muscle[k].pathPoint.length; ++cq) {
+        // Create one if needed.
+        if (spheres.length <= cq) {
+          let geom = new THREE.SphereGeometry(1, 8, 8);
+          let s = new THREE.Mesh(geom, new THREE.MeshLambertMaterial({
+            color: color,
+            wireframe: false,
+            flatShading: THREE.FlatShading
+          }));
+          this.scene.add(s);
+          spheres.push(s);
+        }
+        // Put it at the right place with the right size.
+        let sphere = spheres[cq];
+        sphere.visible = true;
+        sphere.material.color = color;
+        let pos = new THREE.Vector3(
+          message.muscle[k].pathPoint[cq].x,
+          message.muscle[k].pathPoint[cq].y,
+          message.muscle[k].pathPoint[cq].z);
+        sphere.position.copy(pos);
+        sphere.scale.x = radius;
+        sphere.scale.y = radius;
+        sphere.scale.z = radius;
+      }
+      // Turn off not needed ones.
+      for(; cq < spheres.length; ++cq) {
+        spheres[cq].visible = false;
       }
     } // end for message.muscle
   }
