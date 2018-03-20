@@ -30,12 +30,16 @@
     'RESET_TYPE',
     'spikeListenerService',
     'simulationInfo',
+    'collab3DSettingsService',
+    'environmentService',
     function(
       simulationConfigService,
       backendInterfaceService,
       RESET_TYPE,
       spikeListenerService,
-      simulationInfo
+      simulationInfo,
+      collab3DSettingsService,
+      environmentService
     ) {
       return {
         templateUrl:
@@ -48,6 +52,7 @@
         link: function(scope, element) {
           var brain3D;
           var brainContainer = element.find('.esv-brainvisualizer-main');
+          scope.isPrivateExperiment = environmentService.isPrivateExperiment();
 
           scope.BRAIN3D = BRAIN3D;
 
@@ -125,108 +130,95 @@
           };
 
           let initBrainSettings = () => {
-            try {
-              let brainvisualiserSettings = localStorage.getItem(
-                'brainvisualiser.' + simulationInfo.experimentID
-              );
-              if (brainvisualiserSettings) {
-                scope.currentValues = JSON.parse(brainvisualiserSettings);
+            if (!collab3DSettingsService.settings)
+              collab3DSettingsService.loadSettings();
+
+            return collab3DSettingsService.settings.then(settings => {
+              if (settings.brainVisualizer) {
+                scope.currentValues = settings.brainVisualizer;
               }
-            } finally {
-              angular.noop();
-            }
+            });
+          };
 
-            let saveBrainVisu = _.throttle(
-              () => {
-                scope.currentValues.savedSettings = true;
-                localStorage.setItem(
-                  'brainvisualiser.' + simulationInfo.experimentID,
-                  JSON.stringify(scope.currentValues)
-                );
-              },
-              200,
-              { leading: false }
-            );
-
-            scope.$watchCollection('currentValues', saveBrainVisu);
-            scope.$watchCollection(
-              'currentValues.disabledPopulations',
-              saveBrainVisu
-            );
+          scope.saveSettings = () => {
+            collab3DSettingsService.settings.then(settings => {
+              scope.currentValues.savedSettings = true;
+              settings.brainVisualizer = scope.currentValues;
+              collab3DSettingsService.saveSettings();
+            });
           };
 
           scope.initWithPopulations = function() {
-            initBrainSettings();
+            initBrainSettings().then(() => {
+              backendInterfaceService.getPopulations(function(response) {
+                if (response.populations) {
+                  var data = { populations: {} };
+                  scope.populations = [];
 
-            backendInterfaceService.getPopulations(function(response) {
-              if (response.populations) {
-                var data = { populations: {} };
-                scope.populations = [];
+                  data.userData = scope.userFile;
 
-                data.userData = scope.userFile;
+                  for (var i in response.populations) {
+                    if (response.populations.hasOwnProperty(i)) {
+                      var pop = response.populations[i];
+                      let userPopColor =
+                        data.userData &&
+                        data.userData.populations &&
+                        data.userData.populations[pop.name] &&
+                        data.userData.populations[pop.name].color;
+                      var newPop = {};
+                      newPop.list = pop.indices;
+                      newPop.gids = pop.gids;
 
-                for (var i in response.populations) {
-                  if (response.populations.hasOwnProperty(i)) {
-                    var pop = response.populations[i];
-                    let userPopColor =
-                      data.userData &&
-                      data.userData.populations &&
-                      data.userData.populations[pop.name] &&
-                      data.userData.populations[pop.name].color;
-                    var newPop = {};
-                    newPop.list = pop.indices;
-                    newPop.gids = pop.gids;
+                      newPop.color =
+                        userPopColor ||
+                        'hsl(' +
+                          i / (response.populations.length + 1) * 360.0 +
+                          ',100%,80%)';
+                      newPop.name = pop.name;
+                      if (scope.currentValues.disabledPopulations)
+                        newPop.visible = !scope.currentValues
+                          .disabledPopulations[pop.name];
+                      else newPop.visible = true;
 
-                    newPop.color =
-                      userPopColor ||
-                      'hsl(' +
-                        i / (response.populations.length + 1) * 360.0 +
-                        ',100%,80%)';
-                    newPop.name = pop.name;
-                    if (scope.currentValues.disabledPopulations)
-                      newPop.visible = !scope.currentValues.disabledPopulations[
-                        pop.name
-                      ];
-                    else newPop.visible = true;
-
-                    scope.populations.push(newPop);
-                    data.populations[pop.name] = newPop;
-                  }
-                }
-
-                scope.initBrainContainer(data);
-
-                scope.userFile = brain3D.userData;
-
-                if (scope.userFile) {
-                  if (!scope.currentValues.savedSettings)
-                    scope.currentValues.currentShape = BRAIN3D.REP_SHAPE_USER;
-
-                  if (scope.userFile.populations) {
-                    scope.settings.userCoordMode = true;
-                  } else {
-                    if (scope.userFile.colors) {
-                      if (!scope.currentValues.savedSettings) {
-                        scope.currentValues.displayColorMaps = true;
-                        scope.currentValues.currentColorMap =
-                          BRAIN3D.COLOR_MAP_USER;
-                      }
-                      scope.settings.userColorsMode = true;
-                      scope.settings.userCoordMode = true;
+                      scope.populations.push(newPop);
+                      data.populations[pop.name] = newPop;
                     }
                   }
-                }
 
-                if (scope.currentValues.savedSettings) {
-                  scope.setShape(scope.currentValues.currentShape);
-                  scope.setDistribution(
-                    scope.currentValues.currentDistribution
-                  );
-                  scope.setDisplay(scope.currentValues.currentDisplay);
-                  scope.setColorMap(scope.currentValues.currentColorMap);
-                  scope.updateSpikeScaler();
+                  scope.initBrainContainer(data);
+
+                  scope.userFile = brain3D.userData;
+
+                  if (scope.userFile) {
+                    if (!scope.currentValues.savedSettings)
+                      scope.currentValues.currentShape = BRAIN3D.REP_SHAPE_USER;
+
+                    if (scope.userFile.populations) {
+                      scope.settings.userCoordMode = true;
+                    } else {
+                      if (scope.userFile.colors) {
+                        if (!scope.currentValues.savedSettings) {
+                          scope.currentValues.displayColorMaps = true;
+                          scope.currentValues.currentColorMap =
+                            BRAIN3D.COLOR_MAP_USER;
+                        }
+                        scope.settings.userColorsMode = true;
+                        scope.settings.userCoordMode = true;
+                      }
+                    }
+                  }
+
+                  if (scope.currentValues.savedSettings) {
+                    scope.setShape(scope.currentValues.currentShape);
+                    scope.setDistribution(
+                      scope.currentValues.currentDistribution
+                    );
+                    scope.setDisplay(scope.currentValues.currentDisplay);
+                    scope.setColorMap(scope.currentValues.currentColorMap);
+                    scope.updateSpikeScaler();
+                  }
                 }
-              }
+              });
             });
           };
 

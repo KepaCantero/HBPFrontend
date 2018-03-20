@@ -341,6 +341,7 @@
         jpeg: 'file-image-o',
         json: 'file-text-o',
         '3ds': 'file-text-o',
+        ini: 'file-text-o',
         bibi: 'file-text-o',
         sdf: 'file-text-o',
         exc: 'file-text-o'

@@ -11,6 +11,8 @@ describe('Directive: brainvisualizer', function() {
 
   beforeEach(module('exdFrontendApp'));
   beforeEach(module('exd.templates'));
+  beforeEach(module('gz3dMock'));
+
   beforeEach(
     module(function($provide) {
       backendInterfaceServiceMock.getBrain = function(callback) {
@@ -128,6 +130,19 @@ describe('Directive: brainvisualizer', function() {
     })
   );
 
+  let simulationConfigService;
+  let brainVisuConfig;
+  beforeEach(
+    inject(function(_simulationConfigService_, _gz3d_) {
+      brainVisuConfig = {};
+      simulationConfigService = _simulationConfigService_;
+      spyOn(simulationConfigService, 'loadConfigFile').and.callFake(() =>
+        window.$q.resolve(JSON.stringify(brainVisuConfig))
+      );
+      _gz3d_.scene.composerSettings = {};
+    })
+  );
+
   describe('- normal initialization', function() {
     beforeEach(
       inject(function(_$rootScope_, _RESET_TYPE_, $compile) {
@@ -180,7 +195,6 @@ describe('Directive: brainvisualizer', function() {
 
         $rootScope = _$rootScope_;
         $compile('<brainvisualizer></brainvisualizer>')($rootScope);
-        $rootScope.$digest();
       })
     );
 
@@ -201,8 +215,8 @@ describe('Directive: brainvisualizer', function() {
     });
 
     it('should handle spike scaler', function() {
-      $rootScope.$$childTail.currentValues.spikeScaler = 1.0;
       $rootScope.$digest();
+      $rootScope.$$childTail.currentValues.spikeScaler = 1.0;
       $rootScope.$$childTail.updateSpikeScaler();
 
       expect($rootScope.spikefactor).toBe(1.0);
@@ -249,6 +263,7 @@ describe('Directive: brainvisualizer', function() {
     });
 
     it('should be able to update data', function() {
+      $rootScope.$digest();
       simulationConfigServiceMock.simulateCatch = false;
       simulationConfigServiceMock.fileExists = false;
       $rootScope.$digest();
@@ -258,6 +273,7 @@ describe('Directive: brainvisualizer', function() {
     });
 
     it('should be able to update data on reset', function() {
+      $rootScope.$digest();
       $rootScope.$$childTail.update = jasmine.createSpy('update');
 
       $rootScope.$broadcast('RESET', RESET_TYPE.RESET_FULL);
@@ -267,6 +283,7 @@ describe('Directive: brainvisualizer', function() {
     });
 
     it('should be able to update data on reset', function() {
+      $rootScope.$digest();
       $rootScope.$$childTail.update = jasmine.createSpy('update');
 
       $rootScope.$broadcast('pynn.populationsChanged');
@@ -289,6 +306,42 @@ describe('Directive: brainvisualizer', function() {
       $rootScope.$digest();
       $rootScope.$$childTail.exportNeuronsPositions();
       expect(simulationConfigServiceMock.saveConfigFile).toHaveBeenCalled();
+    });
+
+    it('should load brainVisualizer config in 3d-settings', function() {
+      brainVisuConfig = {
+        brainVisualizer: {
+          spikeScaler: 0.51,
+          currentShape: 'Sphere',
+          currentDistribution: 'Overlap',
+          currentDisplay: 'Blended',
+          displayColorMaps: false,
+          savedSettings: true
+        }
+      };
+      $rootScope.$digest();
+      expect($rootScope.$$childTail.currentValues.spikeScaler).toEqual(
+        brainVisuConfig.brainVisualizer.spikeScaler
+      );
+    });
+
+    it('should save 3d-settings on brain vizualiser', function() {
+      brainVisuConfig = {
+        brainVisualizer: {
+          spikeScaler: 0.51,
+          currentShape: 'Sphere',
+          currentDistribution: 'Overlap',
+          currentDisplay: 'Blended',
+          displayColorMaps: false,
+          savedSettings: true
+        }
+      };
+      $rootScope.$digest();
+      simulationConfigService.saveConfigFile.calls.reset();
+
+      $rootScope.$$childTail.saveSettings();
+      $rootScope.$digest();
+      expect(simulationConfigService.saveConfigFile).toHaveBeenCalled();
     });
   });
 
