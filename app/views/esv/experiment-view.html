@@ -19,7 +19,7 @@
   </div>
 
   <!-- Alert popup -->
-  <div class="alert alert-warning ng-hide" ng-show="vm.userContextService.isJoiningStoppedSimulation && !vm.userContextService.demoMode">
+  <div class="alert alert-warning ng-hide" style=" z-index: 999;  position: fixed;  width: 100%;" ng-show="vm.userContextService.isJoiningStoppedSimulation && !vm.userContextService.demoMode">
     <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
     Sorry, the simulation you just wanted to join is already stopped.
 
