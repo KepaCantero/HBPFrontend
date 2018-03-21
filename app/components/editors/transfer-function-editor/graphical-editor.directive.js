@@ -49,6 +49,7 @@
     'simulationInfo',
     'codeEditorsServices',
     'environmentService',
+    'editorsPanelService',
     function(
       $log,
       backendInterfaceService,
@@ -64,7 +65,8 @@
       TRANSFER_FUNCTION_TYPE,
       simulationInfo,
       codeEditorsServices,
-      environmentService
+      environmentService,
+      editorsPanelService
     ) {
       return {
         templateUrl:
@@ -277,7 +279,14 @@
             backendInterfaceService.getStructuredTransferFunctions(
               scope.loadTransferFunctions
             );
-            backendInterfaceService.getPopulations(scope.loadPopulations);
+            let tf2select =
+              editorsPanelService.openOptions &&
+              editorsPanelService.openOptions.selectTF;
+            backendInterfaceService
+              .getPopulations(scope.loadPopulations)
+              .then(() => {
+                tf2select && scope.selectTransferFunction(tf2select);
+              });
             backendInterfaceService.getTopics(scope.loadTopics);
             refreshEditor();
           };

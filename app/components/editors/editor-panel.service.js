@@ -29,12 +29,18 @@
 
   angular.module('editorsPanelModule', []).factory('editorsPanelService', [
     '$window',
+    '$timeout',
+    '$rootScope',
+    '$q',
     'environmentService',
     'simulationInfo',
     'userContextService',
     'nrpAnalytics',
     function(
       $window,
+      $timeout,
+      $rootScope,
+      $q,
       environmentService,
       simulationInfo,
       userContextService,
@@ -58,17 +64,26 @@
           this.cancelLockSubscription && this.cancelLockSubscription();
         };
 
+        this.showEditor = (tabIndex, options) => {
+          this.activeTabIndex = tabIndex;
+          this.showEditorPanel && this.toggleEditors();
+          this.openOptions = options;
+          this.toggleEditors().then(() =>
+            $timeout(() => delete this.openOptions, 100)
+          );
+        };
+
         this.toggleEditors = function() {
           if (
             !environmentService.isPrivateExperiment() ||
             !userContextService.lockService
           ) {
-            that.showEditorsPanel();
+            that.toggleEditorsPanel();
           } else {
             if (!that.showEditorPanel) {
               that.loadingEditPanel = true;
               // try and add a lock for editing
-              userContextService.lockService
+              return userContextService.lockService
                 .tryAddLock()
                 .then(that.onTryAddLock)
                 .catch(function() {
@@ -80,13 +95,14 @@
                   that.loadingEditPanel = false;
                 });
             } else {
-              that.showEditorsPanel();
+              that.toggleEditorsPanel();
               userContextService.removeEditLock();
             }
           }
+          return $q.resolve();
         };
 
-        this.showEditorsPanel = function() {
+        this.toggleEditorsPanel = function() {
           this.showEditorPanel = !this.showEditorPanel;
           nrpAnalytics.eventTrack('Toggle-editor-panel', {
             category: 'Simulation-GUI',
@@ -127,8 +143,10 @@
             userContextService.setEditDisabled(true);
           } else {
             userContextService.userEditingID = userContextService.userID;
-            that.showEditorsPanel();
+            that.toggleEditorsPanel();
           }
+
+          return $q.resolve();
         };
       }
 

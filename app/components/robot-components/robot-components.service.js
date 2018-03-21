@@ -114,6 +114,8 @@
             topicObject.name = 'ROS: /' + topicURL;
             topicObject.userData.gazeboType = 'rostopic';
             topicObject.userData.rosTopic = '/' + topicURL;
+            topicObject.userData.type = 'sensor';
+            topicObject.userData.rosType = 'sensor_msgs.msg.Image';
             sensorObject.add(topicObject);
 
             this.sensors.cameras.push(sensorObject);
@@ -143,6 +145,8 @@
           topicObject.name = 'ROS: /' + topicURL;
           topicObject.userData.gazeboType = 'rostopic';
           topicObject.userData.rosTopic = '/' + topicURL;
+          topicObject.userData.type = 'actuator';
+          topicObject.userData.rosType = 'geometry_msgs.msg.Twist';
           this.robotControllers.add(topicObject);
 
           this.actuators.push(topicObject);

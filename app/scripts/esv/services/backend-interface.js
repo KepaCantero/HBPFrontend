@@ -340,12 +340,10 @@
           );
         },
         getPopulations: function(callback) {
-          resourceBrainPopulations(simulationInfo.serverBaseUrl).get(
+          return resourceBrainPopulations(simulationInfo.serverBaseUrl).get(
             { sim_id: simulationInfo.simulationID },
-            function(response) {
-              callback(response);
-            }
-          );
+            callback
+          ).$promise;
         },
         getTopics: function(callback) {
           resourceTopics(simulationInfo.serverBaseUrl).get({}, function(data) {
@@ -469,9 +467,7 @@
             {
               sim_id: simulationInfo.simulationID
             },
-            function(data) {
-              callback(data);
-            }
+            callback
           ).$promise;
         },
         getStructuredTransferFunctions: function(callback) {

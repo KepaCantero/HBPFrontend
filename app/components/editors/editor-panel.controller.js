@@ -66,9 +66,10 @@
         graphicalEditor: 6
       };
 
-      $scope.activeTabIndex = $scope.isOwner
-        ? $scope.tabindex.environment
-        : $scope.tabindex.transferfunction;
+      if (!editorsPanelService.activeTabIndex)
+        editorsPanelService.activeTabIndex = $scope.isOwner
+          ? $scope.tabindex.environment
+          : $scope.tabindex.transferfunction;
 
       $scope.controls = {};
 
@@ -78,7 +79,8 @@
       $scope.cleErrorTopic = bbpConfig.get('ros-topics').cleError;
       $scope.rosbridgeWebsocketUrl = serverConfig.rosbridge.websocket;
 
-      var isTabSelected = (...tabs) => tabs.indexOf($scope.activeTabIndex) >= 0;
+      var isTabSelected = (...tabs) =>
+        tabs.indexOf(editorsPanelService.activeTabIndex) >= 0;
 
       $scope.openCallback = function() {
         // The Panel is opened
@@ -104,14 +106,14 @@
       };
 
       $scope.refresh = function() {
-        if (!$scope.panelIsOpen || !$scope.activeTabIndex) return;
+        if (!editorsPanelService.showEditorPanel) return;
 
         // find the tabcontrol for the selected tabindex
         let selectedTab = _($scope.tabindex)
           .map((tabIndex, tabName) => [tabIndex, tabName])
           .filter(
             ([tabIndex, tabName]) =>
-              tabIndex === $scope.activeTabIndex && tabName
+              tabIndex === editorsPanelService.activeTabIndex && tabName
           )
           .map(([tabIndex, tabName]) => $scope.controls[tabName]) // eslint-disable-line no-unused-vars
           .first();

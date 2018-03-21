@@ -16,7 +16,9 @@ describe('Directive: graphicalEditor', function() {
     $timeout;
 
   var backendInterfaceServiceMock = {
-    getPopulations: jasmine.createSpy('getPopulations'),
+    getPopulations: jasmine
+      .createSpy('getPopulations')
+      .and.callFake(() => window.$q.resolve()),
     getStructuredTransferFunctions: jasmine.createSpy(
       'getStructuredTransferFunctions'
     ),

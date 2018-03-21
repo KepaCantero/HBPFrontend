@@ -33,6 +33,9 @@
     'gz3d',
     'EDIT_MODE',
     'simulationInfo',
+    'backendInterfaceService',
+    'serverError',
+    'editorsPanelService',
     function(
       OBJECT_VIEW_MODE,
       $timeout,
@@ -41,7 +44,10 @@
       baseEventHandler,
       gz3d,
       EDIT_MODE,
-      simulationInfo
+      simulationInfo,
+      backendInterfaceService,
+      serverError,
+      editorsPanelService
     ) {
       return {
         templateUrl:
@@ -84,6 +90,49 @@
               setTreeSelected
             );
             gz3d.gui.guiEvents.removeListener('delete_entity', deleteEntity);
+          };
+
+          const DECORATOR_BY_TYPE = {
+            sensor: userData => {
+              let topicId = userData.rosTopic.split('/').pop();
+              return [
+                [topicId],
+                `@nrp.MapRobotSubscriber('${topicId}', Topic('${userData.rosTopic}', ${userData.rosType}))
+@nrp.Robot2Neuron()`
+              ];
+            },
+            actuator: userData => [
+              [],
+              `@nrp.Neuron2Robot(Topic('${userData.rosTopic}', ${userData.rosType}))`
+            ]
+          };
+
+          scope.createTopicTF = () => {
+            return backendInterfaceService
+              .getTransferFunctions()
+              .then(({ data: tfNames }) => {
+                let selectedData =
+                  objectInspectorService.selectedRobotComponent.userData;
+                let topicName = selectedData.rosTopic;
+                topicName = topicName.substr(1).replace(/\//g, '_');
+                let tfname = topicName;
+                let postfix = 2;
+                while (tfNames[tfname]) tfname = topicName + '_' + postfix++;
+
+                let [parameters, decorator] = DECORATOR_BY_TYPE[
+                  selectedData.type
+                ](selectedData);
+
+                backendInterfaceService.addTransferFunction(
+                  `${decorator}
+def ${tfname}(${['t', ...parameters].join(', ')}):
+    # Auto generated TF for ${topicName}
+    if t % 2 < 0.02:
+        clientLogger.info('Time: ', t)`,
+                  () => editorsPanelService.showEditor(6, { selectTF: tfname }),
+                  err => serverError.displayHTTPError(err)
+                );
+              });
           };
 
           scope.$on('$destroy', function() {

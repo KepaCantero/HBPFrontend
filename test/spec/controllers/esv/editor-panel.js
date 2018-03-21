@@ -77,20 +77,21 @@ describe('Controller: editorPanelCtrl', function() {
   });
 
   it('should refresh the panel on the open callbacks', function() {
-    scope.activeTabIndex = scope.tabindex.transferfunction;
+    editorsPanelService.showEditorPanel = true;
+    editorsPanelService.activeTabIndex = scope.tabindex.transferfunction;
     scope.openCallback();
     expect(scope.controls.graphicalEditor.refresh).not.toHaveBeenCalled();
 
-    scope.activeTabIndex = scope.tabindex.statemachine;
+    editorsPanelService.activeTabIndex = scope.tabindex.statemachine;
     scope.closeCallback();
     scope.openCallback();
     expect(scope.controls.graphicalEditor.refresh).not.toHaveBeenCalled();
 
-    scope.activeTabIndex = scope.tabindex.pynneditor;
+    editorsPanelService.activeTabIndex = scope.tabindex.pynneditor;
     scope.closeCallback();
     scope.openCallback();
 
-    scope.activeTabIndex = scope.tabindex.graphicalEditor;
+    editorsPanelService.activeTabIndex = scope.tabindex.graphicalEditor;
     scope.closeCallback();
     scope.openCallback();
     expect(scope.controls.graphicalEditor.refresh).toHaveBeenCalled();
