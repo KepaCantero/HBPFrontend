@@ -211,7 +211,6 @@
       };
 
       this.exitDialog = function() {
-        this.hideTooltip();
         this.openExitDialog();
       };
 
@@ -413,14 +412,6 @@
       if (this.objectInspectorService !== null) {
         this.objectInspectorService.removeEventListeners();
       }
-    }
-
-    hideTooltip() {
-      this.$timeout(() => {
-        $('.tooltip')
-          .delay(700)
-          .fadeOut('slow');
-      });
     }
 
     setEditMode(newMode) {
