@@ -69,10 +69,10 @@ describe('Services: editorsPanelService', function() {
   });
 
   describe(' - independent tests', function() {
-    it(' - showEditorsPanel()', function() {
+    it(' - toggleEditorsPanel()', function() {
       expect(editorsPanelService.showEditorPanel).toBe(false);
 
-      editorsPanelService.showEditorsPanel();
+      editorsPanelService.toggleEditorsPanel();
 
       expect(editorsPanelService.showEditorPanel).toBe(true);
     });
@@ -93,8 +93,21 @@ describe('Services: editorsPanelService', function() {
       expect(editorsPanelService.showEditorPanel).toBe(false);
     });
 
+    it('should reopen editors if already open on showEditor', function() {
+      spyOn(editorsPanelService, 'toggleEditors').and.returnValue(
+        window.$q.resolve()
+      );
+
+      let options = { test: true };
+      editorsPanelService.showEditorPanel = true;
+      editorsPanelService.showEditor(1, options);
+
+      expect(editorsPanelService.toggleEditors).toHaveBeenCalledTimes(2);
+      expect(editorsPanelService.openOptions).toBe(options);
+    });
+
     it(' - onTryAddLock()', function() {
-      spyOn(editorsPanelService, 'showEditorsPanel').and.callThrough();
+      spyOn(editorsPanelService, 'toggleEditorsPanel').and.callThrough();
 
       // test failure
       var lockResult = {
@@ -120,7 +133,7 @@ describe('Services: editorsPanelService', function() {
       editorsPanelService.onTryAddLock(lockResult);
 
       expect(userContextService.userEditingID).toBe(userContextService.userID);
-      expect(editorsPanelService.showEditorsPanel).toHaveBeenCalled();
+      expect(editorsPanelService.toggleEditorsPanel).toHaveBeenCalled();
     });
   });
 
@@ -146,7 +159,7 @@ describe('Services: editorsPanelService', function() {
     });
 
     it(' - toggleEditors()', function() {
-      spyOn(editorsPanelService, 'showEditorsPanel').and.callThrough();
+      spyOn(editorsPanelService, 'toggleEditorsPanel').and.callThrough();
 
       // test when not showing
       expect(editorsPanelService.showEditorPanel).toBe(false);
@@ -164,7 +177,7 @@ describe('Services: editorsPanelService', function() {
 
       editorsPanelService.toggleEditors();
 
-      expect(editorsPanelService.showEditorsPanel).toHaveBeenCalled();
+      expect(editorsPanelService.toggleEditorsPanel).toHaveBeenCalled();
       expect(userContextService.removeEditLock).toHaveBeenCalled();
     });
   });
@@ -176,7 +189,7 @@ describe('Services: editorsPanelService', function() {
     });
 
     it(' - toggleEditors()', function() {
-      spyOn(editorsPanelService, 'showEditorsPanel').and.callThrough();
+      spyOn(editorsPanelService, 'toggleEditorsPanel').and.callThrough();
 
       expect(editorsPanelService.showEditorPanel).toBe(false);
 
