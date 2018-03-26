@@ -115,6 +115,15 @@
             topicObject.userData.gazeboType = 'rostopic';
             topicObject.userData.rosTopic = '/' + topicURL;
             topicObject.userData.type = 'sensor';
+            if (
+              rosRobotProperties.sensor_ros_message_type &&
+              rosRobotProperties.sensor_ros_message_type[i]
+            ) {
+              topicObject.userData.rosType = rosRobotProperties.sensor_ros_message_type[
+                i
+              ].replace('/', '.msg.');
+            } else topicObject.userData.rosType = 'unknown';
+
             topicObject.userData.rosType = 'sensor_msgs.msg.Image';
             sensorObject.add(topicObject);
 
@@ -146,7 +155,15 @@
           topicObject.userData.gazeboType = 'rostopic';
           topicObject.userData.rosTopic = '/' + topicURL;
           topicObject.userData.type = 'actuator';
-          topicObject.userData.rosType = 'geometry_msgs.msg.Twist';
+          if (
+            rosRobotProperties.actuator_ros_message_type &&
+            rosRobotProperties.actuator_ros_message_type[i]
+          ) {
+            topicObject.userData.rosType = rosRobotProperties.actuator_ros_message_type[
+              i
+            ].replace('/', '.msg.');
+          } else topicObject.userData.rosType = 'unknown';
+
           this.robotControllers.add(topicObject);
 
           this.actuators.push(topicObject);
