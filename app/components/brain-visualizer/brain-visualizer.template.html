@@ -26,7 +26,7 @@
 
             </div>
 
-            <div style="padding-bottom:1px" >
+            <div style="padding-bottom:1px;position: relative;" >
                 <label class="esv-brainvisualizer-radio-label" ng-style="{'color':userFile || 'gray'}">
                 <input class="esv-brainvisualizer-radio" type="radio" ng-disabled="!userFile"
                     ng-model="currentValues.currentShape" ng-value="BRAIN3D.REP_SHAPE_USER" ng-change="setShape(BRAIN3D.REP_SHAPE_USER)">Custom</label>
@@ -128,6 +128,17 @@
                 </div>
             </div>
 
+        </div>
+
+        <div class="esv-brainvisualizer-box">
+            <button type="button" class="btn btn-default"
+                style="width: 100%;"
+                ng-click="saveSettings()"
+                owner-only
+                ng-disabled="!isPrivateExperiment">
+                <i class="glyphicon glyphicon-download"></i>
+                <span>Save Settings</span>
+            </button>
         </div>
 
     </div>

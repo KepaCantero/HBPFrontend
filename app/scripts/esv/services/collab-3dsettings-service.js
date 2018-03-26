@@ -30,14 +30,16 @@
     'userNavigationService',
     'simulationInfo',
     function(gz3d, simulationConfigService) {
-      var loadSettings = function() {
+      let service = {};
+
+      service.loadSettings = () => {
         if (gz3d.scene.defaultComposerSettings === undefined) {
           gz3d.scene.defaultComposerSettings = JSON.parse(
             JSON.stringify(gz3d.scene.composerSettings)
           );
         }
 
-        return simulationConfigService
+        return (service.settings = simulationConfigService
           .loadConfigFile('3d-settings')
           .then(function(fileContent) {
             gz3d.scene.composerSettings = JSON.parse(fileContent);
@@ -46,24 +48,20 @@
               JSON.stringify(gz3d.scene.composerSettings)
             );
 
-            return fileContent;
+            return gz3d.scene.composerSettings;
           })
           .catch(function() {
             gz3d.scene.applyComposerSettings(true);
-          });
+          }));
       };
 
-      var saveSettings = function() {
+      service.saveSettings = function() {
         simulationConfigService.saveConfigFile(
           '3d-settings',
           JSON.stringify(gz3d.scene.composerSettings, null, 2)
         );
       };
-
-      return {
-        loadSettings: loadSettings,
-        saveSettings: saveSettings
-      };
+      return service;
     }
   ]);
 })();
