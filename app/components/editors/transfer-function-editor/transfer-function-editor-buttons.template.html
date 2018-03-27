@@ -1,42 +1,25 @@
-<button type="button" class="btn btn-default btn-md"
-        owner-only
-        ng-disabled="(stateService.currentState === STATE.INITIALIZED)"
-        ng-click="createTf()">
-  <i class="glyphicon glyphicon-star"></i><span> New</span>
+<button ng-show="isPrivateExperiment" type="button" class="btn btn-default btn-md small-button" owner-only ng-click="saveTFIntoCollabStorage()"
+  ng-disabled="stateService.currentState === STATE.INITIALIZED || !collabDirty" v-busy="isSavingToCollab" v-busy-label="Saving to Storage"
+  v-pressable>
+  <i class="glyphicon glyphicon-book"></i>
+  <span> Save to Storage</span>
 </button>
 
-<button ng-show="isPrivateExperiment" type="button" class="btn btn-default"
-        owner-only
-        ng-click="saveTFIntoCollabStorage()"
-        ng-disabled="stateService.currentState === STATE.INITIALIZED || !collabDirty"
-        v-busy="isSavingToCollab"
-        v-busy-label="Saving to Storage"
-        v-pressable>
-  <i class="glyphicon glyphicon-book"></i><span> Save to Storage</span>
+<button ng-show="isPrivateExperiment" type="button" class="btn btn-default  btn-md small-button" owner-only ng-click="saveCSVIntoCollabStorage()"
+  ng-disabled="(stateService.currentState === STATE.INITIALIZED)" v-busy="isSavingCSVToCollab" v-busy-label="Saving to Storage"
+  v-pressable>
+  <i class="glyphicon glyphicon glyphicon-stats"></i>
+  <span> Save CSV to Storage</span>
 </button>
-
-<button ng-show="isPrivateExperiment" type="button" class="btn btn-default"
-        owner-only
-        ng-click="saveCSVIntoCollabStorage()"
-        ng-disabled="(stateService.currentState === STATE.INITIALIZED)"
-        v-busy="isSavingCSVToCollab"
-        v-busy-label="Saving to Storage"
-        v-pressable>
-  <i class="glyphicon glyphicon glyphicon-stats"></i><span> Save CSV to Storage</span>
-</button>
-
 
 <!-- The trick here is to use a 'a' tag instead of a 'button' tag -->
-<button owner-only
-        id="download-transfer-functions"
-        class="btn btn-default btn-md"
-        ng-click="download()">
-  <i class="glyphicon glyphicon-download"></i><span>Download</span>
+<button owner-only id="download-transfer-functions" class="btn btn-default btn-md small-button" ng-click="download()" style="margin-left:10px">
+  <i class="glyphicon glyphicon-download"></i>
+  <span>Download</span>
 </button>
 
-<button class="btn btn-default " type="file"
-        owner-only
-        ngf-select="loadTransferFunctions($file)" accept=".py"
-        ng-disabled="(stateService.currentState === STATE.INITIALIZED) || stateService.statePending">
-  <i class="glyphicon glyphicon-upload"></i><span> Upload</span>
+<button class="btn btn-default btn-md small-button" type="file" owner-only ngf-select="upload($file)" accept=".py"
+  ng-disabled="(stateService.currentState === STATE.INITIALIZED) || stateService.statePending">
+  <i class="glyphicon glyphicon-upload"></i>
+  <span> Upload</span>
 </button>

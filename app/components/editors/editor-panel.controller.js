@@ -62,8 +62,7 @@
         statemachine: 2,
         transferfunction: 3,
         pynneditor: 4,
-        events: 5,
-        graphicalEditor: 6
+        events: 5
       };
 
       if (!editorsPanelService.activeTabIndex)
@@ -96,8 +95,7 @@
           isTabSelected(
             $scope.tabindex.transferfunction,
             $scope.tabindex.statemachine,
-            $scope.tabindex.pynneditor,
-            $scope.tabindex.graphicalEditor
+            $scope.tabindex.pynneditor
           )
         )
           gz3d.scene.controls.keyboardBindingsEnabled = false;

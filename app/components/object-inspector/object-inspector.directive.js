@@ -24,6 +24,8 @@
 (function() {
   'use strict';
 
+  const TF_EDITOR_TAB = 3;
+
   angular.module('objectInspectorModule', []).directive('objectInspector', [
     'OBJECT_VIEW_MODE',
     '$timeout',
@@ -129,7 +131,10 @@ def ${tfname}(${['t', ...parameters].join(', ')}):
     # Auto generated TF for ${topicName}
     if t % 2 < 0.02:
         clientLogger.info('TF ${topicName}:', t)`,
-                  () => editorsPanelService.showEditor(6, { selectTF: tfname }),
+                  () =>
+                    editorsPanelService.showEditor(TF_EDITOR_TAB, {
+                      selectTF: tfname
+                    }),
                   err => serverError.displayHTTPError(err)
                 );
               });

@@ -16,7 +16,7 @@
       <uib-tab heading="Transfer Functions" index="tabindex.transferfunction"
            select="disableKeyBindings(); controls.transferfunction.refresh()"
            deselect="reenableKeyBindings()">
-        <transfer-function-editor control="controls.transferfunction"/>
+        <transfer-function-editor  topic="{{cleErrorTopic}}"  server="{{rosbridgeWebsocketUrl}}" control="controls.transferfunction"/>
       </uib-tab>
       <uib-tab heading="State Machine (SMACH)" index="tabindex.statemachine"
            select="disableKeyBindings(); controls.statemachine.refresh()"
@@ -27,13 +27,6 @@
            select="disableKeyBindings();controls.pynneditor.refresh()"
            deselect="reenableKeyBindings()">
         <pynn-editor control="controls.pynneditor"/>
-      </uib-tab>
-      <uib-tab heading="Transfer Functions V2 (beta)" index="tabindex.graphicalEditor"
-           select="disableKeyBindings(); controls.graphicalEditor.refresh()"
-           disable="!devMode"
-           deselect="reenableKeyBindings()">
-        <graphical-editor topic="{{cleErrorTopic}}"  server="{{rosbridgeWebsocketUrl}}"
-                          control="controls.graphicalEditor"/>
       </uib-tab>
     </uib-tabset>
   </div>
