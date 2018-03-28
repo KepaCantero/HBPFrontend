@@ -25,20 +25,60 @@ describe('Service: tip-service', function() {
 
   it('should set current tip', function() {
     tipTooltipService.setCurrentTip(TIP_CODES.WELCOME);
-    expect(tipTooltipService.currentTip).toBe(TIP_CODES.WELCOME);
+    expect(tipTooltipService.visibleTips[0]).toBe(TIP_CODES.WELCOME);
   });
 
   it('should reset tip list position when set current tip', function() {
-    tipTooltipService.tipListPos = 1;
     tipTooltipService.setCurrentTip(TIP_CODES.WELCOME);
-    expect(tipTooltipService.tipListPos).toBe(0);
+    expect(TIP_CODES.WELCOME.tipListPos).toBe(0);
+  });
+
+  it('should handle first visible', function() {
+    tipTooltipService.hidden = false;
+
+    TIP_CODES.WELCOME.hidden = true;
+    expect(tipTooltipService.firstVisible(TIP_CODES.WELCOME)).toBe(false);
+    TIP_CODES.WELCOME.hidden = false;
+
+    tipTooltipService.setCurrentTip(TIP_CODES.WELCOME);
+    tipTooltipService.setCurrentTip(TIP_CODES.NAVIGATION);
+
+    expect(tipTooltipService.firstVisible(TIP_CODES.WELCOME)).toBe(false);
+    expect(tipTooltipService.firstVisible(TIP_CODES.NAVIGATION)).toBe(true);
+  });
+
+  it('should not stack duplicate', function() {
+    tipTooltipService.visibleTips = [TIP_CODES.WELCOME, TIP_CODES.NAVIGATION];
+
+    TIP_CODES.WELCOME.displayed = false;
+    TIP_CODES.NAVIGATION.displayed = false;
+    tipTooltipService.setCurrentTip(TIP_CODES.WELCOME);
+    tipTooltipService.setCurrentTip(TIP_CODES.NAVIGATION);
+    tipTooltipService.setCurrentTip(TIP_CODES.NAVIGATION);
+
+    expect(tipTooltipService.visibleTips.length).toBe(2);
+  });
+
+  it('should hide a tip', function() {
+    tipTooltipService.hideTip(TIP_CODES.WELCOME);
+    expect(TIP_CODES.WELCOME.hidden).toBe(true);
+  });
+
+  it('should support someTipsAreHidden', function() {
+    tipTooltipService.hidden = false;
+    tipTooltipService.setCurrentTip(TIP_CODES.WELCOME);
+    tipTooltipService.setCurrentTip(TIP_CODES.NAVIGATION);
+    tipTooltipService.hideTip(TIP_CODES.NAVIGATION);
+
+    expect(tipTooltipService.someTipsAreHidden()).toBe(true);
   });
 
   it('should move to previous/next tips', function() {
+    TIP_CODES.SIMULATIONS_TIPS.tipListPos = null;
     tipTooltipService.setCurrentTip(TIP_CODES.SIMULATIONS_TIPS);
-    tipTooltipService.showNext();
-    expect(tipTooltipService.tipListPos).toBe(1);
-    tipTooltipService.showPrevious();
-    expect(tipTooltipService.tipListPos).toBe(0);
+    tipTooltipService.showNext(TIP_CODES.SIMULATIONS_TIPS);
+    expect(TIP_CODES.SIMULATIONS_TIPS.tipListPos).toBe(1);
+    tipTooltipService.showPrevious(TIP_CODES.SIMULATIONS_TIPS);
+    expect(TIP_CODES.SIMULATIONS_TIPS.tipListPos).toBe(0);
   });
 });

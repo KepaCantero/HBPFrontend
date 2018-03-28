@@ -47,14 +47,22 @@
     RUNNING_SIMULATIONS: {
       text: 'The running simulations are listed here.'
     },
+    NAVIGATION: {
+      text:
+        'Use the <b>w, s, a, d</b> keys to translate the camera. Move your <b>mouse</b> whilst pressing the <b>left button</b> to rotate the camera. The translation/rotation sensibility can be changed in the settings under the <b>User camera</b> section.',
+      stackMode: true
+    },
+    OBJECT_INSPECTOR: {
+      text:
+        'The object inspector can be used to move/rotate/scale and inspect 3D objects in the scene.<br>' +
+        'For more informations about these functionnalities use the <b>mouse over tooltips</b> in the Object Inspector.',
+      stackMode: true
+    },
     SIMULATIONS_TIPS: {
       tipList: [
         {
           text:
-            'Welcome to the simulation! Use the w/s keys to move forward/backward in the 3D scene... Move your mouse whilst pressing the left button to rotate the camera'
-        },
-        {
-          text: 'Press the "Play" button to run the simulation.',
+            'Welcome to the simulation! Press the "Play" button to run the simulation.',
           image: 'img/tips/play.jpg'
         },
         {
