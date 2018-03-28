@@ -216,6 +216,7 @@
                 name: selectedEntity.name
               };
               $scope.environmentUploaded = true;
+              $scope.selectedEnvironment = selectedEntity;
             }
             if ($scope.entityName.startsWith('Robot')) {
               $scope.paths.robotPath = {
@@ -224,6 +225,7 @@
                 name: selectedEntity.name
               };
               $scope.robotUploaded = true;
+              $scope.selectedRobot = selectedEntity;
             }
             if ($scope.entityName.startsWith('Brain')) {
               $scope.paths.brainPath = {
@@ -232,6 +234,7 @@
                 name: selectedEntity.name
               };
               $scope.brainUploaded = true;
+              $scope.selectedBrain = selectedEntity;
             }
             $scope.destroyDialog();
           };
@@ -305,6 +308,18 @@
           };
 
           $scope.createUploadModal = function() {
+            if (
+              $scope.entityName == 'Environment' &&
+              $scope.selectedEnvironment
+            ) {
+              $scope.selectEntity($scope.selectedEnvironment);
+            }
+            if ($scope.entityName == 'Brain' && $scope.selectedBrain) {
+              $scope.selectEntity($scope.selectedBrain);
+            }
+            if ($scope.entityName == 'Robot' && $scope.selectedRobot) {
+              $scope.selectEntity($scope.selectedRobot);
+            }
             nrpModalService.createModal({
               templateUrl: 'views/esv/entities-list.html',
               closable: true,

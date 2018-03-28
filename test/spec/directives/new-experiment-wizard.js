@@ -235,12 +235,13 @@
         return deferred.promise;
       });
       spyOn(scope, 'createUploadModal').and.callThrough();
+      scope.selectedRobot = 'RobotTest';
       scope.uploadRobotDialog();
       scope.uploadEntity('PublicEnv');
       scope.$digest();
       expect(scope.createUploadModal).toHaveBeenCalled();
       expect(scope.entityName).toEqual('Robot');
-
+      expect(scope.entityPageState.selected).toEqual('RobotTest');
       expect(scope.entities[0].name).toEqual('Arm robot force based version');
       expect(scope.entities[1].description).toEqual('First Hollie arm model.');
       expect(scope.entities[2].thumbnail).toBe('');
@@ -285,10 +286,12 @@
         return deferred.promise;
       });
       spyOn(scope, 'createUploadModal').and.callThrough();
+      scope.selectedEnvironment = 'EnvironmentTest';
       scope.uploadEnvironmentDialog();
       scope.uploadEntity('PublicEnv');
       scope.$digest();
       expect(scope.createUploadModal).toHaveBeenCalled();
+      expect(scope.entityPageState.selected).toEqual('EnvironmentTest');
       expect(scope.entityName).toEqual('Environment');
       expect(scope.entities[0].name).toEqual('Fake environment1');
       expect(scope.entities[1].description).toEqual('Fake Description2');
@@ -338,10 +341,12 @@
         return deferred.promise;
       });
       spyOn(scope, 'createUploadModal').and.callThrough();
+      scope.selectedBrain = 'BrainTest';
       scope.uploadBrainDialog();
       scope.uploadEntity('PublicEnv');
       scope.$digest();
       expect(scope.createUploadModal).toHaveBeenCalled();
+      expect(scope.entityPageState.selected).toEqual('BrainTest');
       expect(scope.entityName).toEqual('Brain');
       expect(scope.entities[0].description).toEqual(
         'This brain is fake, which means that a zombie can get confused while trying to eat it'
