@@ -53,8 +53,6 @@ describe('Controller: editorPanelCtrl', function() {
         simulationInfo: simulationInfo
       });
 
-      scope.controls.graphicalEditor.refresh = jasmine.createSpy('refresh');
-
       $httpBackend.whenGET(/\/me/).respond(200);
     })
   );
@@ -77,24 +75,24 @@ describe('Controller: editorPanelCtrl', function() {
   });
 
   it('should refresh the panel on the open callbacks', function() {
+    scope.controls.transferfunction.refresh = jasmine.createSpy(
+      'transferfunction.refresh'
+    );
     editorsPanelService.showEditorPanel = true;
-    editorsPanelService.activeTabIndex = scope.tabindex.transferfunction;
-    scope.openCallback();
-    expect(scope.controls.graphicalEditor.refresh).not.toHaveBeenCalled();
 
     editorsPanelService.activeTabIndex = scope.tabindex.statemachine;
     scope.closeCallback();
     scope.openCallback();
-    expect(scope.controls.graphicalEditor.refresh).not.toHaveBeenCalled();
+    expect(scope.controls.transferfunction.refresh).not.toHaveBeenCalled();
 
     editorsPanelService.activeTabIndex = scope.tabindex.pynneditor;
     scope.closeCallback();
     scope.openCallback();
 
-    editorsPanelService.activeTabIndex = scope.tabindex.graphicalEditor;
+    editorsPanelService.activeTabIndex = scope.tabindex.transferfunction;
     scope.closeCallback();
     scope.openCallback();
-    expect(scope.controls.graphicalEditor.refresh).toHaveBeenCalled();
+    expect(scope.controls.transferfunction.refresh).toHaveBeenCalled();
   });
 
   it('should disable the key bindings when an code editor tab is active and the panel is opened', function() {
@@ -119,13 +117,6 @@ describe('Controller: editorPanelCtrl', function() {
 
     //Test the pynn-editor tab
     scope.activeTabIndex = scope.tabindex.pynneditor;
-    scope.openCallback();
-    expect(gz3d.scene.controls.keyboardBindingsEnabled).toBeFalsy();
-    scope.closeCallback();
-    expect(gz3d.scene.controls.keyboardBindingsEnabled).toBeTruthy();
-
-    //Test the graphical-editor tab
-    scope.activeTabIndex = scope.tabindex.graphicalEditor;
     scope.openCallback();
     expect(gz3d.scene.controls.keyboardBindingsEnabled).toBeFalsy();
     scope.closeCallback();
