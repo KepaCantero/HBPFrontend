@@ -62,7 +62,8 @@
         statemachine: 2,
         transferfunction: 3,
         pynneditor: 4,
-        events: 5
+        events: 5,
+        resourcesEditor: 6
       };
 
       if (!editorsPanelService.activeTabIndex)
@@ -71,7 +72,6 @@
           : $scope.tabindex.transferfunction;
 
       $scope.controls = {};
-
       for (let tab in $scope.tabindex)
         if ($scope.tabindex.hasOwnProperty(tab)) $scope.controls[tab] = {};
 
@@ -95,10 +95,12 @@
           isTabSelected(
             $scope.tabindex.transferfunction,
             $scope.tabindex.statemachine,
-            $scope.tabindex.pynneditor
+            $scope.tabindex.pynneditor,
+            $scope.tabindex.resourcesEditor
           )
-        )
+        ) {
           gz3d.scene.controls.keyboardBindingsEnabled = false;
+        }
 
         $scope.refresh();
       };

@@ -38,7 +38,8 @@
       storageServer,
       clbConfirm,
       experimentsFactory,
-      tipTooltipService
+      tipTooltipService,
+      baseEventHandler
     ) {
       this.$scope = $scope;
       this.$window = $window;
@@ -57,6 +58,8 @@
       this.experimentsFactory = experimentsFactory;
 
       $scope.$on('$destroy', () => this.experimentInput.off('change'));
+      this.baseEventHandler = baseEventHandler;
+      this.resourcesFolder = {};
     }
 
     loadPrivateExperimentList() {
@@ -94,12 +97,19 @@
     $onInit() {
       this.loadExperiments();
     }
-
     loadExperiments() {
       this.loadExperimentList();
       this.loadPrivateExperimentList();
     }
-
+    loadResources(experimentid) {
+      this.selectedParent = {};
+      this.selectedParent.uuid = experimentid;
+      this.resourcesFolder = this.selectedParent;
+      this.loadParentFileList();
+    }
+    suppressKeyPress(event) {
+      this.baseEventHandler.suppressAnyKeyPress(event);
+    }
     loadExperimentList() {
       this.storageServer
         .getExperiments()
@@ -200,7 +210,6 @@
           if (!newfolder) return;
           let parent = this.selectedParent;
           parent.creating = true;
-
           this.storageServer
             .createFolder(parent.uuid, newfolder)
             .then(() => this.selectParent(parent))
@@ -274,7 +283,6 @@
     uploadFile(e) {
       let selectedParent = this.selectedParent;
       selectedParent.uploading = true;
-
       let filesData = [...e.target.files].map(f =>
         this.$q(resolve => {
           let textReader = new FileReader();
@@ -307,15 +315,16 @@
             })
         )
       );
-
-      this.$q
-        .all(filesData)
-        .then(() => this.loadParentFileList())
-        .catch(err => this.onError('Failed to upload file', err))
-        .finally(() => {
-          e.target.value = null;
-          selectedParent.uploading = false;
-        });
+      return this.$q.resolve(
+        this.$q
+          .all(filesData)
+          .then(() => this.loadParentFileList())
+          .catch(err => this.onError('Failed to upload file', err))
+          .finally(() => {
+            e.target.value = null;
+            selectedParent.uploading = false;
+          })
+      );
     }
 
     static get FILE_TYPES() {
@@ -393,10 +402,96 @@
     'storageServer',
     'clbConfirm',
     'experimentsFactory',
-    'tipTooltipService'
+    'tipTooltipService',
+    'baseEventHandler'
   ];
+  class ResourcesExplorerController extends ExperimentExplorerController {
+    constructor(
+      $scope,
+      $element,
+      $window,
+      $location,
+      $stateParams,
+      $q,
+      $log,
+      $uibModal,
+      clbErrorDialog,
+      storageServer,
+      clbConfirm,
+      experimentsFactory,
+      tipTooltipService,
+      simulationInfo,
+      baseEventHandler,
+      backendInterfaceService
+    ) {
+      super(
+        $scope,
+        $element,
+        $window,
+        $location,
+        $stateParams,
+        $q,
+        $log,
+        $uibModal,
+        clbErrorDialog,
+        storageServer,
+        clbConfirm,
+        experimentsFactory,
+        tipTooltipService,
+        baseEventHandler
+      );
 
+      this.$scope = $scope;
+      this.storageServer = storageServer;
+      this.simulationInfo = simulationInfo;
+      this.resourcesFolder = {};
+      this.selectedParent = {};
+      this.backendInterfaceService = backendInterfaceService;
+    }
+    $onInit() {
+      this.loadResourceFolderUuid(this.simulationInfo.experimentID);
+    }
+
+    uploadFile(e) {
+      super.uploadFile(e).then(() => {
+        this.backendInterfaceService.cloneFileResources();
+      });
+    }
+    loadResourceFolderUuid(experiment) {
+      this.storageServer
+        .getExperimentFiles(experiment)
+        .then(files => {
+          this.resourcesFolder = files.filter(f => f.name === 'resources');
+          super.loadResources(this.resourcesFolder[0].uuid);
+        })
+        .catch(err => this.onError('Failed to load Resources folder', err));
+    }
+    suppressKeyPress(event) {
+      this.baseEventHandler.suppressAnyKeyPress(event);
+    }
+  }
+  ResourcesExplorerController.$$ngIsClass = true;
+  ResourcesExplorerController.$inject = [
+    '$scope',
+    '$element',
+    '$window',
+    '$location',
+    '$stateParams',
+    '$q',
+    '$log',
+    '$uibModal',
+    'clbErrorDialog',
+    'storageServer',
+    'clbConfirm',
+    'experimentsFactory',
+    'tipTooltipService',
+    'simulationInfo',
+    'baseEventHandler',
+    'backendInterfaceService'
+  ];
+  //window.ExperimentExplorerController = ExperimentExplorerController;
   angular
     .module('experimentExplorer', ['storageServer'])
-    .controller('ExperimentExplorerController', ExperimentExplorerController);
+    .controller('ExperimentExplorerController', ExperimentExplorerController)
+    .controller('ResourcesExplorerController', ResourcesExplorerController);
 })();

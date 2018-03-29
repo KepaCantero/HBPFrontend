@@ -28,6 +28,12 @@
            deselect="reenableKeyBindings()">
         <pynn-editor control="controls.pynneditor"/>
       </uib-tab>
+      <uib-tab heading="Resources" index="tabindex.resourcesEditor"
+           select="disableKeyBindings();controls.resourceseditor.refresh()"
+           disable="!devMode"
+           deselect="reenableKeyBindings()">
+        <resources-editor control="controls.resourceseditor"/>
+      </uib-tab>
     </uib-tabset>
   </div>
   <button type="button" class="button-close" data-ng-click="editorsPanelService.toggleEditors()">×</button>
