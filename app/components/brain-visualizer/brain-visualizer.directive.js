@@ -32,6 +32,7 @@
     'simulationInfo',
     'collab3DSettingsService',
     'environmentService',
+    'clbErrorDialog',
     function(
       simulationConfigService,
       backendInterfaceService,
@@ -39,7 +40,8 @@
       spikeListenerService,
       simulationInfo,
       collab3DSettingsService,
-      environmentService
+      environmentService,
+      clbErrorDialog
     ) {
       return {
         templateUrl:
@@ -186,6 +188,18 @@
                   }
 
                   scope.initBrainContainer(data);
+
+                  if (
+                    scope.userFile &&
+                    Object.keys(scope.userFile).length &&
+                    !brain3D.userData
+                  ) {
+                    clbErrorDialog.open({
+                      type: 'Brainvisualizer Error.',
+                      message:
+                        'The format of the brainvisualizer file you are using is not correct. You can generate the correct format by using the "Save" button beside the Custom option.'
+                    });
+                  }
 
                   scope.userFile = brain3D.userData;
 
