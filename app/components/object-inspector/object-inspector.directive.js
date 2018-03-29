@@ -128,7 +128,7 @@
 def ${tfname}(${['t', ...parameters].join(', ')}):
     # Auto generated TF for ${topicName}
     if t % 2 < 0.02:
-        clientLogger.info('Time: ', t)`,
+        clientLogger.info('TF ${topicName}:', t)`,
                   () => editorsPanelService.showEditor(6, { selectTF: tfname }),
                   err => serverError.displayHTTPError(err)
                 );
