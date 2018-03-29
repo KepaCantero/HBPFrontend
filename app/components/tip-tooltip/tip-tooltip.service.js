@@ -25,37 +25,119 @@
   'use strict';
 
   class TipTooltipService {
-    constructor(TIP_CODES) {
+    constructor(TIP_CODES, $sce) {
       this.TIP_CODES = TIP_CODES;
 
       this.hidden = true;
-      this.currentTip = TIP_CODES.WELCOME;
-      this.tipListPos = 0;
+      this.visibleTips = [];
+      this.$sce = $sce;
+      this.ready = false;
     }
 
-    showPrevious() {
-      if (this.tipListPos > 0) {
-        this.tipListPos--;
+    showPrevious(tip) {
+      if (tip.tipListPos > 0) {
+        tip.tipListPos--;
       }
     }
 
-    showNext() {
-      if (this.tipListPos < this.currentTip.tipList.length - 1) {
-        this.tipListPos++;
+    showNext(tip) {
+      if (tip.tipListPos < tip.tipList.length - 1) {
+        tip.tipListPos++;
+      }
+    }
+
+    firstVisible(tip) {
+      if (tip.hidden) return false;
+
+      for (var i = 0; i < this.visibleTips.length; i++) {
+        if (this.visibleTips[i] === tip) return true;
+        else if (!this.visibleTips[i].hidden) return false;
       }
     }
 
     setCurrentTip(tip) {
-      this.currentTip = tip;
-      this.tipListPos = 0;
+      if (tip.displayed) return;
+
+      if (!tip.stackMode) {
+        _.forEach(this.visibleTips, function(tip) {
+          tip.displayed = false;
+        });
+
+        this.visibleTips = _.filter(this.visibleTips, t => t.stackMode);
+      }
+
+      tip.displayed = true;
+      tip.tipListPos = 0;
+
+      var alreadyAdded = false;
+
+      _.forEach(this.visibleTips, function(itip) {
+        if (itip === tip) alreadyAdded = true;
+      });
+
+      if (!alreadyAdded) this.visibleTips.unshift(tip);
     }
 
     startShowingTipIfRequired() {
       this.hidden = localStorage.getItem('TIP_TOOLTIP_HIDDEN') === 'true';
+
+      _.forEach(this.TIP_CODES, function(tip, tipType) {
+        tip.hidden =
+          localStorage.getItem('TIP_TOOLTIP_HIDDEN_' + tipType) === 'true';
+      });
+
+      this.ready = true;
     }
 
-    toggleTip() {
-      this.hidden = !this.hidden;
+    tipToType(tip) {
+      var tipType = '';
+
+      _.forEach(this.TIP_CODES, function(itip, type) {
+        if (itip === tip) tipType = type;
+      });
+
+      return tipType;
+    }
+
+    hideTip(tip) {
+      tip.displayed = false;
+      tip.hidden = true;
+
+      localStorage.setItem(
+        'TIP_TOOLTIP_HIDDEN_' + this.tipToType(tip),
+        tip.hidden ? 'true' : 'false'
+      );
+    }
+
+    someTipsAreHidden() {
+      if (this.hidden) return true;
+
+      var oneHidden = false;
+
+      _.forEach(this.visibleTips, function(tip) {
+        if (tip.hidden) oneHidden = true;
+      });
+
+      return oneHidden;
+    }
+
+    toggleTip(forceHide) {
+      if (this.someTipsAreHidden() && !forceHide) {
+        this.hidden = false;
+        _.forEach(this.TIP_CODES, tip => {
+          tip.hidden = false;
+          localStorage.setItem(
+            'TIP_TOOLTIP_HIDDEN_' + this.tipToType(tip),
+            tip.hidden ? 'true' : 'false'
+          );
+        });
+      } else {
+        this.hidden = true;
+        _.forEach(this.TIP_CODES, function(tip) {
+          tip.displayed = false;
+        });
+      }
+
       localStorage.setItem(
         'TIP_TOOLTIP_HIDDEN',
         this.hidden ? 'true' : 'false'
@@ -64,7 +146,7 @@
   }
 
   TipTooltipService.$$ngIsClass = true;
-  TipTooltipService.$inject = ['TIP_CODES'];
+  TipTooltipService.$inject = ['TIP_CODES', '$sce'];
 
   angular
     .module('tipTooltipModule')

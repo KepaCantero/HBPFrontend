@@ -35,27 +35,31 @@
                   </li>
                   <li class="inline-listitem inline-spaced">Transform</li>
 
-                  <li class="inline-listitem" ng-show="objectInspectorService.selectedObject.position">
+                  <li class="inline-listitem" ng-show="objectInspectorService.selectedObject.position"
+                    title="Activating this mode allows you to move objects simply by clicking and dragging them with the mouse. They automatically snap to other objects in the 3D scene. You can press the spacebar to apply a rotation while moving them.">
                     <button type="button" class="btn btn-xs btn-rounded" ng-class="{active:gz3d.scene.manipulationMode === EDIT_MODE.NATURAL}"
                       ng-click="objectInspectorService.setManipulationMode((gz3d.scene.manipulationMode === EDIT_MODE.NATURAL) ? EDIT_MODE.VIEW : EDIT_MODE.NATURAL)">
                       <b>Snap</b>
                     </button>
                   </li>
 
-                  <li class="inline-listitem" ng-show="objectInspectorService.selectedObject.position">
+                  <li class="inline-listitem" ng-show="objectInspectorService.selectedObject.position"
+                  title="Activating this mode allows you to translate selected object in the 3D view.">
                     <button type="button" class="btn btn-xs btn-rounded" ng-class="{active:gz3d.scene.manipulationMode === EDIT_MODE.TRANSLATE}"
                       ng-click="objectInspectorService.setManipulationMode((gz3d.scene.manipulationMode === EDIT_MODE.TRANSLATE) ? EDIT_MODE.VIEW : EDIT_MODE.TRANSLATE)">
                       <i class="fa fa-arrows" aria-hidden="true"></i>
                     </button>
                   </li>
-                  <li class="inline-listitem" ng-show="objectInspectorService.selectedObject.scale">
+                  <li class="inline-listitem" ng-show="objectInspectorService.selectedObject.scale"
+                  title="Activating this mode allows you to scale selected object in the 3D view. Please note that only primitive shapes can be scaled.">
                     <button type="button" class="btn btn-xs btn-rounded" ng-class="{active:gz3d.scene.manipulationMode === EDIT_MODE.SCALE}"
                       ng-click="objectInspectorService.setManipulationMode((gz3d.scene.manipulationMode === EDIT_MODE.SCALE) ? EDIT_MODE.VIEW : EDIT_MODE.SCALE)"
                       ng-disabled="!objectInspectorService.isSelectedObjectSimpleShape()">
                       <i class="fa fa-expand" aria-hidden="true"></i>
                     </button>
                   </li>
-                  <li class="inline-listitem" ng-show="objectInspectorService.selectedObject.rotation">
+                  <li class="inline-listitem" ng-show="objectInspectorService.selectedObject.rotation"
+                  title="Activating this mode allows you to rotate selected object in the 3D view.">
                     <button type="button" class="btn btn-xs btn-rounded" ng-class="{active:gz3d.scene.manipulationMode === EDIT_MODE.ROTATE}"
                       ng-click="objectInspectorService.setManipulationMode((gz3d.scene.manipulationMode === EDIT_MODE.ROTATE) ? EDIT_MODE.VIEW : EDIT_MODE.ROTATE)">
                       <i class="fa fa-repeat" aria-hidden="true"></i>
@@ -64,7 +68,7 @@
                 </ol>
               </li>
               <!-- sub-section - numerical translation, collapsible -->
-              <li class="sub-section-item" ng-show="!collapsedTransform">
+              <li class="sub-section-item" ng-show="!collapsedTransform" title="Translate selected object using numerical values in meters.">
                 <h6>Translation (meters)</h6>
                 <ol class="vec3-num-input-list" ng-show="objectInspectorService.selectedObject.position">
                   <li class="vec3-num-input-item">
@@ -83,7 +87,7 @@
               </li>
 
               <!-- sub-section - numerical rotation, collapsible -->
-              <li class="sub-section-item" ng-show="!collapsedTransform">
+              <li class="sub-section-item" ng-show="!collapsedTransform"  title="Rotate selected object using numerical values in radians or in degrees.">
 
                 <div style="display:flex; justify-content: space-between;">
 
@@ -107,7 +111,7 @@
 
                   <li class="vec3-num-input-item">
                     <div style="position:relative">
-                      <div type="button" class="btn btn-default btn-degrees" ng-click="objectInspectorService.toggleAngleMode()">
+                      <div type="button" class="btn btn-default btn-degrees" ng-click="objectInspectorService.toggleAngleMode()" title="Switch rotation values to degrees or radians">
                         {{objectInspectorService.angleMode}}
                       </div>
                     </div>
@@ -115,7 +119,7 @@
                 </ol>
               </li>
               <!-- sub-section - numerical scaling, collapsible -->
-              <li class="sub-section-item" ng-show="!collapsedTransform">
+              <li class="sub-section-item" ng-show="!collapsedTransform"  title="Select selected object using numerical values. Only primitive objects can be scaled.">
                 <h6>Scale</h6>
                 <ol class="vec3-num-input-list" ng-show="objectInspectorService.selectedObject.scale">
                   <li class="vec3-num-input-item">
@@ -137,7 +141,7 @@
               </li>
 
               <!-- sub-section - axis lock, collapsible -->
-              <li class="sub-section-item" ng-show="!collapsedTransform">
+              <li class="sub-section-item" ng-show="!collapsedTransform" title="When snap mode is activated (see snap button at the top), you can use these settings to freeze the object on one or more axis while you are dragging it with the mouse.">
                 <h6>Snap Axis Lock</h6>
                 <ol class="vec3-num-input-list">
                   <li class="vec3-num-input-item">
@@ -164,7 +168,7 @@
 
 
               <!-- sub-section - view mode, collapsible -->
-              <li class="sub-section-item" ng-show="!collapsedTransform">
+              <li class="sub-section-item" ng-show="!collapsedTransform" title ="Choose if you want translate/rotate to be applied in local object space or in world space.">
                 <h6>Space</h6>
                 <ul class="input-list">
                   <li class="input-listitem">
@@ -177,7 +181,7 @@
               </li>
 
               <!-- sub-section - snap to grid, collapsible -->
-              <li class="sub-section-item" ng-show="!collapsedTransform">
+              <li class="sub-section-item" ng-show="!collapsedTransform" title="Forces object position to be aligned on a grid.">
                 <h6>Snap to Grid</h6>
                 <ul class="input-list">
                   <li class="vec3-num-input-item">
@@ -204,7 +208,7 @@
                 </ol>
               </li>
               <!-- sub-section - view mode, collapsible -->
-              <li class="sub-section-item" ng-show="!collapsedVisuals">
+              <li class="sub-section-item" ng-show="!collapsedVisuals" title="Choose the render view mode for the selected object.">
                 <h6>View Modes</h6>
                 <ul class="input-list">
                   <li class="input-listitem">
@@ -221,12 +225,12 @@
                 </ul>
               </li>
               <!-- sub-section - material, collapsible -->
-              <li class="sub-section-item" ng-show="!collapsedVisuals && objectInspectorService.hasColorableVisual">
+              <li class="sub-section-item" ng-show="!collapsedVisuals && objectInspectorService.hasColorableVisual" title="Choose the material color">
                 <h6>Material</h6>
                 <materials-chooser on-select="objectInspectorService.selectMaterial(material)" />
               </li>
               <!-- sub-section - collisions, collapsible -->
-              <li class="sub-section-item" ng-show="!collapsedVisuals">
+              <li class="sub-section-item" ng-show="!collapsedVisuals" title="Display the collision mesh">
                 <h6>Collision</h6>
                 <ul class="input-list">
                   <li class="input-listitem">

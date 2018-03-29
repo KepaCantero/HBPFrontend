@@ -3,9 +3,9 @@
 <!-- endbuild -->
 
 
-<div ng-class="tipTooltipService.hidden?'explorer-full-size':'explorer-reduced-for-tip'">
+<div ng-class="tipTooltipService.someTipsAreHidden()?'explorer-full-size':'explorer-reduced-for-tip'">
 
-  <div  ng-show="!tipTooltipService.hidden">
+  <div  ng-show="!tipTooltipService.someTipsAreHidden()">
 
       <div class="tip-tooltip-place-explorer">
       <tip-tooltip  style="display:block;margin-right:16px"></tip-tooltip>

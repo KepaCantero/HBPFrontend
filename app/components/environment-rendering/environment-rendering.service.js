@@ -50,6 +50,7 @@
       'collab3DSettingsService',
       '$timeout',
       'tipTooltipService',
+      'TIP_CODES',
       function(
         $q,
         STATE,
@@ -64,7 +65,8 @@
         nrpAnalytics,
         collab3DSettingsService,
         $timeout,
-        tipTooltipService
+        tipTooltipService,
+        TIP_CODES
       ) {
         function EnvironmentRenderingService() {
           var that = this;
@@ -297,6 +299,28 @@
             }
           };
 
+          this.showCameraHintWhenNeeded = function() {
+            if (!this.sceneLoading) {
+              var camera = gz3d.scene.viewManager.mainUserView.camera;
+
+              if (this.lastCameraTransform) {
+                if (
+                  !camera.position.equals(this.lastCameraTransform.position) ||
+                  !camera.quaternion.equals(this.lastCameraTransform.quaternion)
+                ) {
+                  this.tipTooltipService.setCurrentTip(TIP_CODES.NAVIGATION);
+                }
+              }
+
+              this.lastCameraTransform = {
+                position: camera.position.clone(),
+                quaternion: camera.quaternion.clone()
+              };
+            }
+
+            $timeout(() => this.showCameraHintWhenNeeded(), 200);
+          };
+
           this.onSceneLoaded = function() {
             if (this.sceneLoading) {
               nrpAnalytics.durationEventTrack('Browser-initialization', {
@@ -315,6 +339,8 @@
             delete this.assetLoadingSplashScreen;
             this.sceneLoading = false;
             this.tipTooltipService.startShowingTipIfRequired();
+
+            $timeout(() => this.showCameraHintWhenNeeded(), 200);
           };
 
           // Init composer settings

@@ -36,6 +36,8 @@
     'backendInterfaceService',
     'serverError',
     'editorsPanelService',
+    'tipTooltipService',
+    'TIP_CODES',
     function(
       OBJECT_VIEW_MODE,
       $timeout,
@@ -47,7 +49,9 @@
       simulationInfo,
       backendInterfaceService,
       serverError,
-      editorsPanelService
+      editorsPanelService,
+      tipTooltipService,
+      TIP_CODES
     ) {
       return {
         templateUrl:
@@ -55,6 +59,8 @@
         restrict: 'E',
         scope: true,
         link: function(scope) {
+          tipTooltipService.setCurrentTip(TIP_CODES.OBJECT_INSPECTOR);
+
           scope.minimized = false;
           scope.collapsedTransform = false;
           scope.collapsedVisuals = false;

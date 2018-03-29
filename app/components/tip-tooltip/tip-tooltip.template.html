@@ -2,52 +2,55 @@
 <link rel="stylesheet" href="/components/tip-tooltip/tip-tooltip.style.css" />
 <!-- endbuild -->
 
+<div ng-if="vm.tipTooltipService.ready" ng-repeat="tip in vm.tipTooltipService.visibleTips" ng-show="!vm.tipTooltipService.hidden" style="margin-top:5px">
 
+  <div  ng-show="!tip.hidden" class="tip-tooltip">
 
-  <div ng-show="!vm.tipTooltipService.hidden" class="tip-tooltip">
-
-      <div style="display:flex;flex-direction: column;">
+    <div style="display:flex;flex-direction: column;">
       <div style="display: flex; justify-content: space-between;">
         <div style="display:flex; align-items: center;">
 
           <i class="fa fa-info-circle tip-help-icon" style="min-width: 25px;"></i>
 
-          <img ng-show="vm.tipTooltipService.currentTip.tipList? vm.tipTooltipService.currentTip.tipList[vm.tipTooltipService.tipListPos].image:vm.tipTooltipService.currentTip.image" class="tip-image"
-          ng-src="{{vm.tipTooltipService.currentTip.tipList? vm.tipTooltipService.currentTip.tipList[vm.tipTooltipService.tipListPos].image:vm.tipTooltipService.currentTip.image}}" draggable="false"/>
+          <img ng-show="tip.tipList? tip.tipList[tip.tipListPos].image:tip.image"
+            class="tip-image" ng-src="{{tip.tipList? tip.tipList[tip.tipListPos].image:tip.image}}"
+            draggable="false" />
 
-          <div style="max-width:920px; margin-right:5px">
-          {{vm.tipTooltipService.currentTip.tipList? vm.tipTooltipService.currentTip.tipList[vm.tipTooltipService.tipListPos].text :
-                                                        vm.tipTooltipService.currentTip.text}}
+          <div style="max-width:920px; margin-right:5px" ng-bind-html="vm.tipTooltipService.$sce.trustAsHtml(tip.tipList? tip.tipList[tip.tipListPos].text : tip.text)">
           </div>
 
         </div>
 
 
-        <div style="display:flex; min-width: 73px; flex-shrink: 0;">
+        <div style="display:flex; min-width: 73px; flex-shrink: 0; justify-content: flex-end;">
 
-            <div ng-click="vm.tipTooltipService.toggleTip()" class="tip-tooltip-hide">
-              <i class="fa fa-times" style="margin-right: 5px;"></i>hide
+          <div ng-show="vm.tipTooltipService.firstVisible(tip)" ng-click="vm.tipTooltipService.toggleTip(true)" class="tip-tooltip-hide"  style="margin-right: 5px;">
+            hide all tips
+          </div>
+
+          <div ng-click="vm.tipTooltipService.hideTip(tip)" class="tip-tooltip-hide">
+            <i class="fa fa-times"></i>
           </div>
 
         </div>
       </div>
 
-      <div ng-if="vm.tipTooltipService.currentTip.tipList">
-          <div style="display: flex;
+      <div ng-if="tip.tipList">
+        <div style="display: flex;
           margin-left: 43px;
           margin-top: 16px;">
-            <div ng-disable="vm.tipTooltipService.tipListPos===0" ng-click="vm.tipTooltipService.showPrevious()"
-            ng-class="{'tip-tooltip-button':true,'tip-tooltip-button-disabled':vm.tipTooltipService.tipListPos===0}">
-                <i class="fa fa-chevron-left" style="margin-right: 5px;"></i>previous
-            </div>
+          <div ng-disable="tip.tipListPos===0" ng-click="vm.tipTooltipService.showPrevious(tip)" ng-class="{'tip-tooltip-button':true,'tip-tooltip-button-disabled':tip.tipListPos===0}">
+            <i class="fa fa-chevron-left" style="margin-right: 5px;"></i>previous
+          </div>
 
-            <div ng-disable="vm.tipTooltipService.tipListPos===vm.tipTooltipService.currentTip.tipList.length-1"  ng-click="vm.tipTooltipService.showNext()"
-            ng-class="{'tip-tooltip-button':true,'tip-tooltip-button-disabled':vm.tipTooltipService.tipListPos===vm.tipTooltipService.currentTip.tipList.length-1}">
-                <i class="fa fa-chevron-right" style="margin-right: 5px;"></i>next
-            </div>
+          <div ng-disable="tip.tipListPos===tip.tipList.length-1" ng-click="vm.tipTooltipService.showNext(tip)"
+            ng-class="{'tip-tooltip-button':true,'tip-tooltip-button-disabled':tip.tipListPos===tip.tipList.length-1}">
+            <i class="fa fa-chevron-right" style="margin-right: 5px;"></i>next
           </div>
         </div>
+      </div>
 
     </div>
-</div>
+  </div>
 
+</div>
