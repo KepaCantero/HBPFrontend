@@ -254,12 +254,14 @@
 
             <div>
 
-              <button ng-disabled="!objectInspectorService.isSelectedRobotComponentTopic()" type="button" class="btn btn-default very-small-button" ng-click="createTopicTF()">
+              <button ng-disabled="!objectInspectorService.isSelectedRobotComponentTopic()" type="button" class="btn btn-default very-small-button" ng-click="createTopicTF()"
+                style="width: calc(100% - 5px);margin-bottom: 5px;">
                 <i class="glyphicon glyphicon-equalizer"></i>
                 <span> Transfer Function</span>
               </button>
 
-              <button ng-disabled="!objectInspectorService.isSelectedRobotComponentTopic()" type="button" class="btn btn-default very-small-button" ng-click="">
+              <button ng-disabled="!objectInspectorService.isSelectedRobotComponentTopic()" type="button" class="btn btn-default very-small-button" ng-click=""
+              style="width: calc(100% - 5px);margin-bottom: 5px;">
                 <i class="glyphicon glyphicon-arrow-left"></i>
                 <span>Read Data</span>
               </button>
@@ -268,12 +270,12 @@
 
             <div>
 
-              <button ng-disabled="!objectInspectorService.isSelectedRobotComponentTopic()" type="button" class="btn btn-default very-small-button" ng-click="">
+              <button ng-disabled="!objectInspectorService.isSelectedRobotComponentTopic()" type="button" class="btn btn-default very-small-button" ng-click="" style="width:100%; margin-bottom: 5px;">
                 <i class="glyphicon glyphicon-equalizer"></i>
                 <span>Add Noise</span>
               </button>
 
-              <button ng-disabled="!objectInspectorService.isSelectedRobotComponentTopic()" type="button" class="btn btn-default very-small-button" ng-click="">
+              <button ng-disabled="!objectInspectorService.isSelectedRobotComponentTopic()" type="button" class="btn btn-default very-small-button" ng-click="" style="width:100%; margin-bottom: 5px;">
                 <i class="glyphicon glyphicon-arrow-right"></i>
                 <span> Send Message</span>
               </button>
