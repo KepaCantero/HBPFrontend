@@ -574,6 +574,7 @@
           });
         }
       });
+      spyOn(storageServer, 'getCustomModels').and.returnValue($q.resolve([]));
       spyOn(storageServer, 'setCustomModel').and.returnValue(
         $q.reject({ data: 'Custom Model Failed' })
       );

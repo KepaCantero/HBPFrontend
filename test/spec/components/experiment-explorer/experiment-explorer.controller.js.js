@@ -331,7 +331,9 @@ describe('Controller: ExperimentExplorerController', function() {
 
     var fileReaderMock = { readAsArrayBuffer: angular.noop };
     spyOn(window, 'FileReader').and.returnValue(fileReaderMock);
-
+    spyOn(storageServer, 'getExperimentFiles').and.returnValue(
+      window.$q.when([{ name: 'myFile.txt' }])
+    );
     controller.uploadFile({ target: { files: [{ name: 'myfile.txt' }] } });
 
     fileReaderMock.onload({ target: { result: 'content' } });
@@ -428,7 +430,9 @@ describe('Controller: ExperimentExplorerController', function() {
     selectExperiment(controller);
 
     spyOn(controller, 'onError');
-
+    spyOn(storageServer, 'getExperimentFiles').and.returnValue(
+      window.$q.when([{ name: 'myFile.txt' }])
+    );
     spyOn(storageServer, 'setBlobContent').and.returnValue(window.$q.reject());
 
     var fileReaderMock = { readAsArrayBuffer: angular.noop };

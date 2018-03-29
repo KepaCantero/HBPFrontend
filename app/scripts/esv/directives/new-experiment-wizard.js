@@ -34,6 +34,7 @@
     'newExperimentProxyService',
     '$stateParams',
     '$timeout',
+    'clbConfirm',
     function(
       $q,
       $window,
@@ -43,7 +44,8 @@
       $http,
       newExperimentProxyService,
       $stateParams,
-      $timeout
+      $timeout,
+      clbConfirm
     ) {
       return {
         templateUrl: 'views/esv/new-experiment-wizard.html',
@@ -269,24 +271,44 @@
                 textReader.readAsArrayBuffer(zip);
               })
                 .then(([filename, filecontent]) => {
-                  return storageServer
-                    .setCustomModel(
-                      filename,
-                      (entityType += 's').toLowerCase(),
-                      filecontent
-                    )
-                    .catch(err => {
-                      $scope.destroyDialog();
-                      $scope.createErrorPopup(err.data);
-                      return $q.reject(err);
-                    })
-                    .then(() => {
-                      $scope.entityName = entityType;
-                      return $scope.entityUploader.uploadFromPrivateStorage(
-                        zip.name
-                      );
-                    })
-                    .finally(() => ($scope.uploadingModel = false));
+                  storageServer
+                    .getCustomModels((entityType + 's').toLowerCase())
+                    .then(customModels => {
+                      return (customModels.filter(customModel =>
+                        customModel.fileName.includes(filename)
+                      ).length
+                        ? clbConfirm
+                            .open({
+                              title: `A file with the name ${filename} exists`,
+                              confirmLabel: 'Yes',
+                              cancelLabel: 'No',
+                              template:
+                                'Are you sure you would like to upload the file again?',
+                              closable: true
+                            })
+                            .catch(() => $q.resolve())
+                        : $q.resolve()
+                      ).then(() => {
+                        return storageServer
+                          .setCustomModel(
+                            filename,
+                            (entityType += 's').toLowerCase(),
+                            filecontent
+                          )
+                          .catch(err => {
+                            $scope.destroyDialog();
+                            $scope.createErrorPopup(err.data);
+                            return $q.reject(err);
+                          })
+                          .then(() => {
+                            $scope.entityName = entityType;
+                            return $scope.entityUploader.uploadFromPrivateStorage(
+                              zip.name
+                            );
+                          })
+                          .finally(() => ($scope.uploadingModel = false));
+                      });
+                    });
                 })
                 .catch(() => {
                   $scope.uploadingModel = false;
