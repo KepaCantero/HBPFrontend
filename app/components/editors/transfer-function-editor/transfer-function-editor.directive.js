@@ -159,6 +159,10 @@ def {0}(t):
               scope.editorOptions
             );
 
+            let docs = documentationURLs.getDocumentationURLs();
+            scope.cleDocumentationURL = docs.cleDocumentationURL;
+            scope.platformDocumentationURL = docs.platformDocumentationURL;
+
             scope.onNewErrorMessageReceived = function(msg) {
               if (
                 msg.severity < 2 &&
