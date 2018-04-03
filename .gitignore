@@ -27,6 +27,7 @@
 /app/fonts
 /dist
 /doc
+/app/model_library.json
 
 # Temp Folders #
 ################
