@@ -10401,6 +10401,10 @@ GZ3D.Scene.prototype.beginNaturalManipulation = function(event)
 
       this.naturalAutoAlignMode = new GZ3D.AutoAlignModel(this);
       this.naturalAutoAlignMode.start(model);
+
+      if (this.controls && this.controls.input && this.controls.input.mouse) {
+        this.controls.input.mouse.enabled = false;
+      }
     }
 
 };
@@ -10430,6 +10434,10 @@ GZ3D.Scene.prototype.endNaturalManipulation = function(event)
     this.naturalAutoAlignMode.finish();
     this.naturalAutoAlignMode = null;
     this.updateDynamicEnvMap();
+
+    if (this.controls && this.controls.input && this.controls.input.mouse) {
+      this.controls.input.mouse.enabled = true;
+    }
   }
 };
 
