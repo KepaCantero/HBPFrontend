@@ -188,8 +188,7 @@
           {
             save: {
               method: 'PUT',
-              interceptor: { responseError: serverError.displayHTTPError },
-              headers: { 'Content-Type': 'text/plain' }
+              interceptor: { responseError: serverError.displayHTTPError }
             }
           }
         );
