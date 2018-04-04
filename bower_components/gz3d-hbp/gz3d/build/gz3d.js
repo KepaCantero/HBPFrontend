@@ -382,35 +382,12 @@ GZ3D.VisualMuscleModel = function(scene, robotName) {
   this.radius = 1;
 };
 
-// Helper function for creating a cylinder mesh between two given points
-GZ3D.VisualMuscleModel.prototype.cylinderMesh = function(pointX, pointY, radius, material) {
-  var direction = new THREE.Vector3().subVectors(pointY, pointX);
-  var orientation = new THREE.Matrix4();
-  orientation.lookAt(pointX, pointY, new THREE.Object3D().up);
-  var rotation_matrix = new THREE.Matrix4();
-
-  rotation_matrix.set(1, 0, 0, 0,
-    0, 0, 1, 0,
-    0, -1, 0, 0,
-    0, 0, 0, 1);
-
-  orientation.multiply(rotation_matrix);
-  var edgeGeometry = new THREE.CylinderGeometry(radius, radius, direction.length(), 8, 1);
-  var edge = new THREE.Mesh(edgeGeometry, material);
-  edge.applyMatrix(orientation);
-  // position based on midpoints - there may be a better solution than this
-  edge.position.x = (pointY.x + pointX.x) / 2;
-  edge.position.y = (pointY.y + pointX.y) / 2;
-  edge.position.z = (pointY.z + pointX.z) / 2;
-
-  return edge;
-};
 
 GZ3D.VisualMuscleModel.prototype.updateVisualization = function(message) {
   if (message.robot_name === this.robotName) {
     if (this.last_muscle_count !== message.muscle.length)
     {
-      // Compute the radius as fraction of the average length of all muscles.
+      // Compute the radius as fraction of the average length of all cylinders.
       var total_length = 0;
       for (var k1 = 0; k1 < message.muscle.length; ++k1) {
         total_length += message.muscle[k1].length;
@@ -420,73 +397,74 @@ GZ3D.VisualMuscleModel.prototype.updateVisualization = function(message) {
     }
 
     for (var k = 0; k < message.muscle.length; ++k) {
+      // NOTE: The number of path segments can vary over time
+      // because wrap objects cause local refinement of the initial path.
       var cylinder = null;
       var cq = 0;
       var cylinderEndPoint_1 = null;
       var cylinderEndPoint_2 = null;
       var radius = this.radius;
       var activation = message.muscle[k].activation;
-      var color = new THREE.Color(activation, 0.0, 1.0-activation);
+      var color;
+      if (message.muscle[k].isMuscle) {
+        color = new THREE.Color(activation, 0, 1-activation);
+      } else {
+        color = new THREE.Color(activation, 1-activation, 0); // Path actuators are green.
+      }
+      var num_segments = message.muscle[k].pathPoint.length - 1;
 
+      // In case we don't have enough muscles.
+      // NOTE: The case were the number of muscles decreases is not handled.
+      // It would result in superfluous visible geometry.
       if (!(k in this.cylinderShapes)) {
-        // TODO: This is not going to work when the number of segments changes.
-        this.cylinderShapes[k] = {};
-        for (cq = 0; cq < message.muscle[k].pathPoint.length - 1; ++cq) {
-          cylinderEndPoint_1 = new THREE.Vector3(message.muscle[k].pathPoint[cq].x, message.muscle[k].pathPoint[cq].y, message.muscle[k].pathPoint[cq].z);
-          cylinderEndPoint_2 = new THREE.Vector3(message.muscle[k].pathPoint[cq + 1].x, message.muscle[k].pathPoint[cq + 1].y, message.muscle[k].pathPoint[cq + 1].z);
+        this.cylinderShapes[k] = [];
+      }
+      let cylinders = this.cylinderShapes[k];
 
-          cylinder = this.cylinderMesh(cylinderEndPoint_1, cylinderEndPoint_2, radius, new THREE.MeshLambertMaterial({
+      for (cq = 0; cq < num_segments; ++cq) {
+        cylinderEndPoint_1 = new THREE.Vector3(
+          message.muscle[k].pathPoint[cq].x,
+          message.muscle[k].pathPoint[cq].y,
+          message.muscle[k].pathPoint[cq].z);
+        cylinderEndPoint_2 = new THREE.Vector3(
+          message.muscle[k].pathPoint[cq + 1].x,
+          message.muscle[k].pathPoint[cq + 1].y,
+          message.muscle[k].pathPoint[cq + 1].z);
+
+        // Create new cylinder on demand.
+        if (cylinders.length <= cq) {
+          let edgeGeometry = new THREE.CylinderGeometry(1, 1, 1, 8, 1);
+          let cylinder = new THREE.Mesh(edgeGeometry, new THREE.MeshLambertMaterial({
             color: color,
             wireframe: false,
             flatShading: THREE.FlatShading
           }));
           this.scene.add(cylinder);
-
-          this.cylinderShapes[k][cq] = cylinder;
+          cylinders.push(cylinder);
         }
+
+        cylinder = this.cylinderShapes[k][cq];
+        cylinder.visible = true; // In case less segments were needed the last frame.
+        // Align and scale the cylinder.
+        let cylinder_direction = new THREE.Vector3().subVectors(cylinderEndPoint_2, cylinderEndPoint_1);
+        cylinder.material.color = color;
+        cylinder.scale.y = cylinder_direction.length();
+        cylinder.scale.x = radius;
+        cylinder.scale.z = radius;
+        cylinder_direction.normalize();
+        cylinder.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0), cylinder_direction);
+        cylinder.position.x = (cylinderEndPoint_2.x + cylinderEndPoint_1.x) / 2;
+        cylinder.position.y = (cylinderEndPoint_2.y + cylinderEndPoint_1.y) / 2;
+        cylinder.position.z = (cylinderEndPoint_2.z + cylinderEndPoint_1.z) / 2;
+      } // end for path points
+      // I don't bother tracking how many segments were needed last time.
+      // Simply loop over all superfluous segments and turn them all off.
+      for(; cq < cylinders.length; ++cq)
+      {
+        let to_remove = cylinders[cq];
+        to_remove.visible = false;
       }
-      else {
-        for (cq = 0; cq < message.muscle[k].pathPoint.length - 1; ++cq) {
-          cylinderEndPoint_1 = new THREE.Vector3(message.muscle[k].pathPoint[cq].x, message.muscle[k].pathPoint[cq].y, message.muscle[k].pathPoint[cq].z);
-          cylinderEndPoint_2 = new THREE.Vector3(message.muscle[k].pathPoint[cq + 1].x, message.muscle[k].pathPoint[cq + 1].y, message.muscle[k].pathPoint[cq + 1].z);
-          cylinder = this.cylinderShapes[k][cq];
-          if (cylinder)
-          {
-            var cylinder_direction = new THREE.Vector3().subVectors(cylinderEndPoint_2, cylinderEndPoint_1);
-            cylinder.geometry.height = cylinder_direction.length();
-            cylinder.geometry.radiusTop = radius;
-            cylinder.geometry.radiusBottom = radius;
-            cylinder.material.color = color;
-
-            // Reset to default position
-            cylinder.position.set(0, 0, 0);
-            cylinder.scale.set(1, 1, 1);
-            cylinder.rotation.set(0, 0, 0);
-            cylinder.updateMatrix();
-
-            // Then update to new muscle path
-            var cylinder_orientation = new THREE.Matrix4();
-            cylinder_orientation.lookAt(cylinderEndPoint_1, cylinderEndPoint_2, new THREE.Object3D().up);
-            var cylinder_rotation_matrix = new THREE.Matrix4();
-
-            cylinder_rotation_matrix.set(1, 0, 0, 0,
-              0, 0, 1, 0,
-              0, -1, 0, 0,
-              0, 0, 0, 1);
-
-            cylinder_orientation.multiply(cylinder_rotation_matrix);
-            cylinder.applyMatrix(cylinder_orientation);
-
-            cylinder.position.x = (cylinderEndPoint_2.x + cylinderEndPoint_1.x) / 2;
-            cylinder.position.y = (cylinderEndPoint_2.y + cylinderEndPoint_1.y) / 2;
-            cylinder.position.z = (cylinderEndPoint_2.z + cylinderEndPoint_1.z) / 2;
-
-            cylinder.updateMatrix();
-            cylinder.geometry.verticesNeedUpdate = true;
-          }
-        }
-      }
-    }
+    } // end for message.muscle
   }
 };
 
