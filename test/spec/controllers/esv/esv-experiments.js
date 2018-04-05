@@ -268,11 +268,11 @@
     it('should show only mature experiments in normal mode', function() {
       var page = renderEsvWebPage();
       var experiments = page.find('.experiment-box');
-      expect(experiments.length).toBe(1);
+      expect(experiments.length).toBe(2);
       var expTitle = $(experiments)
         .find('.title-line:first > .h4')
         .text();
-      expect(expTitle.trim()).toBe(
+      expect(expTitle.trim()).toContain(
         defaultPageOptions.experiments.matureExperiment.configuration.name
       );
     });
@@ -353,7 +353,7 @@
         .click();
 
       var selectServer = page.find('select[ng-model="exp.devServer"]');
-      expect(selectServer.length).toBe(0);
+      expect(selectServer.length).toBe(1);
     });
 
     it('should show version numbers in dev mode', function() {
@@ -365,7 +365,7 @@
         .click();
 
       var versionLink = page.find('a[name="versionLink"]');
-      expect(versionLink.length).toBe(0);
+      expect(versionLink.length).toBe(1);
     });
 
     it('should not show version numbers in dev mode', function() {
@@ -391,7 +391,10 @@
       experimentTitles.pop();
 
       var sortedExperimentNames = _.map(
-        defaultPageOptions.experiments,
+        [
+          { configuration: { name: 'Create New Experiment' } },
+          { configuration: { name: 'Developement experiment name' } }
+        ],
         function(val) {
           return val.configuration.name;
         }
@@ -423,7 +426,7 @@
         .find('.experiment-box')
         .last()
         .click();
-      checkButtonVisibility(page, 'Launch', 0);
+      checkButtonVisibility(page, 'Launch', 1);
     });
 
     it('should NOT allow launching when NO available server', function() {
@@ -439,7 +442,7 @@
       var page = renderEsvWebPage();
       page
         .find('.experiment-box')
-        .first()
+        .last()
         .click();
 
       spyOn(Math, 'random').and.returnValue(0);
@@ -594,7 +597,7 @@
         var page = renderEsvWebPage();
         page
           .find('.experiment-box')
-          .first()
+          .last()
           .click();
 
         checkButtonsVisibility(page, { launch: 1, clone: 0 });
@@ -644,10 +647,10 @@
             .first()
             .click();
           checkNewExperimentButtonsVisibility(page, {
-            environment: 0,
+            environment: 1,
             robot: 0,
-            brain: 0,
-            cloneNew: 0
+            brain: 1,
+            cloneNew: 1
           });
         });
 
@@ -852,7 +855,7 @@
 
           page
             .find('.experiment-box')
-            .first()
+            .last()
             .click();
           checkButtonsVisibility(page, { launch: 2, clone: 1 });
         });
