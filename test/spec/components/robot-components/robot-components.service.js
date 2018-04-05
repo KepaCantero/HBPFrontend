@@ -61,8 +61,8 @@ describe('Services: robotComponentsService', function() {
     mockServiceSuccessResponse = {
       sensor_names: ['default::robot::some_link::my_camera'],
       sensor_types: ['camera'],
-      camera_names: ['camera_01'],
-      rostopic_camera_urls: ['camera_01/camera_image'],
+      sensor_names_ROS: ['camera_01'],
+      rostopic_sensor_urls: ['camera_01/camera_image'],
       rostopic_actuator_urls: ['actuator_01']
     };
     mockServiceFailureResponse = 'default failure';
@@ -131,7 +131,7 @@ describe('Services: robotComponentsService', function() {
     expect(robotComponentsService.sensors.cameras[0]).toBe(mockCamera);
     expect(
       robotComponentsService.sensors.cameras[0].children[0].userData.rosTopic
-    ).toBe('/' + mockServiceSuccessResponse.rostopic_camera_urls[0]);
+    ).toBe('/' + mockServiceSuccessResponse.rostopic_sensor_urls[0]);
 
     expect(robotComponentsService.robotControllers).toBeDefined();
     expect(robotComponentsService.actuators.length).toBe(1);

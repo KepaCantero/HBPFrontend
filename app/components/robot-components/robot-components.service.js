@@ -99,10 +99,12 @@
         for (let i = 0; i < rosRobotProperties.sensor_names.length; i = i + 1) {
           if (rosRobotProperties.sensor_types[i] === 'camera') {
             let sensorName = rosRobotProperties.sensor_names[i];
+            // (Luc) The logic below is flawed as a DVS sensor is no references in
+            // sensor_names_ROS and sensor_ros_message_type, but only in sensor_types
             let cameraName =
-              rosRobotProperties.camera_names[this.sensors.cameras.length];
+              rosRobotProperties.sensor_names_ROS[this.sensors.cameras.length];
             let topicURL = this.getCameraTopicURL(
-              rosRobotProperties.rostopic_camera_urls,
+              rosRobotProperties.rostopic_sensor_urls,
               cameraName
             );
 
@@ -124,7 +126,6 @@
               ].replace('/', '.msg.');
             } else topicObject.userData.rosType = 'unknown';
 
-            topicObject.userData.rosType = 'sensor_msgs.msg.Image';
             sensorObject.add(topicObject);
 
             this.sensors.cameras.push(sensorObject);
