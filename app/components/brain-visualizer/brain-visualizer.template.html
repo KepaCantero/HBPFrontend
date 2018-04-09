@@ -27,7 +27,7 @@
             </div>
 
             <div style="padding-bottom:1px;position: relative;" >
-                <label class="esv-brainvisualizer-radio-label" ng-style="{'color':userFile || 'gray'}">
+                <label class="esv-brainvisualizer-radio-label" ng-style="{'color':!!userFile || 'gray'}">
                 <input class="esv-brainvisualizer-radio" type="radio" ng-disabled="!userFile"
                     ng-model="currentValues.currentShape" ng-value="BRAIN3D.REP_SHAPE_USER" ng-change="setShape(BRAIN3D.REP_SHAPE_USER)">Custom</label>
 
