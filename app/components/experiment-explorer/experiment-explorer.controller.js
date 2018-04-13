@@ -281,12 +281,30 @@
           textReader.onload = e => resolve([f.name, e.target.result]);
           textReader.readAsArrayBuffer(f);
         }).then(([filename, filecontent]) =>
-          this.storageServer.setBlobContent(
-            this.selectedParent.uuid,
-            filename,
-            filecontent,
-            true
-          )
+          this.storageServer
+            .getExperimentFiles(this.selectedParent.uuid)
+            .then(files => {
+              return (files.filter(file => file.name == filename).length
+                ? this.clbConfirm
+                    .open({
+                      title: `A file with the name ${filename} exists`,
+                      confirmLabel: 'Yes',
+                      cancelLabel: 'No',
+                      template:
+                        'Are you sure you would like to upload the file again?',
+                      closable: true
+                    })
+                    .catch(() => this.$q.resolve())
+                : this.$q.resolve()
+              ).then(() =>
+                this.storageServer.setBlobContent(
+                  this.selectedParent.uuid,
+                  filename,
+                  filecontent,
+                  true
+                )
+              );
+            })
         )
       );
 
@@ -294,7 +312,10 @@
         .all(filesData)
         .then(() => this.loadParentFileList())
         .catch(err => this.onError('Failed to upload file', err))
-        .finally(() => (selectedParent.uploading = false));
+        .finally(() => {
+          e.target.value = null;
+          selectedParent.uploading = false;
+        });
     }
 
     static get FILE_TYPES() {

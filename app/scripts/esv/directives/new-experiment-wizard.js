@@ -34,6 +34,7 @@
     'newExperimentProxyService',
     '$stateParams',
     '$timeout',
+    'clbConfirm',
     function(
       $q,
       $window,
@@ -43,7 +44,8 @@
       $http,
       newExperimentProxyService,
       $stateParams,
-      $timeout
+      $timeout,
+      clbConfirm
     ) {
       return {
         templateUrl: 'views/esv/new-experiment-wizard.html',
@@ -59,14 +61,7 @@
           $scope.environmentUploaded = false;
           $scope.newExperiment = 'newExperiment';
           $scope.experimentCloned = false;
-          //object containing the path to the robot,env, brain
-          //looks like : {
-          // robotPath: 'icub_model/icub.sdf'
-          // environmentPath: 'virtual_room/vitual_room.sdf'
-          // brainPath: 'brain_models/braitenberg.py'
-          //}
           $scope.paths = {};
-          $scope.newExperimentPath = '.templateEmpty/TemplateEmpty.exc';
 
           var RobotUploader = {
             name: 'Robot',
@@ -79,15 +74,23 @@
                 });
               $scope.createUploadModal('PrivateStorage');
             },
-            uploadFromPrivateStorage: () => {
+            uploadFromPrivateStorage: (customModel = undefined) => {
               delete $scope.entities;
               storageServer
                 .getCustomModels('robots')
                 .then(robots => {
-                  robots.map(
-                    robot => (robot.path = decodeURIComponent(robot.path))
-                  );
+                  robots.map(robot => {
+                    robot.path = decodeURIComponent(robot.path);
+                    robot.custom = true;
+                  });
                   $scope.entities = $scope.parseEntityList(robots);
+                  if (customModel) {
+                    let selectedModel = {};
+                    selectedModel = robots.filter(item =>
+                      item.fileName.includes(customModel)
+                    )[0];
+                    $scope.selectEntity(selectedModel);
+                  }
                 })
                 .catch(err => {
                   $scope.createErrorPopup(err);
@@ -120,8 +123,8 @@
                   $scope.entities = $scope.parseEntityList(environments);
                   if (customModel) {
                     let selectedModel = {};
-                    selectedModel.id = environments.filter(item =>
-                      item.path.includes(customModel)
+                    selectedModel = environments.filter(item =>
+                      item.fileName.includes(customModel)
                     )[0];
                     $scope.selectEntity(selectedModel);
                   }
@@ -145,15 +148,23 @@
                 });
               $scope.createUploadModal('PrivateStorage');
             },
-            uploadFromPrivateStorage: () => {
+            uploadFromPrivateStorage: (customModel = undefined) => {
               delete $scope.entities;
               storageServer
                 .getCustomModels('brains')
                 .then(brains => {
-                  brains.map(
-                    brain => (brain.path = decodeURIComponent(brain.path))
-                  );
+                  brains.map(brain => {
+                    brain.path = decodeURIComponent(brain.path);
+                    brain.custom = true;
+                  });
                   $scope.entities = $scope.parseEntityList(brains);
+                  if (customModel) {
+                    let selectedModel = {};
+                    selectedModel = brains.filter(item =>
+                      item.fileName.includes(customModel)
+                    )[0];
+                    $scope.selectEntity(selectedModel);
+                  }
                 })
                 .catch(err => {
                   $scope.createErrorPopup(err);
@@ -203,23 +214,29 @@
             if ($scope.entityName.startsWith('Environment')) {
               $scope.paths.environmentPath = {
                 path: selectedEntity.path,
-                custom: selectedEntity.custom ? selectedEntity.custom : false
+                custom: selectedEntity.custom ? selectedEntity.custom : false,
+                name: selectedEntity.name
               };
               $scope.environmentUploaded = true;
+              $scope.selectedEnvironment = selectedEntity;
             }
             if ($scope.entityName.startsWith('Robot')) {
               $scope.paths.robotPath = {
                 path: selectedEntity.path,
-                custom: selectedEntity.custom ? selectedEntity.custom : false
+                custom: selectedEntity.custom ? selectedEntity.custom : false,
+                name: selectedEntity.name
               };
               $scope.robotUploaded = true;
+              $scope.selectedRobot = selectedEntity;
             }
             if ($scope.entityName.startsWith('Brain')) {
               $scope.paths.brainPath = {
                 path: selectedEntity.path,
-                custom: selectedEntity.custom ? selectedEntity.custom : false
+                custom: selectedEntity.custom ? selectedEntity.custom : false,
+                name: selectedEntity.name
               };
               $scope.brainUploaded = true;
+              $scope.selectedBrain = selectedEntity;
             }
             $scope.destroyDialog();
           };
@@ -254,24 +271,44 @@
                 textReader.readAsArrayBuffer(zip);
               })
                 .then(([filename, filecontent]) => {
-                  return storageServer
-                    .setCustomModel(
-                      filename,
-                      (entityType += 's').toLowerCase(),
-                      filecontent
-                    )
-                    .catch(err => {
-                      $scope.destroyDialog();
-                      $scope.createErrorPopup(err.data);
-                      return $q.reject(err);
-                    })
-                    .then(() => {
-                      $scope.entityName = entityType;
-                      return $scope.entityUploader.uploadFromPrivateStorage(
-                        filename
-                      );
-                    })
-                    .finally(() => ($scope.uploadingModel = false));
+                  storageServer
+                    .getCustomModels((entityType + 's').toLowerCase())
+                    .then(customModels => {
+                      return (customModels.filter(customModel =>
+                        customModel.fileName.includes(filename)
+                      ).length
+                        ? clbConfirm
+                            .open({
+                              title: `A file with the name ${filename} exists`,
+                              confirmLabel: 'Yes',
+                              cancelLabel: 'No',
+                              template:
+                                'Are you sure you would like to upload the file again?',
+                              closable: true
+                            })
+                            .catch(() => $q.resolve())
+                        : $q.resolve()
+                      ).then(() => {
+                        return storageServer
+                          .setCustomModel(
+                            filename,
+                            (entityType += 's').toLowerCase(),
+                            filecontent
+                          )
+                          .catch(err => {
+                            $scope.destroyDialog();
+                            $scope.createErrorPopup(err.data);
+                            return $q.reject(err);
+                          })
+                          .then(() => {
+                            $scope.entityName = entityType;
+                            return $scope.entityUploader.uploadFromPrivateStorage(
+                              zip.name
+                            );
+                          })
+                          .finally(() => ($scope.uploadingModel = false));
+                      });
+                    });
                 })
                 .catch(() => {
                   $scope.uploadingModel = false;
@@ -289,10 +326,22 @@
           };
 
           $scope.selectEntity = function(entity) {
-            $scope.entityPageState.selected = entity.id;
+            $scope.entityPageState.selected = entity;
           };
 
           $scope.createUploadModal = function() {
+            if (
+              $scope.entityName == 'Environment' &&
+              $scope.selectedEnvironment
+            ) {
+              $scope.selectEntity($scope.selectedEnvironment);
+            }
+            if ($scope.entityName == 'Brain' && $scope.selectedBrain) {
+              $scope.selectEntity($scope.selectedBrain);
+            }
+            if ($scope.entityName == 'Robot' && $scope.selectedRobot) {
+              $scope.selectEntity($scope.selectedRobot);
+            }
             nrpModalService.createModal({
               templateUrl: 'views/esv/entities-list.html',
               closable: true,
@@ -301,22 +350,6 @@
               windowClass: 'modal-window'
             });
           };
-
-          $scope.createEntitiesListFromBrainFiles = brainFiles =>
-            $q.all(
-              brainFiles.map(brain =>
-                storageServer.getFileContent(brain.uuid).then(
-                  resp =>
-                    resp && {
-                      name: brain.name.split('.')[0],
-                      id: brain.name.split('.')[0],
-                      description:
-                        resp.data.match(/^"""([^"]*)"""/m)[1].trim() ||
-                        'Brain description'
-                    }
-                )
-              )
-            );
 
           $scope.createErrorPopup = function(errorMessage) {
             clbErrorDialog.open({
@@ -349,7 +382,6 @@
                 name: entity.name,
                 custom: entity.custom ? entity.custom : false,
                 description: entity.description,
-                id: entity,
                 thumbnail: entity.thumbnail
               };
             });
