@@ -61,12 +61,18 @@
   angular
     .module('exdFrontendApp')
     .constant(
-      'DEFAULT_TF_CODE',
+      'DEFAULT_RAW_TF_CODE',
       `@nrp.Robot2Neuron()
 def {0}(t):
     #log the first timestep (20ms), each couple of seconds
     if t % 2 < 0.02:
         clientLogger.info('Time: ', t)`
+    )
+    .constant(
+      'DEFAULT_SCRIPT_TF_CODE',
+      `#log the first timestep (20ms), each couple of seconds
+if t % 2 < 0.02:
+    clientLogger.info('Time: ', t)`
     )
     .directive('transferFunctionEditor', [
       '$log',
@@ -91,7 +97,8 @@ def {0}(t):
       'saveErrorsService',
       'clbConfirm',
       'downloadFileService',
-      'DEFAULT_TF_CODE',
+      'DEFAULT_RAW_TF_CODE',
+      'DEFAULT_SCRIPT_TF_CODE',
       function(
         $log,
         backendInterfaceService,
@@ -115,7 +122,8 @@ def {0}(t):
         saveErrorsService,
         clbConfirm,
         downloadFileService,
-        DEFAULT_TF_CODE
+        DEFAULT_RAW_TF_CODE,
+        DEFAULT_SCRIPT_TF_CODE
       ) {
         return {
           templateUrl:
@@ -574,11 +582,17 @@ def {0}(t):
                 }
               }
 
-              var rawcode = DEFAULT_TF_CODE.replace('{0}', scope.selectedTF);
+              var rawcode = DEFAULT_RAW_TF_CODE.replace(
+                '{0}',
+                scope.selectedTF
+              );
+              var scriptcode = DEFAULT_SCRIPT_TF_CODE;
 
               var tf = new ScriptObject(
                 scope.selectedTF,
-                scope.centerPanelTabSelection === 'script' ? '' : rawcode
+                scope.centerPanelTabSelection === 'script'
+                  ? scriptcode
+                  : rawcode
               );
               tf.type = undefined;
               tf.name = scope.selectedTF;
