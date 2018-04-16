@@ -36,11 +36,6 @@
     }
 
     $onInit() {
-      if (this.config.model.website) {
-        window.location.replace(this.config.model.website);
-        return;
-      }
-
       if (this.config.model && this.config.model.author) {
         this.enforceArray(this.config.model.author, 'name');
         this.enforceArray(this.config.model.author, 'email');
