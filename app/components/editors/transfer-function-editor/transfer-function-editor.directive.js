@@ -121,13 +121,11 @@ def {0}(t):
           templateUrl:
             'components/editors/transfer-function-editor/transfer-function-editor.template.html',
           restrict: 'E',
-          scope: {
-            control: '='
-          },
+          scope: { control: '=' },
           link: function(scope, element, attrs) {
             var ScriptObject = pythonCodeHelper.ScriptObject;
 
-            var DIRTY_TYPE = 'TF';
+            const DIRTY_TYPE = 'TF';
 
             scope.populations = [];
             scope.topics = [];
@@ -211,15 +209,15 @@ def {0}(t):
             };
 
             scope.centerPanelTabChanged = function(newtab) {
-              if (scope.nTransferFunctionDirty) {
-                scope.applyAllDirtyScripts(() => {
-                  scope.centerPanelTabSelection = newtab;
-                  scope.updateCurrentTFContent();
-                });
-              } else {
-                scope.centerPanelTabSelection = newtab;
-                scope.updateCurrentTFContent();
-              }
+              //   if (scope.nTransferFunctionDirty) {
+              //     scope.applyAllDirtyScripts(() => {
+              //       scope.centerPanelTabSelection = newtab;
+              //       scope.updateCurrentTFContent();
+              //     });
+              //   } else {
+              scope.centerPanelTabSelection = newtab;
+              scope.updateCurrentTFContent();
+              //              }
             };
 
             scope.cleanCompileError = function(transferFunction) {
@@ -261,6 +259,7 @@ def {0}(t):
               transferFunction.dirty = true;
               scope.nTransferFunctionDirty++;
               scope.collabDirty = true;
+              autoSaveService.setDirty(DIRTY_TYPE, scope.transferFunctions);
             };
 
             scope.getFriendlyTopicName = function(topic) {
@@ -414,7 +413,8 @@ def {0}(t):
             };
 
             scope.control.refresh = function() {
-              scope.populateStructuredTransferFunctions();
+              if (scope.collabDirty) refreshEditor();
+              else scope.populateStructuredTransferFunctions();
             };
 
             scope.setTFtype = function(tf) {
@@ -460,6 +460,8 @@ def {0}(t):
                 }
               });
 
+              autoSaveService.clearDirty(DIRTY_TYPE);
+
               if (!oneFound) doneCallback();
             };
 
@@ -480,6 +482,13 @@ def {0}(t):
                       scope.cleanCompileError(transferFunction);
                       if (doneCallback) doneCallback();
                       scope.updateNTransferFunctionDirty();
+                      if (scope.nTransferFunctionDirty == 0)
+                        autoSaveService.clearDirty(DIRTY_TYPE);
+                      else
+                        autoSaveService.setDirty(
+                          DIRTY_TYPE,
+                          scope.transferFunctions
+                        );
                     },
                     function(data) {
                       serverError.displayHTTPError(data);
@@ -512,11 +521,19 @@ def {0}(t):
                       transferFunction.dirty = false;
                       transferFunction.local = false;
                       scope.updateNTransferFunctionDirty();
+                      if (scope.nTransferFunctionDirty == 0)
+                        autoSaveService.clearDirty(DIRTY_TYPE);
+                      else
+                        autoSaveService.setDirty(
+                          DIRTY_TYPE,
+                          scope.transferFunctions
+                        );
                       transferFunction.oldName = transferFunction.name = pythonCodeHelper.getFunctionName(
                         transferFunction.rawCode
                       );
 
                       if (
+                        scope.transferFunction &&
                         scope.transferFunction.name === transferFunction.name
                       ) {
                         scope.selectTransferFunction(transferFunction.name);
@@ -593,6 +610,7 @@ def {0}(t):
 
               scope.nTransferFunctionDirty++;
               scope.transferFunctions.push(tf);
+              autoSaveService.setDirty(DIRTY_TYPE, scope.transferFunctions);
               scope.selectTransferFunction(tf.name);
             };
 
@@ -626,6 +644,7 @@ def {0}(t):
               tf.variables = [];
               tf.local = true;
               scope.transferFunctions.push(tf);
+              autoSaveService.setDirty(DIRTY_TYPE, scope.transferFunctions);
               scope.selectTransferFunction(tf.name);
               scope.createDevice();
               tf.devices[0].name = 'device';
@@ -910,6 +929,7 @@ def {0}(t):
 
             var deleteInternal = function(scope, index) {
               scope.transferFunctions.splice(index, 1);
+              autoSaveService.setDirty(DIRTY_TYPE, scope.transferFunctions);
               if (scope.transferFunctions.length > 0) {
                 scope.selectTransferFunction(scope.transferFunctions[0].name);
               } else {
@@ -1002,6 +1022,7 @@ def {0}(t):
                   scope.collabDirty = environmentService.isPrivateExperiment();
                 }
               });
+              autoSaveService.setDirty(DIRTY_TYPE, scope.transferFunctions);
             };
 
             function applyUploadedTransferFunctions(tfs) {
@@ -1165,6 +1186,23 @@ def {0}(t):
                 }
               }
             };
+
+            autoSaveService.registerFoundAutoSavedCallback(
+              DIRTY_TYPE,
+              (autoSaved, applyChanges) => {
+                scope.collabDirty = true;
+                scope.centerPanelTabSelection = 'rawscript';
+                scope.transferFunctions = autoSaved;
+                if (scope.transferFunctions.length)
+                  scope.selectTransferFunction(scope.transferFunctions[0].name);
+
+                if (applyChanges) {
+                  _.forEach(autoSaved, tf =>
+                    scope.applyScript(tf, angular.noop)
+                  );
+                }
+              }
+            );
           }
         };
       }
