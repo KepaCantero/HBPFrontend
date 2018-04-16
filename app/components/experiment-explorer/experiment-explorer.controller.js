@@ -349,7 +349,7 @@
     }
 
     getFileModifiedDate(f) {
-      return moment(f.modifiedOn).format('YYYY-MM-DD hh:mm:ss');
+      return moment(f.modifiedOn).format('YYYY-MM-DD HH:mm:ss');
     }
 
     static get FILE_ICONS() {
