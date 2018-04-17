@@ -528,10 +528,10 @@
 
                     <div class="smallButtonBlock">
 
-                      <button type="button" class="btn btn-default small-button" href ng-click='createTopicChannel(true)' ng-class="{'disabled': selectedTF == null || !selectedTopic}">Add Publisher
+                      <button type="button" class="btn btn-default" href ng-click='createTopicChannel(true)' ng-class="{'disabled': selectedTF == null || !selectedTopic}">Add Publisher
                       </button>
 
-                      <button type="button" class="btn btn-default small-button" href ng-click='createTopicChannel(false)' ng-class="{'disabled': selectedTF == null || !selectedTopic}">Add Subscriber
+                      <button type="button" class="btn btn-default" href ng-click='createTopicChannel(false)' ng-class="{'disabled': selectedTF == null || !selectedTopic}">Add Subscriber
                       </button>
                     </div>
 
@@ -575,10 +575,10 @@
                     <div class="smallButtonBlock">
 
 
-                      <button href ng-click='createDevice()' type="button" class="btn btn-default small-button" ng-class="{'disabled': !selectedTF || !isNeuronsSelected || !selectedPopulation}">Create Device
+                      <button href ng-click='createDevice()' type="button" class="btn btn-default" ng-class="{'disabled': !selectedTF || !isNeuronsSelected || !selectedPopulation}">Create Device
                       </button>
 
-                      <button type="button" class="btn btn-default btn-md  small-button" ng-disabled="(stateService.currentState === STATE.INITIALIZED) || stateService.statePending || !selectedPopulation || !isNeuronsSelected"
+                      <button type="button" class="btn btn-default btn-md" ng-disabled="(stateService.currentState === STATE.INITIALIZED) || stateService.statePending || !selectedPopulation || !isNeuronsSelected"
                         ng-click="createNewMonitor();">
                         <span> Create Monitor</span>
                       </button>
@@ -605,7 +605,7 @@
 
                     <input class="normal" type="text" ng-model="newVariableName" style="min-width: 100px;" />
 
-                    <button type="button" class="btn btn-default btn-md  small-button" ng-disabled="newVariableName.length===0" ng-click="addNewVariable(newVariableName);"
+                    <button type="button" class="btn btn-default btn-md" ng-disabled="newVariableName.length===0" ng-click="addNewVariable(newVariableName);"
                       style="min-width: 61px; margin-left: 8px;">
                       <span> Add </span>
                     </button>
@@ -616,7 +616,7 @@
 
 
                 <div class="smallButtonBlock">
-                  <button type="button" class="btn btn-default small-button" style="display: flex;
+                  <button type="button" class="btn btn-default" style="display: flex;
                       justify-content: center;" href ng-click='addMode=null'>
 
                     <i class="fa fa-arrow-left" style="margin-top: 2px; margin-right: 5px;"></i>
@@ -648,14 +648,14 @@
 
       <div style="display:flex">
 
-        <button type="button" ng-class="{'tf-apply-changes-dirty':transferFunction.dirty}" class="btn btn-default btn-md small-button"
+        <button type="button" ng-class="{'tf-apply-changes-dirty':transferFunction.dirty}" class="btn btn-default btn-md"
           ng-click="apply()" ng-disabled="!transferFunction.dirty || (stateService.currentState === STATE.INITIALIZED) || stateService.statePending"
           v-busy="transferFunction.dirty && stateService.statePending" v-busy-label="Applying changes" v-pressable style="display:flex;margin-right:10px;">
           <i class="glyphicon glyphicon-ok-circle" ng-class="{'tf-apply-changes-dirty':transferFunction.dirty}" style="font-size: 15px; padding-right: 6px; padding-top: 1px;"></i>
           <span> Apply</span>
         </button>
 
-        <button type="button" ng-class="{'tf-apply-changes-dirty':nTransferFunctionDirty}" class="btn btn-default btn-md small-button"
+        <button type="button" ng-class="{'tf-apply-changes-dirty':nTransferFunctionDirty}" class="btn btn-default btn-md"
           ng-click="applyAllDirtyScripts()" ng-disabled="!nTransferFunctionDirty || (stateService.currentState === STATE.INITIALIZED) || stateService.statePending"
           v-busy="nTransferFunctionDirty && stateService.statePending" v-busy-label="Applying changes" v-pressable style="display:flex">
           <i class="glyphicon glyphicon-ok-circle" ng-class="{'tf-apply-changes-dirty':nTransferFunctionDirty}" style="font-size: 15px; padding-right: 6px; padding-top: 1px;"></i>
