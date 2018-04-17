@@ -29,8 +29,8 @@
     function($http, bbpConfig) {
       /**
                *  Fetches the proxyUrl
-               *  
-               *  Example usage : 
+               *
+               *  Example usage :
                *  var proxyUrl = newExperimentProxyService.getProxyUrl();
                *  which will fetch the proxy url to use in subsequent HTTP requests
                *
@@ -42,20 +42,23 @@
       /**
                *  Performs an HTTP request to the proxy to fetch the list of  template models
                *  (i.e. robot, environment, brain etc).
-               *  
-               *  Example usage : 
+               *
+               *  Example usage :
                *  var robotsJSONPromise = newExperimentProxyService.getEntity('robots');
                *  which will fetch a promise containing the JSON with the response
                *
-               *  @return a promise containing the JSON with the response from the proxy. The 
-               *  promise itself contains an array of entities. 
+               *  @return a promise containing the JSON with the response from the proxy. The
+               *  promise itself contains an array of entities.
               **/
-      this.getTemplateModels = function(entityName) {
+      this.getTemplateModels = entityName => {
         return $http({
-          url: this.getProxyUrl() + '/models/' + entityName,
+          url: this.getModelUrl(entityName),
           method: 'GET'
         });
       };
+
+      this.getModelUrl = entityName =>
+        this.getProxyUrl() + '/models/' + entityName;
     }
   ]);
 })();

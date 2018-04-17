@@ -78,10 +78,13 @@
       scope.uploadEntity('PrivateStorage');
       scope.$digest();
       expect(scope.entities[0]).toEqual({
+        id: 'fakeICub',
         name: 'fakeICub',
         description: 'fakeICub',
         thumbnail: '',
         path: 'undefined',
+        configpath:
+          'http%3A%2F%2Fproxy%2Fstorage%2Fcustommodelconfig%2Fundefined',
         custom: true
       });
       expect(scope.entities[1].name).toBe('fakeHusky');
@@ -92,11 +95,13 @@
         var deferred = $q.defer();
         deferred.resolve([
           {
+            id: 'fake3DSpace',
             name: 'fake3DSpace',
             description: 'fake3DSpace',
             thumbnail: ''
           },
           {
+            id: 'fakeFZIGround',
             name: 'fakeFZIGround',
             description: 'fakeFZIGround',
             thumbnail: ''
@@ -108,6 +113,7 @@
       scope.uploadEntity('PrivateStorage');
       scope.$digest();
       expect(scope.entities[0]).toEqual({
+        id: 'fake3DSpace',
         name: 'fake3DSpace',
         description: 'fake3DSpace',
         thumbnail: '',
@@ -122,11 +128,13 @@
         var deferred = $q.defer();
         deferred.resolve([
           {
+            id: 'fakeBraitenberg',
             name: 'fakeBraitenberg',
             description: 'fakeBraitenberg',
             thumbnail: ''
           },
           {
+            id: 'fakeIdleBrain',
             name: 'fakeIdleBrain',
             description: 'fakeIdleBrain',
             thumbnail: ''
@@ -139,6 +147,7 @@
       scope.uploadEntity('PrivateStorage');
       scope.$digest();
       expect(scope.entities[0]).toEqual({
+        id: 'fakeBraitenberg',
         name: 'fakeBraitenberg',
         description: 'fakeBraitenberg',
         thumbnail: '',

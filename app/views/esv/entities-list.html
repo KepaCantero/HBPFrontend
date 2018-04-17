@@ -28,6 +28,9 @@
                     </div>
                     <div ng-if="entity.path == entityPageState.selected.path" ng-show="!isPrivateExperiment || config.canCloneExperiments">{{entity.description}}</div>
                     <div ng-if="entity.path != entityPageState.selected.path">{{entity.description | limitTo: 200}}...</div>
+                    <div ng-if="entity.path == entityPageState.selected.path && (entityName == 'Robot'|| entityName == 'Robots') && entity.configpath">
+                        <a class="robot-doc-link" href="#/robot-doc?config={{entity.configpath}}" target="_blank">Documentation</a>
+                    </div>
                 </div>
             </div>
             <hr class="list-separator">

@@ -70,7 +70,14 @@
               newExperimentProxyService
                 .getTemplateModels('robots')
                 .then(robots => {
-                  $scope.entities = $scope.parseEntityList(robots.data);
+                  $scope.entities = $scope
+                    .parseEntityList(robots.data)
+                    .map(r => {
+                      r.configpath = `${newExperimentProxyService.getModelUrl(
+                        'robots'
+                      )}/${r.id}/config`;
+                      return r;
+                    });
                 });
               $scope.createUploadModal('PrivateStorage');
             },
@@ -83,7 +90,15 @@
                     robot.path = decodeURIComponent(robot.path);
                     robot.custom = true;
                   });
-                  $scope.entities = $scope.parseEntityList(robots);
+                  $scope.entities = $scope.parseEntityList(robots).map(r => {
+                    r.configpath = window.encodeURIComponent(
+                      `${storageServer.STORAGE_BASE_URL}/custommodelconfig/${window.encodeURIComponent(
+                        r.path
+                      )}`
+                    );
+                    return r;
+                  });
+
                   if (customModel) {
                     let selectedModel = {};
                     selectedModel = robots.filter(item =>
@@ -378,6 +393,7 @@
           $scope.parseEntityList = entityArray =>
             entityArray.map(entity => {
               return {
+                id: entity.id,
                 path: entity.path ? entity.path : undefined,
                 name: entity.name,
                 custom: entity.custom ? entity.custom : false,
