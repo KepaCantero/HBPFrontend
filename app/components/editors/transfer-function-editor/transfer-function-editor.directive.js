@@ -129,13 +129,11 @@ if t % 2 < 0.02:
           templateUrl:
             'components/editors/transfer-function-editor/transfer-function-editor.template.html',
           restrict: 'E',
-          scope: {
-            control: '='
-          },
+          scope: { control: '=' },
           link: function(scope, element, attrs) {
             var ScriptObject = pythonCodeHelper.ScriptObject;
 
-            var DIRTY_TYPE = 'TF';
+            const DIRTY_TYPE = 'TF';
 
             scope.populations = [];
             scope.topics = [];
@@ -219,15 +217,15 @@ if t % 2 < 0.02:
             };
 
             scope.centerPanelTabChanged = function(newtab) {
-              if (scope.nTransferFunctionDirty) {
-                scope.applyAllDirtyScripts(() => {
-                  scope.centerPanelTabSelection = newtab;
-                  scope.updateCurrentTFContent();
-                });
-              } else {
-                scope.centerPanelTabSelection = newtab;
-                scope.updateCurrentTFContent();
-              }
+              //   if (scope.nTransferFunctionDirty) {
+              //     scope.applyAllDirtyScripts(() => {
+              //       scope.centerPanelTabSelection = newtab;
+              //       scope.updateCurrentTFContent();
+              //     });
+              //   } else {
+              scope.centerPanelTabSelection = newtab;
+              scope.updateCurrentTFContent();
+              //              }
             };
 
             scope.cleanCompileError = function(transferFunction) {
@@ -269,6 +267,7 @@ if t % 2 < 0.02:
               transferFunction.dirty = true;
               scope.nTransferFunctionDirty++;
               scope.collabDirty = true;
+              autoSaveService.setDirty(DIRTY_TYPE, scope.transferFunctions);
             };
 
             scope.getFriendlyTopicName = function(topic) {
@@ -422,7 +421,8 @@ if t % 2 < 0.02:
             };
 
             scope.control.refresh = function() {
-              scope.populateStructuredTransferFunctions();
+              if (scope.collabDirty) refreshEditor();
+              else scope.populateStructuredTransferFunctions();
             };
 
             scope.setTFtype = function(tf) {
@@ -468,6 +468,8 @@ if t % 2 < 0.02:
                 }
               });
 
+              autoSaveService.clearDirty(DIRTY_TYPE);
+
               if (!oneFound) doneCallback();
             };
 
@@ -488,6 +490,13 @@ if t % 2 < 0.02:
                       scope.cleanCompileError(transferFunction);
                       if (doneCallback) doneCallback();
                       scope.updateNTransferFunctionDirty();
+                      if (scope.nTransferFunctionDirty == 0)
+                        autoSaveService.clearDirty(DIRTY_TYPE);
+                      else
+                        autoSaveService.setDirty(
+                          DIRTY_TYPE,
+                          scope.transferFunctions
+                        );
                     },
                     function(data) {
                       serverError.displayHTTPError(data);
@@ -520,11 +529,19 @@ if t % 2 < 0.02:
                       transferFunction.dirty = false;
                       transferFunction.local = false;
                       scope.updateNTransferFunctionDirty();
+                      if (scope.nTransferFunctionDirty == 0)
+                        autoSaveService.clearDirty(DIRTY_TYPE);
+                      else
+                        autoSaveService.setDirty(
+                          DIRTY_TYPE,
+                          scope.transferFunctions
+                        );
                       transferFunction.oldName = transferFunction.name = pythonCodeHelper.getFunctionName(
                         transferFunction.rawCode
                       );
 
                       if (
+                        scope.transferFunction &&
                         scope.transferFunction.name === transferFunction.name
                       ) {
                         scope.selectTransferFunction(transferFunction.name);
@@ -607,6 +624,7 @@ if t % 2 < 0.02:
 
               scope.nTransferFunctionDirty++;
               scope.transferFunctions.push(tf);
+              autoSaveService.setDirty(DIRTY_TYPE, scope.transferFunctions);
               scope.selectTransferFunction(tf.name);
             };
 
@@ -640,6 +658,7 @@ if t % 2 < 0.02:
               tf.variables = [];
               tf.local = true;
               scope.transferFunctions.push(tf);
+              autoSaveService.setDirty(DIRTY_TYPE, scope.transferFunctions);
               scope.selectTransferFunction(tf.name);
               scope.createDevice();
               tf.devices[0].name = 'device';
@@ -924,6 +943,7 @@ if t % 2 < 0.02:
 
             var deleteInternal = function(scope, index) {
               scope.transferFunctions.splice(index, 1);
+              autoSaveService.setDirty(DIRTY_TYPE, scope.transferFunctions);
               if (scope.transferFunctions.length > 0) {
                 scope.selectTransferFunction(scope.transferFunctions[0].name);
               } else {
@@ -1016,6 +1036,7 @@ if t % 2 < 0.02:
                   scope.collabDirty = environmentService.isPrivateExperiment();
                 }
               });
+              autoSaveService.setDirty(DIRTY_TYPE, scope.transferFunctions);
             };
 
             function applyUploadedTransferFunctions(tfs) {
@@ -1179,6 +1200,23 @@ if t % 2 < 0.02:
                 }
               }
             };
+
+            autoSaveService.registerFoundAutoSavedCallback(
+              DIRTY_TYPE,
+              (autoSaved, applyChanges) => {
+                scope.collabDirty = true;
+                scope.centerPanelTabSelection = 'rawscript';
+                scope.transferFunctions = autoSaved;
+                if (scope.transferFunctions.length)
+                  scope.selectTransferFunction(scope.transferFunctions[0].name);
+
+                if (applyChanges) {
+                  _.forEach(autoSaved, tf =>
+                    scope.applyScript(tf, angular.noop)
+                  );
+                }
+              }
+            );
           }
         };
       }
