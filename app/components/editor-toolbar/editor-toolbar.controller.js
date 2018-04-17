@@ -61,7 +61,8 @@
       rosCommanderService,
       tipTooltipService,
       TIP_CODES,
-      nrpModalService
+      nrpModalService,
+      autosaveOnExitService
     ) {
       this.backendInterfaceService = backendInterfaceService;
       this.clientLoggerService = clientLoggerService;
@@ -100,6 +101,7 @@
       this.$location = $location;
       this.$window = $window;
       this.nrpModalService = nrpModalService;
+      this.autosaveOnExitService = autosaveOnExitService;
 
       this.tipTooltipService.setCurrentTip(TIP_CODES.SIMULATIONS_TIPS);
 
@@ -367,8 +369,16 @@
       this.stateService.stopListeningForStatusInformation();
     }
 
+    stop() {
+      this.autosaveOnExitService.onExit().then(() => {
+        this.simControlButtonHandler(this.STATE.STOPPED);
+      });
+    }
+
     exit() {
-      this.exitSimulation();
+      this.autosaveOnExitService.onExit().then(() => {
+        this.exitSimulation();
+      });
     }
 
     exitSimulation() {
@@ -716,7 +726,8 @@
     'rosCommanderService',
     'tipTooltipService',
     'TIP_CODES',
-    'nrpModalService'
+    'nrpModalService',
+    'autosaveOnExitService'
   ];
 
   angular

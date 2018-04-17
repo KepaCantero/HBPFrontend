@@ -38,6 +38,7 @@
       this.simulationConfigService = simulationConfigService;
 
       this.settingsData = undefined;
+      this.lastSavedSettingsData = undefined;
     }
 
     loadSettings() {
@@ -53,14 +54,33 @@
             'UserInteractionSettingsService.loadSettings() - error during loadConfigFile()'
           );
           this.settingsData = JSON.parse(JSON.stringify(this.UIS_DEFAULTS));
+        })
+        .finally(() => {
+          this.lastSavedSettingsData = JSON.parse(
+            JSON.stringify(this.settingsData)
+          );
         });
     }
 
+    _persistToFile(data) {
+      let stringifiedData = JSON.stringify(data, null, 2);
+
+      return this.simulationConfigService
+        .saveConfigFile('user-interaction-settings', stringifiedData)
+        .then(() => (this.lastSavedSettingsData = JSON.parse(stringifiedData)));
+    }
+
     saveSettings() {
-      this.simulationConfigService.saveConfigFile(
-        'user-interaction-settings',
-        JSON.stringify(this.settingsData, null, 2)
-      );
+      return this._persistToFile(this.settingsData);
+    }
+
+    saveSetting(...settingType) {
+      let clone = Object.assign({}, this.lastSavedSettingsData); // shallow
+
+      //update lastSaved's clone with the new data from settingsData
+      settingType.forEach(sType => (clone[sType] = this.settingsData[sType]));
+
+      return this._persistToFile(clone);
     }
 
     clampCameraSensitivity() {
