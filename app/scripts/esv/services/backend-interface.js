@@ -87,6 +87,17 @@
           }
         );
       };
+      var resourcesCloneFiles = function(backendBaseUrl) {
+        return $resource(
+          backendBaseUrl + '/simulation/clone-resources-files',
+          {},
+          {
+            clone: {
+              method: 'POST'
+            }
+          }
+        );
+      };
       var resourceTransferFunctionSimulation = function(backendBaseUrl) {
         return $resource(
           backendBaseUrl + '/simulation/:sim_id/transfer-functions',
@@ -559,6 +570,11 @@
             simulationInfo.serverBaseUrl,
             { sim_id: simulationInfo.simulationID }
           ).extendTimeout().$promise;
+        },
+        cloneFileResources: function() {
+          return resourcesCloneFiles(simulationInfo.serverBaseUrl).clone({
+            exp_id: simulationInfo.experimentID
+          });
         }
       };
     }

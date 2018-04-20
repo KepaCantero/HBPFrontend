@@ -34,6 +34,13 @@
       controller: 'ExperimentExplorerController',
       controllerAs: 'vm'
     }))
+    .directive('resourcesEditor', () => ({
+      templateUrl:
+        'components/experiment-explorer/resources-explorer.template.html',
+      restrict: 'E',
+      controller: 'ResourcesExplorerController',
+      controllerAs: 'vm'
+    }))
     .directive('experimentFolders', () => ({
       restrict: 'E',
       replace: true,

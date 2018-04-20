@@ -1,0 +1,86 @@
+<!-- build:css(.tmp) /components/experiment-explorer/resources-explorer.css -->
+<link rel="stylesheet" href="/components/experiment-explorer/resources-explorer.style.css" />
+<!-- endbuild -->
+
+  <script type="text/ng-template" id="experiment-explorer-folder-name.html">
+    <div class="modal-header">
+      <button type="button" class="close" ng-click="$dismiss()" aria-hidden="true">&times;</button>
+      <h4 class="modal-title">Create new folder</h4>
+    </div>
+    <div class="modal-body" style="display:flex" ng-keydown="vm.suppressKeyPress($event)">
+      <label>Enter the new folder name:</label>
+      <input ng-model="folderName" autofocus style="flex-grow: 1;margin: 0 10px;">
+    </div>
+    <div class="modal-footer">
+      <button class="btn" ng-click="$dismiss()">Cancel</button>
+      <button class="btn btn-default" ng-click="$close(folderName)">Create</button>
+    </div>
+  </script>
+
+  <script type="text/ng-template" id="experiment-explorer-folder.html">
+    <div disable-animate ng-repeat="folder in parent.folders | orderBy: 'name'">
+      <div class="res-folder" ng-click="vm.selectParent(folder)" ng-class="{'folder-selected':vm.selectedParent.uuid == folder.uuid}">
+        <i class="fa" ng-class="folder.selected?'fa-folder-open-o':'fa-folder-o'"></i>
+        <span class="res-label">{{folder.name}}</span>
+      </div>
+      <experiment-folders parent="folder"></experiment-folders>
+    </div>
+  </script>
+
+  <div class="res-explorer-view">
+
+    <input type="file" multiple id="experiment-input">
+    <div class="res-explorer">
+      <div class="res-left-panel">
+        <span class="title">Resources</span>
+        <div class="res-list">
+          <experiment-folders parent="vm.resourcesFolder"></experiment-folders>
+        </div>
+       </div>
+      <div class="res-right-panel">
+        <div class="res-files-header">
+          <div class="res-"></div>
+          <div class="res-file-name">Name</div>
+          <div class="res-file-type">Type</div>
+          <div class="res-file-size">Size</div>
+          <div class="res-file-date">Modified</div>
+          <div class="res-file-actions" ng-show="vm.selectedParent">
+            <span class="action-button" ng-if="vm.selectedParent.parentFolder" ng-click="!vm.selectedParent.deleting && vm.deleteFolder(vm.selectedParent)">
+              <span class="delete-folder-button" ng-if="!vm.selectedParent.deleting && !vm.selectedParent.loadingFiles" disable-animate title="Delete folder">
+                <i class="fa fa-folder"></i>
+                <i class="fa fa-remove"></i>
+              </span>
+            <i ng-if="vm.selectedParent.deleting" disable-animate class="fa fa-spinner fa-pulse fa-1x fa-fw" title="Deleting..."></i>
+            </span>
+            <span class="action-button" ng-click="!vm.selectedParent.uploading && vm.uploadFileClick()">
+              <i ng-if="!vm.selectedParent.uploading && !vm.selectedParent.loadingFiles" disable-animate class="fa fa-upload" title="Upload file"></i>
+              <i ng-if="vm.selectedParent.uploading" disable-animate class="fa fa-spinner fa-pulse fa-1x fa-fw" title="Uploading..."></i>
+            </span>
+          </div>
+        </div>
+        <div ng-if="vm.selectedParent.loadingFiles" disable-animate class="res-files-loading">Loading...</div>
+        <div ng-if="!vm.selectedParent.loadingFiles" disable-animate class="res-files-list">
+          <div class="res-file" ng-class="{'res-file-selected':vm.selectedFileId == file.uuid}" ng-repeat="file in vm.selectedParent.files | orderBy: 'name'"
+            ng-click="vm.selectFile(file.uuid)">
+            <div class="res-file-icon"><i class="fa fa-{{file.icon}}"></i></div>
+            <div class="res-file-name truncate">{{file.name}}</div>
+            <div class="res-file-type truncate">{{file.typeDescription}}</div>
+            <div class="res-file-size truncate">{{file.size | bytes}}</div>
+            <div class="res-file-date truncate">{{file.modifiedDate}}</div>
+            <div class="res-file-actions" ng-if="file.type != 'folder'">
+              <span class="action-button" ng-click="!file.deleting && vm.deleteFile(file)">
+                <i ng-if="!file.deleting" disable-animate class="fa fa-remove" style="color:#e84539" title="Delete file"></i>
+                <i ng-if="file.deleting" disable-animate class="fa fa-spinner fa-pulse fa-1x fa-fw" title="Deleting..."></i>
+              </span>
+              <span class="action-button" ng-click="!file.downloading && vm.downloadFile(file)">
+                <i ng-if="!file.downloading" disable-animate class="fa fa-download" title="Download file"></i>
+                <i ng-if="file.downloading" disable-animate class="fa fa-spinner fa-pulse fa-1x fa-fw" title="Downloading..."></i>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
