@@ -1,4 +1,6 @@
+<!-- build:css(.tmp) components/robot-documentation/robot-documentation.style.css -->
 <link rel="stylesheet" href="components/robot-documentation/robot-documentation.style.css" />
+<!-- endbuild -->
 
 <div class="container" ng-if="$ctrl.show">
     <div class="row">
@@ -8,16 +10,17 @@
             <div class="page-header">
                 <h1>{{$ctrl.config.model.name}}</h1>
             </div>
-            <ng-if ng-if="$ctrl.config.model.website">
-                <a href="{{$ctrl.config.model.website}}">Website</a>
-                <br/>
-            </ng-if>
             <ng-if ng-if="$ctrl.config.model.license">
                 <span>License: </span> {{$ctrl.config.model.license}}
                 <br/>
             </ng-if>
             <span>Version: </span>
             <span>{{$ctrl.config.model.version}}</span>
+            <br/>
+            <ng-if ng-if="$ctrl.config.model.website">
+                <a href="{{$ctrl.config.model.website}}">External website</a>
+                <br/>
+            </ng-if>
 
             <div class="page-header">
                 <h2>Description</h2>
