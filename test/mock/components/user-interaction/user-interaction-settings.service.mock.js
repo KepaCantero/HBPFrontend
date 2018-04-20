@@ -2,6 +2,11 @@
   'use strict';
 
   var mockSettingsData = {
+    autosaveOnExit: {
+      tranferFunctions: {
+        CSVData: true
+      }
+    },
     camera: {
       sensitivity: {
         translation: 0.123,
@@ -20,6 +25,11 @@
         })
       };
       this.loadSettings = jasmine.createSpy('loadSettings');
-      this.saveSettings = jasmine.createSpy('loadSettings');
+      this.saveSettings = jasmine.createSpy('saveSettings');
+      this.saveSetting = jasmine
+        .createSpy('saveSetting')
+        .and.callFake(function() {
+          return window.$q.when();
+        });
     });
 })();

@@ -17,7 +17,7 @@
             <button class="btn btn-default btn-danger exit-panel-right-button"
             ng-if="vm.userContextService.isOwner()"
             ng-disabled="vm.stateService.statePending"
-            ng-click="vm.destroyDialog();vm.simControlButtonHandler(vm.STATE.STOPPED)"
+            ng-click="vm.destroyDialog();vm.stop()"
             ng-show="(vm.stateService.currentState !== vm.STATE.STOPPED) &&
                       (vm.stateService.currentState !== vm.STATE.FAILED)">Stop
             </button>

@@ -99,6 +99,7 @@ if t % 2 < 0.02:
       'downloadFileService',
       'DEFAULT_RAW_TF_CODE',
       'DEFAULT_SCRIPT_TF_CODE',
+      '$q',
       function(
         $log,
         backendInterfaceService,
@@ -123,7 +124,8 @@ if t % 2 < 0.02:
         clbConfirm,
         downloadFileService,
         DEFAULT_RAW_TF_CODE,
-        DEFAULT_SCRIPT_TF_CODE
+        DEFAULT_SCRIPT_TF_CODE,
+        $q
       ) {
         return {
           templateUrl:
@@ -1167,11 +1169,13 @@ if t % 2 < 0.02:
             };
 
             scope.saveCSVIntoCollabStorage = function() {
+              let deferred = $q.defer();
               scope.isSavingCSVToCollab = true;
               backendInterfaceService.saveCSVRecordersFiles(
                 function() {
                   // Success callback
                   scope.isSavingCSVToCollab = false;
+                  deferred.resolve();
                 },
                 function() {
                   // Failure callback
@@ -1180,9 +1184,11 @@ if t % 2 < 0.02:
                     message:
                       'Error while saving recorded CSV files to the Storage.'
                   });
+                  deferred.reject();
                   scope.isSavingCSVToCollab = false;
                 }
               );
+              return deferred.promise;
             };
 
             scope.delete = function() {

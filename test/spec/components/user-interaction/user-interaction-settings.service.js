@@ -54,9 +54,12 @@ describe('Services: userInteractionSettingsService', function() {
         cb(mockConfig);
         return mockConfigPromise;
       }),
-      catch: jasmine.createSpy('catch')
+      catch: jasmine.createSpy('catch').and.callFake(() => mockConfigPromise),
+      finally: jasmine.createSpy('finally').and.returnValue(mockConfigPromise)
     };
-    simulationConfigService.loadConfigFile.and.returnValue(mockConfigPromise);
+    simulationConfigService.loadConfigFile = jasmine
+      .createSpy('test')
+      .and.returnValue(mockConfigPromise);
 
     userInteractionSettingsService.loadSettings();
     expect(
@@ -99,12 +102,18 @@ describe('Services: userInteractionSettingsService', function() {
     // test error/catch case
     mockConfigPromise.catch.and.callFake(function(cb) {
       cb();
+      return mockConfigPromise;
     });
     userInteractionSettingsService.loadSettings();
     expect(userInteractionSettingsService.settingsData).toEqual(UIS_DEFAULTS);
   });
 
   it(' - saveSettings()', function() {
+    var mockConfig =
+      '{"camera": {"sensitivity": {"translation": 0.1, "rotation": 1.2}}}';
+    simulationConfigService.saveConfigFile = jasmine
+      .createSpy('saveConfigFile')
+      .and.returnValue(window.$q.resolve(mockConfig));
     userInteractionSettingsService.settingsData = UIS_DEFAULTS;
     userInteractionSettingsService.saveSettings();
 

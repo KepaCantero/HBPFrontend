@@ -28,7 +28,8 @@ describe('Controller: EditorToolbarController', function() {
     STATE,
     EDIT_MODE,
     RESET_TYPE,
-    nrpModalService;
+    nrpModalService,
+    autosaveOnExitService;
 
   // load the controller's module
   beforeEach(module('editorToolbarModule'));
@@ -143,7 +144,8 @@ describe('Controller: EditorToolbarController', function() {
       _NAVIGATION_MODES_,
       _EDIT_MODE_,
       _RESET_TYPE_,
-      _nrpModalService_
+      _nrpModalService_,
+      _autosaveOnExitService_
     ) {
       $controller = _$controller_;
       $rootScope = _$rootScope_;
@@ -172,6 +174,7 @@ describe('Controller: EditorToolbarController', function() {
       EDIT_MODE = _EDIT_MODE_;
       RESET_TYPE = _RESET_TYPE_;
       nrpModalService = _nrpModalService_;
+      autosaveOnExitService = _autosaveOnExitService_;
 
       userContextService.hasEditRights.and.callFake(function(entity) {
         return (
@@ -188,6 +191,34 @@ describe('Controller: EditorToolbarController', function() {
         $rootScope: $rootScope,
         $scope: $scope
       });
+    });
+
+    it('should called simControlButtonHandler when stop is called', function() {
+      spyOn(autosaveOnExitService, 'onExit').and.callFake(function() {
+        return {
+          then: function(cb) {
+            cb();
+          }
+        };
+      });
+      spyOn(editorToolbarController, 'simControlButtonHandler');
+      editorToolbarController.stop();
+      expect(
+        editorToolbarController.simControlButtonHandler
+      ).toHaveBeenCalledWith(editorToolbarController.STATE.STOPPED);
+    });
+
+    it('should called simControlButtonHandler when exit is called', function() {
+      spyOn(autosaveOnExitService, 'onExit').and.callFake(function() {
+        return {
+          then: function(cb) {
+            cb();
+          }
+        };
+      });
+      spyOn(editorToolbarController, 'exitSimulation');
+      editorToolbarController.exit();
+      expect(editorToolbarController.exitSimulation).toHaveBeenCalled();
     });
 
     it('should set isJoiningStoppedSimulation to true when already stopped', function() {
