@@ -2,14 +2,14 @@
   ng-disabled="stateService.currentState === STATE.INITIALIZED || !collabDirty" v-busy="isSavingToCollab" v-busy-label="Saving to Storage"
   v-pressable>
   <i class="glyphicon glyphicon-book"></i>
-  <span> Save to Storage</span>
+  <span> Save</span>
 </button>
 
 <button ng-show="isPrivateExperiment" type="button" class="btn btn-default  btn-md" owner-only ng-click="saveCSVIntoCollabStorage()"
   ng-disabled="(stateService.currentState === STATE.INITIALIZED)" v-busy="isSavingCSVToCollab" v-busy-label="Saving to Storage"
   v-pressable>
   <i class="glyphicon glyphicon glyphicon-stats"></i>
-  <span> Save CSV to Storage</span>
+  <span> Save CSV</span>
 </button>
 
 <!-- The trick here is to use a 'a' tag instead of a 'button' tag -->
