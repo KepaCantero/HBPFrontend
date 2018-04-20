@@ -130,10 +130,12 @@
         }
 
         function findConfigFileName(configType, cachedConfigFiles) {
-          for (var i = 0; i < cachedConfigFiles.length; i++) {
-            var r = cachedConfigFiles[i];
+          if (cachedConfigFiles) {
+            for (var i = 0; i < cachedConfigFiles.length; i++) {
+              var r = cachedConfigFiles[i];
 
-            if (r.type === configType) return r;
+              if (r.type === configType) return r;
+            }
           }
 
           return null;

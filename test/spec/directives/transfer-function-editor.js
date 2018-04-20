@@ -18,6 +18,7 @@ describe('Directive: transferFunctionEditor', function() {
     downloadFileService,
     codeEditorsServices,
     clbErrorDialog,
+    $httpBackend,
     registerFoundAutoSavedCallback;
 
   var shouldUseErrorCallback = false;
@@ -122,6 +123,7 @@ describe('Directive: transferFunctionEditor', function() {
       _clbErrorDialog_,
       _autoSaveService_
     ) {
+      $httpBackend = _$httpBackend_;
       clbErrorDialog = _clbErrorDialog_;
       codeEditorsServices = _codeEditorsServices_;
       downloadFileService = _downloadFileService_;
@@ -850,15 +852,149 @@ def tf1(t):
       expect(isolateScope.refresh).toHaveBeenCalled();
     });
 
-    it(' centerPanelTabChanged should call updateCurrentTFContent', function() {
-      spyOn(isolateScope, 'updateCurrentTFContent').and.callThrough();
+    it('rawToStructured should convert raw script', function() {
+      var callbackHasBeenCalled = false;
 
+      var tf = {
+        name: 'test',
+        rawCode: `@nrp.Robot2Neuron()
+      def tf1(t):
+          pass)`
+      };
+
+      isolateScope.transferFunction = { name: 'tf1', code: 'return 42' };
+      isolateScope.transferFunctions = [isolateScope.transferFunction];
+      var structuredTransferFunction = {
+        name: 'tf1',
+        code: 'return 42',
+        devices: []
+      };
+
+      $httpBackend
+        .whenPUT(
+          'http://bbpce016.epfl.ch:8080/simulation/mocked_simulation_id/convert-raw-tf-to-structured'
+        )
+        .respond(200, { structuredScript: structuredTransferFunction });
+      isolateScope.rawToStructured(tf, () => {
+        callbackHasBeenCalled = true;
+      });
+      $httpBackend.flush();
+
+      expect(callbackHasBeenCalled).toBe(true);
+    });
+
+    it('rawToStructured should handle error', function() {
+      var callbackHasBeenCalled = false;
+
+      var tf = {
+        name: 'test',
+        rawCode: `@nrp.Robot2Neuron()
+      def tf1(t):
+          pass)`
+      };
+
+      isolateScope.transferFunction = {
+        name: 'tf1',
+        code: 'return 42',
+        error: {}
+      };
+      isolateScope.transferFunctions = [isolateScope.transferFunction];
+
+      $httpBackend
+        .whenPUT(
+          'http://bbpce016.epfl.ch:8080/simulation/mocked_simulation_id/convert-raw-tf-to-structured'
+        )
+        .respond(200, { error: 'This an error', name: 'tf1' });
+      isolateScope.rawToStructured(tf, () => {
+        callbackHasBeenCalled = true;
+      });
+      $httpBackend.flush();
+
+      expect(callbackHasBeenCalled).toBe(true);
+    });
+
+    it('structuredToRaw should convert script to raw', function() {
+      isolateScope.transferFunction = {
+        name: 'test',
+        code: 'return 42',
+        devices: []
+      };
+      isolateScope.transferFunctions = [isolateScope.transferFunction];
+
+      $httpBackend
+        .whenPUT(
+          'http://bbpce016.epfl.ch:8080/simulation/mocked_simulation_id/convert-structured-tf-to-raw'
+        )
+        .respond(200, { rawScript: 'RAWTEST' });
+      isolateScope.structuredToRaw(isolateScope.transferFunction, () => {});
+      $httpBackend.flush();
+
+      expect(isolateScope.transferFunction.rawCode).toBe('RAWTEST');
+    });
+
+    it('convertAllDirtyScripts should convert all dirty scripts', function() {
+      var structuredTransferFunction = {
+        name: 'tf1',
+        code: 'return 42',
+        devices: [],
+        error: {}
+      };
+
+      $httpBackend
+        .whenPUT(
+          'http://bbpce016.epfl.ch:8080/simulation/mocked_simulation_id/convert-raw-tf-to-structured'
+        )
+        .respond(200, { structuredScript: structuredTransferFunction });
+
+      $httpBackend
+        .whenPUT(
+          'http://bbpce016.epfl.ch:8080/simulation/mocked_simulation_id/convert-structured-tf-to-raw'
+        )
+        .respond(200, { rawScript: 'RAWTEST' });
+
+      isolateScope.transferFunction = {
+        name: 'test',
+        code: 'return 42',
+        dirty: true,
+        error: {}
+      };
+      isolateScope.transferFunctions = [isolateScope.transferFunction];
+
+      isolateScope.centerPanelTabSelection = 'script';
+
+      var callbackHasBeenCalled = false;
+
+      isolateScope.convertAllDirtyScripts(() => (callbackHasBeenCalled = true));
+      $httpBackend.flush();
+      expect(callbackHasBeenCalled).toBe(true);
+
+      callbackHasBeenCalled = false;
+
+      isolateScope.centerPanelTabSelection = 'rawscript';
+      isolateScope.convertAllDirtyScripts(() => (callbackHasBeenCalled = true));
+      $httpBackend.flush();
+      expect(callbackHasBeenCalled).toBe(true);
+    });
+
+    it(' centerPanelTabChanged should change panel directly when no tfs are dirty', function() {
+      isolateScope.switchingToNewTab = null;
+      isolateScope.nTransferFunctionDirty = 0;
+      isolateScope.centerPanelTabSelection = 'rawscript';
+
+      isolateScope.centerPanelTabChanged('script');
+      expect(isolateScope.centerPanelTabSelection).toBe('script');
+    });
+
+    it(' centerPanelTabChanged should call convertAllDirtyScripts', function() {
+      spyOn(isolateScope, 'convertAllDirtyScripts').and.callThrough();
+
+      isolateScope.nTransferFunctionDirty = 1;
       isolateScope.centerPanelTabChanged('rawscript');
-      expect(isolateScope.updateCurrentTFContent).toHaveBeenCalled();
+      expect(isolateScope.convertAllDirtyScripts).toHaveBeenCalled();
 
       isolateScope.nTransferFunctionDirty = 1;
       isolateScope.centerPanelTabChanged('script');
-      expect(isolateScope.updateCurrentTFContent).toHaveBeenCalled();
+      expect(isolateScope.convertAllDirtyScripts).toHaveBeenCalled();
     });
 
     it(' centerPanelTabChanged should not change from rawscript to script when TF is faulty', function() {

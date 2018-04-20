@@ -44,7 +44,13 @@
           lineNumbers: true,
           readOnly: false,
           indentUnit: 4,
-          mode: 'text/x-python'
+          mode: 'text/x-python',
+          extraKeys: {
+            Tab: function(cm) {
+              var spaces = Array(cm.getOption('indentUnit') + 1).join(' ');
+              cm.replaceSelection(spaces);
+            }
+          }
         };
       }
 

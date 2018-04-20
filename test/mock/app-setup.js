@@ -27,7 +27,7 @@
           return;
         }
 
-        $httpBackend.whenGET(/\/identity\/[^/]+$/).respond({
+        $httpBackend.whenGET(/\/identity\/?[^/]*$/).respond({
           id: 'vonarnim',
           username: 'cmartins',
           displayName: 'Claudio Sousa'

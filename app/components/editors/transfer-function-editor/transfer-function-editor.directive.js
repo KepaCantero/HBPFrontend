@@ -74,6 +74,42 @@ def {0}(t):
 if t % 2 < 0.02:
     clientLogger.info('Time: ', t)`
     )
+    .factory('structuredTransferFunctionToRaw', [
+      '$resource',
+      'serverError',
+      function($resource, serverError) {
+        return function(baseUrl) {
+          return $resource(
+            baseUrl + '/convert-structured-tf-to-raw',
+            {},
+            {
+              put: {
+                method: 'PUT',
+                interceptor: { responseError: serverError.displayHTTPError }
+              }
+            }
+          );
+        };
+      }
+    ])
+    .factory('rawTransferFunctionToStructured', [
+      '$resource',
+      'serverError',
+      function($resource, serverError) {
+        return function(baseUrl) {
+          return $resource(
+            baseUrl + '/convert-raw-tf-to-structured',
+            {},
+            {
+              put: {
+                method: 'PUT',
+                interceptor: { responseError: serverError.displayHTTPError }
+              }
+            }
+          );
+        };
+      }
+    ])
     .directive('transferFunctionEditor', [
       '$log',
       'backendInterfaceService',
@@ -100,6 +136,8 @@ if t % 2 < 0.02:
       'DEFAULT_RAW_TF_CODE',
       'DEFAULT_SCRIPT_TF_CODE',
       '$q',
+      'structuredTransferFunctionToRaw',
+      'rawTransferFunctionToStructured',
       function(
         $log,
         backendInterfaceService,
@@ -125,7 +163,9 @@ if t % 2 < 0.02:
         downloadFileService,
         DEFAULT_RAW_TF_CODE,
         DEFAULT_SCRIPT_TF_CODE,
-        $q
+        $q,
+        structuredTransferFunctionToRaw,
+        rawTransferFunctionToStructured
       ) {
         return {
           templateUrl:
@@ -291,43 +331,128 @@ if t % 2 < 0.02:
               }
             };
 
+            scope.rawToStructured = function(tf, callback) {
+              var url =
+                simulationInfo.serverBaseUrl +
+                '/simulation/' +
+                simulationInfo.simulationID;
+              rawTransferFunctionToStructured(url).put(
+                {},
+                { name: tf.name, source: tf.rawCode },
+                data => {
+                  var tf;
+                  if (!data.error && data.structuredScript) {
+                    var tfs = data.structuredScript;
+                    tf = _.find(scope.transferFunctions, { name: tfs.name });
+
+                    var found = angular.isDefined(tf);
+                    if (found) {
+                      scope.cleanCompileError(tf);
+                      if (tf.error && tf.error[scope.ERROR.LOADING])
+                        delete tf.error[scope.ERROR.LOADING];
+
+                      tf.code = tfs.code;
+                      tf.oldName = tfs.name;
+                      tf.devices = tfs.devices;
+                      tf.variables = tfs.variables;
+                      tf.topics = tfs.topics;
+                    }
+                  }
+
+                  if (callback) callback(tf);
+                },
+                () => {
+                  if (callback) callback(tf);
+                }
+              );
+            };
+
+            scope.structuredToRaw = function(tf, callback) {
+              var url =
+                simulationInfo.serverBaseUrl +
+                '/simulation/' +
+                simulationInfo.simulationID;
+              structuredTransferFunctionToRaw(url).put(
+                {},
+                tf,
+                data => {
+                  tf.rawCode = data.rawScript;
+                  if (callback) callback(tf);
+                },
+                () => {
+                  if (callback) callback(tf);
+                }
+              );
+            };
+
             scope.centerPanelTabChanged = function(newtab) {
-              //   if (scope.nTransferFunctionDirty) {
-              //     scope.applyAllDirtyScripts(() => {
-              //       scope.centerPanelTabSelection = newtab;
-              //       scope.updateCurrentTFContent();
-              //     });
-              //   } else {
+              if (!scope.switchingToNewTab) {
+                if (scope.nTransferFunctionDirty) {
+                  scope.switchingToNewTab = newtab;
 
-              // inhibit transition rawscript -> script with a faulty TF
-              if (
-                scope.isTfFaulty(scope.transferFunction) &&
-                scope.centerPanelTabSelection == 'rawscript' &&
-                newtab == 'script'
-              ) {
-                return;
+                  scope.convertAllDirtyScripts(() => {
+                    scope.switchingToNewTab = undefined;
+
+                    // Check if there is an error
+
+                    var hasError = false;
+
+                    _.forEach(scope.transferFunctions, function(
+                      transferFunction
+                    ) {
+                      let errors = Object.keys(transferFunction.error);
+                      let index = errors.indexOf(scope.ERROR.RUNTIME);
+                      if (index > -1) {
+                        errors.splice(index, 1);
+                      }
+
+                      if (errors.length) {
+                        hasError = true;
+                      }
+                    });
+
+                    if (!hasError) {
+                      scope.centerPanelTabSelection = newtab;
+                      scope.refresh();
+                    } else {
+                      clbErrorDialog.open({
+                        type: 'Transfer Function Error.',
+                        message:
+                          'There are errors in some of your function transfer functions. They should be fixed before you can switch script format.'
+                      });
+                    }
+                  });
+                } else {
+                  scope.switchingToNewTab = undefined;
+                  scope.centerPanelTabSelection = newtab;
+                  scope.refresh();
+                }
               }
-
-              scope.centerPanelTabSelection = newtab;
-              scope.updateCurrentTFContent();
             };
 
             function cleanEditorErrors() {
-              let editor = codeEditorsServices.getEditor(
-                scope.centerPanelTabSelection == 'rawscript'
-                  ? 'rawCodeEditor'
-                  : 'codeEditor'
-              );
-              if (editor) {
-                for (let i = 0; i < editor.lineCount(); i++)
-                  editor.removeLineClass(i, 'background', 'alert-danger');
+              for (let j = 0; j < 2; j++) {
+                let editor = codeEditorsServices.getEditor(
+                  j === 0 ? 'rawCodeEditor' : 'codeEditor'
+                );
+                if (editor) {
+                  for (let i = 0; i < editor.lineCount(); i++)
+                    editor.removeLineClass(i, 'background', 'alert-danger');
+                }
               }
             }
 
             scope.cleanCompileError = function(transferFunction) {
               cleanEditorErrors();
-              delete transferFunction.error[scope.ERROR.COMPILE];
-              delete transferFunction.error[scope.ERROR.NO_OR_MULTIPLE_NAMES];
+              if (transferFunction && transferFunction.error) {
+                if (transferFunction.error[scope.ERROR.COMPILE])
+                  delete transferFunction.error[scope.ERROR.COMPILE];
+
+                if (transferFunction.error[scope.ERROR.NO_OR_MULTIPLE_NAMES])
+                  delete transferFunction.error[
+                    scope.ERROR.NO_OR_MULTIPLE_NAMES
+                  ];
+              }
             };
 
             scope.getFriendlyPopulationName = function(neurons) {
@@ -556,6 +681,38 @@ if t % 2 < 0.02:
               }
             };
 
+            scope.convertAllDirtyScripts = function(doneCallback) {
+              var convertAllDirtyScriptsCount = 0;
+
+              _.forEach(scope.transferFunctions, function(transferFunction) {
+                if (transferFunction.dirty) {
+                  convertAllDirtyScriptsCount++;
+                }
+              });
+
+              if (convertAllDirtyScriptsCount > 0) {
+                _.forEach(scope.transferFunctions, function(transferFunction) {
+                  if (transferFunction.dirty) {
+                    if (scope.centerPanelTabSelection === 'script') {
+                      scope.structuredToRaw(transferFunction, () => {
+                        convertAllDirtyScriptsCount--;
+                        if (convertAllDirtyScriptsCount == 0 && doneCallback)
+                          doneCallback();
+                      });
+                    } else {
+                      scope.cleanCompileError(transferFunction);
+
+                      scope.rawToStructured(transferFunction, () => {
+                        convertAllDirtyScriptsCount--;
+                        if (convertAllDirtyScriptsCount == 0 && doneCallback)
+                          doneCallback();
+                      });
+                    }
+                  }
+                });
+              } else doneCallback();
+            };
+
             scope.applyAllDirtyScripts = function(doneCallback) {
               var oneFound = false;
               _.forEach(scope.transferFunctions, function(transferFunction) {
@@ -729,7 +886,7 @@ if t % 2 < 0.02:
                   ? scriptcode
                   : rawcode
               );
-              tf.type = undefined;
+              tf.type = 1;
               tf.name = scope.selectedTF;
               tf.oldName = tf.name;
               tf.devices = [];
