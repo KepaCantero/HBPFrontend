@@ -590,15 +590,17 @@ if t % 2 < 0.02:
             };
 
             scope.createNewTF = function() {
-              if (scope.transferFunction && scope.transferFunction.oldName) {
-                if (scope.transferFunction.oldName !== scope.selectedTF) {
-                  scope.transferFunction.name = scope.transferFunction.oldName;
-                } else {
-                  scope.selectedTF = getFreeName(
-                    scope.transferFunctions,
-                    'transferFunction'
-                  );
-                }
+              if (
+                scope.transferFunction &&
+                scope.transferFunction.oldName &&
+                scope.transferFunction.oldName !== scope.selectedTF
+              ) {
+                scope.transferFunction.name = scope.transferFunction.oldName;
+              } else {
+                scope.selectedTF = getFreeName(
+                  scope.transferFunctions,
+                  'transferFunction'
+                );
               }
 
               var rawcode = DEFAULT_RAW_TF_CODE.replace(
