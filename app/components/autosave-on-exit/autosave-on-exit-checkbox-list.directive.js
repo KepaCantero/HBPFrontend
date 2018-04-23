@@ -30,7 +30,12 @@
       'autosaveOnExitService',
       function(autosaveOnExitService) {
         return {
-          template: '<div>' + '  <div ng-transclude>' + '  </div>' + '</div>',
+          template:
+            '<div>\n' +
+            '  <h4>{{title}}</h4>\n' +
+            '  <div ng-transclude>\n' +
+            '  </div>\n' +
+            '</div>\n',
           transclude: true,
           restrict: 'E',
           scope: true,
@@ -41,6 +46,7 @@
             '$attrs',
             function($scope, $element, $attrs) {
               $scope.editorType = $attrs.id;
+              $scope.title = $attrs.title || 'Autosave to Storage on Exit';
 
               this.getEditorType = function() {
                 return $scope.editorType;
