@@ -320,7 +320,7 @@
                         <div ng-class="{'fa fa-caret-right':!top.showDetails,'fa fa-caret-down':top.showDetails}" class="tf-parameter-caret">
                         </div>
 
-                        <div class="tf-parameter-title">{{top.isDefault?'Default':top.name}}</div>
+                        <div class="tf-parameter-title">{{top.name}}</div>
 
                       </div>
 
@@ -338,8 +338,8 @@
 
                             <div ng-if="transferFunction.type !== TRANSFER_FUNCTION_TYPE.NEURONMONITOR || top.name !== 'publisher'">
                               <div class="tf-param-varblock-label">Name</div>
-                              <input ng-if="!top.isDefault" class="normal" type="text" name="input" ng-model="top.name" ng-change="setDirty(transferFunction)" style="width:100%">
-                              <input ng-if="top.isDefault" class="normal disabled" type="text" name="input" value="t"  style="width:100%">
+                              <input class="normal" type="text" name="input" ng-model="top.name" ng-change="setDirty(transferFunction)" ng-class="{'disabled': top.isDefault}"
+                                style="width:100%">
                               <div style="text-align:right;font-size:10px; margin:1px" ng-if="top.publishing">or
                                 <input type="checkbox" ng-model="top.isDefault" ng-change="setTopicName(top)" /> use as default</div>
                             </div>
