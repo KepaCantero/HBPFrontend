@@ -577,7 +577,7 @@ def tf1(t):
       isolateScope.addNewVariable('variable');
       expect(isolateScope.transferFunction.variables.length).toEqual(1);
       expect(isolateScope.transferFunction.variables[0]).toEqual({
-        name: 'variable1',
+        name: 'variable',
         initial_value: '0',
         type: 'int',
         showDetails: true
@@ -600,7 +600,7 @@ def tf1(t):
       isolateScope.createTopicChannel(true);
       expect(isolateScope.transferFunction.topics.length).toEqual(2);
       expect(isolateScope.transferFunction.topics[1]).toEqual({
-        name: 'topic1',
+        name: 'topic',
         topic: '/foo/bar',
         type: 'FooBar',
         publishing: true
@@ -615,7 +615,7 @@ def tf1(t):
       isolateScope.createDevice();
       expect(isolateScope.transferFunction.devices.length).toEqual(2);
       expect(isolateScope.transferFunction.devices[1]).toEqual({
-        name: 'device2',
+        name: 'device',
         type: 'LeakyIntegratorAlpha',
         neurons: {
           name: 'sensors',
@@ -631,7 +631,7 @@ def tf1(t):
       isolateScope.createDevice();
       expect(isolateScope.transferFunction.devices.length).toEqual(3);
       expect(isolateScope.transferFunction.devices[2]).toEqual({
-        name: 'device3',
+        name: 'device2',
         type: 'LeakyIntegratorAlpha',
         neurons: {
           name: 'actors',
@@ -651,7 +651,7 @@ def tf1(t):
       isolateScope.createDevice();
       expect(isolateScope.transferFunction.devices.length).toEqual(4);
       expect(isolateScope.transferFunction.devices[3]).toEqual({
-        name: 'device4',
+        name: 'device3',
         type: 'LeakyIntegratorAlpha',
         neurons: {
           name: 'foobars',

@@ -762,12 +762,15 @@ if t % 2 < 0.02:
                   found = true;
                 }
               };
-              var counter = 0;
+              var counter = '';
               var found = true;
-              while (found) {
-                counter++;
+
+              for (;;) {
                 found = false;
                 _.forEach(set, check);
+
+                if (!found) break;
+                counter = counter === '' ? 2 : counter + 1;
               }
               return prefix + counter;
             };
