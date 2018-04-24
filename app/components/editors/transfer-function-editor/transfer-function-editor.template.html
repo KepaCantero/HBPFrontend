@@ -509,9 +509,9 @@
               </div>
 
 
-              <div ng-show="addMode">
+              <div ng-show="addMode" style="height:100%">
 
-                <div ng-show="addMode=='addTopic'">
+                <div ng-show="addMode=='addTopic'" style="height: calc(100% - 40px);">
 
                   <div class="tf-param-title-block tf-param-title-background-topics">
 
@@ -521,7 +521,7 @@
 
                   <hr style="margin-bottom: 3px; margin-top: 2px; width: 100%; margin-right:10px">
 
-                  <div style="height:100%">
+                  <div style="height: calc(100% - 40px);">
                     <ul style="max-height: calc(100% - 32pt); overflow-y: auto;">
                       <li ng-repeat="topic in topics" ng-class="{'selected' : topic == $parent.selectedTopic, 'notSelected' : topic !== $parent.selectedTopic}"
                         ng-click="$parent.selectedTopic = topic;">
@@ -541,11 +541,21 @@
                       </button>
                     </div>
 
+                    <div class="smallButtonBlock">
+                      <button type="button" class="btn btn-default" style="display: flex;
+                          justify-content: center;" href ng-click='addMode=null'>
+
+                        <i class="fa fa-arrow-left" style="margin-top: 2px; margin-right: 5px;"></i>
+                        Cancel
+                      </button>
+                    </div>
+
+
                   </div>
 
                 </div>
 
-                <div ng-show="addMode=='addDevice'">
+                <div ng-show="addMode=='addDevice'" style="height: calc(100% - 40px);">
 
 
                   <div class="tf-param-title-block  tf-param-title-background-neurons">
@@ -557,7 +567,7 @@
                   <hr style="margin-bottom: 3px; margin-top: 2px; width: 100%; margin-right:10px">
 
 
-                  <div style="height:100%">
+                  <div  style="height: calc(100% - 40px);">
                     <ul style="max-height: calc(100% - 32pt); overflow-y: auto;">
                       <li ng-repeat="population in populations">
 
@@ -590,11 +600,21 @@
                       </button>
 
                     </div>
+
+                    <div class="smallButtonBlock">
+                      <button type="button" class="btn btn-default" style="display: flex;
+                          justify-content: center;" href ng-click='addMode=null'>
+
+                        <i class="fa fa-arrow-left" style="margin-top: 2px; margin-right: 5px;"></i>
+                        Cancel
+                      </button>
+                    </div>
+
                   </div>
 
                 </div>
 
-                <div ng-show="addMode=='addVariable'">
+                <div ng-show="addMode=='addVariable'" style="height: calc(100% - 40px);">
 
                   <div class="tf-param-title-block  tf-param-title-background-variables">
 
@@ -616,19 +636,20 @@
                       <span> Add </span>
                     </button>
 
+
+                  </div>
+
+                  <div class="smallButtonBlock">
+                    <button type="button" class="btn btn-default" style="display: flex;
+                        justify-content: center;" href ng-click='addMode=null'>
+
+                      <i class="fa fa-arrow-left" style="margin-top: 2px; margin-right: 5px;"></i>
+                      Cancel
+                    </button>
                   </div>
 
                 </div>
 
-
-                <div class="smallButtonBlock">
-                  <button type="button" class="btn btn-default" style="display: flex;
-                      justify-content: center;" href ng-click='addMode=null'>
-
-                    <i class="fa fa-arrow-left" style="margin-top: 2px; margin-right: 5px;"></i>
-                    Cancel
-                  </button>
-                </div>
 
               </div>
 
