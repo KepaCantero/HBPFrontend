@@ -138,5 +138,16 @@ describe('Service: EditorToolbar', function() {
         dynamicViewOverlayService.closeAllOverlaysOfType
       ).toHaveBeenCalledWith(DYNAMIC_VIEW_CHANNELS.PERFORMANCE_MONITOR);
     });
+
+    it('Toggle ROS terminal View should toggle visibility', function() {
+      dynamicViewOverlayService.isOverlayOpen.and.returnValue({
+        then: jasmine.createSpy('then').and.callFake(function(fn) {
+          fn(false);
+        })
+      });
+      expect(editorToolbarService.showRosTerminal).toBeFalsy();
+      editorToolbarService.toggleRosTerminal();
+      expect(editorToolbarService.showRosTerminal).toBe(true);
+    });
   });
 });

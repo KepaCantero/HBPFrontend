@@ -477,13 +477,14 @@ if t % 2 < 0.02:
 
             scope.applyScript = function(transferFunction, doneCallback) {
               if (transferFunction) {
+                scope.cleanCompileError(transferFunction);
+                delete transferFunction.error[scope.ERROR.RUNTIME];
+                delete transferFunction.error[scope.ERROR.LOADING];
                 if (scope.centerPanelTabSelection === 'script') {
                   if (transferFunction.code === '') {
                     transferFunction.code = 'return';
                   }
                   scope.setTFtype(transferFunction);
-                  delete transferFunction.error[scope.ERROR.RUNTIME];
-                  delete transferFunction.error[scope.ERROR.LOADING];
                   backendInterfaceService.setStructuredTransferFunction(
                     transferFunction,
                     function() {
