@@ -75,9 +75,9 @@
                 <i class="fa fa-remove"></i>
               </span>
             <i ng-if="vm.selectedParent.deleting" disable-animate class="fa fa-spinner fa-pulse fa-1x fa-fw" title="Deleting..."></i>
-            </spandiv>
+            </span>
             <span class="action-button" ng-click="!vm.selectedParent.creating && vm.createFolder()">
-              <span class="create-folder-button" ng-if="!vm.selectedParent.creating && !vm.selectedParent.loadingFile" disable-animate title="Create new folder">
+              <span class="create-folder-button" ng-if="!vm.selectedParent.creating && !vm.selectedParent.loadingFile && vm.selectedParent.name != 'resources'" disable-animate title="Create new folder">
                 <i class="fa fa-folder"></i>
                 <i class="fa fa-plus"></i>
               </span>
