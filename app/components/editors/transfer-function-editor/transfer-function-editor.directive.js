@@ -193,6 +193,79 @@ if t % 2 < 0.02:
                   }
                   flawedTransferFunction.error[msg.errorType] = msg;
                   // do not show error message in code block, because the line numbers probably do not match
+                  if (msg.lineNumber >= 0) {
+                    // There is a line information for the error
+                    // Error line highlighting
+                    var codeMirrorLineNumber = msg.lineNumber - 1; // 0-based line numbering
+                    flawedTransferFunction.error[
+                      msg.errorType
+                    ].lineHandle = codeMirrorLineNumber;
+
+                    if (scope.centerPanelTabSelection == 'rawscript') {
+                      const rawEditor = codeEditorsServices.getEditor(
+                        'rawCodeEditor'
+                      );
+                      rawEditor.addLineClass(
+                        codeMirrorLineNumber,
+                        'background',
+                        'alert-danger'
+                      );
+                    } else {
+                      const structuredEditor = codeEditorsServices.getEditor(
+                        'codeEditor'
+                      );
+                      if (msg.errorType === scope.ERROR.COMPILE) {
+                        // Compile error in Structured TF, so we can't compare with the outdated Raw version of the TF
+                        // instead we try to match the error line in the Structured TF
+                        const errorLine =
+                          msg.lineText.length > 4
+                            ? msg.lineText
+                                .substr(4)
+                                .trimRight('\n')
+                                .trimRight()
+                            : msg.lineText;
+                        for (let i = 0; i < structuredEditor.lineCount(); i++) {
+                          if (
+                            structuredEditor.getLine(i).trimRight() == errorLine
+                          ) {
+                            structuredEditor.addLineClass(
+                              i,
+                              'background',
+                              'alert-danger'
+                            );
+                            break;
+                          }
+                        }
+                      } else {
+                        // Run time error in Structured TF. We don't have the linetext, so we will compare the
+                        // Structured TF with the Raw version,
+                        const updateRawTFError = () => {
+                          const structuredLineCount = structuredEditor.lineCount();
+                          const rawMatches = flawedTransferFunction.rawCode.match(
+                            /\n/g
+                          );
+                          const rawLineCount = rawMatches
+                            ? rawMatches.length + 1
+                            : 1;
+                          const errorLine = msg.lineNumber - 1;
+                          structuredEditor.addLineClass(
+                            Math.max(
+                              0,
+                              Math.min(
+                                structuredLineCount - 1,
+                                errorLine - rawLineCount + structuredLineCount
+                              )
+                            ),
+                            'background',
+                            'alert-danger'
+                          );
+                        };
+                        if (scope.synchingRawTF)
+                          scope.synchingRawTF.then(() => updateRawTFError());
+                        else updateRawTFError();
+                      }
+                    }
+                  }
                 }
               }
             };
@@ -230,7 +303,20 @@ if t % 2 < 0.02:
               //              }
             };
 
+            function cleanEditorErrors() {
+              let editor = codeEditorsServices.getEditor(
+                scope.centerPanelTabSelection == 'rawscript'
+                  ? 'rawCodeEditor'
+                  : 'codeEditor'
+              );
+              if (editor) {
+                for (let i = 0; i < editor.lineCount(); i++)
+                  editor.removeLineClass(i, 'background', 'alert-danger');
+              }
+            }
+
             scope.cleanCompileError = function(transferFunction) {
+              cleanEditorErrors();
               delete transferFunction.error[scope.ERROR.COMPILE];
               delete transferFunction.error[scope.ERROR.NO_OR_MULTIPLE_NAMES];
             };
@@ -490,7 +576,6 @@ if t % 2 < 0.02:
                     function() {
                       transferFunction.dirty = false;
                       transferFunction.local = false;
-                      scope.cleanCompileError(transferFunction);
                       if (doneCallback) doneCallback();
                       scope.updateNTransferFunctionDirty();
                       if (scope.nTransferFunctionDirty == 0)
@@ -500,6 +585,10 @@ if t % 2 < 0.02:
                           DIRTY_TYPE,
                           scope.transferFunctions
                         );
+                      scope.synchingRawTF = scope.populateTransferFunctionsWithRawCode();
+                      scope.synchingRawTF.then(
+                        () => (scope.synchingRawTF = null)
+                      );
                     },
                     function(data) {
                       serverError.displayHTTPError(data);
