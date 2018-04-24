@@ -21,6 +21,16 @@ describe('Controller: ResourcesExplorerController', function() {
         parent: '89857775-6215-4d53-94ee-fb6c18b9e2f8'
       }
     ],
+    experimentFilesWithoutResources: [
+      {
+        uuid: '207a87c9-78d9-4504-bde7-6919feaac12a',
+        name: 'all_neurons_spike_monitor.py',
+        parent: '758096b6-e500-452b-93e1-ba2bba203844',
+        contentType: 'text/plain',
+        type: 'file',
+        modifiedOn: '2017-08-07T07:59:35.837002Z'
+      }
+    ],
     experimentFiles: [
       {
         uuid: '207a87c9-78d9-4504-bde7-6919feaac12a',
@@ -118,6 +128,18 @@ describe('Controller: ResourcesExplorerController', function() {
     $rootScope.$digest();
     return controller;
   };
+  var checkAndLoadResourcesFolder = function(experimentFiles) {
+    spyOn(storageServer, 'getExperimentFiles').and.returnValue(
+      $q.when(experimentFiles)
+    );
+    $rootScope.$digest();
+    var controller = element.scope().vm;
+    spyOn(controller, 'loadResourceFolderUuid');
+    controller.checkAndLoadResourcesFolder();
+    $rootScope.$digest();
+    return controller;
+  };
+
   it('Experiments should have a resources folder', function() {
     var controller = loadResourceFolderUuid();
     expect(controller.resourcesFolder.uuid).toBe(
@@ -136,5 +158,19 @@ describe('Controller: ResourcesExplorerController', function() {
     );
     uploadFile();
     expect(backendInterfaceService.cloneFileResources).toHaveBeenCalled();
+  });
+
+  it('should create the resources folder', function() {
+    spyOn(storageServer, 'createFolder').and.returnValue($q.when());
+    var controller = checkAndLoadResourcesFolder(
+      MOCKED_DATA.experimentFilesWithoutResources
+    );
+
+    expect(controller.loadResourceFolderUuid).toHaveBeenCalled();
+  });
+
+  it('should load the resources folder', function() {
+    var controller = checkAndLoadResourcesFolder(MOCKED_DATA.experimentFiles);
+    expect(controller.loadResourceFolderUuid).toHaveBeenCalled();
   });
 });
