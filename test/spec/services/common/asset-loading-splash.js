@@ -98,7 +98,7 @@
   });
 
   describe('Controller: AssetLoadingSplashCtrl', function() {
-    var scope, timeout, assetLoadingSplash;
+    var scope, timeout, $location, assetLoadingSplash;
 
     var assetLoadingSplashMock = {};
     var environmentRenderingServiceMock = {
@@ -121,15 +121,24 @@
       })
     );
     beforeEach(
-      inject(function(_$scope_, _$timeout_, _assetLoadingSplash_, $controller) {
+      inject(function(
+        _$scope_,
+        _$timeout_,
+        _assetLoadingSplash_,
+        _$location_,
+        $controller
+      ) {
         scope = _$scope_;
         timeout = _$timeout_;
+        $location = _$location_;
         assetLoadingSplash = _assetLoadingSplash_;
 
         assetLoadingSplashMock.setProgressObserver = jasmine.createSpy(
           'setProgressObserver'
         );
         assetLoadingSplashMock.close = jasmine.createSpy('close');
+
+        $location.path = jasmine.createSpy('path');
 
         scope.$apply = jasmine.createSpy('$apply');
 
@@ -158,9 +167,10 @@
       expect(scope.totalAssets).toEqual(3);
     });
 
-    it('should close the splash close', function() {
+    it('should close the splash close and redirect to esv-private', function() {
       scope.close();
       expect(assetLoadingSplash.close).toHaveBeenCalled();
+      expect($location.path).toHaveBeenCalledWith('esv-private');
     });
 
     it('should watch gz3d when assets are loaded without error', function() {
