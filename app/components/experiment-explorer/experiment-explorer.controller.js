@@ -449,9 +449,25 @@
       this.backendInterfaceService = backendInterfaceService;
     }
     $onInit() {
-      this.loadResourceFolderUuid(this.simulationInfo.experimentID);
+      this.checkAndLoadResourcesFolder();
     }
 
+    checkAndLoadResourcesFolder() {
+      this.storageServer
+        .getExperimentFiles(this.simulationInfo.experimentID)
+        .then(files => {
+          this.resourcesFolder = files.filter(f => f.name === 'resources');
+          if (this.resourcesFolder.length == 0) {
+            this.storageServer
+              .createFolder(this.simulationInfo.experimentID, 'resources')
+              .then(() => {
+                this.loadResourceFolderUuid(this.simulationInfo.experimentID);
+              });
+          } else {
+            this.loadResourceFolderUuid(this.simulationInfo.experimentID);
+          }
+        });
+    }
     uploadFile(e) {
       super.uploadFile(e).then(() => {
         this.backendInterfaceService.cloneFileResources();
@@ -462,6 +478,9 @@
         .getExperimentFiles(experiment)
         .then(files => {
           this.resourcesFolder = files.filter(f => f.name === 'resources');
+          if (!this.resourcesFolder.length) {
+            return this.$q.reject('Could not retrieve the resources folder');
+          }
           super.loadResources(this.resourcesFolder[0].uuid);
         })
         .catch(err => this.onError('Failed to load Resources folder', err));
