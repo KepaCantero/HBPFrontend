@@ -88,7 +88,7 @@
         <div class="underlined-tab-area">
 
           <div class="underlined-tab" ng-click="centerPanelTabChanged('script')">
-            <div ng-class="{'underlined-tab-selected':centerPanelTabSelection=='script'}">
+            <div ng-class="{'underlined-tab-selected':centerPanelTabSelection=='script','centerPanelTabDeactivated':isTfFaulty(transferFunction)}">
               Script
             </div>
             <div ng-show="centerPanelTabSelection=='script'" class="underlined-box"></div>
@@ -126,7 +126,7 @@
 
         </div>
 
-        <div ng-show="centerPanelTabSelection=='script'" style="height: 100%;">
+        <div ng-show="centerPanelTabSelection=='script' && !isTfFaulty(transferFunction)" style="height: 100%;">
 
           <div style="display:flex; height: 100%; ">
 

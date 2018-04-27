@@ -481,16 +481,14 @@
           ).$promise;
         },
         getStructuredTransferFunctions: function(callback) {
-          resourceStructuredTransferFunctions(
+          return resourceStructuredTransferFunctions(
             simulationInfo.serverBaseUrl
           ).get(
             {
               sim_id: simulationInfo.simulationID
             },
-            function(data) {
-              callback(data);
-            }
-          );
+            callback
+          ).$promise;
         },
         setActivateTransferFunction: function(
           name,
@@ -518,7 +516,9 @@
           successCallback,
           errorCallback
         ) {
-          resourceTransferFunctionSimulation(simulationInfo.serverBaseUrl).edit(
+          return resourceTransferFunctionSimulation(
+            simulationInfo.serverBaseUrl
+          ).edit(
             {
               sim_id: simulationInfo.simulationID,
               transfer_function_name: name
@@ -526,7 +526,7 @@
             data,
             successCallback,
             errorCallback
-          );
+          ).$promise;
         },
         addTransferFunction: function(data, successCallback, errorCallback) {
           resourceTransferFunctionSimulation(simulationInfo.serverBaseUrl).add(
@@ -543,7 +543,7 @@
           successCallback,
           errorCallback
         ) {
-          resourceStructuredTransferFunctions(
+          return resourceStructuredTransferFunctions(
             simulationInfo.serverBaseUrl
           ).patch(
             {
@@ -552,7 +552,7 @@
             data,
             successCallback,
             errorCallback
-          );
+          ).$promise;
         },
         resetCollab: function(resetData, successCallback, errorCallback) {
           return resourceResetCollab(simulationInfo.serverBaseUrl).reset(

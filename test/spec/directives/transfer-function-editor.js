@@ -22,6 +22,11 @@ describe('Directive: transferFunctionEditor', function() {
 
   var shouldUseErrorCallback = false;
 
+  var getTransferFunctionResponse = {
+    data: { tf1: 'pass', tf2: 'pass', faultyTf: 'invalidCode' },
+    active: { tf1: true, tf2: true, faultyTf: false }
+  };
+
   var backendInterfaceServiceMock = {
     getPopulations: jasmine
       .createSpy('getPopulations')
@@ -30,19 +35,12 @@ describe('Directive: transferFunctionEditor', function() {
       'getStructuredTransferFunctions'
     ),
     getTransferFunctions: function(callback) {
-      callback({
-        data: { tf1: 'pass', tf2: 'pass' },
-        active: { tf1: true, tf2: true }
-      });
-      return {
-        then: function(callback) {
-          callback();
-        }
-      };
+      callback(getTransferFunctionResponse);
+      return window.$q.resolve();
     },
-    setStructuredTransferFunction: jasmine.createSpy(
-      'setStructuredTransferFunction'
-    ),
+    setStructuredTransferFunction: jasmine
+      .createSpy('setStructuredTransferFunction')
+      .and.callFake(() => window.$q.resolve()),
     setActivateTransferFunction: function(
       name,
       id,
@@ -53,9 +51,9 @@ describe('Directive: transferFunctionEditor', function() {
       if (!shouldUseErrorCallback) callback1();
       else callback2();
     },
-    editTransferFunction: function(name, rawCode, callback) {
-      callback();
-    },
+    editTransferFunction: jasmine
+      .createSpy('editTransferFunction')
+      .and.callFake(() => window.$q.resolve()),
     deleteTransferFunction: jasmine.createSpy('deleteTransferFunction'),
     getServerBaseUrl: jasmine.createSpy('getServerBaseUrl'),
     saveTransferFunctions: jasmine.createSpy('saveTransferFunctions'),
@@ -277,7 +275,7 @@ def tf1(t):
         }
       ]
     });
-    expect(isolateScope.transferFunctions.length).toEqual(2);
+    expect(isolateScope.transferFunctions.length).toEqual(3);
     expect(isolateScope.transferFunctions[0].devices).toEqual([0, 8, 15]);
     expect(isolateScope.transferFunctions[0].topics).toEqual([
       { name: 'sub', isDefault: false }
@@ -352,16 +350,17 @@ def tf1(t):
   });
 
   describe('with loaded transfer functions', function() {
-    var expectedTf1, expectedTf2;
+    var expectedTf1, expectedTf2, expectedFaultyTf;
     var expectedTopic1, expectedTopic2;
     var expectedPopulation1, expectedPopulation2, expectedPopulation3;
     var expected = [];
 
     beforeEach(function() {
+      let tfID = 0;
       $scope.control.refresh();
-      expectedTf1 = new ScriptObject('tf1', 'return 42');
+      expectedTf1 = new ScriptObject(tfID++, 'return 42');
       expectedTf1.type = TRANSFER_FUNCTION_TYPE.NEURON2ROBOT;
-      expectedTf1.oldName = 'tf1';
+      expectedTf1.name = expectedTf1.oldName = 'tf1';
       expectedTf1.local = false;
       expectedTf1.rawCode = '\n\n\n\n\n\n\n\n\n';
       expectedTf1.devices = [
@@ -386,9 +385,10 @@ def tf1(t):
         }
       ];
       expectedTf1.variables = [];
-      expectedTf2 = new ScriptObject('tf2', 'pass');
+
+      expectedTf2 = new ScriptObject(tfID++, 'pass');
       expectedTf2.type = TRANSFER_FUNCTION_TYPE.NEURON2ROBOT;
-      expectedTf2.oldName = 'tf2';
+      expectedTf2.name = expectedTf2.oldName = 'tf2';
       expectedTf2.local = true;
       expectedTf2.devices = [
         {
@@ -415,7 +415,14 @@ def tf1(t):
           type: 'int'
         }
       ];
-      expected = [expectedTf1, expectedTf2];
+
+      expectedFaultyTf = new ScriptObject(tfID++, null);
+      expectedFaultyTf.local = false;
+      expectedFaultyTf.name = expectedFaultyTf.oldName = 'faultyTf';
+      expectedFaultyTf.rawCode = 'invalidCode';
+      expectedFaultyTf.active = false;
+
+      expected = [expectedTf1, expectedTf2, expectedFaultyTf];
 
       expectedPopulation1 = {
         name: 'sensors',
@@ -568,7 +575,7 @@ def tf1(t):
       expect(isolateScope.transferFunction.name).toEqual('tf2');
       // rename tf2
       isolateScope.selectTransferFunction('tf3');
-      expect(isolateScope.transferFunction.id).toEqual('tf2');
+      expect(isolateScope.transferFunction.id).toEqual(1);
       expect(isolateScope.transferFunction.name).toEqual('tf3');
       isolateScope.selectTransferFunction('tf1');
       expect(isolateScope.transferFunction).toEqual(expectedTf1);
@@ -576,11 +583,19 @@ def tf1(t):
       expect(isolateScope.transferFunctions[1].name).toEqual('tf2');
     });
 
+    it('should change to rawscript panel when selecting a faulty transfer functions', function() {
+      isolateScope.centerPanelTabSelection = 'script';
+      isolateScope.selectTransferFunction('faultyTf');
+
+      expect(isolateScope.transferFunction).toEqual(expectedFaultyTf);
+      expect(isolateScope.centerPanelTabSelection).toBe('rawscript');
+    });
+
     it('should create a new tf correctly', function() {
       isolateScope.transferFunction = expectedTf1;
       isolateScope.transferFunction.name = 'tf3';
       isolateScope.createNewTF();
-      expect(isolateScope.transferFunctions.length).toEqual(3);
+      expect(isolateScope.transferFunctions.length).toEqual(4);
       expect(isolateScope.transferFunction.topics).toEqual([]);
       expect(isolateScope.transferFunction.variables).toEqual([]);
       expect(isolateScope.transferFunction.devices).toEqual([]);
@@ -591,11 +606,11 @@ def tf1(t):
       isolateScope.transferFunction.name = 'tf3';
       // in case no neurons are selected, nothing happens
       isolateScope.createNewMonitor();
-      expect(isolateScope.transferFunctions.length).toEqual(2);
+      expect(isolateScope.transferFunctions.length).toEqual(3);
       // if neurons are selected, a new monitor tf is created
       isolateScope.selectedPopulation = expectedPopulation1;
       isolateScope.createNewMonitor();
-      expect(isolateScope.transferFunctions.length).toEqual(3);
+      expect(isolateScope.transferFunctions.length).toEqual(4);
       expect(isolateScope.transferFunction.topics).toEqual([
         {
           name: 'publisher',
@@ -625,7 +640,7 @@ def tf1(t):
       isolateScope.transferFunction = expectedTf1;
       isolateScope.createNewTF();
       isolateScope.createNewTF();
-      expect(isolateScope.transferFunctions.length).toEqual(4);
+      expect(isolateScope.transferFunctions.length).toEqual(5);
       expect(isolateScope.transferFunctions[0].name).not.toEqual(
         isolateScope.transferFunctions[2].name
       );
@@ -639,7 +654,7 @@ def tf1(t):
       isolateScope.selectedPopulation = expectedPopulation1;
       isolateScope.createNewMonitor();
       isolateScope.createNewMonitor();
-      expect(isolateScope.transferFunctions.length).toEqual(4);
+      expect(isolateScope.transferFunctions.length).toEqual(5);
       expect(isolateScope.transferFunctions[0].name).not.toEqual(
         isolateScope.transferFunctions[2].name
       );
@@ -846,6 +861,17 @@ def tf1(t):
       expect(isolateScope.updateCurrentTFContent).toHaveBeenCalled();
     });
 
+    it(' centerPanelTabChanged should not change from rawscript to script when TF is faulty', function() {
+      spyOn(isolateScope, 'updateCurrentTFContent').and.callThrough();
+      let faultyTf = { code: null }; // faulty TF
+
+      isolateScope.transferFunction = faultyTf;
+      isolateScope.centerPanelTabSelection = 'rawscript';
+
+      isolateScope.centerPanelTabChanged('script');
+      expect(isolateScope.updateCurrentTFContent).not.toHaveBeenCalled();
+    });
+
     it('should handle reset', function() {
       isolateScope.populations = [{}, {}];
       isolateScope.$broadcast('RESET', RESET_TYPE.RESET_FULL);
@@ -853,22 +879,18 @@ def tf1(t):
     });
 
     it('should apply transfer functions correctly', function() {
-      expect(isolateScope.transferFunctions.length).toEqual(2);
+      expect(isolateScope.transferFunctions.length).toEqual(3);
       isolateScope.selectTransferFunction('tf2');
       expect(isolateScope.transferFunction.local).toBeTruthy();
       isolateScope.apply();
       expect(
         backendInterfaceService.setStructuredTransferFunction
-      ).toHaveBeenCalledWith(
-        isolateScope.transferFunction,
-        jasmine.any(Function),
-        jasmine.any(Function)
-      );
-      backendInterfaceService.setStructuredTransferFunction.calls
-        .mostRecent()
-        .args[1]();
+      ).toHaveBeenCalledWith(isolateScope.transferFunction);
+
+      isolateScope.$apply();
+
       expect(isolateScope.transferFunction.local).toBeFalsy();
-      expect(isolateScope.transferFunctions.length).toEqual(2);
+      expect(isolateScope.transferFunctions.length).toEqual(3);
       expect(isolateScope.transferFunction.name).toEqual('tf2');
     });
 
@@ -880,13 +902,15 @@ def tf1(t):
       isolateScope.transferFunctions[1].rawCode =
         '@nrp.Robot2Neuron()\ndef tf2(t):\n    pass';
 
-      expect(isolateScope.transferFunctions.length).toEqual(2);
+      expect(isolateScope.transferFunctions.length).toEqual(3);
       isolateScope.selectTransferFunction('tf2');
       expect(isolateScope.transferFunction.local).toBeTruthy();
-      isolateScope.apply();
+      isolateScope.apply(); //apply TF
+
+      isolateScope.$apply();
 
       expect(isolateScope.transferFunction.local).toBeFalsy();
-      expect(isolateScope.transferFunctions.length).toEqual(2);
+      expect(isolateScope.transferFunctions.length).toEqual(3);
       expect(isolateScope.transferFunction.name).toEqual('tf2');
     });
 
@@ -898,7 +922,7 @@ def tf1(t):
       isolateScope.transferFunctions[1].rawCode =
         '@nrp.Robot2Neuron()\ndef tf2(t):\n    pass';
 
-      expect(isolateScope.transferFunctions.length).toEqual(2);
+      expect(isolateScope.transferFunctions.length).toEqual(3);
       isolateScope.selectTransferFunction('tf2');
       expect(isolateScope.transferFunction.local).toBeTruthy();
       isolateScope.apply();
@@ -907,7 +931,11 @@ def tf1(t):
 
     it('populateTransferFunctionsWithRawCode should populate raw function', function() {
       isolateScope.populateTransferFunctionsWithRawCode();
-      expect(isolateScope.transferFunctions[0].rawCode).toBe('pass');
+      let tfs = isolateScope.transferFunctions;
+      expect(tfs[0].rawCode).toBe('pass');
+
+      let lastTf = tfs[tfs.length - 1];
+      expect(isolateScope.isTfFaulty(lastTf)).toBe(true);
     });
 
     it('should decide on a tf type correctly', function() {
@@ -927,23 +955,69 @@ def tf1(t):
     });
 
     it('should delete transfer functions correctly', function() {
-      expect(isolateScope.transferFunctions.length).toEqual(2);
+      let getTransferFunctionsResponseCopy = angular.copy(
+        getTransferFunctionResponse
+      );
+      let savedGetTransferFunctions =
+        backendInterfaceService.getTransferFunctions;
+
+      backendInterfaceService.getTransferFunctions = function(callback) {
+        callback(getTransferFunctionsResponseCopy);
+        return {
+          then: callback
+        };
+      };
+
+      let deleteFromGetTransferFunctionsResponse = function(tfName) {
+        delete getTransferFunctionsResponseCopy['data'][tfName];
+        delete getTransferFunctionsResponseCopy['active'][tfName];
+      };
+
+      let savedDeleteTransferFunction =
+        backendInterfaceService.deleteTransferFunction;
+
+      backendInterfaceService.deleteTransferFunction = jasmine
+        .createSpy('deleteTransferFunction')
+        .and.callFake(function(tfName, callback) {
+          deleteFromGetTransferFunctionsResponse(tfName);
+          return {
+            then: callback
+          };
+        });
+
+      deleteFromGetTransferFunctionsResponse('tf2');
+      expect(isolateScope.transferFunctions.length).toEqual(3);
       isolateScope.selectTransferFunction('tf2');
       isolateScope.delete();
-      expect(isolateScope.transferFunctions.length).toEqual(1);
+
+      expect(isolateScope.transferFunctions.length).toEqual(2);
       expect(
         backendInterfaceService.deleteTransferFunction
-      ).not.toHaveBeenCalled();
+      ).not.toHaveBeenCalled(); // tf2 is local
       expect(isolateScope.transferFunction).not.toBeNull();
 
       isolateScope.selectTransferFunction('tf1');
       isolateScope.delete();
+
+      expect(isolateScope.transferFunctions.length).toEqual(1);
+      expect(backendInterfaceService.deleteTransferFunction).toHaveBeenCalled();
+      expect(isolateScope.transferFunction).not.toBeNull();
+
+      isolateScope.selectTransferFunction('faultyTf');
+      isolateScope.delete();
+
       expect(isolateScope.transferFunctions.length).toEqual(0);
       expect(backendInterfaceService.deleteTransferFunction).toHaveBeenCalled();
       expect(isolateScope.transferFunction).toBeNull();
+
+      //restore standard mocks
+      backendInterfaceService.getTransferFunctions = savedGetTransferFunctions;
+      backendInterfaceService.deleteTransferFunction = savedDeleteTransferFunction;
     });
 
     it('should save transfer functions to file', function() {
+      isolateScope.centerPanelTabSelection = 'rawscript';
+
       spyOn(downloadFileService, 'downloadFile');
       spyOn(window, 'Blob').and.returnValue({});
       var href = 'http://some/url';
@@ -953,19 +1027,15 @@ def tf1(t):
           .and.returnValue(href)
       };
       window.URL = URLMock;
-      isolateScope.download(
-        new ScriptObject('transferFunctionId', 'Some code')
-      );
+      isolateScope.download();
       expect(URLMock.createObjectURL).toHaveBeenCalled();
       expect(downloadFileService.downloadFile).toHaveBeenCalledWith(
         href,
         'transferFunctions.py'
       );
 
-      isolateScope.centerPanelTabSelection = 'rawscript';
-      isolateScope.download(
-        new ScriptObject('transferFunctionId', 'Some code')
-      );
+      isolateScope.centerPanelTabSelection = 'script';
+      isolateScope.download();
       expect(URLMock.createObjectURL).toHaveBeenCalled();
     });
 
@@ -981,7 +1051,7 @@ def tf1(t):
           fnName +
           ' (someParam1, someParam2):\n' +
           '    insert awesome python code here\n' +
-          '    and here for multiligne awesomeness';
+          '    and here for multi-line awesomeness';
         return code;
       });
 
@@ -1005,9 +1075,14 @@ def tf1(t):
       $timeout.flush();
     });
 
-    it('should correctly saveTFIntoCollabStorage', function() {
+    it('should correctly saveTFIntoCollabStorage with rawscript', function() {
+      isolateScope.centerPanelTabSelection = 'rawscript';
+
       expect(isolateScope.isSavingToCollab).toEqual(false);
       isolateScope.saveTFIntoCollabStorage();
+
+      // isolateScope.$apply;
+
       expect(
         backendInterfaceService.saveTransferFunctions
       ).toHaveBeenCalledWith(
@@ -1015,6 +1090,7 @@ def tf1(t):
         jasmine.any(Function),
         jasmine.any(Function)
       );
+
       expect(isolateScope.isSavingToCollab).toEqual(true);
       backendInterfaceService.saveTransferFunctions.calls.argsFor(0)[1]();
       expect(isolateScope.isSavingToCollab).toBe(false);
@@ -1025,6 +1101,23 @@ def tf1(t):
       expect(isolateScope.isSavingToCollab).toBe(false);
       expect(clbErrorDialog.open).toHaveBeenCalled();
       clbErrorDialog.open.calls.reset();
+    });
+
+    it('should correctly saveTFIntoCollabStorage with script', function() {
+      isolateScope.centerPanelTabSelection = 'script';
+
+      expect(isolateScope.isSavingToCollab).toEqual(false);
+      isolateScope.saveTFIntoCollabStorage();
+
+      isolateScope.$apply();
+
+      expect(
+        backendInterfaceService.saveTransferFunctions
+      ).toHaveBeenCalledWith(
+        _.map(isolateScope.transferFunctions, 'rawCode'),
+        jasmine.any(Function),
+        jasmine.any(Function)
+      );
     });
 
     it('should set the saving flag correctly if csv saving succeed', function() {
@@ -1061,15 +1154,23 @@ def tf1(t):
     });
 
     it('should support toggleActive', function() {
-      var tf = { active: false };
+      var tf = { active: false, code: 'some code' };
 
       isolateScope.toggleActive(tf);
       expect(tf.active).toBe(true);
 
       shouldUseErrorCallback = true;
       isolateScope.toggleActive(tf);
+
       expect(tf.active).toBe(true);
       shouldUseErrorCallback = false;
+    });
+
+    it('should not call toggleActive on faulty TFs', function() {
+      var tf = { active: false, code: null };
+
+      isolateScope.toggleActive(tf);
+      expect(tf.active).toBe(false);
     });
   });
 });
