@@ -1,7 +1,7 @@
 'use strict';
 
 describe('Directive: object-inspector', function() {
-  var $rootScope, $compile, $scope;
+  var $rootScope, $compile, $scope, getFileContentDefer, storageServer;
   var gz3d;
   var elementScope;
   var dynamicViewOverlayService;
@@ -31,7 +31,8 @@ describe('Directive: object-inspector', function() {
       _gz3d_,
       _dynamicViewOverlayService_,
       _objectInspectorService_,
-      _backendInterfaceService_
+      _backendInterfaceService_,
+      _storageServer_
     ) {
       $rootScope = _$rootScope_;
       $compile = _$compile_;
@@ -39,6 +40,7 @@ describe('Directive: object-inspector', function() {
       dynamicViewOverlayService = _dynamicViewOverlayService_;
       objectInspectorService = _objectInspectorService_;
       backendInterfaceService = _backendInterfaceService_;
+      storageServer = _storageServer_;
 
       spyOn(gz3d.gui.guiEvents, 'on').and.callThrough();
       spyOn(gz3d.gui.guiEvents, 'removeListener').and.callThrough();
@@ -54,6 +56,11 @@ describe('Directive: object-inspector', function() {
         overlayWrapperMock
       );
       spyOn(angular, 'isDefined').and.returnValue(true);
+
+      getFileContentDefer = window.$q.defer();
+      spyOn(storageServer, 'getFileContent').and.returnValue(
+        getFileContentDefer.promise
+      );
     })
   );
 
@@ -75,6 +82,58 @@ describe('Directive: object-inspector', function() {
 
     elementScope.cleanup();
     expect(gz3d.gui.guiEvents.removeListener).toHaveBeenCalledTimes(2);
+  });
+
+  it('should resolve old robot path format', function() {
+    getFileContentDefer.resolve({
+      uuid: 'uuid',
+      data: '<ExD><bibiConf src="bibifile" /></ExD>'
+    });
+
+    storageServer.getFileContent.and.returnValue({
+      uuid: 'uuid',
+      data: '<ExD><bodyModel></bodyModel></ExD>'
+    });
+    $rootScope.$digest();
+    expect(elementScope.robotConfigPath).toBe(
+      'http://proxy/storage/experimentID/robot.config?byname=true'
+    );
+  });
+
+  it('should resolve cloned experiment robot path', function() {
+    getFileContentDefer.resolve({
+      uuid: 'uuid',
+      data: '<ExD><bibiConf src="bibifile" /></ExD>'
+    });
+    storageServer.getFileContent.and.returnValue({
+      uuid: 'uuid',
+      data:
+        '<ExD><bodyModel customAsset="false" assetPath="robots/myrobot"/></ExD>'
+    });
+    $rootScope.$digest();
+    expect(elementScope.robotConfigPath).toBe(
+      'http://proxy/models/robots/myrobot/config'
+    );
+  });
+
+  it('should resolve experiment created from custom model robot path', function() {
+    getFileContentDefer.resolve({
+      uuid: 'uuid',
+      data: '<ExD><bibiConf src="bibifile" /></ExD>'
+    });
+    spyOn(storageServer, 'getCustomModels').and.returnValue(
+      window.$q.resolve([
+        { path: window.encodeURIComponent('/robots/robot.zip') }
+      ])
+    );
+    storageServer.getFileContent.and.returnValue({
+      uuid: 'uuid',
+      data: '<ExD><bodyModel customAsset="true" assetPath="robot.zip"/></ExD>'
+    });
+    $rootScope.$digest();
+    expect(elementScope.robotConfigPath).toBe(
+      'http%3A%2F%2Fproxy%2Fstorage%2Fcustommodelconfig%2F%252Frobots%252Frobot.zip'
+    );
   });
 
   it('should create a new TF on createTopicTF', function() {
