@@ -52,7 +52,7 @@
       };
 
       var open = function(callbackOnClose) {
-        this.callbackOnClose = callbackOnClose;
+        this.callbackOnClose = callbackOnClose || _.noop;
         if (angular.isDefined(myModal)) {
           myModal.close();
         }
@@ -69,9 +69,9 @@
         if (angular.isDefined(myModal)) {
           myModal.close();
         }
-        if (angular.isDefined(this.callbackOnClose)) {
-          this.callbackOnClose();
-        }
+
+        this.callbackOnClose();
+
         myModal = undefined;
       };
 
@@ -90,12 +90,14 @@
     'assetLoadingSplash',
     'environmentRenderingService',
     'gz3d',
+    '$location',
     function(
       $scope,
       $timeout,
       assetLoadingSplash,
       environmentRenderingService,
-      gz3d
+      gz3d,
+      $location
     ) {
       $scope.progressData = {};
       $scope.isError = false;
@@ -107,6 +109,7 @@
 
       $scope.close = function() {
         assetLoadingSplash.close();
+        $location.path('esv-private');
       };
 
       assetLoadingSplash.setProgressObserver(function(data) {
@@ -153,7 +156,7 @@
       // Give 15 seconds for asset loading progress to be received
       $timeout(function() {
         if ($scope.totalAssets === 0) {
-          console.error('Asset loading timeout occured.');
+          console.error('Asset loading timeout occurred.');
           $scope.isError = true;
         }
       }, 15000);
