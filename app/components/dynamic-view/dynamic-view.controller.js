@@ -143,6 +143,14 @@
           heightPercent: 40
         }
       },
+      MODEL_VIEWER: {
+        name: 'Noise Model viewer',
+        directive: 'noise-model',
+        overlayDefaultSize: {
+          width: 500,
+          height: 450
+        }
+      },
       SPIKE_TRAIN: {
         name: 'Spike-Train',
         directive: 'spike-train',
