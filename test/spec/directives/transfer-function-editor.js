@@ -17,7 +17,8 @@ describe('Directive: transferFunctionEditor', function() {
     RESET_TYPE,
     downloadFileService,
     codeEditorsServices,
-    clbErrorDialog;
+    clbErrorDialog,
+    registerFoundAutoSavedCallback;
 
   var shouldUseErrorCallback = false;
 
@@ -120,7 +121,8 @@ describe('Directive: transferFunctionEditor', function() {
       _RESET_TYPE_,
       _downloadFileService_,
       _codeEditorsServices_,
-      _clbErrorDialog_
+      _clbErrorDialog_,
+      _autoSaveService_
     ) {
       clbErrorDialog = _clbErrorDialog_;
       codeEditorsServices = _codeEditorsServices_;
@@ -140,6 +142,10 @@ describe('Directive: transferFunctionEditor', function() {
       editorMock.removeLineClass = jasmine.createSpy('removeLineClass');
       pythonCodeHelper = _pythonCodeHelper_;
       ScriptObject = pythonCodeHelper.ScriptObject;
+      registerFoundAutoSavedCallback = spyOn(
+        _autoSaveService_,
+        'registerFoundAutoSavedCallback'
+      );
 
       $scope = $rootScope.$new();
       $templateCache.put('views/esv/transfer-function-editor.html', '');
@@ -357,6 +363,7 @@ def tf1(t):
       expectedTf1.type = TRANSFER_FUNCTION_TYPE.NEURON2ROBOT;
       expectedTf1.oldName = 'tf1';
       expectedTf1.local = false;
+      expectedTf1.rawCode = '\n\n\n\n\n\n\n\n\n';
       expectedTf1.devices = [
         {
           name: 'device1',
@@ -468,6 +475,75 @@ def tf1(t):
       msg.errorType = errorType = isolateScope.ERROR.LOADING;
       isolateScope.onNewErrorMessageReceived(msg);
       expect(transferFunctions[1].error[errorType]).toEqual(msg);
+    });
+
+    it('should cleanCompileErrors', function() {
+      const msg = {
+        functionName: 'tf1',
+        message: 'You nearly broke the platform!',
+        errorType: isolateScope.ERROR.COMPILE,
+        severity: 1,
+        sourceType: SOURCE_TYPE.TRANSFER_FUNCTION
+      };
+      spyOn(isolateScope, 'cleanCompileError');
+      isolateScope.onNewErrorMessageReceived(msg);
+      expect(isolateScope.cleanCompileError).toHaveBeenCalled();
+    });
+
+    it('should handle runtime errors correctly', function() {
+      const rawCodeEditor = {
+        addLineClass: jasmine.createSpy('addLineClass_raw'),
+        lineCount: () => 10,
+        getLine: () => '',
+        removeLineClass: angular.noop
+      };
+
+      const structuredEditor = {
+        addLineClass: jasmine.createSpy('addLineClass_structured'),
+        lineCount: () => 5,
+        getLine: () => '',
+        removeLineClass: angular.noop
+      };
+
+      spyOn(codeEditorsServices, 'getEditor').and.callFake(
+        name => (name == 'rawCodeEditor' ? rawCodeEditor : structuredEditor)
+      );
+
+      const msg = {
+        functionName: 'tf1',
+        lineNumber: 8,
+        errorType: isolateScope.ERROR.RUNTIME,
+        severity: 1,
+        sourceType: SOURCE_TYPE.TRANSFER_FUNCTION
+      };
+
+      isolateScope.onNewErrorMessageReceived(msg);
+      expect(structuredEditor.addLineClass).toHaveBeenCalledWith(
+        2,
+        'background',
+        'alert-danger'
+      );
+    });
+
+    it('should add error line to current editor ', function() {
+      const msg = {
+        functionName: 'tf1',
+        lineText: 'You nearly broke the platform!',
+        errorType: isolateScope.ERROR.COMPILE,
+        severity: 1,
+        lineNumber: 1,
+        sourceType: SOURCE_TYPE.TRANSFER_FUNCTION
+      };
+
+      const editor = {
+        addLineClass: jasmine.createSpy('addLineClass'),
+        lineCount: () => 1,
+        getLine: () => '',
+        removeLineClass: angular.noop
+      };
+
+      spyOn(codeEditorsServices, 'getEditor').and.returnValue(editor);
+      isolateScope.onNewErrorMessageReceived(msg);
     });
 
     it('should ignore state machine errors', function() {
@@ -975,6 +1051,13 @@ def tf1(t):
         .mostRecent()
         .args[1]();
       expect(isolateScope.isSavingCSVToCollab).toBe(false);
+    });
+
+    it('autosave should call callback if autosave work found', function() {
+      const data = [{ name: 'tf1', error: {} }];
+      registerFoundAutoSavedCallback.calls.first().args[1](data, false);
+
+      expect(isolateScope.transferFunctions[0].name).toBe('tf1');
     });
 
     it('should support toggleActive', function() {
