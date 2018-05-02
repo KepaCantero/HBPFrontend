@@ -8,7 +8,7 @@
     beforeEach(module('tipTooltipModule'));
     beforeEach(module('editorToolbarModule'));
     beforeEach(module('exd.templates')); // import html template
-    beforeEach(module('contextMenuStateMock'));
+    beforeEach(module('contextMenuStateServiceMock'));
     beforeEach(module('dynamicViewModule'));
     beforeEach(module('exdFrontendApp'));
 
@@ -27,6 +27,7 @@
     beforeEach(module('dynamicViewOverlayServiceMock'));
     beforeEach(module('clientLoggerServiceMock'));
     beforeEach(module('gz3dViewsServiceMock'));
+    beforeEach(module('pullForceServiceMock'));
 
     beforeEach(
       inject(function(_$rootScope_, _$compile_) {

@@ -5,6 +5,7 @@ describe('Directive: environment settings quality', function() {
 
   beforeEach(module('exdFrontendApp'));
   beforeEach(module('exd.templates'));
+  beforeEach(module('editorToolbarServiceMock'));
 
   beforeEach(
     module(function($provide) {

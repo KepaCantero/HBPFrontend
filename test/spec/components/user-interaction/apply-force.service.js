@@ -39,14 +39,10 @@ describe('Services: applyForceService', function() {
 describe('Services: applyForceService', function() {
   var applyForceService;
 
-  var mockEvent, mockContainer, mockRosService;
+  var mockContainer, mockRosService;
   var eventDispatcherService;
 
-  var contextMenuState,
-    gz3d,
-    userNavigationService,
-    dynamicViewOverlayService,
-    stateService;
+  var gz3d, userNavigationService, dynamicViewOverlayService, stateService;
   var DYNAMIC_VIEW_CHANNELS, STATE;
 
   //var mockModel = {
@@ -71,7 +67,6 @@ describe('Services: applyForceService', function() {
   beforeEach(module('userInteractionModule'));
   beforeEach(module('gz3dMock'));
   beforeEach(module('roslibMock'));
-  beforeEach(module('contextMenuStateMock'));
   beforeEach(module('simulationInfoMock'));
   beforeEach(module('dynamicViewModule'));
   beforeEach(module('dynamicViewOverlayServiceMock'));
@@ -85,7 +80,6 @@ describe('Services: applyForceService', function() {
   beforeEach(
     inject(function(
       _applyForceService_,
-      _contextMenuState_,
       _gz3d_,
       _eventDispatcherService_,
       _stateService_,
@@ -96,7 +90,6 @@ describe('Services: applyForceService', function() {
     ) {
       applyForceService = _applyForceService_;
 
-      contextMenuState = _contextMenuState_;
       gz3d = _gz3d_;
       dynamicViewOverlayService = _dynamicViewOverlayService_;
       DYNAMIC_VIEW_CHANNELS = _DYNAMIC_VIEW_CHANNELS_;
@@ -119,62 +112,11 @@ describe('Services: applyForceService', function() {
       });
     window.ROSLIB.ServiceRequest = jasmine.createSpy('ServiceRequest');
 
-    mockEvent = {
-      stopPropagation: jasmine.createSpy('stopPropagation')
-    };
-
     mockContainer = {};
     gz3d.scene.viewManager.mainUserView.container = mockContainer;
   });
 
-  it('should add a working context menu item', function(done) {
-    //applyForceService.initialize();
-
-    expect(applyForceService.contextMenuItem).toBeDefined();
-    expect(applyForceService.contextMenuItem.visible).toBe(false);
-    expect(applyForceService.contextMenuItem.items[0].visible).toBe(false);
-
-    // Fake open overlay view
-    dynamicViewOverlayService
-      .isOverlayOpen(DYNAMIC_VIEW_CHANNELS.APPLY_FORCE_CONFIGURATION)
-      .then.and.callFake(function(fn) {
-        fn(true); // over lay view open
-      });
-
-    // show()
-    /* eslint-disable camelcase */
-    // only show for non-static models
-    var mockModel = {
-      userData: {
-        is_static: true
-      }
-    };
-    applyForceService.contextMenuItem.show(mockModel);
-    expect(applyForceService.contextMenuItem.visible).toBe(false);
-    expect(
-      dynamicViewOverlayService.closeAllOverlaysOfType
-    ).toHaveBeenCalledWith(DYNAMIC_VIEW_CHANNELS.APPLY_FORCE_CONFIGURATION);
-    expect(applyForceService.targetModel).not.toBeDefined();
-    // test with non-static model
-    mockModel.userData.is_static = false;
-    applyForceService.contextMenuItem.show(mockModel);
-    expect(applyForceService.contextMenuItem.visible).toBe(true);
-    expect(applyForceService.targetModel).toBe(mockModel);
-    // check with already defined target model
-    spyOn(applyForceService, 'detachGizmo').and.callThrough();
-    applyForceService.contextMenuItem.show(mockModel);
-    expect(applyForceService.detachGizmo).toHaveBeenCalled();
-    /* eslint-enable camelcase */
-
-    // hide()
-    applyForceService.contextMenuItem.hide();
-    expect(applyForceService.contextMenuItem.visible).toBe(false);
-
-    done();
-  });
-
   it('should enter/exit apply force mode', function(done) {
-    applyForceService.targetModel = mockModel;
     spyOn(applyForceService, 'applyForceToLink').and.callThrough();
     var container = (gz3d.scene.viewManager.mainUserView.container = document.createElement(
       'div'
@@ -183,19 +125,15 @@ describe('Services: applyForceService', function() {
     spyOn(container, 'removeEventListener').and.callThrough();
 
     applyForceService.initialize();
-
-    applyForceService.contextMenuItem.items[0].callback(mockEvent);
-
+    applyForceService.ActivateForTarget(mockModel);
     // entered apply force mode, added event listeners
-    expect(contextMenuState.hideMenu).toHaveBeenCalled();
-    expect(applyForceService.domElementPointerBindings).toBe(container);
     expect(container.addEventListener).toHaveBeenCalled();
 
     // Fake open overlay view and button click
     dynamicViewOverlayService
       .isOverlayOpen(DYNAMIC_VIEW_CHANNELS.APPLY_FORCE_CONFIGURATION)
       .then.and.callFake(function(fn) {
-        fn(false); // over lay view open
+        fn(true); // over lay view open
       });
     var mockIntersection = {
       link: {},
@@ -217,8 +155,6 @@ describe('Services: applyForceService', function() {
   });
 
   it('should exit force mode on cancel', function(done) {
-    applyForceService.targetModel = mockModel;
-
     spyOn(applyForceService, 'applyForceToLink').and.callThrough();
     var container = (gz3d.scene.viewManager.mainUserView.container = document.createElement(
       'div'
@@ -227,11 +163,9 @@ describe('Services: applyForceService', function() {
     spyOn(container, 'removeEventListener').and.callThrough();
 
     applyForceService.initialize();
-
-    applyForceService.contextMenuItem.items[0].callback(mockEvent);
+    applyForceService.ActivateForTarget(mockModel);
 
     // entered apply force mode, added event listeners
-    expect(contextMenuState.hideMenu).toHaveBeenCalled();
     expect(applyForceService.domElementPointerBindings).toBe(container);
     expect(container.addEventListener).toHaveBeenCalled();
 
@@ -289,7 +223,8 @@ describe('Services: applyForceService', function() {
     applyForceService.initialize();
 
     var mockMousePos = { x: 3, y: 3 };
-    applyForceService.applyForceToLink(mockMousePos);
+    var dummyForceDir = new THREE.Vector3(0, 1, 0);
+    applyForceService.applyForceToLink(mockMousePos, dummyForceDir);
 
     expect(mockRosService.callService).toHaveBeenCalled();
 
@@ -313,7 +248,7 @@ describe('Services: applyForceService', function() {
       },
       {
         object: {
-          parent: {},
+          parent: mockModel,
           userData: {
             gazeboType: 'link'
           }
@@ -336,14 +271,16 @@ describe('Services: applyForceService', function() {
     // test no valid intersections
     mockRaycaster.intersectObjects.and.returnValue([]);
     var intersectionResult = applyForceService.getLinkRayCastIntersection(
-      mockMousePos
+      mockMousePos,
+      mockFalseObject
     );
     expect(intersectionResult).not.toBeDefined();
 
     // test with valid intersection
     mockRaycaster.intersectObjects.and.returnValue(mockIntersections);
     intersectionResult = applyForceService.getLinkRayCastIntersection(
-      mockMousePos
+      mockMousePos,
+      mockModel
     );
     expect(intersectionResult.link).toBe(mockIntersections[2].object);
 
@@ -373,8 +310,7 @@ describe('Services: applyForceService', function() {
       spyOn(container, 'removeEventListener').and.callThrough();
 
       applyForceService.initialize();
-
-      applyForceService.contextMenuItem.items[0].callback(mockEvent);
+      applyForceService.ActivateForTarget(mockModel);
     });
 
     it('Apply should be disabled on play', function() {

@@ -5,6 +5,7 @@ describe('Directive: environment settings colors', function() {
 
   beforeEach(module('exdFrontendApp'));
   beforeEach(module('exd.templates'));
+  beforeEach(module('editorToolbarServiceMock'));
 
   beforeEach(
     module(function($provide) {
@@ -40,7 +41,7 @@ describe('Directive: environment settings colors', function() {
   );
 
   it('should initialize default values', function() {
-    editorToolbarService.showEnvironmentSettingsPanel = true;
+    editorToolbarService.isEnvironmentSettingsPanelActive.and.returnValue(true);
     $rootScope.$digest();
 
     expect($rootScope.$$childTail.inGamma).toBeDefined();

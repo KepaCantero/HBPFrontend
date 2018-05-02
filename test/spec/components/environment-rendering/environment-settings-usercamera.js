@@ -7,6 +7,7 @@ describe('Directive: render settings user camera frustum', function() {
   beforeEach(module('exd.templates'));
 
   beforeEach(module('userInteractionSettingsServiceMock'));
+  beforeEach(module('editorToolbarServiceMock'));
 
   beforeEach(
     module(function($provide) {
@@ -35,7 +36,7 @@ describe('Directive: render settings user camera frustum', function() {
   );
 
   it('should initialize default user camera frustum values', function() {
-    editorToolbarService.showEnvironmentSettingsPanel = true;
+    editorToolbarService.isEnvironmentSettingsPanelActive.and.returnValue(true);
     $rootScope.$digest();
 
     expect(gz3dMock.scene.composerSettings.verticalFOV).toBeDefined();

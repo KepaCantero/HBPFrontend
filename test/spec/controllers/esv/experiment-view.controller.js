@@ -34,7 +34,7 @@ describe('Controller: ExperimentViewController', function() {
   beforeEach(module('stateServiceMock'));
   beforeEach(module('gz3dMock'));
   beforeEach(module('userContextServiceMock'));
-  beforeEach(module('contextMenuStateMock'));
+  beforeEach(module('contextMenuStateServiceMock'));
   beforeEach(module('simulationInfoMock'));
   beforeEach(module('colorableObjectServiceMock'));
   beforeEach(module('environmentRenderingServiceMock'));

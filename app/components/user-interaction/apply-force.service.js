@@ -27,7 +27,6 @@
 angular.module('userInteractionModule').service('applyForceService', [
   'gz3d',
   'roslib',
-  'contextMenuState',
   'simulationInfo',
   'stateService',
   'dynamicViewOverlayService',
@@ -39,7 +38,6 @@ angular.module('userInteractionModule').service('applyForceService', [
   function(
     gz3d,
     roslib,
-    contextMenuState,
     simulationInfo,
     stateService,
     dynamicViewOverlayService,
@@ -58,48 +56,6 @@ angular.module('userInteractionModule').service('applyForceService', [
       this.floatPrecision = 2;
 
       this.initialize = () => {
-        this.contextMenuItem = {
-          id: 'Force Interaction',
-          visible: false,
-          items: [
-            {
-              text: 'Apply Force',
-              callback: function(event) {
-                enterModeApplyForce();
-                event.stopPropagation();
-              },
-              visible: false
-            }
-          ],
-
-          hide: function() {
-            this.visible = this.items[0].visible = false;
-          },
-
-          show: function(model) {
-            dynamicViewOverlayService
-              .isOverlayOpen(DYNAMIC_VIEW_CHANNELS.APPLY_FORCE_CONFIGURATION)
-              .then(isOpen => {
-                if (isOpen) {
-                  dynamicViewOverlayService.closeAllOverlaysOfType(
-                    DYNAMIC_VIEW_CHANNELS.APPLY_FORCE_CONFIGURATION
-                  );
-                  if (that.targetModel !== undefined) {
-                    that.detachGizmo();
-                    gz3d.scene.refresh3DViews();
-                  }
-                }
-              });
-
-            this.visible = this.items[0].visible = !model.userData.is_static;
-            if (this.visible) {
-              that.targetModel = model;
-            }
-
-            return true;
-          }
-        };
-
         let rosBridgeURL = simulationInfo.serverConfig.rosbridge.websocket;
         this.rosConnection = roslib.getOrCreateConnectionTo(rosBridgeURL);
         this.rosServiceApplyBodyWrench = new ROSLIB.Service({
@@ -110,8 +66,6 @@ angular.module('userInteractionModule').service('applyForceService', [
       };
 
       let enterModeApplyForce = () => {
-        contextMenuState.hideMenu();
-
         var userViewDOM = gz3d.scene.viewManager.mainUserView.container;
         this.domElementPointerBindings = userViewDOM ? userViewDOM : document;
         this.domElementKeyboardBindings = document;
@@ -224,7 +178,7 @@ angular.module('userInteractionModule').service('applyForceService', [
         }
       };
 
-      let updateGizmoForceDirection = forceVectorWorld => {
+      const updateGizmoForceDirection = forceVectorWorld => {
         roundVector3(forceVectorWorld);
         let gizmoOrientation = new THREE.Quaternion();
         gizmoOrientation.setFromUnitVectors(
@@ -244,11 +198,11 @@ angular.module('userInteractionModule').service('applyForceService', [
         gz3d.scene.refresh3DViews();
       };
 
-      this.applyForceToLink = link => {
-        const forceVector = this.forceVector
+      this.applyForceToLink = (link, forceVector, forceStrength) => {
+        const f = forceVector
           .clone()
           .normalize()
-          .multiplyScalar(this.forceStrength);
+          .multiplyScalar(forceStrength);
 
         /* eslint-disable camelcase */
         var request = new ROSLIB.ServiceRequest({
@@ -256,7 +210,7 @@ angular.module('userInteractionModule').service('applyForceService', [
           reference_frame: '',
           reference_point: { x: 0.0, y: 0.0, z: 0.0 },
           wrench: {
-            force: { x: forceVector.x, y: forceVector.y, z: forceVector.z },
+            force: { x: f.x, y: f.y, z: f.z },
             torque: { x: 0.0, y: 0.0, z: 0.0 }
           },
           start_time: { secs: 0, nsecs: 0 },
@@ -294,7 +248,7 @@ angular.module('userInteractionModule').service('applyForceService', [
         return intersections;
       };
 
-      this.getLinkRayCastIntersection = mousePos => {
+      this.getLinkRayCastIntersection = (mousePos, targetModel) => {
         let intersections = getViewportRaycastIntersections(mousePos);
 
         if (intersections.length > 0) {
@@ -306,7 +260,7 @@ angular.module('userInteractionModule').service('applyForceService', [
                 if (
                   object.userData &&
                   object.userData.gazeboType === 'link' &&
-                  object.parent === this.targetModel
+                  object.parent === targetModel
                 ) {
                   // we have a link and it's a child of the target model
                   return { link: object, intersection: intersections[i] };
@@ -338,7 +292,11 @@ angular.module('userInteractionModule').service('applyForceService', [
       };
 
       this.OnApplyForce = () => {
-        this.applyForceToLink(this.targetLink);
+        this.applyForceToLink(
+          this.targetLink,
+          this.forceVector,
+          this.forceStrength
+        );
         this.disableApplyForceMode();
         stateService.setCurrentState(STATE.STARTED);
       };
@@ -532,7 +490,10 @@ angular.module('userInteractionModule').service('applyForceService', [
               that.disableApplyForceMode();
             }
 
-            const linkIntersection = this.getLinkRayCastIntersection(mousePos);
+            const linkIntersection = this.getLinkRayCastIntersection(
+              mousePos,
+              this.targetModel
+            );
 
             if (linkIntersection !== undefined) {
               dynamicViewOverlayService
@@ -580,6 +541,11 @@ angular.module('userInteractionModule').service('applyForceService', [
             this.detachGizmo();
             break;
         }
+      };
+
+      this.ActivateForTarget = model => {
+        this.targetModel = model;
+        enterModeApplyForce();
       };
     }
 

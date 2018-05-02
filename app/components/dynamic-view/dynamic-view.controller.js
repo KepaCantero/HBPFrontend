@@ -229,6 +229,13 @@
       APPLY_FORCE_CONFIGURATION: {
         name: 'Apply Force',
         directive: 'apply-force-view',
+        allowMultipleViews: false,
+        isResizeable: false
+      },
+      PULL_FORCE_MODE: {
+        name: 'Apply Force',
+        directive: 'pull-force',
+        allowMultipleViews: false,
         isResizeable: false
       }
     });

@@ -6,6 +6,7 @@ describe('Directive: performance-monitor', function() {
   beforeEach(module('exdFrontendApp'));
   beforeEach(module('performanceMonitorServiceMock'));
   beforeEach(module('exd.templates'));
+  beforeEach(module('editorToolbarServiceMock'));
 
   var elementScope, controller;
 

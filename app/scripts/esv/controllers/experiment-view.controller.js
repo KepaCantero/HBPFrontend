@@ -55,8 +55,7 @@
       simulationInfo,
       contextMenuState,
       timeout,
-      window,
-      applyForceService
+      window
     ) {
       this.element = element;
       this.userContextService = userContextService;
@@ -165,7 +164,6 @@
         };
 
         contextMenuState.pushItemGroup(colorableMenuItemGroup);
-        contextMenuState.pushItemGroup(applyForceService.contextMenuItem);
 
         //main context menu handler
         scope.onContainerMouseDown = function(event) {

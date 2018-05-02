@@ -48,7 +48,8 @@
       setDefaultCameraPose: jasmine.createSpy('setDefaultCameraPose'),
       setRobotInfoVisible: jasmine.createSpy('setRobotInfoVisible'),
       container: {
-        addEventListener: jasmine.createSpy('addEventListener')
+        addEventListener: jasmine.createSpy('addEventListener'),
+        removeEventListener: jasmine.createSpy('removeEventListener')
       },
       radialMenu: {
         showing: false
@@ -62,7 +63,8 @@
         selectPicker: jasmine.createSpy('selectPicker'),
         pickerNames: '',
         space: 'world',
-        snapDist: 0
+        snapDist: 0,
+        object: {}
       },
       naturalAutoAlignMode: {
         onKeyUp: jasmine.createSpy('onKeyUp'),
@@ -106,7 +108,8 @@
       applyComposerSettings: jasmine.createSpy('applyComposerSettings'),
       getByName: jasmine.createSpy('getByName'),
       toggleScreenChangeMenu: jasmine.createSpy('toggleScreenChangeMenu'),
-      attachEventListeners: jasmine.createSpy('attachEventListeners')
+      attachEventListeners: jasmine.createSpy('attachEventListeners'),
+      getRayCastModel: jasmine.createSpy('getRayCastModel')
     };
 
     this.iface = {

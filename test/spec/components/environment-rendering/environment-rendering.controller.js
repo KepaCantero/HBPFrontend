@@ -39,7 +39,7 @@ describe('Controller: EnvironmentRenderingController', function() {
   beforeEach(module('userNavigationServiceMock'));
   beforeEach(module('userContextServiceMock'));
   beforeEach(module('editorsPanelServiceMock'));
-  beforeEach(module('contextMenuStateMock'));
+  beforeEach(module('contextMenuStateServiceMock'));
   beforeEach(module('simulationInfoMock'));
   beforeEach(module('assetLoadingSplashMock'));
   beforeEach(module('colorableObjectServiceMock'));
