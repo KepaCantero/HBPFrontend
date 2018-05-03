@@ -538,6 +538,7 @@ def tf1(t):
       const msg = {
         functionName: 'tf1',
         lineText: 'You nearly broke the platform!',
+        message: 'You nearly broke the platform! Line 1',
         errorType: isolateScope.ERROR.COMPILE,
         severity: 1,
         lineNumber: 1,

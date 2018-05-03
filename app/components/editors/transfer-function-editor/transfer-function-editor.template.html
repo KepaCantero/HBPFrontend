@@ -138,7 +138,7 @@
 
               <div ng-repeat="(type, error) in transferFunction.error">
                 <div class="alert alert-danger" style="margin-top: 5px;" role="alert">
-                  {{error.message}}
+                  {{error.messageGraphical?error.messageGraphical:error.message}}
                   <b>({{type}})</b>
                 </div>
               </div>
