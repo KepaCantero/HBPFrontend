@@ -538,6 +538,8 @@ if t % 2 < 0.02:
                 scope.selectedPopulation = null;
                 scope.isNeuronsSelected = false;
                 scope.nTransferFunctionDirty = 0;
+                scope.collabDirty = false;
+                scope.updateCurrentTFContent();
               }
             });
 
