@@ -254,7 +254,6 @@ if t % 2 < 0.02:
                       const structuredEditor = codeEditorsServices.getEditor(
                         'codeEditor'
                       );
-
                       if (msg.errorType === scope.ERROR.COMPILE) {
                         // Compile error in Structured TF, so we can't compare with the outdated Raw version of the TF
                         // instead we try to match the error line in the Structured TF
@@ -265,9 +264,6 @@ if t % 2 < 0.02:
                                 .trimRight('\n')
                                 .trimRight()
                             : msg.lineText;
-
-                        let newLineNumber = msg.lineNumber;
-
                         for (let i = 0; i < structuredEditor.lineCount(); i++) {
                           if (
                             structuredEditor.getLine(i).trimRight() == errorLine
@@ -277,15 +273,9 @@ if t % 2 < 0.02:
                               'background',
                               'alert-danger'
                             );
-                            newLineNumber = i + 1;
                             break;
                           }
                         }
-
-                        msg.messageGraphical = msg.message.replace(
-                          'line ' + msg.lineNumber,
-                          'line ' + newLineNumber
-                        );
                       } else {
                         // Run time error in Structured TF. We don't have the linetext, so we will compare the
                         // Structured TF with the Raw version,
@@ -310,7 +300,6 @@ if t % 2 < 0.02:
                             'alert-danger'
                           );
                         };
-
                         if (scope.synchingRawTF)
                           scope.synchingRawTF.then(() => updateRawTFError());
                         else updateRawTFError();
