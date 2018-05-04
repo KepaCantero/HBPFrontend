@@ -63,6 +63,8 @@
       SERVER_VIDEO_STREAM: 'This button opens the server video viewer.',
       ROS_TERMINAL: 'Open the ROS terminal.',
       EXIT_BUTTON: 'Here you can leave the simulation.',
-      INFO_BUTTON: 'This button shows information about the simulation.'
+      INFO_BUTTON: 'This button shows information about the simulation.',
+      FORCE_APPLY:
+        'This button opens the aply force dialog to activate dynamic application of forces on objects.'
     });
 })();
