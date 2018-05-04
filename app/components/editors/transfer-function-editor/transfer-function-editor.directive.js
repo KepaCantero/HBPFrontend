@@ -498,9 +498,9 @@ if t % 2 < 0.02:
 
             scope.setDirty = function(transferFunction) {
               transferFunction.dirty = true;
-              scope.nTransferFunctionDirty++;
               scope.collabDirty = true;
               autoSaveService.setDirty(DIRTY_TYPE, scope.transferFunctions);
+              scope.updateNTransferFunctionDirty();
             };
 
             scope.getFriendlyTopicName = function(topic) {
@@ -908,9 +908,8 @@ if t % 2 < 0.02:
               tf.rawCode = rawcode;
               tf.active = true;
 
-              scope.nTransferFunctionDirty++;
+              scope.setDirty(tf);
               scope.transferFunctions.push(tf);
-              autoSaveService.setDirty(DIRTY_TYPE, scope.transferFunctions);
               scope.selectTransferFunction(tf.name);
             };
 
@@ -944,9 +943,9 @@ if t % 2 < 0.02:
               tf.variables = [];
               tf.local = true;
               scope.transferFunctions.push(tf);
-              autoSaveService.setDirty(DIRTY_TYPE, scope.transferFunctions);
               scope.selectTransferFunction(tf.name);
               scope.createDevice();
+              scope.setDirty(tf);
               tf.devices[0].name = 'device';
 
               scope.addMode = null;
@@ -1500,6 +1499,8 @@ if t % 2 < 0.02:
                   );
                   deleteInternal(scope, index);
                 }
+
+                scope.collabDirty = true;
               }
             };
 
