@@ -426,7 +426,7 @@ GZ3D.VisualMuscleModel.prototype.updateVisualization = function(message) {
       for (cq = 0; cq < num_segments; ++cq) {
         // Create new cylinder on demand.
         if (cylinders.length <= cq) {
-          let edgeGeometry = new THREE.CylinderGeometry(1, 1, 1, 8, 1);
+          let edgeGeometry = new THREE.CylinderBufferGeometry(1, 1, 1, 8, 1);
           let cylinder = new THREE.Mesh(edgeGeometry, new THREE.MeshLambertMaterial({
             color: color,
             wireframe: false,
@@ -468,7 +468,7 @@ GZ3D.VisualMuscleModel.prototype.updateVisualization = function(message) {
       for (cq = 0; cq < message.muscle[k].pathPoint.length; ++cq) {
         // Create one if needed.
         if (spheres.length <= cq) {
-          let geom = new THREE.SphereGeometry(1, 8, 8);
+          let geom = new THREE.SphereBufferGeometry(1, 8, 8);
           let s = new THREE.Mesh(geom, new THREE.MeshLambertMaterial({
             color: color,
             wireframe: false,
