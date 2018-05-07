@@ -125,7 +125,7 @@
 
           let refreshEditor = (reset = false) => {
             var editor = codeEditorsServices.getEditorChild(
-              'codeEditor',
+              'pynnEditor',
               element[0]
             );
             codeEditorsServices.refreshEditor(editor);
@@ -133,7 +133,7 @@
           };
           scope.applyEditorOptions = function() {
             var editor = codeEditorsServices.getEditorChild(
-              'codeEditor',
+              'pynnEditor',
               element[0]
             );
             _.forOwn(scope.editorOptions, function(value, key) {
@@ -318,7 +318,7 @@
               function() {
                 // Success callback
                 scope.loading = false;
-                codeEditorsServices.getEditor('codeEditor').markClean();
+                codeEditorsServices.getEditor('pynnEditor').markClean();
                 scope.clearError();
                 scope.localBrainDirty = false;
                 if (restart) {
@@ -416,7 +416,7 @@
                 c = line.indexOf(name, c + 1);
                 if (c !== -1) {
                   var token = codeEditorsServices
-                    .getEditor('codeEditor')
+                    .getEditor('pynnEditor')
                     .getTokenAt({ line: l, ch: c + 1 });
                   if (token.type !== 'string' && token.string === name) {
                     ret = { line: l, ch: c };
@@ -512,7 +512,7 @@
           };
 
           scope.markError = function(errorMessage, line, column) {
-            var editor = codeEditorsServices.getEditor('codeEditor');
+            var editor = codeEditorsServices.getEditor('pynnEditor');
             if (isNaN(line) || isNaN(column)) {
               return;
             }
@@ -555,7 +555,7 @@
           scope.clearError = function() {
             if (scope.lineHandle) {
               codeEditorsServices
-                .getEditor('codeEditor')
+                .getEditor('pynnEditor')
                 .removeLineClass(scope.lineHandle, 'background');
             }
             if (scope.lineWidget) {
