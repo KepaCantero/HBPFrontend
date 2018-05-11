@@ -17,6 +17,7 @@ describe('Services: objectInspectorService', function() {
     $compile,
     $rootScope,
     $timeout,
+    $httpBackend,
     objectInspectorService,
     colorableObjectService;
   var gz3d, stateService, EDIT_MODE, STATE, OBJECT_VIEW_MODE;
@@ -87,7 +88,8 @@ describe('Services: objectInspectorService', function() {
       _mockObject_,
       _OBJECT_VIEW_MODE_,
       _NAVIGATION_MODES_,
-      _userNavigationService_
+      _userNavigationService_,
+      _$httpBackend_
     ) {
       $rootScope = _$rootScope_;
       $compile = _$compile_;
@@ -102,7 +104,14 @@ describe('Services: objectInspectorService', function() {
       OBJECT_VIEW_MODE = _OBJECT_VIEW_MODE_;
       NAVIGATION_MODES = _NAVIGATION_MODES_;
       userNavigationService = _userNavigationService_;
+      $httpBackend = _$httpBackend_;
     });
+
+    $httpBackend.whenGET(
+      'http://proxy/storage/experimentID/experiment_configuration.exc?byname=true'
+    ).respond(`<xml>
+        <bibiConf src="bibifile.bibi"/>
+    </xml>`);
 
     $scope = $rootScope.$new();
     $compile('<object-inspector></object-inspector>')($scope);
