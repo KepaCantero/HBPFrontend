@@ -811,7 +811,10 @@
             $q.when({
               uuid: 'fakeUUID',
               data:
-                '<xml><name>Name</name><thumbnail>thumbnail.png</thumbnail><description>Desc</description><timeout>840.0</timeout></xml>'
+                '<xml><name>Name</name><thumbnail>thumbnail.png</thumbnail>\
+                <description>Desc</description><timeout>840.0</timeout>\
+                <bibiConf src="file.bibi"/>\
+                </xml>'
             })
           );
           $httpBackend

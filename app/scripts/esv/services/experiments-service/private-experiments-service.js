@@ -91,6 +91,11 @@
             timeout: parseInt(
               xml.getElementsByTagNameNS('*', 'timeout')[0].textContent
             ),
+            brainProcesses: parseInt(
+              xml
+                .getElementsByTagNameNS('*', 'bibiConf')[0]
+                .getAttribute('processes') || 1
+            ),
             experimentFile: file.data,
             experimentConfiguration: ''
           };

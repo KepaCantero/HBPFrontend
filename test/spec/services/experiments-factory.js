@@ -69,7 +69,10 @@ describe('Services: experimentsFactory', function() {
       $q.when({
         uuid: 'fakeUUID',
         data:
-          '<xml><name>Name</name><thumbnail>thumbnail.png</thumbnail><description>Desc</description><timeout>840.0</timeout></xml>'
+          '<xml><name>Name</name><thumbnail>thumbnail.png</thumbnail>\
+          <description>Desc</description><timeout>840.0</timeout>\
+          <bibiConf/>\
+          </xml>'
       })
     );
     spyOn(storageServer, 'getBlobContent').and.returnValue(
@@ -147,7 +150,11 @@ describe('Services: experimentsFactory', function() {
     );
     spyOn(experimentProxyService, 'getImage');
     var xml =
-      '<?xml version="1.0" ?><ns1:ExD xmlns:ns1="http://schemas.humanbrainproject.eu/SP10/2014/ExDConfig"><ns1:name>newName</ns1:name><ns1:description>newDescription</ns1:description><ns1:timeout>100</ns1:timeout><thumbnail>fake.png</thumbnail></ns1:ExD>';
+      '<?xml version="1.0" ?><ns1:ExD xmlns:ns1="http://schemas.humanbrainproject.eu/SP10/2014/ExDConfig">\
+      <ns1:name>newName</ns1:name><ns1:description>newDescription</ns1:description>\
+      <ns1:timeout>100</ns1:timeout><thumbnail>fake.png</thumbnail>\
+      <ns1:bibiConf/>\
+      </ns1:ExD>';
     spyOn(storageServer, 'getFileContent').and.returnValue(
       $q.when({ uuid: 'uuid', data: xml })
     );
@@ -181,7 +188,11 @@ describe('Services: experimentsFactory', function() {
     );
     spyOn(experimentProxyService, 'getImage');
     var xml =
-      '<?xml version="1.0" ?><ns1:ExD xmlns:ns1="http://schemas.humanbrainproject.eu/SP10/2014/ExDConfig"><ns1:name>newName</ns1:name><ns1:description>newDescription</ns1:description><ns1:timeout>100</ns1:timeout><thumbnail>fake.png</thumbnail></ns1:ExD>';
+      '<?xml version="1.0" ?><ns1:ExD xmlns:ns1="http://schemas.humanbrainproject.eu/SP10/2014/ExDConfig">\
+      <ns1:name>newName</ns1:name><ns1:description>newDescription</ns1:description>\
+      <ns1:timeout>100</ns1:timeout><thumbnail>fake.png</thumbnail>\
+      <bibiConf src="fakeBibi.bibi"/>\
+      </ns1:ExD>';
     spyOn(storageServer, 'getFileContent').and.returnValue(
       $q.when({ uuid: 'uuid', data: xml })
     );
@@ -223,7 +234,9 @@ describe('Services: experimentsFactory', function() {
       $q.when([{ uuid: 'fakeUUID' }])
     );
     var xml =
-      '<?xml version="1.0" ?><ns1:ExD xmlns:ns1="http://schemas.humanbrainproject.eu/SP10/2014/ExDConfig"><ns1:name>newName</ns1:name><ns1:description>newDescription</ns1:description><ns1:timeout>100</ns1:timeout><thumbnail>fake.png</thumbnail></ns1:ExD>';
+      '<?xml version="1.0" ?><ns1:ExD xmlns:ns1="http://schemas.humanbrainproject.eu/SP10/2014/ExDConfig">\
+      <ns1:name>newName</ns1:name><ns1:description>newDescription</ns1:description><ns1:timeout>100</ns1:timeout>\
+      <thumbnail>fake.png</thumbnail><bibiConf/></ns1:ExD>';
     spyOn(storageServer, 'getFileContent').and.returnValue(
       $q.when({ uuid: 'uuid', data: xml })
     );
