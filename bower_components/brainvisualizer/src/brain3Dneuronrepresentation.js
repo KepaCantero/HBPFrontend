@@ -487,9 +487,9 @@ BRAIN3D.NeuroRepresentation.prototype.applyFlatShape = function ()
 
         for (var y = 0; y < nline; y++)
         {
-            var pvyx = vy.x * y / (nline - 1) * edgeSize;
-            var pvyy = vy.y * y / (nline - 1) * edgeSize;
-            var pvyz = vy.z * y / (nline - 1) * edgeSize;
+            var pvyx = vy.x * y / (nline - 1) * edgeSize || 0;;
+            var pvyy = vy.y * y / (nline - 1) * edgeSize || 0;;
+            var pvyz = vy.z * y / (nline - 1) * edgeSize || 0;;
 
             pvyx += vy.x * -edgeSize * 0.5;
             pvyy += vy.y * -edgeSize * 0.5;
@@ -504,9 +504,9 @@ BRAIN3D.NeuroRepresentation.prototype.applyFlatShape = function ()
             {
                 var px, py, py;
 
-                px = vx.x * x / (nperline - 1) * edgeSize;
-                py = vx.y * x / (nperline - 1) * edgeSize;
-                pz = vx.z * x / (nperline - 1) * edgeSize;
+                px = vx.x * x / (nperline - 1) * edgeSize || 0;;
+                py = vx.y * x / (nperline - 1) * edgeSize || 0;;
+                pz = vx.z * x / (nperline - 1) * edgeSize || 0;;
 
                 px += vx.x * -edgeSize * 0.5;
                 py += vx.y * -edgeSize * 0.5;
