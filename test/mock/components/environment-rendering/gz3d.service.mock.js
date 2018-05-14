@@ -42,6 +42,9 @@
     ];
 
     this.scene = {
+      composerSettings: {
+        pbrMaterial: true
+      },
       render: jasmine.createSpy('render'),
       resetView: jasmine.createSpy('resetView'),
       refresh3DViews: jasmine.createSpy('refresh3DViews'),

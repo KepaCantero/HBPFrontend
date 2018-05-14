@@ -102,6 +102,7 @@
       this.$window = $window;
       this.nrpModalService = nrpModalService;
       this.autosaveOnExitService = autosaveOnExitService;
+      this.pbrMaterial = false;
 
       this.tipTooltipService.setCurrentTip(TIP_CODES.SIMULATIONS_TIPS);
 
@@ -238,6 +239,9 @@
       if (this.editorsPanelService.showEditorPanel) {
         this.editorsPanelService.toggleEditors();
       }
+      //Workaround for resseting correctly the PBR textures
+      this.gz3d.scene.composerSettings.pbrMaterial = this.pbrMaterial;
+      this.gz3d.scene.applyComposerSettings();
       // Close opened object inspectors. ResetType is 1
       this.notifyResetToWidgets(this.RESET_TYPE.RESET_FULL);
       this.updatePanelUI();
@@ -495,7 +499,10 @@
                 subHeadline: messageSubHeadline
               });
             });
-
+            //Workaround for resseting correctly the PBR textures
+            this.pbrMaterial = this.gz3d.scene.composerSettings.pbrMaterial;
+            this.gz3d.scene.composerSettings.pbrMaterial = false;
+            this.gz3d.scene.applyComposerSettings();
             this.backendInterfaceService.resetCollab(
               request,
               this.splash.closeSplash,
