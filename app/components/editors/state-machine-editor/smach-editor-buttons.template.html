@@ -7,7 +7,7 @@
 <button ng-show="isPrivateExperiment" type="button" class="btn btn-default"
         owner-only
         ng-click="saveSMIntoCollabStorage()"
-        ng-disabled="stateService.currentState === STATE.INITIALIZED || !collabDirty || stateMachines.length === 0"
+        ng-disabled="stateService.currentState === STATE.INITIALIZED || !collabDirty"
         v-busy="isSavingToCollab"
         v-busy-label="Saving to Storage"
         v-pressable>

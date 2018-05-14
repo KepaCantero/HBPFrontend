@@ -317,21 +317,23 @@
           scope.delete = function(stateMachines) {
             //make sure stateMachines is an array
             stateMachines = [].concat(stateMachines);
-            return $q.all(
-              stateMachines.map(function(stateMachine) {
-                var index = scope.stateMachines.indexOf(stateMachine);
-                if (stateMachine.local) {
-                  scope.stateMachines.splice(index, 1);
-                } else {
-                  return backendInterfaceService.deleteStateMachine(
-                    stateMachine.id,
-                    function() {
-                      scope.stateMachines.splice(index, 1);
-                    }
-                  );
-                }
-              })
-            );
+            return $q
+              .all(
+                stateMachines.map(function(stateMachine) {
+                  var index = scope.stateMachines.indexOf(stateMachine);
+                  if (stateMachine.local) {
+                    scope.stateMachines.splice(index, 1);
+                  } else {
+                    return backendInterfaceService.deleteStateMachine(
+                      stateMachine.id,
+                      function() {
+                        scope.stateMachines.splice(index, 1);
+                      }
+                    );
+                  }
+                })
+              )
+              .then(() => (scope.collabDirty = true));
           };
 
           scope.getStateMachineName = function(id) {
