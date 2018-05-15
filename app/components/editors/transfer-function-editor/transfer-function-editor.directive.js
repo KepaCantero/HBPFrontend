@@ -196,6 +196,13 @@ if t % 2 < 0.02:
             scope.nTransferFunctionDirty = 0;
             scope.collabDirty = false;
 
+            scope.localHelpVisible = {
+              populations: false,
+              connectToBrain: false,
+              connectToRobot: false,
+              globalVariables: false
+            };
+
             scope.stateService = stateService;
             scope.STATE = STATE;
             scope.ERROR = SIMULATION_FACTORY_CLE_ERROR;
@@ -383,6 +390,10 @@ if t % 2 < 0.02:
                   if (callback) callback(tf);
                 }
               );
+            };
+
+            scope.showLocalHelp = function(show, category) {
+              scope.localHelpVisible[category] = show;
             };
 
             scope.centerPanelTabChanged = function(newtab) {
