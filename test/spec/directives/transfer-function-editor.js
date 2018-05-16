@@ -1308,5 +1308,24 @@ def tf1(t):
       isolateScope.toggleActive(tf);
       expect(tf.active).toBe(false);
     });
+
+    it('should change the name of TF correctly', function() {
+      isolateScope.centerPanelTabSelection = 'rawscript';
+
+      isolateScope.transferFunctions[0].rawCode =
+        '@nrp.Robot2Neuron()\ndef tf1(t):\n    pass';
+      isolateScope.transferFunctions[1].rawCode =
+        '@nrp.Robot2Neuron()\ndef tf2(t):\n    pass';
+
+      expect(isolateScope.transferFunctions.length).toEqual(3);
+      isolateScope.selectTransferFunction('tf2');
+      expect(isolateScope.transferFunction.local).toBeTruthy();
+      isolateScope.setNameTf();
+
+      isolateScope.$apply();
+
+      expect(isolateScope.transferFunction.local).toBeFalsy();
+      expect(isolateScope.transferFunctions.length).toEqual(3);
+    });
   });
 });

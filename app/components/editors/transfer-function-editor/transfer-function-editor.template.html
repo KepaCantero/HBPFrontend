@@ -65,8 +65,15 @@
 
               <div style="display:flex; width: 100%; justify-content: space-between;">
 
-                <div ng-class="{'tfNameDeactivated':!tf.active}">
+                <div ng-show="tf.editName" style= "width: 80%">
+                  <input maxlength="35" ng-blur = "setNameTf()" ng-model="tf.name">
+                </div>
+                <div ng-hide="tf.editName" ng-class="{'tfNameDeactivated':!tf.active}" style="text-overflow: ellipsis; overflow: hidden; width: 80%">
                   {{tf.name}}
+                </div>
+
+                <div ng-click="tf.editName=!tf.editName" style="cursor:pointer; margin-left: 2px; min-width: 21px; border:unset; background-color: rgba(0, 0, 0, 0);">
+                  <i ng-hide="tf.editName" style="outline: none; border: 0; background: transparent;" class="glyphicon glyphicon-pencil"></i>
                 </div>
 
                 <div title="Activate/Deactivate the transfer function" ng-click="toggleActive(tf)" style="cursor:pointer; margin-left: 2px; min-width: 21px; border:unset; background-color: rgba(0, 0, 0, 0);">
