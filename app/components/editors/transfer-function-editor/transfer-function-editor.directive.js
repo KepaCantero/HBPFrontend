@@ -1387,20 +1387,32 @@ if t % 2 < 0.02:
               }
             };
 
+            var saveTFtoBackend = function() {
+              backendInterfaceService.saveTransferFunctions(
+                _.map(scope.transferFunctions, 'rawCode'),
+                function() {
+                  // Success callback
+                  scope.isSavingToCollab = false;
+                  scope.collabDirty = false;
+                  autoSaveService.clearDirty(DIRTY_TYPE);
+                  saveErrorsService.clearDirty(DIRTY_TYPE);
+                },
+                function() {
+                  // Failure callback
+                  clbErrorDialog.open({
+                    type: 'BackendError.',
+                    message:
+                      'Error while saving transfer functions to the Storage.'
+                  });
+                  scope.isSavingToCollab = false;
+                }
+              );
+            };
+
             scope.saveTFIntoCollabStorage = function() {
-              if (scope.centerPanelTabSelection === 'rawscript') {
-                // In raw script I don't have to force an apply to save data
+              scope.applyAllDirtyScripts(() => {
                 scope.doSaveTFIntoCollabStorage();
-              } else {
-                scope.applyAllDirtyScripts(() => {
-                  scope.updateNTransferFunctionDirty();
-                  if (scope.nTransferFunctionDirty === 0) {
-                    scope
-                      .populateTransferFunctionsWithRawCode()
-                      .then(scope.doSaveTFIntoCollabStorage);
-                  }
-                });
-              }
+              });
             };
 
             scope.doSaveTFIntoCollabStorage = function() {
@@ -1422,36 +1434,18 @@ if t % 2 < 0.02:
                     closable: false
                   })
                   .then(function() {
-                    return saveErrorsService
-                      .saveDirtyData(DIRTY_TYPE, scope.transferFunctions)
-                      .then(function() {
-                        return autoSaveService.clearDirty(DIRTY_TYPE);
-                      });
+                    saveTFtoBackend();
+                    return saveErrorsService.saveDirtyData(
+                      DIRTY_TYPE,
+                      scope.transferFunctions
+                    );
                   })
                   .finally(function() {
                     scope.isSavingToCollab = false;
                   });
                 return;
               }
-              backendInterfaceService.saveTransferFunctions(
-                _.map(scope.transferFunctions, 'rawCode'),
-                function() {
-                  // Success callback
-                  scope.isSavingToCollab = false;
-                  scope.collabDirty = false;
-                  autoSaveService.clearDirty(DIRTY_TYPE);
-                  saveErrorsService.clearDirty(DIRTY_TYPE);
-                },
-                function() {
-                  // Failure callback
-                  clbErrorDialog.open({
-                    type: 'BackendError.',
-                    message:
-                      'Error while saving transfer functions to the Storage.'
-                  });
-                  scope.isSavingToCollab = false;
-                }
-              );
+              saveTFtoBackend();
             };
 
             scope.saveCSVIntoCollabStorage = function() {
