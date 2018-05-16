@@ -293,31 +293,36 @@
                 case EDIT_MODE.SCALE:
                 case EDIT_MODE.ROTATE:
                 case EDIT_MODE.NATURAL:
+                  var that = this;
                   stateService.ensureStateBeforeExecuting(
                     STATE.PAUSED,
                     function() {
                       gz3d.scene.setManipulationMode(mode);
-                    }
-                  );
-                  // as view mode deselects any selected object, reselect here
-                  gz3d.scene.selectEntity(this.selectedObject);
+                      // as view mode deselects any selected object, reselect here
+                      gz3d.scene.selectEntity(that.selectedObject);
 
-                  document.addEventListener('keydown', this.onKeyDown, false);
-                  document.addEventListener('keyup', this.onKeyUp, false);
-                  document.addEventListener(
-                    'mouseup',
-                    this.onUpdateNeeded,
-                    false
-                  );
-                  document.addEventListener(
-                    'mousemove',
-                    gz3d.scene.modelManipulator.onPointerMove,
-                    false
-                  );
-                  document.addEventListener(
-                    'mousemove',
-                    this.onMouseMove,
-                    false
+                      document.addEventListener(
+                        'keydown',
+                        that.onKeyDown,
+                        false
+                      );
+                      document.addEventListener('keyup', that.onKeyUp, false);
+                      document.addEventListener(
+                        'mouseup',
+                        that.onUpdateNeeded,
+                        false
+                      );
+                      document.addEventListener(
+                        'mousemove',
+                        gz3d.scene.modelManipulator.onPointerMove,
+                        false
+                      );
+                      document.addEventListener(
+                        'mousemove',
+                        that.onMouseMove,
+                        false
+                      );
+                    }
                   );
 
                   break;
