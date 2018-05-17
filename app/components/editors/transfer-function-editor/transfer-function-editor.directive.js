@@ -268,6 +268,14 @@ if t % 2 < 0.02:
                           if (
                             structuredEditor.getLine(i).trimRight() == errorLine
                           ) {
+                            var lineErrorNumber =
+                              flawedTransferFunction.error[msg.errorType]
+                                .lineNumber;
+                            flawedTransferFunction.error[
+                              msg.errorType
+                            ].message = flawedTransferFunction.error[
+                              msg.errorType
+                            ].message.replace(lineErrorNumber, i + 1);
                             structuredEditor.addLineClass(
                               i,
                               'background',
