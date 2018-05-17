@@ -3,6 +3,8 @@
 // Generated on 2014-10-10 using
 // generator-karma 0.8.3
 
+process.env.CHROME_BIN = require('puppeteer').executablePath();
+
 module.exports = function(config) {
   'use strict';
 
@@ -18,17 +20,11 @@ module.exports = function(config) {
     files: [
       'src/*.js',
       'lib/three.js',
-      'data/brain3Dposes_1.js',
-      'data/brain3Dposes_2.js',
-      'data/brain3Dposes_3.js',
-      'data/brain3Dposes_4.js',
-      'data/brain3Dposes_5.js',
-      'data/brain3Dposes_6.js',
-      'data/brain3Dallannotation.js',
-      'data/brain3Dembeddeddata.js',
       'shaders/*.js',
-      'test/*.js',
+      'test/brainvisualizer.js',
+      'node_modules/lodash/lodash.js'
     ],
+
 
     preprocessors: {
         // source files, that you want to generate coverage for
@@ -51,15 +47,19 @@ module.exports = function(config) {
     // - Safari (only Mac)
     // - PhantomJS
     // - IE (only Windows)
-    browsers: [
-      'PhantomJS'
-    ],
+    browsers: ['ChromeHeadlessNoSandbox'],
+
+    customLaunchers: {
+        ChromeHeadlessNoSandbox: {
+          base: 'ChromeHeadless',
+          flags: ['--no-sandbox']
+        }
+    },
 
     reporters: ['progress', 'junit', 'coverage'],
 
     // Which plugins to enable
     plugins: [
-        'karma-phantomjs-launcher',
         'karma-chrome-launcher',
         'karma-jasmine',
         'karma-coverage',
@@ -89,7 +89,7 @@ module.exports = function(config) {
 
     // Continuous Integration mode
     // if true, it capture browsers, run tests and exit
-    singleRun: false,
+    singleRun: true,
 
     colors: true,
 

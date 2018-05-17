@@ -17,5 +17,8 @@
   ], 
   "license": "GPL2", 
   "homepage": "", 
-  "private": true
+  "private": true, 
+  "dependencies": {
+    "lodash": "^4.17.5"
+  }
 }

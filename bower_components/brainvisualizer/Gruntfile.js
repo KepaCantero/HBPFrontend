@@ -24,8 +24,7 @@ module.exports = function (grunt)
         // Test settings
         karma: {
             unit: {
-                configFile: 'test/karma.conf.js',
-                singleRun: true
+                configFile: 'test/karma.conf.js'
             }
         },
 
@@ -174,46 +173,9 @@ module.exports = function (grunt)
                 {
                     expand: true,
                     cwd: '<%= yeoman.app %>',
-                    src: 'img/*.png',
-                    dest: '<%= yeoman.dist %>'
-                },
-                {
-                    expand: true,
-                    cwd: '<%= yeoman.app %>',
-                    src: 'data/*.js',
-                    dest: '<%= yeoman.dist %>'
-                },
-                {
-                    expand: true,
-                    cwd: '<%= yeoman.app %>',
-                    src: 'test/*.js',
-                    dest: '<%= yeoman.dist %>'
-                },
-                {
-                    expand: true,
-                    cwd: '<%= yeoman.app %>',
                     src: 'shaders/*.js',
                     dest: '<%= yeoman.dist %>'
-                },
-                {
-                    expand: true,
-                    cwd: '<%= yeoman.app %>',
-                    src: 'tools/*.js',
-                    dest: '<%= yeoman.dist %>'
-                },
-                {
-                    expand: true,
-                    cwd: '<%= yeoman.app %>',
-                    src: 'lib/*.js',
-                    dest: '<%= yeoman.dist %>'
-                },
-                {
-                    expand: true,
-                    cwd: '<%= yeoman.app %>',
-                    src: 'htmltest/*',
-                    dest: '<%= yeoman.dist %>'
-                },
-
+                }
                 ]
               }
         },
@@ -251,13 +213,6 @@ module.exports = function (grunt)
             tasks.push('gitcommit:dist');
             tasks.push('gittag:dist');
             tasks.push('gitpush:dist');
-
-            tasks.push('publish:dist');
-            // We don't update the npm description of the latest package for an actual release branch
-            if ('master' === branch)
-            {
-                tasks.push('exec:tag_latest_npm');
-            }
         }
         grunt.task.run(tasks);
     });
