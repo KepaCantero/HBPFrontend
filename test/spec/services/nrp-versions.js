@@ -71,7 +71,7 @@ describe('Services: nrp-versions', function() {
   });
 
   it('should parse the frontend version', function() {
-    httpBackend.expectGET('version.json').respond(200, '{"hbp_nrp_esv":1}');
+    httpBackend.expectGET('package.json').respond(200, '{"version":1}');
     var response = nrpFrontendVersion.get();
     httpBackend.flush();
     expect(response.toString).toBe('Frontend: 1\n');

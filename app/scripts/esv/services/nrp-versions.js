@@ -35,7 +35,7 @@
   };
   var parseFrontendVersion = function(data) {
     var result = {};
-    result.toString = 'Frontend: ' + angular.fromJson(data).hbp_nrp_esv + '\n';
+    result.toString = 'Frontend: ' + angular.fromJson(data).version + '\n';
     return result;
   };
   angular
@@ -65,7 +65,7 @@
       'serverError',
       function($resource, serverError) {
         return $resource(
-          'version.json',
+          'package.json',
           {},
           {
             get: {
