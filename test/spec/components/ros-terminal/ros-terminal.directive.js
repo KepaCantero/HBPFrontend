@@ -80,6 +80,39 @@ describe('Directive: ros-terminal', function() {
     expect(rosCommanderService.sendCommand).toHaveBeenCalled();
   });
 
+  it('should build args corrently', function() {
+    spyOn(rosCommanderService, 'sendCommand').and.callThrough();
+    rosCommandLine.val('rostopic');
+    rosCommandLine.trigger($.Event('keypress', { which: 13 }));
+    expect(rosCommanderService.sendCommand).toHaveBeenCalledWith(
+      'rostopic',
+      []
+    );
+
+    rosCommandLine.val('rostopic arg1 arg2');
+    rosCommandLine.trigger($.Event('keypress', { which: 13 }));
+    expect(rosCommanderService.sendCommand).toHaveBeenCalledWith('rostopic', [
+      'arg1',
+      'arg2'
+    ]);
+
+    rosCommandLine.val('rostopic arg1 "arg_a arg_b" arg3');
+    rosCommandLine.trigger($.Event('keypress', { which: 13 }));
+    expect(rosCommanderService.sendCommand).toHaveBeenCalledWith('rostopic', [
+      'arg1',
+      'arg_a arg_b',
+      'arg3'
+    ]);
+
+    rosCommandLine.val("rostopic arg1 'arg_a arg_b' arg3");
+    rosCommandLine.trigger($.Event('keypress', { which: 13 }));
+    expect(rosCommanderService.sendCommand).toHaveBeenCalledWith('rostopic', [
+      'arg1',
+      'arg_a arg_b',
+      'arg3'
+    ]);
+  });
+
   it('should trigger error message on invalid cmd', function() {
     expect(childScope.commands.length).toBe(1);
     rosCommandLine.val('wrondcmd');
@@ -196,7 +229,7 @@ describe('Directive: ros-terminal', function() {
     expect(childScope.commands.length).toBe(1);
   });
 
-  it('should showa options on multiple response completion', function() {
+  it('should show options on multiple response completion', function() {
     rosCommandLine.val((childScope.cmdLine = 'rostopic '));
     rosResponseObs.next([
       { data: [{ type: 'completion', data: ['list', 'info'] }] },

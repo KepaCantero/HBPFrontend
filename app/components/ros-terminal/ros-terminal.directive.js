@@ -103,8 +103,10 @@
 
             addCmdToHistory(cmdLine);
 
-            //split cmd line in cmd and args
-            let [cmd, ...cmdArgs] = cmdLine.split(' ');
+            //split cmd line in cmd and args, while making sure quoted parts remain whole and remove empty matches
+            let [cmd, ...cmdArgs] = cmdLine
+              .split(/(?:([^"'\s]+)|(?:"([^"]*)")|(?:'([^']*)'))\s*/g)
+              .filter(e => e);
 
             if (AVAILABLE_COMMANDS[cmd]) {
               //is a valid command
