@@ -1290,8 +1290,7 @@ if t % 2 < 0.02:
 
             var splitCodeFile = function(content) {
               // matches a python unindent
-              var regexCode = /^\s{2}[^\n]*\n+(?:\S)/gm;
-
+              var regexCode = /^( {2}|\t)[^\n]*\n+(?:\S)/gm;
               // slice the codefile into separate functions
               var match = regexCode.exec(content);
               var previousMatchIdx = 0;
