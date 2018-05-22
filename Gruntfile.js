@@ -514,6 +514,13 @@ module.exports = function(grunt) {
             dest: '<%= yeoman.dist %>'
           },
           {
+            // copy treecontrol assets to dist
+            expand: true,
+            cwd: '.',
+            src: 'bower_components/angular-tree-control/*/**/*.*',
+            dest: '<%= yeoman.dist %>'
+          },
+          {
             // copy hbp-collaboratory-theme assets to dist
             expand: true,
             cwd: '.',
