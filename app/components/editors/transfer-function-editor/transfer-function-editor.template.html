@@ -156,9 +156,9 @@
 
                     <div class="tf-parameter-section-title">Populations</div>
 
-                    <div style="display:flex">
+                    <div ng-show="!localHelpVisible.populations"  style="display:flex">
 
-                      <button type="button" class="btn btn-default btn-md tf-small-icon-button-param" ng-click="" style="margin-left: 2px; min-width: 21px;">
+                      <button type="button" class="btn btn-default btn-md tf-small-icon-button-param" ng-click="showLocalHelp(true,'populations')" style="margin-left: 2px; min-width: 21px;">
                         <i class="fa fa-question" style="font-size: 12px;"></i>
                       </button>
 
@@ -166,11 +166,31 @@
 
                   </div>
 
+
                   <div class="well well-sm normal tf-param-section-box">
+
+                    <div ng-show="localHelpVisible.populations" class="tf-hint-small-help-block tf-param-title-background-populations">
+                      <div>
+                      Examine the neuron populations as they have been defined in the <B>Brain Editor</B>:
+                    </div>
+                    <div>
+                        <button type="button" class="btn btn-default btn-md tf-small-icon-button-param" ng-click="showLocalHelp(false,'populations')" style="margin-left: 2px;     height: 16px;
+                        width: 16px; position:relative; border: none;
+                        background: none;">
+                            <i class="fa fa-close" style="font-size: 14px;
+                            position: absolute;
+                            left: 3px;
+                            top: -2px;
+                            color: rgba(0,0,0,0.3);"></i>
+                          </button>
+
+                      </div>
+
+                    </div>
 
                     <div class="tf-param-border" style="margin-bottom: 3px;" ng-repeat="pop in populations">
 
-                      <div ng-click="pop.showDetails = !pop.showDetails" class="tf-param-title-background" style="background:#fffef1;">
+                      <div ng-click="pop.showDetails = !pop.showDetails" class="tf-param-title-background tf-param-title-background-populations-sub">
 
                         <div ng-class="{'fa fa-caret-right':!pop.showDetails,'fa fa-caret-down':pop.showDetails}" class="tf-parameter-caret">
                         </div>
@@ -203,15 +223,37 @@
                         <i class="glyphicon glyphicon-plus"></i>
                       </button>
 
-                      <button type="button" class="btn btn-default btn-md tf-small-icon-button-param" ng-click="" style="margin-left: 2px; min-width: 21px;">
+                      <button ng-show="!localHelpVisible.connectToBrain" type="button" class="btn btn-default btn-md tf-small-icon-button-param" ng-click="showLocalHelp(true,'connectToBrain')" style="margin-left: 2px; min-width: 21px;">
                         <i class="fa fa-question" style="font-size: 12px;"></i>
                       </button>
+
 
                     </div>
 
                   </div>
 
                   <div class="well well-sm normal tf-param-section-box">
+
+                      <div ng-show="localHelpVisible.connectToBrain" class="tf-hint-small-help-block tf-param-title-background-neurons">
+                          <div>
+                          Select neurons from populations to read or write spikes from the brain.
+                        </div>
+                        <div>
+                            <button type="button" class="btn btn-default btn-md tf-small-icon-button-param" ng-click="showLocalHelp(false,'connectToBrain')" style="margin-left: 2px;     height: 16px;
+                            width: 16px; position:relative; border: none;
+                            background: none;">
+                                <i class="fa fa-close" style="font-size: 14px;
+                                position: absolute;
+                                left: 3px;
+                                top: -2px;
+                                color: rgba(0,0,0,0.3);"></i>
+                              </button>
+
+                          </div>
+
+                        </div>
+
+
                     <div class="tf-param-border" ng-repeat="dev in transferFunction.devices">
 
                       <div ng-click="dev.showDetails = !dev.showDetails" class="tf-param-title-background tf-param-title-background-neurons">
@@ -300,7 +342,7 @@
                         <i class="glyphicon glyphicon-plus"></i>
                       </button>
 
-                      <button type="button" class="btn btn-default btn-md tf-small-icon-button-param" ng-click="" style="margin-left: 2px; min-width: 21px;">
+                      <button ng-show="!localHelpVisible.connectToRobot" type="button" class="btn btn-default btn-md tf-small-icon-button-param" ng-click="showLocalHelp(true,'connectToRobot')" style="margin-left: 2px; min-width: 21px;">
                         <i class="fa fa-question" style="font-size: 12px;"></i>
                       </button>
 
@@ -308,8 +350,26 @@
                     </div>
                   </div>
 
-
                   <div class="well well-sm normal tf-param-section-box">
+
+                      <div ng-show="localHelpVisible.connectToRobot" class="tf-hint-small-help-block tf-param-title-background-topics">
+                          <div>
+                              Select topics from the robot sensors or actuators to read and write data.
+                        </div>
+                        <div>
+                            <button type="button" class="btn btn-default btn-md tf-small-icon-button-param" ng-click="showLocalHelp(false,'connectToRobot')" style="margin-left: 2px;     height: 16px;
+                            width: 16px; position:relative; border:none; background:none;">
+                                <i class="fa fa-close" style="font-size: 14px;
+                                position: absolute;
+                                left: 3px;
+                                top: -2px;
+                                color: rgba(0,0,0,0.3);"></i>
+                              </button>
+
+                          </div>
+
+                        </div>
+
                     <div ng-repeat="top in transferFunction.topics" class="tf-param-border">
 
                       <div ng-click="top.showDetails = !top.showDetails" class="tf-param-title-background tf-param-title-background-topics">
@@ -400,7 +460,7 @@
                         <i class="glyphicon glyphicon-plus"></i>
                       </button>
 
-                      <button type="button" class="btn btn-default btn-md tf-small-icon-button-param" ng-click="" style="margin-left: 2px; min-width: 21px;">
+                      <button ng-show="!localHelpVisible.globalVariables" type="button" class="btn btn-default btn-md tf-small-icon-button-param" ng-click="showLocalHelp(true,'globalVariables')"  style="margin-left: 2px; min-width: 21px;">
                         <i class="fa fa-question" style="font-size: 12px;"></i>
 
                       </button>
@@ -410,6 +470,27 @@
 
 
                   <div class="well well-sm normal tf-param-section-box">
+
+                      <div ng-show="localHelpVisible.globalVariables" class="tf-hint-small-help-block tf-param-title-background-variables">
+                          <div>
+                          Declare global variables that can be used across all scripts.
+                        </div>
+                        <div>
+                            <button type="button" class="btn btn-default btn-md tf-small-icon-button-param" ng-click="showLocalHelp(false,'globalVariables')" style="margin-left: 2px;     height: 16px;
+                            width: 16px; position:relative; border:none; background:none;">
+                                <i class="fa fa-close" style="font-size: 14px;
+                                position: absolute;
+                                left: 3px;
+                                top: -2px;
+                                color: rgba(0,0,0,0.3);"></i>
+                              </button>
+
+                          </div>
+
+                        </div>
+
+
+
                     <div ng-repeat="var in transferFunction.variables" class="tf-param-border">
 
                       <div ng-click="var.showDetails = !var.showDetails" class="tf-param-title-background tf-param-title-background-variables">

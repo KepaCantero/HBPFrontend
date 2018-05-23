@@ -200,11 +200,19 @@ li {
   background: #fffddb;
 }
 
+.tf-param-title-background-populations-sub {
+  background: #fffef1;
+}
+
+.tf-param-title-background-populations-sub:hover {
+  background: #f1eea9;
+}
+
 .tf-param-title-background-neurons {
   background: #fff1f8;
 }
 
-.tf-param-title-background-neurons:hover {
+.tf-param-title-background.tf-param-title-background-neurons:hover {
   background: #f9e4ee;
 }
 
@@ -212,7 +220,7 @@ li {
   background: #f0fcff;
 }
 
-.tf-param-title-background-topics:hover {
+.tf-param-title-background.tf-param-title-background-topics:hover {
   background: #c5e3e9;
 }
 
@@ -220,7 +228,7 @@ li {
   background: #f9ffe8;
 }
 
-.tf-param-title-background-variables:hover {
+.tf-param-title-background.tf-param-title-background-variables:hover {
   background: #e6f3c6;
 }
 
@@ -392,6 +400,20 @@ li {
   border-bottom-color: #efefef;
   border-bottom-style: solid;
   border-bottom-width: 1px;
+}
+
+.tf-hint-small-help-block {
+  font-size: 12px;
+  margin-top: 2px;
+  margin-bottom: 2px;
+  padding: 5px;
+  border: 1px solid;
+  border-radius: 8px;
+  border-color: #f3f3f3;
+  padding-left: 15px;
+  padding-right: 15px;
+  margin-bottom: 12px;
+  display: flex;
 }
 
 .tf-apply-changes-dirty {
