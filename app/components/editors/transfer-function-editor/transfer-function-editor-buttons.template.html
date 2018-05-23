@@ -13,7 +13,7 @@
 </button>
 
 <!-- The trick here is to use a 'a' tag instead of a 'button' tag -->
-<button owner-only id="download-transfer-functions" class="btn btn-default btn-md" ng-click="download()" style="margin-left:10px">
+<button owner-only id="download-transfer-functions" ng-disabled="!transferFunction" class="btn btn-default btn-md" ng-click="download()" style="margin-left:10px">
   <i class="glyphicon glyphicon-download"></i>
   <span>Download</span>
 </button>

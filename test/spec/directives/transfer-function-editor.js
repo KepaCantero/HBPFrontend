@@ -19,7 +19,8 @@ describe('Directive: transferFunctionEditor', function() {
     codeEditorsServices,
     clbErrorDialog,
     $httpBackend,
-    registerFoundAutoSavedCallback;
+    registerFoundAutoSavedCallback,
+    clbConfirmMock;
 
   var shouldUseErrorCallback = false;
 
@@ -75,6 +76,8 @@ describe('Directive: transferFunctionEditor', function() {
     }
   };
 
+  var clbConfirmMockResultCancel = false;
+
   var roslibMock = {};
   var returnedConnectionObject = {};
   returnedConnectionObject.subscribe = jasmine.createSpy('subscribe');
@@ -95,6 +98,21 @@ describe('Directive: transferFunctionEditor', function() {
       $provide.value('documentationURLs', documentationURLsMock);
       $provide.value('stateService', currentStateMock);
       $provide.value('roslib', roslibMock);
+
+      clbConfirmMock = {
+        open: function() {
+          return {
+            then: function(success, failure) {
+              if (!clbConfirmMockResultCancel) {
+                success();
+              } else {
+                failure();
+              }
+            }
+          };
+        }
+      };
+      $provide.value('clbConfirm', clbConfirmMock);
     })
   );
 

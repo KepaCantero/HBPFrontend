@@ -1266,13 +1266,43 @@ if t % 2 < 0.02:
               return _.map(transferFunctions, 'rawCode').join('\n');
             };
 
-            scope.doDownload = function() {
+            scope.downloadTFFile = function(selectedOnly) {
               var file = new Blob(
-                [scope.buildTransferFunctionFile(scope.transferFunctions)],
+                [
+                  selectedOnly
+                    ? scope.transferFunction.rawCode
+                    : scope.buildTransferFunctionFile(scope.transferFunctions)
+                ],
                 { type: 'plain/text', endings: 'native' }
               );
+
               var href = URL.createObjectURL(file);
-              downloadFileService.downloadFile(href, 'transferFunctions.py');
+              downloadFileService.downloadFile(
+                href,
+                selectedOnly
+                  ? scope.transferFunction.name + '.py'
+                  : 'transferFunctions.py'
+              );
+            };
+
+            scope.doDownload = function() {
+              clbConfirm
+                .open({
+                  title: 'Downloading Transfer Functions',
+                  confirmLabel: 'All',
+                  cancelLabel: 'Selected Only',
+                  template:
+                    'Download all transfer functions or only the selected one ?',
+                  closable: false
+                })
+                .then(
+                  () => {
+                    scope.downloadTFFile(false);
+                  },
+                  () => {
+                    scope.downloadTFFile(true);
+                  }
+                );
             };
 
             scope.download = function() {
