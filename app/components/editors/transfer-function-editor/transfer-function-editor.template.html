@@ -266,8 +266,17 @@
                       </div>
 
                       <div ng-show="!dev.showDetails" style="display:flex; margin-top: 3px;">
-                        <div class="tf-parameter-subtitle" style="margin-left:10px">Type: {{dev.type}}
-                          <br> Population: {{getFriendlyPopulationName(dev.neurons)}}</div>
+                        <div ng-if="transferFunction.type !== TRANSFER_FUNCTION_TYPE.NEURONMONITOR" ng-class="{'fa fa-arrow-circle-left':transferFunction.type === TRANSFER_FUNCTION_TYPE.NEURON2ROBOT,
+                               'fa fa-arrow-circle-right':transferFunction.type === TRANSFER_FUNCTION_TYPE.ROBOT2NEURON}"
+                             class="tf-parameter-subtitle-pubinfo">
+                        </div>
+                        <img ng-if="transferFunction.type === TRANSFER_FUNCTION_TYPE.NEURONMONITOR"
+                             src="img/esv/neuron_monitor_icon.png" width="12" height="12"
+                             class="tf-parameter-subtitle-pubinfo">
+                        <div class="tf-parameter-subtitle">
+                          Type: {{dev.type}}
+                          <br> Population: {{getFriendlyPopulationName(dev.neurons)}}
+                        </div>
                       </div>
 
                       <div ng-show="dev.showDetails" ng-click="$event.stopPropagation()">
