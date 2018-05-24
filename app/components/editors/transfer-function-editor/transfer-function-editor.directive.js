@@ -1397,6 +1397,74 @@ if t % 2 < 0.02:
               autoSaveService.setDirty(DIRTY_TYPE, scope.transferFunctions);
             };
 
+            function findUniqueNameFromTFCode(code) {
+              var newName = pythonCodeHelper.getFunctionName(code);
+              var baseName = newName;
+
+              var count = 2;
+
+              do {
+                var nameFound = false;
+                _.forEach(scope.transferFunctions, function(transferFunction) {
+                  if (transferFunction.name === newName) nameFound = true;
+                });
+
+                if (nameFound) {
+                  newName = baseName + '_' + count;
+                  count++;
+                }
+              } while (nameFound);
+
+              return newName;
+            }
+
+            function addUploadedTransferFunctions(tfs, replace) {
+              if (replace) {
+                scope.deleteTFunctions(scope.transferFunctions);
+                scope.transferFunctions = [];
+                scope.selectedTF = '';
+                scope.transferFunction = null;
+                scope.nTransferFunctionDirty = 0;
+              }
+
+              _.forEach(tfs, function(transferFunction) {
+                var tf = new ScriptObject(
+                  scope.selectedTF,
+                  transferFunction.code
+                );
+
+                var codeName = pythonCodeHelper.getFunctionName(
+                  transferFunction.code
+                );
+                tf.type = undefined;
+                tf.name = findUniqueNameFromTFCode(transferFunction.code);
+                tf.oldName = tf.name;
+                tf.devices = [];
+                tf.topics = [];
+                tf.variables = [];
+                tf.local = true;
+                tf.dirty = true;
+                tf.rawCode =
+                  codeName === tf.name
+                    ? transferFunction.code
+                    : transferFunction.code.replace(
+                        new RegExp('def +' + codeName, 'gm'),
+                        'def ' + tf.name
+                      );
+                tf.active = true;
+                tf.editName = false;
+                scope.nTransferFunctionDirty++;
+                scope.transferFunctions.push(tf);
+              });
+
+              if (
+                (replace || !scope.transferFunction) &&
+                scope.transferFunctions.length > 0
+              ) {
+                scope.selectTransferFunction(scope.transferFunctions[0].name);
+              }
+            }
+
             function applyUploadedTransferFunctions(tfs) {
               // Make sure uploaded file doesn't contain duplicate definition names
               var tfNames = tfs.map(function(tf) {
@@ -1412,35 +1480,23 @@ if t % 2 < 0.02:
                 return;
               }
 
-              scope.deleteTFunctions(scope.transferFunctions);
-              scope.transferFunctions = [];
-              scope.selectedTF = '';
-              scope.transferFunction = null;
-              scope.nTransferFunctionDirty = 0;
-
-              _.forEach(tfs, function(transferFunction) {
-                var tf = new ScriptObject(
-                  scope.selectedTF,
-                  transferFunction.code
+              clbConfirm
+                .open({
+                  title: 'Uploading Transfer Functions',
+                  confirmLabel: 'Add',
+                  cancelLabel: 'Replace',
+                  template:
+                    'Add to the current transfer functions or replace then with the new ones ?',
+                  closable: false
+                })
+                .then(
+                  () => {
+                    addUploadedTransferFunctions(tfs, false);
+                  },
+                  () => {
+                    addUploadedTransferFunctions(tfs, true);
+                  }
                 );
-                tf.type = undefined;
-                tf.name = pythonCodeHelper.getFunctionName(tf.code);
-                tf.oldName = tf.name;
-                tf.devices = [];
-                tf.topics = [];
-                tf.variables = [];
-                tf.local = true;
-                tf.dirty = true;
-                tf.rawCode = transferFunction.code;
-                tf.active = true;
-                tf.editName = false;
-                scope.nTransferFunctionDirty++;
-                scope.transferFunctions.push(tf);
-              });
-
-              if (scope.transferFunctions.length > 0) {
-                scope.selectTransferFunction(scope.transferFunctions[0].name);
-              }
             }
 
             scope.upload = function(file) {
