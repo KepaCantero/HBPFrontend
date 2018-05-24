@@ -176,7 +176,6 @@ describe('Controller: EditorToolbarController', function() {
       RESET_TYPE = _RESET_TYPE_;
       nrpModalService = _nrpModalService_;
       autosaveOnExitService = _autosaveOnExitService_;
-
       userContextService.hasEditRights.and.callFake(function(entity) {
         return (
           userContextService.isOwner ||
@@ -320,6 +319,8 @@ describe('Controller: EditorToolbarController', function() {
     it('should make correct reset calls when server reset happened', function() {
       spyOn(editorToolbarController, 'notifyResetToWidgets').and.callThrough();
       spyOn(editorToolbarController, 'updatePanelUI').and.callThrough();
+      editorToolbarController.gz3d.scene = gz3d.scene;
+
       editorsPanelService.showEditorPanel = true;
 
       editorToolbarController.resetOccuredOnServer();
@@ -520,6 +521,9 @@ describe('Controller: EditorToolbarController', function() {
       expect(splash.spin).toBe(false);
       expect(splash.setMessage).toHaveBeenCalledWith({ headline: 'Finished' });
       expect(splash.close).not.toHaveBeenCalled();
+
+      editorToolbarController.gz3d.scene = gz3d.scene;
+
       // onSimulationDone() should have been called
       expect(stateService.removeMessageCallback).toHaveBeenCalled();
 
