@@ -37,6 +37,15 @@
         return matches[4];
       }
     };
+    returnValue.setFunctionName = function(code, name) {
+      try {
+        name = 'def ' + name + ' (';
+        var newcode = code.replace(/(def)[^)]+(\()/, name);
+        return newcode;
+      } catch (e) {
+        return code;
+      }
+    };
 
     returnValue.ScriptObject = function(id, code) {
       this.name = this.id = id;

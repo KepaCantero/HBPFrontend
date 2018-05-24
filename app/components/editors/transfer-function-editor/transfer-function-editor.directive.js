@@ -764,7 +764,6 @@ if t % 2 < 0.02:
                     .then(function() {
                       transferFunction.dirty = false;
                       transferFunction.local = false;
-                      _doneCallback();
                       scope.updateNTransferFunctionDirty();
                       if (scope.nTransferFunctionDirty == 0)
                         autoSaveService.clearDirty(DIRTY_TYPE);
@@ -777,6 +776,7 @@ if t % 2 < 0.02:
                       scope.synchingRawTF.then(
                         () => (scope.synchingRawTF = null)
                       );
+                      _doneCallback();
                     })
                     .catch(function(data) {
                       serverError.displayHTTPError(data);
@@ -917,6 +917,7 @@ if t % 2 < 0.02:
               tf.dirty = true;
               tf.rawCode = rawcode;
               tf.active = true;
+              tf.editName = true;
 
               scope.setDirty(tf);
               scope.transferFunctions.push(tf);
@@ -993,6 +994,25 @@ if t % 2 < 0.02:
                     scope.transferFunctions.push(faultyTF);
                   }
                 });
+              });
+            };
+
+            scope.setNameTf = function() {
+              var initPanel = scope.centerPanelTabSelection;
+              var active = scope.transferFunction.active;
+              scope.transferFunction.rawCode = pythonCodeHelper.setFunctionName(
+                scope.transferFunction.rawCode,
+                scope.transferFunction.name
+              );
+              scope.transferFunction.editName = !scope.transferFunction
+                .editName;
+              scope.transferFunction.name = scope.transferFunction.oldName;
+              scope.centerPanelTabSelection = 'rawscript';
+              scope.applyScript(scope.transferFunction, () => {
+                scope.saveTFIntoCollabStorage();
+                scope.centerPanelTabSelection = initPanel;
+                scope.transferFunction.active = !active;
+                scope.toggleActive(scope.transferFunction);
               });
             };
 
@@ -1413,6 +1433,7 @@ if t % 2 < 0.02:
                 tf.dirty = true;
                 tf.rawCode = transferFunction.code;
                 tf.active = true;
+                tf.editName = false;
                 scope.nTransferFunctionDirty++;
                 scope.transferFunctions.push(tf);
               });
