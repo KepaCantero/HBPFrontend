@@ -31,7 +31,7 @@
       this.experimentID = 'experimentID';
 
       $httpBackend.whenGET(/.*\/version/).respond({});
-      $httpBackend.whenGET('version.json').respond({});
+      $httpBackend.whenGET('package.json').respond({});
       $httpBackend.whenGET(/.*\/simulation\/mocked_simulation_id/).respond(200);
 
       this.initialized = $q.when();

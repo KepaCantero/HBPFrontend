@@ -131,7 +131,11 @@ module.exports = function(grunt) {
               serveStatic('./bower_components')
             ),
             connect().use('/node_modules', serveStatic('./node_modules')),
-            serveStatic(appConfig.app)
+            serveStatic(appConfig.app),
+            (req, res, next) =>
+              req.url == '/package.json'
+                ? res.end(grunt.file.read('.' + req.url))
+                : next()
           ];
         }
       },
@@ -565,6 +569,12 @@ module.exports = function(grunt) {
             cwd: 'node_modules/chart.js/dist',
             src: ['Chart.min.js'],
             dest: '<%= yeoman.dist %>/node_modules/chart.js/dist'
+          },
+          {
+            expand: true,
+            cwd: '.',
+            src: ['package.json'],
+            dest: '<%= yeoman.dist %>'
           }
         ]
       },
@@ -741,18 +751,6 @@ module.exports = function(grunt) {
       }
     },
 
-    version: {
-      options: {
-        version: '<%= pkg.version %>'
-      },
-      dist: {
-        file: '<%= yeoman.dist %>/version.json'
-      },
-      test: {
-        file: '<%= yeoman.app %>/version.json'
-      }
-    },
-
     ci: {
       options: {
         gerritBranch: '<%= gerritBranch %>'
@@ -775,7 +773,6 @@ module.exports = function(grunt) {
       }
 
       grunt.task.run([
-        'version:test',
         'clean:server',
         'copy:fontawesome', // copy files needed by css style [NRRPLT-4817]
         'copy:gz3dImages', // copy files needed by gz3d [NRRPLT-3145]
@@ -797,7 +794,6 @@ module.exports = function(grunt) {
       }
 
       grunt.task.run([
-        'version:test',
         'clean:server',
         'wiredep',
         'concurrent:server',
@@ -813,7 +809,6 @@ module.exports = function(grunt) {
       return grunt.task.run(['build', 'connect:dist:keepalive']);
     }
     grunt.task.run([
-      'version:test',
       'clean:server',
       'wiredep',
       'concurrent:server',
@@ -822,17 +817,6 @@ module.exports = function(grunt) {
       'protractor:remote'
     ]);
   });
-
-  grunt.registerMultiTask(
-    'version',
-    'Retrieve the version of the application and put it in version.json',
-    function() {
-      grunt.file.write(
-        this.data.file,
-        '{ "hbp_nrp_esv" : "' + this.options().version + '" }'
-      );
-    }
-  );
 
   grunt.registerTask(
     'server',
@@ -855,13 +839,7 @@ module.exports = function(grunt) {
   });
 
   grunt.registerTask('build', function() {
-    var tasks = [
-      'clean:dist',
-      'version:dist',
-      'wiredep',
-      'compass:dist',
-      'useminPrepare'
-    ];
+    var tasks = ['clean:dist', 'wiredep', 'compass:dist', 'useminPrepare'];
     grunt.log.writeln(
       'Option to avoid using imagemin is ' + this.options().noImagemin
     );
