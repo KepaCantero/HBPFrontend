@@ -76,7 +76,7 @@ describe('Directive: transferFunctionEditor', function() {
     }
   };
 
-  var clbConfirmMockResultCancel = false;
+  var clbConfirmMockResultCancel;
 
   var roslibMock = {};
   var returnedConnectionObject = {};
@@ -113,6 +113,7 @@ describe('Directive: transferFunctionEditor', function() {
         }
       };
       $provide.value('clbConfirm', clbConfirmMock);
+      clbConfirmMockResultCancel = false;
     })
   );
 
@@ -1208,6 +1209,8 @@ def tf1(t):
           '    and here for multi-line awesomeness';
         return code;
       });
+
+      clbConfirmMockResultCancel = true;
 
       var tfFileMock = transferFunctionsCode.join('\n');
       var fileReaderMock = {
