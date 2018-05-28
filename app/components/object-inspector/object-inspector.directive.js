@@ -43,6 +43,7 @@
     'storageServer',
     'newExperimentProxyService',
     'bbpConfig',
+    'robotComponentsService',
     function(
       OBJECT_VIEW_MODE,
       $timeout,
@@ -59,7 +60,8 @@
       TIP_CODES,
       storageServer,
       newExperimentProxyService,
-      bbpConfig
+      bbpConfig,
+      robotComponentsService
     ) {
       return {
         templateUrl:
@@ -74,6 +76,7 @@
           scope.collapsedVisuals = false;
           scope.objectInspectorService = objectInspectorService;
           scope.gz3d = gz3d;
+          scope.robotComponentsService = robotComponentsService;
 
           scope.EDIT_MODE = EDIT_MODE;
           scope.OBJECT_VIEW_MODE = OBJECT_VIEW_MODE;

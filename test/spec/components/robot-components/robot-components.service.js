@@ -142,4 +142,24 @@ describe('Services: robotComponentsService', function() {
       robotComponentsService.robotControllers
     );
   });
+
+  it(' - isCameraComponentTopic', function() {
+    let mockComponent = {};
+    expect(
+      robotComponentsService.isCameraComponentTopic(mockComponent)
+    ).toBeFalsy();
+
+    mockComponent.userData = {
+      gazeboType: 'rostopic',
+      rosTopic: 'mockROSTopic'
+    };
+    expect(
+      robotComponentsService.isCameraComponentTopic(mockComponent)
+    ).toBeFalsy();
+
+    mockComponent.sensortype = 'camera';
+    expect(robotComponentsService.isCameraComponentTopic(mockComponent)).toBe(
+      true
+    );
+  });
 });

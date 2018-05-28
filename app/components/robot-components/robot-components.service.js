@@ -196,6 +196,18 @@
       });
       return topicURL;
     }
+
+    isCameraComponentTopic(component) {
+      return (
+        component &&
+        component.userData &&
+        component.userData.gazeboType &&
+        component.userData.gazeboType === 'rostopic' &&
+        component.userData.rosTopic &&
+        component.sensortype &&
+        component.sensortype === 'camera'
+      );
+    }
   }
 
   RobotComponentsService.$$ngIsClass = true;
