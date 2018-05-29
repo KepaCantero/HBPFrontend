@@ -6,11 +6,21 @@ describe('Service: joint-service', function() {
     unsubscribe: jasmine.createSpy('unsubscribe')
   };
 
+  var rosLibServiceObject = {
+    callService: jasmine.createSpy('callService')
+  };
+
   var roslibMock = {
     getOrCreateConnectionTo: jasmine.createSpy('getOrCreateConnectionTo'),
     createTopic: jasmine
       .createSpy('createTopic')
-      .and.returnValue(rosLibConnectionObject)
+      .and.returnValue(rosLibConnectionObject),
+    Ros: jasmine.createSpy('Ros'),
+    Service: jasmine.createSpy('Service'),
+    ServiceRequest: jasmine.createSpy('ServiceRequest'),
+    createService: jasmine
+      .createSpy('createService')
+      .and.returnValue(rosLibServiceObject)
   };
 
   beforeEach(module('simulationInfoMock'));
@@ -74,7 +84,11 @@ describe('Service: joint-service', function() {
     expect(jointService.callbacks.length).toBe(1);
 
     expect(jointMessageCallback).not.toHaveBeenCalled();
-    jointService.parseMessages({ header: { stamp: { secs: 1000, nsecs: 0 } } });
+    jointService.jointsType['jointName'] = 0;
+    jointService.parseMessages({
+      header: { stamp: { secs: 5000, nsecs: 0 } },
+      name: 'jointName'
+    });
     expect(jointMessageCallback).toHaveBeenCalled();
   });
 });

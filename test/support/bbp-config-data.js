@@ -92,5 +92,17 @@ window.bbpConfig = {
     status: '/ros_cle_simulation/status',
     cleError: '/ros_cle_simulation/cle_error',
     logs: '/ros_cle_simulation/logs'
+  },
+  'ros-services': {
+    modelProperties: {
+      name: '/gazebo/get_model_properties',
+      type: 'gazebo_msgs/GetModelProperties',
+      param: 'model_name'
+    },
+    jointProperties: {
+      name: '/gazebo/get_joint_properties',
+      type: 'gazebo_msgs/GetJointProperties',
+      param: 'joint_name'
+    }
   }
 };
