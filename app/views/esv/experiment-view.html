@@ -1,8 +1,10 @@
 <!-- build:css(.tmp) styles/esv/experiment-view.css -->
-<link rel="stylesheet" href="styles/esv/experiment-view.css" />
+<link rel="stylesheet" href="styles/esv/experiment-view.css"/>
 <!-- endbuild -->
 
 <div id="experiment-view">
+
+  <application-top-toolbar></application-top-toolbar>
 
   <div class="editor-display">
     <div id="experiment-view-backdrop">
@@ -16,10 +18,13 @@
     <environment-settings-panel></environment-settings-panel>
 
     <video-stream-generator ng-show="showVideoStreams"></video-stream-generator>
+
+    <editor-toolbar class="toolbar"></editor-toolbar>
   </div>
 
   <!-- Alert popup -->
-  <div class="alert alert-warning ng-hide" style=" z-index: 999;  position: fixed;  width: 100%;" ng-show="vm.userContextService.isJoiningStoppedSimulation && !vm.userContextService.demoMode">
+  <div class="alert alert-warning ng-hide" style=" z-index: 999;  position: fixed;  width: 100%;"
+       ng-show="vm.userContextService.isJoiningStoppedSimulation && !vm.userContextService.demoMode">
     <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
     Sorry, the simulation you just wanted to join is already stopped.
 
@@ -28,15 +33,15 @@
 
   <div class="ros-reconnecting" on-reconnect-timeout="vm.exit()"></div>
 
-  <simulation-timeout-extender extent-auto-condition= "{{vm.simulationInfo.simTimeoutText < vm.simulationInfo.simMaxAutoTimeOutText}}" extent-timeout-condition="{{vm.simulationInfo.simTimeoutText < vm.simulationInfo.simMaxTimeOutText}}" ng-if="vm.userContextService.isOwner()"></simulation-timeout-extender>
+  <simulation-timeout-extender
+    extent-auto-condition="{{vm.simulationInfo.simTimeoutText < vm.simulationInfo.simMaxAutoTimeOutText}}"
+    extent-timeout-condition="{{vm.simulationInfo.simTimeoutText < vm.simulationInfo.simMaxTimeOutText}}"
+    ng-if="vm.userContextService.isOwner()"></simulation-timeout-extender>
 
   <help-tooltip-popover></help-tooltip-popover>
 
-<div class="tip-tooltip-place">
-<tip-tooltip></tip-tooltip>
-</div>
-
-  <editor-toolbar class="toolbar"></editor-toolbar>
-
+  <div class="tip-tooltip-place">
+    <tip-tooltip></tip-tooltip>
+  </div>
 
 </div>

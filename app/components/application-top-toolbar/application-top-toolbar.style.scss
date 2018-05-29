@@ -1,0 +1,62 @@
+/**---LICENSE-BEGIN - DO NOT CHANGE OR MOVE THIS HEADER
+ * This file is part of the Neurorobotics Platform software
+ * Copyright (C) 2014,2015,2016,2017 Human Brain Project
+ * https://www.humanbrainproject.eu
+ *
+ * The Human Brain Project is a European Commission funded project
+ * in the frame of the Horizon2020 FET Flagship plan.
+ * http://ec.europa.eu/programmes/horizon2020/en/h2020-section/fet-flagships
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * ---LICENSE-END**/
+
+@import '../../../bower_components/angular-material/angular-material.scss';
+
+$application-top-toolbar-height: 5%;
+
+.application-top-toolbar-wrapper {
+  .application-top-toolbar {
+    box-shadow: 0px 5px 5px grey;
+
+    min-height: $application-top-toolbar-height;
+
+    .md-toolbar-tools {
+      height: $application-top-toolbar-height;
+    }
+  }
+
+  .application-top-toolbar-section-middle {
+    text-align: center;
+  }
+
+  .application-top-toolbar-section-right {
+  }
+
+  .vertical-divider {
+    border-top-width: 0;
+    border-right-width: 2px;
+    border-right-style: solid;
+    border-color: grey;
+    height: 30px;
+    min-height: 50%;
+    margin-left: 20px;
+    margin-right: 20px;
+  }
+}
+
+// unfortunately necessary as md-menu will manipulate hmtl.style.overflowY when opened, causing a scrollbar to appear
+html {
+  overflow-y: auto !important;
+}

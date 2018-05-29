@@ -9,6 +9,7 @@
     <title>Neurorobotics platform</title>
 
     <link rel="stylesheet" href="node_modules/n3-charts/build/LineChart.min.css" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 
     <!-- build:css(.) styles/vendor.css -->
     <link rel="stylesheet" href="bower_components/font-awesome/css/font-awesome.css" />
@@ -16,6 +17,7 @@
     <link rel="stylesheet" href="bower_components/angular.panels/dist/angular.panels.min.css" />
     <link rel="stylesheet" href="bower_components/v-button/dist/v-button.css" />
     <link rel="stylesheet" href="bower_components/gz3d-hbp/gz3d/client/style/gz3d-hbp.css" />
+    <link rel="stylesheet" href="bower_components/angular-material/angular-material.css">
     <!-- endbuild -->
 
     <!-- build:css(.tmp) styles/main.css -->
@@ -26,11 +28,12 @@
     <link rel="stylesheet" href="styles/esv/reset.css" />
     <!-- endbuild -->
 
+
 </head>
 
 <body class="ng-cloak">
 
-    <!-- Google analytics -->
+  <!-- Google analytics -->
     <script>
         // Get analytics only for production/staging/development servers
         var hostname = document.location.hostname;
@@ -61,8 +64,11 @@
     <script src="bower_components/jquery/dist/jquery.js"></script>
     <script src="bower_components/angular/angular.js"></script>
     <script src="bower_components/angular-animate/angular-animate.js"></script>
+    <script src="bower_components/angular-aria/angular-aria.js"></script>
     <script src="bower_components/angular-bbp-config/angular-bbp-config.js"></script>
     <script src="bower_components/angular-cookies/angular-cookies.js"></script>
+    <script src="bower_components/angular-messages/angular-messages.js"></script>
+    <script src="bower_components/angular-material/angular-material.js"></script>
     <script src="bower_components/angular-resource/angular-resource.js"></script>
     <script src="bower_components/angular-sanitize/angular-sanitize.js"></script>
     <script src="bower_components/angular-toArrayFilter/toArrayFilter.js"></script>
@@ -161,6 +167,7 @@
     <script src="scripts/esv/services/backend-interface.js"></script>
     <script src="scripts/esv/services/roslib-angular.js"></script>
     <script src="scripts/esv/services/simulation-info-service.js"></script>
+    <script src="scripts/esv/services/experiment-view.service.js"></script>
     <script src="scripts/esv/services/slurminfo-service.js"></script>
     <script src="scripts/esv/services/spike-listener-service.js"></script>
     <script src="scripts/esv/services/simstate-angular.js"></script>
@@ -195,6 +202,9 @@
     <script src="scripts/common/services/storageServerRequestInterceptor.js"></script>
     <script src="scripts/admin/admin-controller.js"></script>
     <script src="scripts/admin/admin-service.js"></script>
+    <script src="components/application-top-toolbar/application-top-toolbar.modules.js"></script>
+    <script src="components/application-top-toolbar/application-top-toolbar.controller.js"></script>
+    <script src="components/application-top-toolbar/application-top-toolbar.directive.js"></script>
     <script src="components/brain-visualizer/brain-visualizer.directive.js"></script>
     <script src="components/brain-visualizer/brain-visualizer-panel.controller.js"></script>
     <script src="components/brain-visualizer/brain-visualizer-panel.directive.js"></script>

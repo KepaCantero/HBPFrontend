@@ -102,7 +102,8 @@
       'robotDocumentation',
       'adminModule',
       'modal',
-      'robotComponentsModule'
+      'robotComponentsModule',
+      'applicationTopToolbarModule'
     ])
     // Routes
     .config([

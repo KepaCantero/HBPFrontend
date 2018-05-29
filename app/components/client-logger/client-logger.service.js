@@ -39,6 +39,7 @@
     }
 
     constructor(
+      $rootScope,
       roslib,
       simulationInfo,
       bbpConfig,
@@ -50,8 +51,6 @@
       this.websocket = simulationInfo.serverConfig.rosbridge.websocket;
       this.rosTopic = bbpConfig.get('ros-topics').logs;
       this.LOG_TYPE = LOG_TYPE;
-      //this.dynamicViewOverlayService = dynamicViewOverlayService;
-      //this.DYNAMIC_VIEW_CHANNELS = DYNAMIC_VIEW_CHANNELS;
       this.logHistory = [];
       this.missedConsoleLogs = 0;
 
@@ -82,6 +81,14 @@
       this.logSubscription = this.logs
         .filter(log => log.level === LOG_TYPE.INFO)
         .subscribe(log => consoleLogReceived(log));
+
+      this.resetListenerUnbindHandler = $rootScope.$on('RESET', () => {
+        this.logMessage('Reset EVENT occurred...');
+      });
+
+      $rootScope.$on('EXIT_SIMULATION', () => {
+        this.onExit();
+      });
     }
 
     onExit() {
@@ -151,6 +158,7 @@
 
   ClientLoggerService.$$ngIsClass = true;
   ClientLoggerService.$inject = [
+    '$rootScope',
     'roslib',
     'simulationInfo',
     'bbpConfig',

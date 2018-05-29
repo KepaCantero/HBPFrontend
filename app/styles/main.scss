@@ -44,6 +44,11 @@ $icon-font-path: '/bower_components/hbp-collaboratory-theme/dist/fonts/';
   display: none !important;
 }
 
+// Prevents native orange outline of selected elements
+*:focus {
+  outline: none;
+}
+
 html,
 body,
 [ui-view] {

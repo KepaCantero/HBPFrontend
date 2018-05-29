@@ -59,7 +59,7 @@ describe('Directive: Movable', function() {
     var expectedLeft =
       (initialBoundingRect.left + delta) / window.innerWidth * 100;
     var expectedTop =
-      (initialBoundingRect.top + delta) / window.innerHeight * 100;
+      (initialBoundingRect.top + delta) / window.innerHeight * 100 - 5;
 
     // trigger mouse down
     element.triggerHandler({ type: 'mousedown', pageX: 0, pageY: 0 });
@@ -93,7 +93,7 @@ describe('Directive: Movable', function() {
     var expectedLeft =
       (initialBoundingRect.left + delta) / window.innerWidth * 100;
     var expectedTop =
-      (initialBoundingRect.top + delta) / window.innerHeight * 100;
+      (initialBoundingRect.top + delta) / window.innerHeight * 100 - 5;
 
     element.triggerHandler({ type: 'mousedown', pageX: startX, pageY: startY });
     $scope.$digest();
@@ -131,7 +131,7 @@ describe('Directive: Movable', function() {
     var expectedLeft =
       (initialBoundingRect.left + delta) / window.innerWidth * 100;
     var expectedTop =
-      (initialBoundingRect.top + delta) / window.innerHeight * 100;
+      (initialBoundingRect.top + delta) / window.innerHeight * 100 - 5;
 
     // trigger mouse move
     $document.triggerHandler({
@@ -169,7 +169,7 @@ describe('Directive: Movable', function() {
     var expectedLeft =
       (initialBoundingRect.left + delta) / window.innerWidth * 100;
     var expectedTop =
-      (initialBoundingRect.top + delta) / window.innerHeight * 100;
+      (initialBoundingRect.top + delta) / window.innerHeight * 100 - 5;
 
     child.triggerHandler({ type: 'mousedown', pageX: 0, pageY: 0 });
     $scope.$digest();

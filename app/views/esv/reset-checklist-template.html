@@ -1,87 +1,72 @@
 <!-- build:css(.tmp) styles/esv/reset-checklist-template.css -->
-<link rel="stylesheet" href="styles/esv/reset-checklist-template.css" />
+<link rel="stylesheet" href="styles/esv/reset-checklist-template.css"/>
 <!-- endbuild -->
 
 <div class="reset-checklist-template">
-    <fieldset>
-        <ul style="list-style: none">
-            <span>
-                <b>Simulation</b>
-
-                <li>
-
-                    <label>
-
-                    <input type="radio" ng-model="vm.request.resetType" ng-value="{{vm.RESET_TYPE.RESET_FULL}}" title="Reset also the simulation timeout."
-                       >
-                    </input>
-
-                    Reset Simulation
-                    </label>
-
-                </li>
-                <br/>
-            </span>
-
-            <b>Camera</b>
-            <li>
-                <label>
-
-            <input type="radio" ng-model="vm.request.resetType" ng-value="{{vm.RESET_TYPE.RESET_CAMERA_VIEW}}">
+  <fieldset>
+    <ul style="list-style: none">
+      <span>
+        <b>Simulation</b>
+        <li>
+          <label>
+            <input type="radio" ng-model="vm.resetRequest.resetType" ng-value="{{vm.RESET_TYPE.RESET_FULL}}"
+                   title="Reset also the simulation timeout.">
             </input>
+            Reset Simulation
+          </label>
+        </li>
+        <br/>
+      </span>
+      <b>Camera</b>
+      <li>
+        <label>
+          <input type="radio" ng-model="vm.resetRequest.resetType" ng-value="{{vm.RESET_TYPE.RESET_CAMERA_VIEW}}">
+          </input>
+          Reset Camera View
+        </label>
+      </li>
 
-            Reset Camera View
-            </label>
+      <br/>
 
-            </li>
-            <br/>
+      <span>
+        <b>Brain</b>
+        <li>
+          <label>
+            <input ng-model="vm.resetRequest.resetType" ng-value="{{vm.RESET_TYPE.RESET_BRAIN}}" type="radio"
+                   title="{{vm.environmentService.isPrivateExperiment?'Reset the brain to the last saved state':'Reset the brain to the status it was at the beginning of the simulation'}}">
+            </input>
+            Reset the Neural Network
+          </label>
+        </li>
+        <br/>
+      </span>
 
-            <span>
-                <b>Brain</b>
-                <li>
-                    <label>
+      <span>
+        <b>Environment</b>
+        <li>
+          <label>
+            <input ng-model="vm.resetRequest.resetType" ng-value="{{vm.RESET_TYPE.RESET_WORLD}}" type="radio"
+                   title="{{vm.environmentService.isPrivateExperiment?'Reset Environment Poses to the last saved state':'Reset the poses of models to the original state'}}">
+            </input>
+            Reset Environment Poses
+          </label>
+        </li>
+        <br/>
+      </span>
 
-                    <input ng-model="vm.request.resetType" ng-value="{{vm.RESET_TYPE.RESET_BRAIN}}" type="radio"
-                            title="{{vm.environmnetService.isPrivateExperiment?'Reset the brain to the last saved state':'Reset the brain to the status it was at the beginning of the simulation'}}"
-                           >
-                    </input>
-                        Reset the Neural Network
-                    </label>
-
-                </li>
-                <br/>
-            </span>
-
-            <span>
-            <b>Environment</b>
-            <li>
-                <label>
-
-                <input ng-model="vm.request.resetType" ng-value="{{vm.RESET_TYPE.RESET_WORLD}}" type="radio"
-                        title="{{vm.environmnetService.isPrivateExperiment?'Reset Environment Poses to the last saved state':'Reset the poses of models to the original state'}}">
-                </input>
-                Reset Environment Poses
-                </label>
-
-            </li>
-            <br/>
-            </span>
-
-            <span>
-            <b>Robot</b>
-            <li>
-                <label>
-                <input ng-model="vm.request.resetType" ng-value="{{vm.RESET_TYPE.RESET_ROBOT_POSE}}" type="radio"
-                       title="Reset Robot to the original position and rotation.">
-                </input>
-                  Reset Robot Frame
-                </label>
-
-            </li>
-            <br/>
-        </span>
-
-        </ul>
-    </fieldset>
-    <br/>
+      <span>
+        <b>Robot</b>
+        <li>
+          <label>
+            <input ng-model="vm.resetRequest.resetType" ng-value="{{vm.RESET_TYPE.RESET_ROBOT_POSE}}" type="radio"
+                   title="Reset Robot to the original position and rotation.">
+            </input>
+            Reset Robot Frame
+          </label>
+        </li>
+        <br/>
+      </span>
+    </ul>
+  </fieldset>
+  <br/>
 </div>

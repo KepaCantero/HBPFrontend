@@ -32,9 +32,10 @@
    * @description Service responsible for auto saving to storage on exit
    */
   angular.module('exdFrontendApp').factory('autosaveOnExitService', [
+    '$rootScope',
     'userInteractionSettingsService',
     '$q',
-    function(userInteractionSettingsService, $q) {
+    function($rootScope, userInteractionSettingsService, $q) {
       const JSON_SETTING_NAME = 'autosaveOnExit';
 
       let service = {};
@@ -49,9 +50,11 @@
       };
 
       //load from file
-      userInteractionSettingsService.settings.then(
-        s => (service.settings = s[JSON_SETTING_NAME] || {})
-      );
+      $rootScope.$on('ENTER_SIMULATION', () => {
+        userInteractionSettingsService.settings.then(
+          s => (service.settings = s[JSON_SETTING_NAME] || {})
+        );
+      });
 
       service.getEditorSettings = function(editorType) {
         return service.settings[editorType];
