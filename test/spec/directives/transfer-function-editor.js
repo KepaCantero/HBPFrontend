@@ -526,16 +526,7 @@ def tf1(t):
         removeLineClass: angular.noop
       };
 
-      const structuredEditor = {
-        addLineClass: jasmine.createSpy('addLineClass_structured'),
-        lineCount: () => 5,
-        getLine: () => '',
-        removeLineClass: angular.noop
-      };
-
-      spyOn(codeEditorsServices, 'getEditor').and.callFake(
-        name => (name == 'rawCodeEditor' ? rawCodeEditor : structuredEditor)
-      );
+      spyOn(codeEditorsServices, 'getEditor').and.callFake(() => rawCodeEditor);
 
       const msg = {
         functionName: 'tf1',
@@ -546,8 +537,8 @@ def tf1(t):
       };
 
       isolateScope.onNewErrorMessageReceived(msg);
-      expect(structuredEditor.addLineClass).toHaveBeenCalledWith(
-        2,
+      expect(rawCodeEditor.addLineClass).toHaveBeenCalledWith(
+        7,
         'background',
         'alert-danger'
       );
@@ -602,14 +593,6 @@ def tf1(t):
       expect(isolateScope.transferFunction).toEqual(expectedTf1);
       // changed name is reset
       expect(isolateScope.transferFunctions[1].name).toEqual('tf2');
-    });
-
-    it('should change to rawscript panel when selecting a faulty transfer functions', function() {
-      isolateScope.centerPanelTabSelection = 'script';
-      isolateScope.selectTransferFunction('faultyTf');
-
-      expect(isolateScope.transferFunction).toEqual(expectedFaultyTf);
-      expect(isolateScope.centerPanelTabSelection).toBe('rawscript');
     });
 
     it('should create a new tf correctly', function() {
@@ -860,15 +843,10 @@ def tf1(t):
         'populateTransferFunctionsWithRawCode'
       ).and.callThrough();
 
-      isolateScope.centerPanelTabSelection = 'rawscript';
       isolateScope.updateCurrentTFContent();
       expect(
         isolateScope.populateTransferFunctionsWithRawCode
       ).toHaveBeenCalled();
-
-      isolateScope.centerPanelTabSelection = 'script';
-      isolateScope.updateCurrentTFContent();
-      expect(isolateScope.refresh).toHaveBeenCalled();
     });
 
     it('rawToStructured should convert raw script', function() {
@@ -945,19 +923,138 @@ def tf1(t):
           'http://bbpce016.epfl.ch:8080/simulation/mocked_simulation_id/convert-structured-tf-to-raw'
         )
         .respond(200, { rawScript: 'RAWTEST' });
-      isolateScope.structuredToRaw(isolateScope.transferFunction, () => {});
+      isolateScope.structuredToRaw(isolateScope.transferFunction, script => {
+        isolateScope.transferFunction.rawCode = script;
+      });
       $httpBackend.flush();
 
       expect(isolateScope.transferFunction.rawCode).toBe('RAWTEST');
     });
 
-    it('convertAllDirtyScripts should convert all dirty scripts', function() {
+    it('updateScriptFromStructured should simply copy script if no rawscript', function() {
+      isolateScope.transferFunction = {
+        name: 'test',
+        code: 'return 42',
+        devices: []
+      };
+      isolateScope.transferFunctions = [isolateScope.transferFunction];
+
+      $httpBackend
+        .whenPUT(
+          'http://bbpce016.epfl.ch:8080/simulation/mocked_simulation_id/convert-structured-tf-to-raw'
+        )
+        .respond(200, { rawScript: 'RAWTEST' });
+      isolateScope.updateScriptFromStructured();
+      $httpBackend.flush();
+
+      expect(isolateScope.transferFunction.rawCode).toBe('RAWTEST');
+    });
+
+    it('updateScriptFromStructured should build decorators', function() {
+      var newRawCode = `@nrp.MapCSVRecorder("recorder", filename="all_spikes2.csv", headers=["id", "time"])
+@nrp.MapSpikeSink("record_neurons", nrp.brain.record, nrp.spike_recorder)
+@nrp.Robot2Neuron()
+def tf1(t):
+  pass)`;
+
+      var convertedRawCode = `@nrp.MapSpikeSink("record_neurons", nrp.brain.record, nrp.spike_recorder)
+@nrp.MapCSVRecorder("recorder", filename="all_spikes2.csv", headers=["id", "time"])
+@nrp.Robot2Neuron()
+def tf1(t):
+  pass)`;
+
+      isolateScope.transferFunction = {
+        name: 'tf1',
+        type: 1,
+        devices: [],
+        topics: [],
+        variables: [],
+        rawCode: `@nrp.MapCSVRecorder("recorder", filename="all_spikes.csv", headers=["id", "time"])
+@nrp.Robot2Neuron()
+def tf1(t):
+  pass)`
+      };
+
+      isolateScope.transferFunctions = [isolateScope.transferFunction];
+
+      $httpBackend
+        .whenPUT(
+          'http://bbpce016.epfl.ch:8080/simulation/mocked_simulation_id/convert-structured-tf-to-raw'
+        )
+        .respond(200, { rawScript: newRawCode });
+      spyOn(isolateScope, 'setDirty');
+      isolateScope.decoratorsChangedFromUI();
+      $httpBackend.flush();
+
+      expect(isolateScope.transferFunction.rawCode).toBe(convertedRawCode);
+    });
+
+    it('updateScriptFromStructured should build decorators without code outside function', function() {
+      var newRawCode = `@nrp.MapCSVRecorder("recorder", filename="all_spikes2.csv", headers=["id", "time"])
+@nrp.Robot2Neuron()
+def tf1(t):
+  pass)`;
+
+      var convertedRawCode = `# DON'T ERASE ME
+@nrp.MapCSVRecorder("recorder", filename="all_spikes2.csv", headers=["id", "time"])
+@nrp.Robot2Neuron()
+def tf1(t):
+  pass)`;
+
+      isolateScope.transferFunction = {
+        name: 'tf1',
+        type: 1,
+        devices: [],
+        topics: [],
+        variables: [],
+        rawCode: `# DON'T ERASE ME
+@nrp.MapCSVRecorder("recorder", filename="all_spikes.csv", headers=["id", "time"])
+@nrp.Robot2Neuron()
+def tf1(t):
+  pass)`
+      };
+
+      isolateScope.transferFunctions = [isolateScope.transferFunction];
+
+      $httpBackend
+        .whenPUT(
+          'http://bbpce016.epfl.ch:8080/simulation/mocked_simulation_id/convert-structured-tf-to-raw'
+        )
+        .respond(200, { rawScript: newRawCode });
+      spyOn(isolateScope, 'setDirty');
+      isolateScope.decoratorsChangedFromUI();
+      $httpBackend.flush();
+
+      console.log();
+
+      expect(isolateScope.transferFunction.rawCode).toBe(convertedRawCode);
+    });
+
+    it('should update tf when content is changed', function() {
       var structuredTransferFunction = {
         name: 'tf1',
-        code: 'return 42',
-        devices: [],
-        error: {}
+        code: 'pass',
+        variables: [
+          {
+            type: 'csv',
+            initial_value:
+              '{"filename":"results.csv", "headers": ["Name", "Value"]}'
+          }
+        ]
       };
+
+      isolateScope.transferFunction = {
+        name: 'tf1',
+        type: 1,
+        devices: [],
+        topics: [],
+        variables: [],
+        rawCode: `@nrp.MapCSVRecorder("recorder", filename="all_spikes.csv", headers=["id", "time"])
+@nrp.Robot2Neuron()
+def tf1(t):
+  pass)`
+      };
+      isolateScope.transferFunctions = [isolateScope.transferFunction];
 
       $httpBackend
         .whenPUT(
@@ -965,66 +1062,56 @@ def tf1(t):
         )
         .respond(200, { structuredScript: structuredTransferFunction });
 
-      $httpBackend
-        .whenPUT(
-          'http://bbpce016.epfl.ch:8080/simulation/mocked_simulation_id/convert-structured-tf-to-raw'
-        )
-        .respond(200, { rawScript: 'RAWTEST' });
+      isolateScope.contentChanged();
+      $timeout.flush();
+      $httpBackend.flush();
+
+      expect(isolateScope.transferFunction.variables.length).toBe(1);
+    });
+
+    it('should tf should be renamed when def name is changed', function() {
+      var structuredTransferFunction = {
+        name: 'tf2',
+        code: 'pass',
+        variables: [
+          {
+            type: 'csv',
+            initial_value:
+              '{"filename":"results.csv", "headers": ["Name", "Value"]}'
+          }
+        ]
+      };
 
       isolateScope.transferFunction = {
-        name: 'test',
-        code: 'return 42',
-        dirty: true,
-        error: {}
+        name: 'tf1',
+        type: 1,
+        devices: [],
+        topics: [],
+        variables: [],
+        rawCode: `@nrp.MapCSVRecorder("recorder", filename="all_spikes.csv", headers=["id", "time"])
+@nrp.Robot2Neuron()
+def tf2(t):
+  pass)`
       };
       isolateScope.transferFunctions = [isolateScope.transferFunction];
 
-      isolateScope.centerPanelTabSelection = 'script';
+      $httpBackend
+        .whenPUT(
+          'http://bbpce016.epfl.ch:8080/simulation/mocked_simulation_id/convert-raw-tf-to-structured'
+        )
+        .respond(200, { structuredScript: structuredTransferFunction });
 
-      var callbackHasBeenCalled = false;
-
-      isolateScope.convertAllDirtyScripts(() => (callbackHasBeenCalled = true));
+      spyOn(isolateScope, 'applyScript');
+      isolateScope.contentChanged();
+      $timeout.flush();
       $httpBackend.flush();
-      expect(callbackHasBeenCalled).toBe(true);
 
-      callbackHasBeenCalled = false;
-
-      isolateScope.centerPanelTabSelection = 'rawscript';
-      isolateScope.convertAllDirtyScripts(() => (callbackHasBeenCalled = true));
-      $httpBackend.flush();
-      expect(callbackHasBeenCalled).toBe(true);
+      expect(isolateScope.applyScript).toHaveBeenCalled();
     });
 
-    it(' centerPanelTabChanged should change panel directly when no tfs are dirty', function() {
-      isolateScope.switchingToNewTab = null;
-      isolateScope.nTransferFunctionDirty = 0;
-      isolateScope.centerPanelTabSelection = 'rawscript';
-
-      isolateScope.centerPanelTabChanged('script');
-      expect(isolateScope.centerPanelTabSelection).toBe('script');
-    });
-
-    it(' centerPanelTabChanged should call convertAllDirtyScripts', function() {
-      spyOn(isolateScope, 'convertAllDirtyScripts').and.callThrough();
-
-      isolateScope.nTransferFunctionDirty = 1;
-      isolateScope.centerPanelTabChanged('rawscript');
-      expect(isolateScope.convertAllDirtyScripts).toHaveBeenCalled();
-
-      isolateScope.nTransferFunctionDirty = 1;
-      isolateScope.centerPanelTabChanged('script');
-      expect(isolateScope.convertAllDirtyScripts).toHaveBeenCalled();
-    });
-
-    it(' centerPanelTabChanged should not change from rawscript to script when TF is faulty', function() {
-      spyOn(isolateScope, 'updateCurrentTFContent').and.callThrough();
-      let faultyTf = { code: null }; // faulty TF
-
-      isolateScope.transferFunction = faultyTf;
-      isolateScope.centerPanelTabSelection = 'rawscript';
-
-      isolateScope.centerPanelTabChanged('script');
-      expect(isolateScope.updateCurrentTFContent).not.toHaveBeenCalled();
+    it('should show local Help', function() {
+      isolateScope.showLocalHelp(true, 'NEURONS');
+      expect(isolateScope.localHelpVisible['NEURONS']).toBe(true);
     });
 
     it('should handle reset', function() {
@@ -1033,25 +1120,7 @@ def tf1(t):
       expect(isolateScope.populations.length).toBe(0);
     });
 
-    it('should apply transfer functions correctly', function() {
-      expect(isolateScope.transferFunctions.length).toEqual(3);
-      isolateScope.selectTransferFunction('tf2');
-      expect(isolateScope.transferFunction.local).toBeTruthy();
-      isolateScope.apply();
-      expect(
-        backendInterfaceService.setStructuredTransferFunction
-      ).toHaveBeenCalledWith(isolateScope.transferFunction);
-
-      isolateScope.$apply();
-
-      expect(isolateScope.transferFunction.local).toBeFalsy();
-      expect(isolateScope.transferFunctions.length).toEqual(3);
-      expect(isolateScope.transferFunction.name).toEqual('tf2');
-    });
-
-    it('should apply raw script correctly', function() {
-      isolateScope.centerPanelTabSelection = 'rawscript';
-
+    it('should apply script correctly', function() {
       isolateScope.transferFunctions[0].rawCode =
         '@nrp.Robot2Neuron()\ndef tf1(t):\n    pass';
       isolateScope.transferFunctions[1].rawCode =
@@ -1070,8 +1139,6 @@ def tf1(t):
     });
 
     it('should apply handle duplicate name in raw script correctly', function() {
-      isolateScope.centerPanelTabSelection = 'rawscript';
-
       isolateScope.transferFunctions[0].rawCode =
         '@nrp.Robot2Neuron()\ndef tf2(t):\n    pass';
       isolateScope.transferFunctions[1].rawCode =
@@ -1088,9 +1155,6 @@ def tf1(t):
       isolateScope.populateTransferFunctionsWithRawCode();
       let tfs = isolateScope.transferFunctions;
       expect(tfs[0].rawCode).toBe('pass');
-
-      let lastTf = tfs[tfs.length - 1];
-      expect(isolateScope.isTfFaulty(lastTf)).toBe(true);
     });
 
     it('should decide on a tf type correctly', function() {
@@ -1171,8 +1235,6 @@ def tf1(t):
     });
 
     it('should save transfer functions to file', function() {
-      isolateScope.centerPanelTabSelection = 'rawscript';
-
       spyOn(downloadFileService, 'downloadFile');
       spyOn(window, 'Blob').and.returnValue({});
       var href = 'http://some/url';
@@ -1188,10 +1250,6 @@ def tf1(t):
         href,
         'transferFunctions.py'
       );
-
-      isolateScope.centerPanelTabSelection = 'script';
-      isolateScope.download();
-      expect(URLMock.createObjectURL).toHaveBeenCalled();
     });
 
     it('should be able to load tf from file', function() {
@@ -1233,8 +1291,6 @@ def tf1(t):
     });
 
     it('should correctly saveTFIntoCollabStorage with rawscript', function() {
-      isolateScope.centerPanelTabSelection = 'rawscript';
-
       expect(isolateScope.isSavingToCollab).toEqual(false);
       isolateScope.saveTFIntoCollabStorage();
 
@@ -1261,8 +1317,6 @@ def tf1(t):
     });
 
     it('should correctly saveTFIntoCollabStorage with script', function() {
-      isolateScope.centerPanelTabSelection = 'script';
-
       expect(isolateScope.isSavingToCollab).toEqual(false);
       isolateScope.saveTFIntoCollabStorage();
 
@@ -1323,16 +1377,7 @@ def tf1(t):
       shouldUseErrorCallback = false;
     });
 
-    it('should not call toggleActive on faulty TFs', function() {
-      var tf = { active: false, code: null };
-
-      isolateScope.toggleActive(tf);
-      expect(tf.active).toBe(false);
-    });
-
     it('should change the name of TF correctly', function() {
-      isolateScope.centerPanelTabSelection = 'rawscript';
-
       isolateScope.transferFunctions[0].rawCode =
         '@nrp.Robot2Neuron()\ndef tf1(t):\n    pass';
       isolateScope.transferFunctions[1].rawCode =

@@ -68,12 +68,6 @@ def {0}(t):
     if t % 2 < 0.02:
         clientLogger.info('Time: ', t)`
     )
-    .constant(
-      'DEFAULT_SCRIPT_TF_CODE',
-      `#log the first timestep (20ms), each couple of seconds
-if t % 2 < 0.02:
-    clientLogger.info('Time: ', t)`
-    )
     .factory('structuredTransferFunctionToRaw', [
       '$resource',
       'serverError',
@@ -134,7 +128,6 @@ if t % 2 < 0.02:
       'clbConfirm',
       'downloadFileService',
       'DEFAULT_RAW_TF_CODE',
-      'DEFAULT_SCRIPT_TF_CODE',
       '$q',
       'structuredTransferFunctionToRaw',
       'rawTransferFunctionToStructured',
@@ -162,7 +155,6 @@ if t % 2 < 0.02:
         clbConfirm,
         downloadFileService,
         DEFAULT_RAW_TF_CODE,
-        DEFAULT_SCRIPT_TF_CODE,
         $q,
         structuredTransferFunctionToRaw,
         rawTransferFunctionToStructured
@@ -173,6 +165,9 @@ if t % 2 < 0.02:
           restrict: 'E',
           scope: { control: '=' },
           link: function(scope, element, attrs) {
+            /**************************************/
+            // Initialize
+
             var ScriptObject = pythonCodeHelper.ScriptObject;
 
             const DIRTY_TYPE = 'TF';
@@ -185,7 +180,6 @@ if t % 2 < 0.02:
 
             scope.transferFunction = null;
             scope.selectedTF = null;
-            scope.centerPanelTabSelection = 'script';
             scope.isSavingToCollab = false;
 
             scope.selectedTopic = null;
@@ -218,6 +212,78 @@ if t % 2 < 0.02:
             scope.cleDocumentationURL = docs.cleDocumentationURL;
             scope.platformDocumentationURL = docs.platformDocumentationURL;
 
+            // only start watching for changes after a little timeout
+            // the flood of changes during compilation will cause angular to throw digest errors when watched
+            $timeout(() => {
+              // refresh on resize
+              scope.unbindWatcherResize = scope.$watch(
+                () => {
+                  if (element[0].offsetParent) {
+                    return [
+                      element[0].offsetParent.offsetWidth,
+                      element[0].offsetParent.offsetHeight
+                    ].join('x');
+                  } else {
+                    return '';
+                  }
+                },
+                () => {
+                  refreshEditor();
+                }
+              );
+              refreshEditor();
+              scope.applyEditorOptions();
+            }, 100);
+
+            scope.unbindListenerUpdatePanelUI = scope.$on(
+              'UPDATE_PANEL_UI',
+              function() {
+                // prevent calling the select functions of the tabs
+                scope.refresh();
+              }
+            );
+
+            scope.applyEditorOptions = function() {
+              var editor = codeEditorsServices.getEditorChild(
+                'codeEditor',
+                element[0]
+              );
+
+              for (let opt in scope.editorOptions) {
+                editor.setOption(opt, scope.editorOptions[opt]);
+              }
+
+              editor.on('update', scope.contentChanged);
+            };
+
+            autoSaveService.registerFoundAutoSavedCallback(
+              DIRTY_TYPE,
+              (autoSaved, applyChanges) => {
+                scope.collabDirty = true;
+                scope.transferFunctions = autoSaved;
+                if (scope.transferFunctions.length)
+                  scope.selectTransferFunction(scope.transferFunctions[0].name);
+
+                if (applyChanges) {
+                  _.forEach(autoSaved, tf =>
+                    scope.applyScript(tf, angular.noop)
+                  );
+                }
+              }
+            );
+
+            /**************************************/
+            // Cleanup
+
+            scope.$on('$destroy', () => {
+              scope.resetListenerUnbindHandler();
+              scope.unbindWatcherResize && scope.unbindWatcherResize();
+              scope.unbindListenerUpdatePanelUI();
+            });
+
+            /**************************************/
+            // Error from backend
+
             scope.onNewErrorMessageReceived = function(msg) {
               if (
                 msg.severity < 2 &&
@@ -248,78 +314,14 @@ if t % 2 < 0.02:
                       msg.errorType
                     ].lineHandle = codeMirrorLineNumber;
 
-                    if (scope.centerPanelTabSelection == 'rawscript') {
-                      const rawEditor = codeEditorsServices.getEditor(
-                        'rawCodeEditor'
-                      );
-                      rawEditor.addLineClass(
-                        codeMirrorLineNumber,
-                        'background',
-                        'alert-danger'
-                      );
-                    } else {
-                      const structuredEditor = codeEditorsServices.getEditor(
-                        'codeEditor'
-                      );
-                      if (msg.errorType === scope.ERROR.COMPILE) {
-                        // Compile error in Structured TF, so we can't compare with the outdated Raw version of the TF
-                        // instead we try to match the error line in the Structured TF
-                        const errorLine =
-                          msg.lineText.length > 4
-                            ? msg.lineText
-                                .substr(4)
-                                .trimRight('\n')
-                                .trimRight()
-                            : msg.lineText;
-                        for (let i = 0; i < structuredEditor.lineCount(); i++) {
-                          if (
-                            structuredEditor.getLine(i).trimRight() == errorLine
-                          ) {
-                            var lineErrorNumber =
-                              flawedTransferFunction.error[msg.errorType]
-                                .lineNumber;
-                            flawedTransferFunction.error[
-                              msg.errorType
-                            ].message = flawedTransferFunction.error[
-                              msg.errorType
-                            ].message.replace(lineErrorNumber, i + 1);
-                            structuredEditor.addLineClass(
-                              i,
-                              'background',
-                              'alert-danger'
-                            );
-                            break;
-                          }
-                        }
-                      } else {
-                        // Run time error in Structured TF. We don't have the linetext, so we will compare the
-                        // Structured TF with the Raw version,
-                        const updateRawTFError = () => {
-                          const structuredLineCount = structuredEditor.lineCount();
-                          const rawMatches = flawedTransferFunction.rawCode.match(
-                            /\n/g
-                          );
-                          const rawLineCount = rawMatches
-                            ? rawMatches.length + 1
-                            : 1;
-                          const errorLine = msg.lineNumber - 1;
-                          structuredEditor.addLineClass(
-                            Math.max(
-                              0,
-                              Math.min(
-                                structuredLineCount - 1,
-                                errorLine - rawLineCount + structuredLineCount
-                              )
-                            ),
-                            'background',
-                            'alert-danger'
-                          );
-                        };
-                        if (scope.synchingRawTF)
-                          scope.synchingRawTF.then(() => updateRawTFError());
-                        else updateRawTFError();
-                      }
-                    }
+                    const rawEditor = codeEditorsServices.getEditor(
+                      'codeEditor'
+                    );
+                    rawEditor.addLineClass(
+                      codeMirrorLineNumber,
+                      'background',
+                      'alert-danger'
+                    );
                   }
                 }
               }
@@ -335,16 +337,29 @@ if t % 2 < 0.02:
               true
             );
 
-            scope.updateCurrentTFContent = function() {
-              if (scope.centerPanelTabSelection == 'rawscript') {
-                scope.populateTransferFunctionsWithRawCode().then(function() {
-                  scope.refresh();
-                });
-              } else {
-                scope.populateStructuredTransferFunctions();
-                scope.refresh();
+            function cleanEditorErrors() {
+              let editor = codeEditorsServices.getEditor('codeEditor');
+              if (editor) {
+                for (let i = 0; i < editor.lineCount(); i++)
+                  editor.removeLineClass(i, 'background', 'alert-danger');
+              }
+            }
+
+            scope.cleanCompileError = function(transferFunction) {
+              cleanEditorErrors();
+              if (transferFunction && transferFunction.error) {
+                if (transferFunction.error[scope.ERROR.COMPILE])
+                  delete transferFunction.error[scope.ERROR.COMPILE];
+
+                if (transferFunction.error[scope.ERROR.NO_OR_MULTIPLE_NAMES])
+                  delete transferFunction.error[
+                    scope.ERROR.NO_OR_MULTIPLE_NAMES
+                  ];
               }
             };
+
+            /**************************************/
+            // Converting TF from UI helper to script decorator
 
             scope.rawToStructured = function(tf, callback) {
               var url =
@@ -374,10 +389,10 @@ if t % 2 < 0.02:
                     }
                   }
 
-                  if (callback) callback(tf);
+                  if (callback) callback(tf, data.error);
                 },
                 () => {
-                  if (callback) callback(tf);
+                  if (callback) callback(tf, true);
                 }
               );
             };
@@ -391,88 +406,128 @@ if t % 2 < 0.02:
                 {},
                 tf,
                 data => {
-                  tf.rawCode = data.rawScript;
-                  if (callback) callback(tf);
+                  if (callback) callback(data.rawScript);
                 },
                 () => {
-                  if (callback) callback(tf);
+                  if (callback) callback(null);
                 }
               );
             };
+
+            scope.updateScriptFromStructured = function() {
+              var tf = scope.transferFunction;
+
+              scope.structuredToRaw(tf, script => {
+                if (!script) return;
+
+                // We use a regexp to extract the line which contains the function defintion of the TF,
+                // so we can track argument or name changes in the definition
+                var findFunctionDefLineRegExp = new RegExp(
+                  '^def*.' + tf.name + '.*',
+                  'gm'
+                );
+
+                if (!tf.rawCode) {
+                  tf.rawCode = script;
+                  tf.decorators = extractTFDecoratorFromTF(script);
+                  tf.functionDef = (script.match(findFunctionDefLineRegExp) || [
+                    ''
+                  ])[0];
+                  return;
+                }
+
+                let currentScript = tf.rawCode;
+
+                // Update the function definition first
+
+                var newDef = script.match(findFunctionDefLineRegExp);
+                var oldDef = currentScript.match(findFunctionDefLineRegExp);
+
+                if (newDef && oldDef) {
+                  currentScript = currentScript.replace(oldDef, newDef);
+                }
+
+                // Take care of decorators now
+
+                let oldDecorators = extractTFDecoratorFromTF(currentScript);
+                let newDecorators = extractTFDecoratorFromTF(script);
+
+                currentScript = currentScript.replace(
+                  oldDecorators.pop(),
+                  newDecorators.pop()
+                );
+
+                var tempOldDecorators = oldDecorators.filter(function(val) {
+                  return newDecorators.indexOf(val) == -1;
+                });
+
+                newDecorators = newDecorators.filter(function(val) {
+                  return oldDecorators.indexOf(val) == -1;
+                });
+
+                oldDecorators = tempOldDecorators;
+
+                if (oldDecorators.length === newDecorators.length) {
+                  // Exactly the same size, simply replace the new one by the old ones
+
+                  for (let i = 0; i < oldDecorators.length; i++) {
+                    currentScript = currentScript.replace(
+                      oldDecorators[i],
+                      newDecorators[i]
+                    );
+                  }
+                } else {
+                  for (let i = 0; i < oldDecorators.length; i++) {
+                    let idx = currentScript.indexOf(oldDecorators[i]);
+                    if (idx >= 0)
+                      currentScript = [
+                        currentScript.slice(0, idx),
+                        currentScript.slice(idx + oldDecorators[i].length + 1)
+                      ].join('');
+                  }
+
+                  let idx = currentScript.search(/^@/gm);
+                  if (idx >= 0) {
+                    for (let i = 0; i < newDecorators.length; i++) {
+                      currentScript = [
+                        currentScript.slice(0, idx),
+                        newDecorators[i] + '\n',
+                        currentScript.slice(idx)
+                      ].join('');
+                    }
+                  }
+                }
+
+                tf.rawCode = currentScript;
+
+                tf.decorators = extractTFDecoratorFromTF(currentScript);
+                tf.functionDef = (scope.transferFunction.rawCode.match(
+                  new RegExp(
+                    '^def*.' + scope.transferFunction.name + '.*',
+                    'gm'
+                  )
+                ) || [''])[0];
+
+                if (scope.lastAutoApplyAfterUIStructuredChange) {
+                  $timeout.cancel(scope.lastAutoApplyAfterUIStructuredChange);
+                }
+
+                scope.lastAutoApplyAfterUIStructuredChange = $timeout(() => {
+                  scope.lastAutoApplyAfterUIStructuredChange = null;
+                  scope.applyScript(tf);
+                }, 1000);
+              });
+            };
+
+            /**************************************/
+            // Help bubble
 
             scope.showLocalHelp = function(show, category) {
               scope.localHelpVisible[category] = show;
             };
 
-            scope.centerPanelTabChanged = function(newtab) {
-              if (!scope.switchingToNewTab) {
-                if (scope.nTransferFunctionDirty) {
-                  scope.switchingToNewTab = newtab;
-
-                  scope.convertAllDirtyScripts(() => {
-                    scope.switchingToNewTab = undefined;
-
-                    // Check if there is an error
-
-                    var hasError = false;
-
-                    _.forEach(scope.transferFunctions, function(
-                      transferFunction
-                    ) {
-                      let errors = Object.keys(transferFunction.error);
-                      let index = errors.indexOf(scope.ERROR.RUNTIME);
-                      if (index > -1) {
-                        errors.splice(index, 1);
-                      }
-
-                      if (errors.length) {
-                        hasError = true;
-                      }
-                    });
-
-                    if (!hasError) {
-                      scope.centerPanelTabSelection = newtab;
-                      scope.refresh();
-                    } else {
-                      clbErrorDialog.open({
-                        type: 'Transfer Function Error.',
-                        message:
-                          'There are errors in some of your function transfer functions. They should be fixed before you can switch script format.'
-                      });
-                    }
-                  });
-                } else {
-                  scope.switchingToNewTab = undefined;
-                  scope.centerPanelTabSelection = newtab;
-                  scope.refresh();
-                }
-              }
-            };
-
-            function cleanEditorErrors() {
-              for (let j = 0; j < 2; j++) {
-                let editor = codeEditorsServices.getEditor(
-                  j === 0 ? 'rawCodeEditor' : 'codeEditor'
-                );
-                if (editor) {
-                  for (let i = 0; i < editor.lineCount(); i++)
-                    editor.removeLineClass(i, 'background', 'alert-danger');
-                }
-              }
-            }
-
-            scope.cleanCompileError = function(transferFunction) {
-              cleanEditorErrors();
-              if (transferFunction && transferFunction.error) {
-                if (transferFunction.error[scope.ERROR.COMPILE])
-                  delete transferFunction.error[scope.ERROR.COMPILE];
-
-                if (transferFunction.error[scope.ERROR.NO_OR_MULTIPLE_NAMES])
-                  delete transferFunction.error[
-                    scope.ERROR.NO_OR_MULTIPLE_NAMES
-                  ];
-              }
-            };
+            /**************************************/
+            // Structured decorator UI
 
             scope.getFriendlyPopulationName = function(neurons) {
               if (neurons.type === 1) {
@@ -504,13 +559,6 @@ if t % 2 < 0.02:
               }
             };
 
-            scope.setDirty = function(transferFunction) {
-              transferFunction.dirty = true;
-              scope.collabDirty = true;
-              autoSaveService.setDirty(DIRTY_TYPE, scope.transferFunctions);
-              scope.updateNTransferFunctionDirty();
-            };
-
             scope.getFriendlyTopicName = function(topic) {
               if (topic.publishing) {
                 return 'publishes on ' + topic.topic;
@@ -518,6 +566,107 @@ if t % 2 < 0.02:
                 return 'subscribes to ' + topic.topic;
               }
             };
+
+            scope.deleteHeader = function(v, head) {
+              scope.deleteFrom(v.headers, head);
+              scope.updateCSV(v);
+            };
+
+            scope.addHeader = function(v, header) {
+              v.headers.push(header);
+              scope.updateCSV(v);
+            };
+
+            scope.toggleNeuron = function(neuron, toggle) {
+              if (toggle) {
+                neuron.selected = !neuron.selected;
+              }
+              if (neuron.selected) {
+                scope.isNeuronsSelected = true;
+              } else {
+                var selectionFound = false;
+                _.forEach(scope.selectedPopulation.gids, function(n) {
+                  if (n.selected) {
+                    selectionFound = true;
+                  }
+                });
+                scope.isNeuronsSelected = selectionFound;
+              }
+            };
+
+            /**************************************/
+            // TF editing
+
+            scope.setDirty = function(transferFunction) {
+              transferFunction.dirty = true;
+              scope.collabDirty = true;
+              autoSaveService.setDirty(DIRTY_TYPE, scope.transferFunctions);
+              scope.updateNTransferFunctionDirty();
+            };
+
+            /**************************************/
+            // Managing reset
+
+            scope.resetListenerUnbindHandler = scope.$on('RESET', function(
+              event,
+              resetType
+            ) {
+              if (resetType === RESET_TYPE.RESET_FULL) {
+                scope.populations = [];
+                scope.topics = [];
+                scope.transferFunctions = [];
+                scope.transferFunction = null;
+                scope.selectedTF = null;
+                scope.selectedTopic = null;
+                scope.selectedPopulation = null;
+                scope.isNeuronsSelected = false;
+                scope.nTransferFunctionDirty = 0;
+                scope.collabDirty = false;
+                scope.updateCurrentTFContent();
+              }
+            });
+
+            /**************************************/
+            // Refreshing TF
+
+            scope.updateCurrentTFContent = function() {
+              scope.populateTransferFunctionsWithRawCode().then(function() {
+                scope.refresh();
+              });
+            };
+
+            scope.loadTopics = function(response) {
+              scope.topics = [];
+              scope.topics = response.topics;
+            };
+
+            let refreshEditor = reset => {
+              var editor = codeEditorsServices.getEditorChild(
+                'codeEditor',
+                element[0]
+              );
+              codeEditorsServices.refreshEditor(editor);
+              if (reset) codeEditorsServices.resetEditor(editor);
+
+              scope.updateNTransferFunctionDirty();
+            };
+
+            scope.refresh = function() {
+              refreshEditor();
+            };
+
+            scope.control.refresh = function() {
+              if (scope.collabDirty) refreshEditor();
+              else scope.populateStructuredTransferFunctions();
+            };
+
+            /**************************************/
+            // Loading TF content
+
+            function extractTFDecoratorFromTF(code) {
+              var decorators = code.match(/^@.*/gm);
+              return decorators || [];
+            }
 
             scope.loadPopulations = function(response) {
               scope.populations = [];
@@ -542,111 +691,6 @@ if t % 2 < 0.02:
               });
             };
 
-            scope.resetListenerUnbindHandler = scope.$on('RESET', function(
-              event,
-              resetType
-            ) {
-              if (resetType === RESET_TYPE.RESET_FULL) {
-                scope.populations = [];
-                scope.topics = [];
-                scope.transferFunctions = [];
-                scope.transferFunction = null;
-                scope.selectedTF = null;
-                scope.centerPanelTabSelection = 'script';
-                scope.selectedTopic = null;
-                scope.selectedPopulation = null;
-                scope.isNeuronsSelected = false;
-                scope.nTransferFunctionDirty = 0;
-                scope.collabDirty = false;
-                scope.updateCurrentTFContent();
-              }
-            });
-
-            scope.loadTopics = function(response) {
-              scope.topics = [];
-              scope.topics = response.topics;
-            };
-
-            let refreshEditor = reset => {
-              var editor = codeEditorsServices.getEditorChild(
-                'codeEditor',
-                element[0]
-              );
-              codeEditorsServices.refreshEditor(editor);
-              if (reset) codeEditorsServices.resetEditor(editor);
-
-              editor = codeEditorsServices.getEditorChild(
-                'rawCodeEditor',
-                element[0]
-              );
-              codeEditorsServices.refreshEditor(editor);
-              if (reset) codeEditorsServices.resetEditor(editor);
-
-              scope.updateNTransferFunctionDirty();
-            };
-
-            scope.applyEditorOptions = function() {
-              var editor = codeEditorsServices.getEditorChild(
-                'codeEditor',
-                element[0]
-              );
-
-              for (let opt in scope.editorOptions) {
-                editor.setOption(opt, scope.editorOptions[opt]);
-              }
-
-              editor = codeEditorsServices.getEditorChild(
-                'rawCodeEditor',
-                element[0]
-              );
-
-              for (let opt in scope.editorOptions) {
-                editor.setOption(opt, scope.editorOptions[opt]);
-              }
-            };
-
-            scope.refresh = function() {
-              refreshEditor();
-            };
-
-            // only start watching for changes after a little timeout
-            // the flood of changes during compilation will cause angular to throw digest errors when watched
-            $timeout(() => {
-              // refresh on resize
-              scope.unbindWatcherResize = scope.$watch(
-                () => {
-                  if (element[0].offsetParent) {
-                    return [
-                      element[0].offsetParent.offsetWidth,
-                      element[0].offsetParent.offsetHeight
-                    ].join('x');
-                  } else {
-                    return '';
-                  }
-                },
-                () => {
-                  refreshEditor();
-                }
-              );
-              refreshEditor();
-              scope.applyEditorOptions();
-            }, 100);
-
-            // update UI
-            scope.unbindListenerUpdatePanelUI = scope.$on(
-              'UPDATE_PANEL_UI',
-              function() {
-                // prevent calling the select functions of the tabs
-                scope.refresh();
-              }
-            );
-
-            scope.$on('$destroy', () => {
-              scope.resetListenerUnbindHandler();
-              scope.unbindWatcherResize && scope.unbindWatcherResize();
-              scope.unbindListenerUpdatePanelUI();
-            });
-
             scope.populateStructuredTransferFunctions = function() {
               backendInterfaceService.getStructuredTransferFunctions(
                 scope.loadTransferFunctions
@@ -663,311 +707,6 @@ if t % 2 < 0.02:
               refreshEditor();
             };
 
-            scope.control.refresh = function() {
-              if (scope.collabDirty) refreshEditor();
-              else scope.populateStructuredTransferFunctions();
-            };
-
-            scope.setTFtype = function(tf) {
-              var counter = 0;
-              _.forEach(tf.devices, function(dev) {
-                if (
-                  dev.type === 'LeakyIntegratorAlpha' ||
-                  dev.type === 'LeakyIntegratorExp' ||
-                  dev.type === 'SpikeRecorder'
-                ) {
-                  counter += 1;
-                } else {
-                  counter -= 1;
-                }
-              });
-              _.forEach(tf.topics, function(top) {
-                if (top.publishing) {
-                  if (top.name === '__return__') {
-                    tf.type = TRANSFER_FUNCTION_TYPE.NEURON2ROBOT;
-                  } else {
-                    counter++;
-                  }
-                } else {
-                  counter--;
-                }
-              });
-              if (tf.type) {
-                return;
-              }
-              if (counter > 0) {
-                tf.type = TRANSFER_FUNCTION_TYPE.NEURON2ROBOT;
-              } else {
-                tf.type = TRANSFER_FUNCTION_TYPE.ROBOT2NEURON;
-              }
-            };
-
-            scope.convertAllDirtyScripts = function(doneCallback) {
-              var convertAllDirtyScriptsCount = 0;
-
-              _.forEach(scope.transferFunctions, function(transferFunction) {
-                if (transferFunction.dirty) {
-                  convertAllDirtyScriptsCount++;
-                }
-              });
-
-              if (convertAllDirtyScriptsCount > 0) {
-                _.forEach(scope.transferFunctions, function(transferFunction) {
-                  if (transferFunction.dirty) {
-                    if (scope.centerPanelTabSelection === 'script') {
-                      scope.structuredToRaw(transferFunction, () => {
-                        convertAllDirtyScriptsCount--;
-                        if (convertAllDirtyScriptsCount == 0 && doneCallback)
-                          doneCallback();
-                      });
-                    } else {
-                      scope.cleanCompileError(transferFunction);
-
-                      scope.rawToStructured(transferFunction, () => {
-                        convertAllDirtyScriptsCount--;
-                        if (convertAllDirtyScriptsCount == 0 && doneCallback)
-                          doneCallback();
-                      });
-                    }
-                  }
-                });
-              } else doneCallback();
-            };
-
-            scope.applyAllDirtyScripts = function(doneCallback) {
-              var oneFound = false;
-              _.forEach(scope.transferFunctions, function(transferFunction) {
-                if (transferFunction.dirty) {
-                  scope.applyScript(transferFunction, doneCallback);
-                  oneFound = true;
-                }
-              });
-
-              autoSaveService.clearDirty(DIRTY_TYPE);
-
-              if (!oneFound) doneCallback();
-            };
-
-            scope.applyScript = function(transferFunction, doneCallback) {
-              let _doneCallback = doneCallback || angular.noop;
-              if (transferFunction) {
-                scope.cleanCompileError(transferFunction);
-                delete transferFunction.error[scope.ERROR.RUNTIME];
-                delete transferFunction.error[scope.ERROR.LOADING];
-                if (scope.centerPanelTabSelection === 'script') {
-                  if (transferFunction.code === '') {
-                    transferFunction.code = 'return';
-                  }
-                  scope.setTFtype(transferFunction);
-                  backendInterfaceService
-                    .setStructuredTransferFunction(transferFunction)
-                    .then(function() {
-                      transferFunction.dirty = false;
-                      transferFunction.local = false;
-                      scope.updateNTransferFunctionDirty();
-                      if (scope.nTransferFunctionDirty == 0)
-                        autoSaveService.clearDirty(DIRTY_TYPE);
-                      else
-                        autoSaveService.setDirty(
-                          DIRTY_TYPE,
-                          scope.transferFunctions
-                        );
-                      scope.synchingRawTF = scope.populateTransferFunctionsWithRawCode();
-                      scope.synchingRawTF.then(
-                        () => (scope.synchingRawTF = null)
-                      );
-                      _doneCallback();
-                    })
-                    .catch(function(data) {
-                      serverError.displayHTTPError(data);
-                      _doneCallback();
-                    });
-                } else {
-                  // Make sure we don't have duplicated names
-                  var tfNames = scope.transferFunctions.map(function(tf) {
-                    var tfName = pythonCodeHelper.getFunctionName(tf.rawCode);
-                    return tfName;
-                  });
-
-                  if (new Set(tfNames).size !== tfNames.length) {
-                    clbErrorDialog.open({
-                      type: 'Duplicate definition names',
-                      message: `There is already a transfer function with the same name. Please use another name.`
-                    });
-
-                    _doneCallback();
-                    return;
-                  }
-
-                  scope.cleanCompileError(transferFunction);
-
-                  backendInterfaceService
-                    .editTransferFunction(
-                      transferFunction.name,
-                      transferFunction.rawCode
-                    )
-                    .then(function() {
-                      transferFunction.dirty = false;
-                      transferFunction.local = false;
-
-                      //set code, is not faulty anymore
-                      if (scope.isTfFaulty(transferFunction)) {
-                        transferFunction.code = '';
-                      }
-
-                      scope.updateNTransferFunctionDirty();
-                      if (scope.nTransferFunctionDirty == 0)
-                        autoSaveService.clearDirty(DIRTY_TYPE);
-                      else
-                        autoSaveService.setDirty(
-                          DIRTY_TYPE,
-                          scope.transferFunctions
-                        );
-                      transferFunction.oldName = transferFunction.name = pythonCodeHelper.getFunctionName(
-                        transferFunction.rawCode
-                      );
-
-                      if (
-                        scope.transferFunction &&
-                        scope.transferFunction.name === transferFunction.name
-                      ) {
-                        scope.selectTransferFunction(transferFunction.name);
-                      }
-
-                      _doneCallback();
-                    })
-                    .then(scope.updateCurrentTFContent)
-                    .catch(function(data) {
-                      serverError.displayHTTPError(data);
-                      _doneCallback();
-                    });
-                }
-              }
-            };
-
-            scope.apply = function(doneCallback) {
-              scope.applyScript(scope.transferFunction, doneCallback);
-            };
-
-            scope.selectTransferFunction = function(transferFunction) {
-              scope.selectedTF = transferFunction;
-              var nextTF = null;
-              for (var i = 0; i < scope.transferFunctions.length; ) {
-                if (transferFunction === scope.transferFunctions[i].name) {
-                  nextTF = scope.transferFunctions[i];
-                  break;
-                }
-                i += 1;
-              }
-              if (nextTF === null) {
-                if (scope.transferFunction) {
-                  scope.transferFunction.name = transferFunction;
-                }
-              } else {
-                if (
-                  scope.transferFunction &&
-                  scope.transferFunction.oldName !== scope.transferFunction.name
-                ) {
-                  scope.transferFunction.name = scope.transferFunction.oldName;
-                }
-                scope.transferFunction = nextTF;
-              }
-
-              if (
-                scope.isTfFaulty(scope.transferFunction) &&
-                scope.centerPanelTabSelection == 'script'
-              ) {
-                scope.centerPanelTabChanged('rawscript');
-              }
-            };
-
-            scope.createNewTF = function() {
-              if (
-                scope.transferFunction &&
-                scope.transferFunction.oldName &&
-                scope.transferFunction.oldName !== scope.selectedTF
-              ) {
-                scope.transferFunction.name = scope.transferFunction.oldName;
-              } else {
-                scope.selectedTF = getFreeName(
-                  scope.transferFunctions,
-                  'transferFunction'
-                );
-              }
-
-              var rawcode = DEFAULT_RAW_TF_CODE.replace(
-                '{0}',
-                scope.selectedTF
-              );
-              var scriptcode = DEFAULT_SCRIPT_TF_CODE;
-
-              var tf = new ScriptObject(
-                scope.selectedTF,
-                scope.centerPanelTabSelection === 'script'
-                  ? scriptcode
-                  : rawcode
-              );
-              tf.type = 1;
-              tf.name = scope.selectedTF;
-              tf.oldName = tf.name;
-              tf.devices = [];
-              tf.topics = [];
-              tf.variables = [];
-              tf.local = true;
-              tf.dirty = true;
-              tf.rawCode = rawcode;
-              tf.active = true;
-              tf.editName = true;
-
-              scope.setDirty(tf);
-              scope.transferFunctions.push(tf);
-              scope.selectTransferFunction(tf.name);
-            };
-
-            scope.createNewMonitor = function() {
-              if (!scope.selectedPopulation) {
-                return;
-              }
-              if (scope.transferFunction && scope.transferFunction.oldName) {
-                if (scope.transferFunction.oldName !== scope.selectedTF) {
-                  scope.transferFunction.name = scope.transferFunction.oldName;
-                } else {
-                  scope.selectedTF = getFreeName(
-                    scope.transferFunctions,
-                    'monitor'
-                  );
-                }
-              }
-              var tf = new ScriptObject(scope.selectedTF, 'return True');
-              tf.type = TRANSFER_FUNCTION_TYPE.NEURONMONITOR;
-              tf.name = scope.selectedTF;
-              tf.oldName = tf.name;
-              tf.devices = [];
-              tf.topics = [
-                {
-                  name: 'publisher',
-                  topic: 'a monitoring topic',
-                  type: 'monitor topic',
-                  publishing: true
-                }
-              ];
-              tf.variables = [];
-              tf.local = true;
-              scope.transferFunctions.push(tf);
-              scope.selectTransferFunction(tf.name);
-              scope.createDevice();
-              scope.setDirty(tf);
-              tf.devices[0].name = 'device';
-
-              scope.addMode = null;
-            };
-
-            var detectDefaultTopic = function(t) {
-              t.isDefault = t.name === '__return__';
-            };
-
-            scope.isTfFaulty = tf => (tf ? tf.code == null : false);
-
             scope.populateTransferFunctionsWithRawCode = function() {
               return backendInterfaceService.getTransferFunctions(function(
                 response
@@ -981,6 +720,10 @@ if t % 2 < 0.02:
                   if (found) {
                     tf.rawCode = code;
                     tf.active = response.active[tf.name];
+                    tf.decorators = extractTFDecoratorFromTF(code);
+                    tf.functionDef = (code.match(
+                      new RegExp('^def*.' + tf.name + '.*', 'gm')
+                    ) || [''])[0];
                   } else {
                     //add a faulty TF
                     let newTFId = scope.transferFunctions.length;
@@ -990,6 +733,10 @@ if t % 2 < 0.02:
                     faultyTF.rawCode = code;
                     faultyTF.active = response.active[faultyTF.name];
                     faultyTF.local = false;
+                    faultyTF.decorators = extractTFDecoratorFromTF(code);
+                    faultyTF.functionDef = (code.match(
+                      new RegExp('^def*.' + faultyTF.name + '.*', 'gm')
+                    ) || [''])[0];
 
                     scope.transferFunctions.push(faultyTF);
                   }
@@ -997,49 +744,23 @@ if t % 2 < 0.02:
               });
             };
 
-            scope.setNameTf = function() {
-              var initPanel = scope.centerPanelTabSelection;
-              var active = scope.transferFunction.active;
-              scope.transferFunction.rawCode = pythonCodeHelper.setFunctionName(
-                scope.transferFunction.rawCode,
-                scope.transferFunction.name
-              );
-              scope.transferFunction.editName = !scope.transferFunction
-                .editName;
-              scope.transferFunction.name = scope.transferFunction.oldName;
-              scope.centerPanelTabSelection = 'rawscript';
-              scope.applyScript(scope.transferFunction, () => {
-                scope.saveTFIntoCollabStorage();
-                scope.centerPanelTabSelection = initPanel;
-                scope.transferFunction.active = !active;
-                scope.toggleActive(scope.transferFunction);
-              });
-            };
-
-            scope.toggleActive = function(tf) {
-              if (scope.isTfFaulty(tf)) return;
-
-              tf.active = !tf.active;
-
-              backendInterfaceService.setActivateTransferFunction(
-                tf.name,
-                null,
-                tf.active,
-                function() {},
-                function(data) {
-                  tf.active = !tf.active;
-                  serverError.displayHTTPError(data);
+            scope.parseFilenameAndHeaders = function(v) {
+              if (v.type === 'csv') {
+                if (v.initial_value) {
+                  try {
+                    var parsed = JSON.parse(v.initial_value);
+                    v.filename = parsed.filename;
+                    v.headers = parsed.headers;
+                  } catch (err) {
+                    v.filename = undefined;
+                    v.headers = undefined;
+                  }
                 }
-              );
-            };
-
-            scope.updateNTransferFunctionDirty = function() {
-              scope.nTransferFunctionDirty = 0;
-              _.forEach(scope.transferFunctions, function(tf) {
-                if (tf.dirty) {
-                  scope.nTransferFunctionDirty++;
-                }
-              });
+                if (v.headers === undefined) v.headers = [];
+              } else {
+                v.filename = undefined;
+                v.headers = undefined;
+              }
             };
 
             scope.loadTransferFunctions = function(response) {
@@ -1082,6 +803,130 @@ if t % 2 < 0.02:
               scope.populateTransferFunctionsWithRawCode().then(scope.refresh);
             };
 
+            /**************************************/
+            // Handling script changes
+
+            scope.preprocessDecoratorsForErrors = function(
+              name,
+              code,
+              decorators
+            ) {
+              // Check that we have at least the minimal standard decorators
+
+              if (decorators.length === 0) return false;
+
+              if (
+                (code.match(/^@nrp.Neuron2Robot/gm) || []).length !== 1 &&
+                (code.match(/^@nrp.Robot2Neuron/gm) || []).length !== 1 &&
+                (code.match(/^@nrp.NeuronMonitor/gm) || []).length !== 1
+              )
+                return false;
+
+              if (!code.match(new RegExp('^def*.' + name + '.*', 'gm')))
+                return false;
+
+              return true;
+            };
+
+            scope.checkNameChangedFromScript = function() {
+              var nameFromScript = pythonCodeHelper.getFunctionName(
+                scope.transferFunction.rawCode
+              );
+              if (scope.transferFunction.name === nameFromScript) return false;
+
+              if (scope.lastNameChangeUpdate) {
+                $timeout.cancel(scope.lastNameChangeUpdate);
+              }
+
+              scope.lastNameChangeUpdate = $timeout(() => {
+                var name = pythonCodeHelper.getFunctionName(
+                  scope.transferFunction.rawCode
+                );
+
+                if (name && name !== 'undefined') {
+                  scope.transferFunction.editName = true;
+                  scope.transferFunction.name = name;
+                  scope.setNameTf();
+                }
+              }, 1000);
+
+              return true;
+            };
+
+            scope.contentChanged = function() {
+              if (
+                !scope.renamingTF &&
+                scope.transferFunction &&
+                scope.transferFunction.rawCode
+              ) {
+                var decorators = extractTFDecoratorFromTF(
+                  scope.transferFunction.rawCode
+                );
+
+                var functionDef = (scope.transferFunction.rawCode.match(
+                  new RegExp(
+                    '^def*.' + scope.transferFunction.name + '.*',
+                    'gm'
+                  )
+                ) || [''])[0];
+
+                if (functionDef === '') {
+                  functionDef = (scope.transferFunction.rawCode.match(
+                    new RegExp(
+                      '^def*.' +
+                        pythonCodeHelper.getFunctionName(
+                          scope.transferFunction.rawCode
+                        ) +
+                        '.*',
+                      'gm'
+                    )
+                  ) || [''])[0];
+                }
+
+                if (
+                  !scope.transferFunction.decorators ||
+                  functionDef !== scope.transferFunction.functionDef ||
+                  JSON.stringify(decorators) !==
+                    JSON.stringify(scope.transferFunction.decorators)
+                ) {
+                  if (!scope.checkNameChangedFromScript()) {
+                    if (
+                      scope.preprocessDecoratorsForErrors(
+                        scope.transferFunction.name,
+                        scope.transferFunction.rawCode,
+                        decorators
+                      )
+                    ) {
+                      if (scope.lastDecoratorUpdate) {
+                        $timeout.cancel(scope.lastDecoratorUpdate);
+                      }
+
+                      scope.lastDecoratorUpdate = $timeout(() => {
+                        scope.lastDecoratorUpdate = undefined;
+                        scope.addMode = null;
+
+                        scope.rawToStructured(
+                          scope.transferFunction,
+                          (tf, error) => {
+                            if (!tf) tf = scope.transferFunction;
+                            tf.decoratorDirty = !!error;
+                          }
+                        );
+                      }, 1000);
+                    } else {
+                      scope.transferFunction.decoratorDirty = true;
+                      scope.addMode = null;
+                    }
+                    scope.transferFunction.decorators = decorators;
+                    scope.transferFunction.functionDef = functionDef;
+                  }
+                }
+              }
+            };
+
+            /**************************************/
+            // Handling UI decorator editor changes
+
             var getFreeName = function(set, prefix) {
               var check = function(item) {
                 if (item.name === prefix + counter) {
@@ -1101,6 +946,40 @@ if t % 2 < 0.02:
               return prefix + counter;
             };
 
+            scope.setTFtype = function(tf) {
+              var counter = 0;
+              _.forEach(tf.devices, function(dev) {
+                if (
+                  dev.type === 'LeakyIntegratorAlpha' ||
+                  dev.type === 'LeakyIntegratorExp' ||
+                  dev.type === 'SpikeRecorder'
+                ) {
+                  counter += 1;
+                } else {
+                  counter -= 1;
+                }
+              });
+              _.forEach(tf.topics, function(top) {
+                if (top.publishing) {
+                  if (top.name === '__return__') {
+                    tf.type = TRANSFER_FUNCTION_TYPE.NEURON2ROBOT;
+                  } else {
+                    counter++;
+                  }
+                } else {
+                  counter--;
+                }
+              });
+              if (tf.type) {
+                return;
+              }
+              if (counter > 0) {
+                tf.type = TRANSFER_FUNCTION_TYPE.NEURON2ROBOT;
+              } else {
+                tf.type = TRANSFER_FUNCTION_TYPE.ROBOT2NEURON;
+              }
+            };
+
             scope.addNewVariable = function(variableBaseName) {
               var variable = {};
               variable.name = getFreeName(
@@ -1116,6 +995,7 @@ if t % 2 < 0.02:
               scope.setDirty(scope.transferFunction);
 
               scope.addMode = '';
+              scope.updateScriptFromStructured();
             };
 
             scope.createTopicChannel = function(publishing) {
@@ -1130,6 +1010,7 @@ if t % 2 < 0.02:
               }
 
               scope.addMode = null;
+              scope.updateScriptFromStructured();
             };
 
             scope.setTopicName = function(top) {
@@ -1200,6 +1081,12 @@ if t % 2 < 0.02:
               }
 
               scope.addMode = null;
+              scope.updateScriptFromStructured();
+            };
+
+            scope.decoratorsChangedFromUI = function(tf) {
+              scope.updateScriptFromStructured();
+              scope.setDirty(tf);
             };
 
             scope.deleteFrom = function(array, element) {
@@ -1222,54 +1109,288 @@ if t % 2 < 0.02:
               scope.deleteFrom(scope.transferFunction.variables, v);
             };
 
-            scope.parseFilenameAndHeaders = function(v) {
-              if (v.type === 'csv') {
-                if (v.initial_value) {
-                  var parsed = JSON.parse(v.initial_value);
-                  v.filename = parsed.filename;
-                  v.headers = parsed.headers;
+            /**************************************/
+            // Applying changes
+
+            scope.applyAllDirtyScripts = function(doneCallback) {
+              var oneFound = false;
+              _.forEach(scope.transferFunctions, function(transferFunction) {
+                if (transferFunction.dirty) {
+                  scope.applyScript(transferFunction, doneCallback);
+                  oneFound = true;
                 }
-                if (v.headers === undefined) v.headers = [];
-              } else {
-                v.filename = undefined;
-                v.headers = undefined;
-              }
-            };
-
-            scope.deleteHeader = function(v, head) {
-              scope.deleteFrom(v.headers, head);
-              scope.updateCSV(v);
-            };
-
-            scope.addHeader = function(v, header) {
-              v.headers.push(header);
-              scope.updateCSV(v);
-            };
-
-            scope.updateCSV = function(v) {
-              //eslint-disable-next-line camelcase
-              v.initial_value = JSON.stringify({
-                headers: v.headers,
-                filename: v.filename
               });
-              scope.setDirty(scope.transferFunction);
+
+              autoSaveService.clearDirty(DIRTY_TYPE);
+
+              if (!oneFound) doneCallback();
             };
 
-            scope.toggleNeuron = function(neuron, toggle) {
-              if (toggle) {
-                neuron.selected = !neuron.selected;
-              }
-              if (neuron.selected) {
-                scope.isNeuronsSelected = true;
-              } else {
-                var selectionFound = false;
-                _.forEach(scope.selectedPopulation.gids, function(n) {
-                  if (n.selected) {
-                    selectionFound = true;
-                  }
+            scope.applyScript = function(transferFunction, doneCallback) {
+              let _doneCallback = doneCallback || angular.noop;
+              if (transferFunction) {
+                // Make sure we don't have duplicated names
+                var tfNames = scope.transferFunctions.map(function(tf) {
+                  var tfName = pythonCodeHelper.getFunctionName(tf.rawCode);
+                  return tfName;
                 });
-                scope.isNeuronsSelected = selectionFound;
+
+                if (new Set(tfNames).size !== tfNames.length) {
+                  clbErrorDialog.open({
+                    type: 'Duplicate definition names',
+                    message: `There is already a transfer function with the same name. Please use another name.`
+                  });
+
+                  _doneCallback();
+                  return;
+                }
+
+                scope.cleanCompileError(transferFunction);
+                delete transferFunction.error[scope.ERROR.RUNTIME];
+                delete transferFunction.error[scope.ERROR.LOADING];
+
+                transferFunction.decorators = extractTFDecoratorFromTF(
+                  transferFunction.rawCode
+                );
+                transferFunction.functionDef = (transferFunction.rawCode.match(
+                  new RegExp('^def*.' + transferFunction.name + '.*', 'gm')
+                ) || [''])[0];
+
+                if (transferFunction.functionDef === '') {
+                  transferFunction.functionDef = (transferFunction.rawCode.match(
+                    new RegExp(
+                      '^def*.' +
+                        pythonCodeHelper.getFunctionName(
+                          scope.transferFunction.rawCode
+                        ) +
+                        '.*',
+                      'gm'
+                    )
+                  ) || [''])[0];
+                }
+
+                backendInterfaceService
+                  .editTransferFunction(
+                    transferFunction.name,
+                    transferFunction.rawCode
+                  )
+                  .then(function() {
+                    transferFunction.dirty = false;
+                    transferFunction.local = false;
+
+                    scope.updateNTransferFunctionDirty();
+                    if (scope.nTransferFunctionDirty == 0)
+                      autoSaveService.clearDirty(DIRTY_TYPE);
+                    else
+                      autoSaveService.setDirty(
+                        DIRTY_TYPE,
+                        scope.transferFunctions
+                      );
+                    transferFunction.oldName = transferFunction.name = pythonCodeHelper.getFunctionName(
+                      transferFunction.rawCode
+                    );
+
+                    if (
+                      scope.transferFunction &&
+                      scope.transferFunction.name === transferFunction.name
+                    ) {
+                      scope.selectTransferFunction(transferFunction.name);
+                    }
+
+                    _doneCallback();
+                    $timeout(() => {
+                      if ($.isEmptyObject(transferFunction.error)) {
+                        transferFunction.decoratorDirty = false;
+                      }
+                    }, 1.0);
+                  })
+                  .then(scope.updateCurrentTFContent)
+                  .catch(function(data) {
+                    serverError.displayHTTPError(data);
+                    _doneCallback();
+                  });
               }
+            };
+
+            scope.apply = function(doneCallback) {
+              scope.applyScript(scope.transferFunction, doneCallback);
+            };
+
+            /**************************************/
+            // Transfer function list management
+
+            scope.selectTransferFunction = function(transferFunction) {
+              scope.selectedTF = transferFunction;
+              var nextTF = null;
+              for (var i = 0; i < scope.transferFunctions.length; ) {
+                if (transferFunction === scope.transferFunctions[i].name) {
+                  nextTF = scope.transferFunctions[i];
+                  break;
+                }
+                i += 1;
+              }
+              if (nextTF === null) {
+                if (scope.transferFunction) {
+                  scope.transferFunction.name = transferFunction;
+                }
+              } else {
+                if (
+                  scope.transferFunction &&
+                  scope.transferFunction.oldName !== scope.transferFunction.name
+                ) {
+                  scope.transferFunction.name = scope.transferFunction.oldName;
+                }
+                scope.transferFunction = nextTF;
+              }
+            };
+
+            scope.createNewTF = function() {
+              if (
+                scope.transferFunction &&
+                scope.transferFunction.oldName &&
+                scope.transferFunction.oldName !== scope.selectedTF
+              ) {
+                scope.transferFunction.name = scope.transferFunction.oldName;
+              } else {
+                scope.selectedTF = getFreeName(
+                  scope.transferFunctions,
+                  'transferFunction'
+                );
+              }
+
+              var rawcode = DEFAULT_RAW_TF_CODE.replace(
+                '{0}',
+                scope.selectedTF
+              );
+              var tf = new ScriptObject(scope.selectedTF, rawcode);
+              tf.type = 1;
+              tf.name = scope.selectedTF;
+              tf.oldName = tf.name;
+              tf.devices = [];
+              tf.topics = [];
+              tf.variables = [];
+              tf.local = true;
+              tf.dirty = true;
+              tf.rawCode = rawcode;
+              tf.active = true;
+              tf.editName = true;
+
+              scope.setDirty(tf);
+              scope.transferFunctions.push(tf);
+              scope.selectTransferFunction(tf.name);
+            };
+
+            scope.createNewMonitor = function() {
+              if (!scope.selectedPopulation) {
+                return;
+              }
+              if (scope.transferFunction && scope.transferFunction.oldName) {
+                if (scope.transferFunction.oldName !== scope.selectedTF) {
+                  scope.transferFunction.name = scope.transferFunction.oldName;
+                } else {
+                  scope.selectedTF = getFreeName(
+                    scope.transferFunctions,
+                    'monitor'
+                  );
+                }
+              }
+              var tf = new ScriptObject(scope.selectedTF, 'return True');
+              tf.type = TRANSFER_FUNCTION_TYPE.NEURONMONITOR;
+              tf.name = scope.selectedTF;
+              tf.oldName = tf.name;
+              tf.devices = [];
+              tf.topics = [
+                {
+                  name: 'publisher',
+                  topic: 'a monitoring topic',
+                  type: 'monitor topic',
+                  publishing: true
+                }
+              ];
+              tf.variables = [];
+              tf.local = true;
+              scope.transferFunctions.push(tf);
+              scope.selectTransferFunction(tf.name);
+              scope.createDevice();
+              scope.setDirty(tf);
+              tf.devices[0].name = 'device';
+
+              scope.updateScriptFromStructured();
+              scope.addMode = null;
+            };
+
+            var detectDefaultTopic = function(t) {
+              t.isDefault = t.name === '__return__';
+            };
+
+            scope.setNameTf = function() {
+              scope.renamingTF = true;
+              var active = scope.transferFunction.active;
+              scope.transferFunction.rawCode = pythonCodeHelper.setFunctionName(
+                scope.transferFunction.rawCode,
+                scope.transferFunction.name
+              );
+
+              scope.transferFunction.decorators = extractTFDecoratorFromTF(
+                scope.transferFunction.rawCode
+              );
+              scope.transferFunction.functionDef = (scope.transferFunction.rawCode.match(
+                new RegExp('^def*.' + scope.transferFunction.name + '.*', 'gm')
+              ) || [''])[0];
+
+              scope.transferFunction.editName = !scope.transferFunction
+                .editName;
+              scope.transferFunction.name = scope.transferFunction.oldName;
+              scope.applyScript(scope.transferFunction, () => {
+                scope.transferFunction.active = !active;
+                scope.toggleActive(scope.transferFunction);
+                scope.renamingTF = false;
+              });
+            };
+
+            scope.toggleActive = function(tf) {
+              tf.active = !tf.active;
+
+              backendInterfaceService.setActivateTransferFunction(
+                tf.name,
+                null,
+                tf.active,
+                function() {},
+                function(data) {
+                  tf.active = !tf.active;
+                  serverError.displayHTTPError(data);
+                }
+              );
+            };
+
+            scope.updateNTransferFunctionDirty = function() {
+              scope.nTransferFunctionDirty = 0;
+              _.forEach(scope.transferFunctions, function(tf) {
+                if (tf.dirty) {
+                  scope.nTransferFunctionDirty++;
+                }
+              });
+            };
+
+            scope.deleteTFunctions = function(transferFunctions) {
+              if (transferFunctions === undefined) return;
+
+              //make sure transferFunctions is an array
+              transferFunctions = [].concat(transferFunctions);
+              transferFunctions.map(function(transferFunction) {
+                var index = scope.transferFunctions.indexOf(transferFunction);
+                if (transferFunction.local) {
+                  return scope.transferFunctions.splice(index, 1);
+                } else {
+                  backendInterfaceService.deleteTransferFunction(
+                    transferFunction.name,
+                    angular.noop
+                  );
+                  scope.transferFunctions.splice(index, 1);
+                  scope.collabDirty = environmentService.isPrivateExperiment();
+                }
+              });
+              autoSaveService.setDirty(DIRTY_TYPE, scope.transferFunctions);
             };
 
             var deleteInternal = function(scope, index) {
@@ -1281,6 +1402,62 @@ if t % 2 < 0.02:
                 scope.transferFunction = null;
               }
             };
+
+            scope.delete = function() {
+              if (scope.transferFunction) {
+                var transferFunction = scope.transferFunction;
+                var index = scope.transferFunctions.indexOf(transferFunction);
+                if (transferFunction.local) {
+                  deleteInternal(scope, index);
+                } else {
+                  backendInterfaceService.deleteTransferFunction(
+                    transferFunction.name,
+                    angular.noop
+                  );
+                  deleteInternal(scope, index);
+                }
+
+                scope.collabDirty = true;
+              }
+            };
+
+            /**************************************/
+            // CSV
+
+            scope.updateCSV = function(v) {
+              //eslint-disable-next-line camelcase
+              v.initial_value = JSON.stringify({
+                headers: v.headers,
+                filename: v.filename
+              });
+              scope.setDirty(scope.transferFunction);
+            };
+
+            scope.saveCSVIntoCollabStorage = function() {
+              let deferred = $q.defer();
+              scope.isSavingCSVToCollab = true;
+              backendInterfaceService.saveCSVRecordersFiles(
+                function() {
+                  // Success callback
+                  scope.isSavingCSVToCollab = false;
+                  deferred.resolve();
+                },
+                function() {
+                  // Failure callback
+                  clbErrorDialog.open({
+                    type: 'BackendError.',
+                    message:
+                      'Error while saving recorded CSV files to the Storage.'
+                  });
+                  deferred.reject();
+                  scope.isSavingCSVToCollab = false;
+                }
+              );
+              return deferred.promise;
+            };
+
+            /**************************************/
+            // Import / Export
 
             scope.buildTransferFunctionFile = function(transferFunctions) {
               return _.map(transferFunctions, 'rawCode').join('\n');
@@ -1305,7 +1482,7 @@ if t % 2 < 0.02:
               );
             };
 
-            scope.doDownload = function() {
+            scope.download = function() {
               clbConfirm
                 .open({
                   title: 'Downloading Transfer Functions',
@@ -1323,22 +1500,6 @@ if t % 2 < 0.02:
                     scope.downloadTFFile(true);
                   }
                 );
-            };
-
-            scope.download = function() {
-              if (scope.centerPanelTabSelection === 'rawscript') {
-                // In raw script I don't have to force an apply to save data
-                scope.doDownload();
-              } else {
-                scope.applyAllDirtyScripts(() => {
-                  scope.updateNTransferFunctionDirty();
-                  if (scope.nTransferFunctionDirty === 0) {
-                    scope
-                      .populateTransferFunctionsWithRawCode()
-                      .then(scope.doDownload);
-                  }
-                });
-              }
             };
 
             var insertIfTransferFunction = function(list, tfCode) {
@@ -1374,27 +1535,6 @@ if t % 2 < 0.02:
               );
 
               return loadedTransferFunctions;
-            };
-
-            scope.deleteTFunctions = function(transferFunctions) {
-              if (transferFunctions === undefined) return;
-
-              //make sure transferFunctions is an array
-              transferFunctions = [].concat(transferFunctions);
-              transferFunctions.map(function(transferFunction) {
-                var index = scope.transferFunctions.indexOf(transferFunction);
-                if (transferFunction.local) {
-                  return scope.transferFunctions.splice(index, 1);
-                } else {
-                  backendInterfaceService.deleteTransferFunction(
-                    transferFunction.name,
-                    angular.noop
-                  );
-                  scope.transferFunctions.splice(index, 1);
-                  scope.collabDirty = environmentService.isPrivateExperiment();
-                }
-              });
-              autoSaveService.setDirty(DIRTY_TYPE, scope.transferFunctions);
             };
 
             function findUniqueNameFromTFCode(code) {
@@ -1501,7 +1641,6 @@ if t % 2 < 0.02:
 
             scope.upload = function(file) {
               if (file && !file.$error) {
-                scope.centerPanelTabSelection = 'rawscript';
                 var textReader = new FileReader();
                 textReader.onload = function(e) {
                   applyUploadedTransferFunctions(
@@ -1511,6 +1650,9 @@ if t % 2 < 0.02:
                 textReader.readAsText(file);
               }
             };
+
+            /**************************************/
+            // Saving
 
             var saveTFtoBackend = function() {
               backendInterfaceService.saveTransferFunctions(
@@ -1572,64 +1714,6 @@ if t % 2 < 0.02:
               }
               saveTFtoBackend();
             };
-
-            scope.saveCSVIntoCollabStorage = function() {
-              let deferred = $q.defer();
-              scope.isSavingCSVToCollab = true;
-              backendInterfaceService.saveCSVRecordersFiles(
-                function() {
-                  // Success callback
-                  scope.isSavingCSVToCollab = false;
-                  deferred.resolve();
-                },
-                function() {
-                  // Failure callback
-                  clbErrorDialog.open({
-                    type: 'BackendError.',
-                    message:
-                      'Error while saving recorded CSV files to the Storage.'
-                  });
-                  deferred.reject();
-                  scope.isSavingCSVToCollab = false;
-                }
-              );
-              return deferred.promise;
-            };
-
-            scope.delete = function() {
-              if (scope.transferFunction) {
-                var transferFunction = scope.transferFunction;
-                var index = scope.transferFunctions.indexOf(transferFunction);
-                if (transferFunction.local) {
-                  deleteInternal(scope, index);
-                } else {
-                  backendInterfaceService.deleteTransferFunction(
-                    transferFunction.name,
-                    angular.noop
-                  );
-                  deleteInternal(scope, index);
-                }
-
-                scope.collabDirty = true;
-              }
-            };
-
-            autoSaveService.registerFoundAutoSavedCallback(
-              DIRTY_TYPE,
-              (autoSaved, applyChanges) => {
-                scope.collabDirty = true;
-                scope.centerPanelTabSelection = 'rawscript';
-                scope.transferFunctions = autoSaved;
-                if (scope.transferFunctions.length)
-                  scope.selectTransferFunction(scope.transferFunctions[0].name);
-
-                if (applyChanges) {
-                  _.forEach(autoSaved, tf =>
-                    scope.applyScript(tf, angular.noop)
-                  );
-                }
-              }
-            );
           }
         };
       }

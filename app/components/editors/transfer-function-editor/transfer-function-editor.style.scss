@@ -140,7 +140,6 @@ li {
   flex-direction: column;
   display: flex;
   margin-bottom: 10px;
-  margin-top: 3px;
 }
 
 .right-panel {
@@ -194,6 +193,10 @@ li {
   justify-content: flex-end;
   padding-right: 10px;
   padding-bottom: 5px;
+}
+
+.tf-param-title-background-disabled {
+  background: #f3f3f3;
 }
 
 .tf-param-title-background-populations {
