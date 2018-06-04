@@ -85,7 +85,6 @@
 
     onNewJointMessage(message) {
       if (!this.allJoints) this.initializeJoints(message.name);
-
       var currentTime =
         message.header.stamp.secs + message.header.stamp.nsecs * 0.000000001;
       if (currentTime > this.plot.options.axes.x.max) {

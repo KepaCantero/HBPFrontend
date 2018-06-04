@@ -51,7 +51,53 @@
         // eslint-disable-next-line camelcase
         { throttle_rate: 1.0 / JointPlotService.POINT_FREQUENCY * 1000.0 }
       );
+
       this.callbacks = [];
+
+      this.ros = new this.roslib.Ros({ url: this.server });
+      this.jointsType = {};
+
+      this.modelProp = bbpConfig.get('ros-services').modelProperties;
+      this.jointProp = bbpConfig.get('ros-services').jointProperties;
+
+      this.getModelPropertiesService = this.roslib.createService(
+        this.ros,
+        this.modelProp.name,
+        this.modelProp.type
+      );
+      this.getJointPropertiesService = this.roslib.createService(
+        this.ros,
+        this.jointProp.name,
+        this.jointProp.type
+      );
+
+      let modelreq = {};
+      let jointreq = {};
+      modelreq[this.modelProp.param] = 'robot';
+
+      this.getModelPropertiesService.callService(
+        new this.roslib.ServiceRequest(modelreq),
+        res => {
+          angular.forEach(res['joint_names'], joint => {
+            jointreq[this.jointProp.param] = joint;
+
+            this.getJointPropertiesService.callService(
+              new this.roslib.ServiceRequest(jointreq),
+              res => {
+                this.jointsType[joint] = res['type'];
+              },
+              error => {
+                console.error(
+                  'ROS communication error. ' + JSON.stringify(error)
+                );
+              }
+            );
+          });
+        },
+        error => {
+          console.error('ROS communication error. ' + JSON.stringify(error));
+        }
+      );
     }
 
     close() {
@@ -74,6 +120,19 @@
 
       let currentTime =
         message.header.stamp.secs + message.header.stamp.nsecs * 0.000000001;
+
+      // Do not plot if the jointTypes hasn't been populated yet
+      if (!Object.keys(this.jointsType).length) return;
+
+      // Check for revolute joint (type == 0). Ref: GazeboRosPackages
+      for (let i = 0; i < message.name.length; i++) {
+        if (this.jointsType[message.name[i]] === 0) {
+          message.position[i] =
+            message.position[i] >= 0
+              ? message.position[i] % (2 * Math.PI)
+              : message.position[i] % (2 * Math.PI) + 2 * Math.PI;
+        }
+      }
 
       if (
         Math.abs(currentTime - this.lastMessageTime) * tolerance >=

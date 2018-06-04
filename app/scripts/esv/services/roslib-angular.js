@@ -116,6 +116,24 @@
         };
       })(ROSLIB.Topic.prototype.subscribe);
 
+      ROSLIB.createService = function(
+        connection,
+        serviceName,
+        serviceType,
+        additionalOptions
+      ) {
+        return new ROSLIB.Service(
+          _.extend(
+            {
+              ros: connection,
+              name: serviceName,
+              serviceType: serviceName
+            },
+            additionalOptions
+          )
+        );
+      };
+
       // Return the (formerly global) reference so that it can be injected
       // into other aspects of the AngularJS application.
       return ROSLIB;
