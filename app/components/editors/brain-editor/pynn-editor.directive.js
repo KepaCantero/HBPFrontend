@@ -94,7 +94,7 @@
           scope.isSavingToCollab = false;
 
           var ScriptObject = pythonCodeHelper.ScriptObject;
-          scope.pynnScript = new ScriptObject(0, 'empty');
+          scope.pynnScript = new ScriptObject(0, '');
 
           scope.editorOptions = codeEditorsServices.getDefaultEditorOptions();
 
@@ -163,7 +163,7 @@
                   scope.searchToken('si');
                 }, 100);
               } else {
-                scope.pynnScript.code = 'empty';
+                scope.pynnScript.code = '# Write PyNN script here';
                 scope.populations = [];
                 refreshEditor();
               }

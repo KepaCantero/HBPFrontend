@@ -43,7 +43,7 @@ describe('Services: userNavigationService', function() {
         scene: {
           scene: new THREE.Scene(),
           getByName: function() {
-            return null;
+            return 'robot';
           },
           viewManager: {
             mainUserView: {

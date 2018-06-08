@@ -208,7 +208,7 @@ describe('Directive: pynnEditor', function() {
       });
       isolateScope.refresh();
       expect(backendInterfaceService.getBrain).toHaveBeenCalled();
-      expect(isolateScope.pynnScript.code).toBe('empty');
+      expect(isolateScope.pynnScript.code).toBe('# Write PyNN script here');
     });
 
     it('should apply changes made on the pynn script and the brain population properly', function() {

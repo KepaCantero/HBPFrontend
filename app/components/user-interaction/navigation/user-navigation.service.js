@@ -115,21 +115,26 @@
 
                   // set up controls
                   that.freeCameraControls = new THREE.FirstPersonControls(gz3d);
-                  that.lookatRobotControls = new THREE.LookatRobotControls(
-                    gz3d.scene.viewManager.mainUserView,
-                    gz3d.scene.getByName('robot')
-                  );
-                  that.avatarControls = new THREE.AvatarControls(that, gz3d);
-                  that.avatarControls.createAvatarTopics(that.avatarObjectName);
 
-                  userInteractionSettingsService.settings //.loadSettings()
-                    .then(function(settings) {
-                      if (settings.camera.defaultMode === 'lookatrobot') {
-                        that.setLookatRobotCamera();
-                      } else {
-                        that.setModeFreeCamera();
-                      }
-                    });
+                  if (gz3d.scene.getByName('robot')) {
+                    that.lookatRobotControls = new THREE.LookatRobotControls(
+                      gz3d.scene.viewManager.mainUserView,
+                      gz3d.scene.getByName('robot')
+                    );
+                    that.avatarControls = new THREE.AvatarControls(that, gz3d);
+                    that.avatarControls.createAvatarTopics(
+                      that.avatarObjectName
+                    );
+
+                    userInteractionSettingsService.settings //.loadSettings()
+                      .then(function(settings) {
+                        if (settings.camera.defaultMode === 'lookatrobot') {
+                          that.setLookatRobotCamera();
+                        } else {
+                          that.setModeFreeCamera();
+                        }
+                      });
+                  }
                 });
               }
             });
