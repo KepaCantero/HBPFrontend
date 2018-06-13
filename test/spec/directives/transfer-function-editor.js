@@ -178,11 +178,10 @@ describe('Directive: transferFunctionEditor', function() {
     })
   );
 
-  it('should init the populations, topics and transfer functions', function() {
+  it('should init the populations, topics', function() {
     $scope.control.refresh();
     expect(isolateScope.populations).toEqual([]);
     expect(isolateScope.topics).toEqual([]);
-    expect(isolateScope.transferFunctions).toEqual([]);
     expect(
       backendInterfaceService.getStructuredTransferFunctions
     ).toHaveBeenCalled();

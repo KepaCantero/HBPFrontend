@@ -657,7 +657,10 @@ def {0}(t):
 
             scope.control.refresh = function() {
               if (scope.collabDirty) refreshEditor();
-              else scope.populateStructuredTransferFunctions();
+              else {
+                scope.populateTransferFunctionsWithRawCode();
+                scope.populateStructuredTransferFunctions();
+              }
             };
 
             /**************************************/
