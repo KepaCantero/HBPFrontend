@@ -63,7 +63,8 @@ describe('Services: robotComponentsService', function() {
       sensor_types: ['camera'],
       sensor_names_ROS: ['camera_01'],
       rostopic_sensor_urls: ['camera_01/camera_image'],
-      rostopic_actuator_urls: ['actuator_01']
+      rostopic_actuator_urls: ['actuator_01'],
+      sensor_ros_message_type: ['sensor_msgs/Image']
     };
     mockServiceFailureResponse = 'default failure';
     /* eslint-enable camelcase */
@@ -127,11 +128,11 @@ describe('Services: robotComponentsService', function() {
     robotComponentsService.parseRobotModelProperties(
       mockServiceSuccessResponse
     );
-    expect(robotComponentsService.sensors.cameras.length).toBe(1);
-    expect(robotComponentsService.sensors.cameras[0]).toBe(mockCamera);
-    expect(
-      robotComponentsService.sensors.cameras[0].children[0].userData.rosTopic
-    ).toBe('/' + mockServiceSuccessResponse.rostopic_sensor_urls[0]);
+    expect(robotComponentsService.sensors.length).toBe(1);
+    expect(robotComponentsService.sensors[0]).toBe(mockCamera);
+    expect(robotComponentsService.sensors[0].children[0].userData.rosType).toBe(
+      'sensor_msgs.msg.Image'
+    );
 
     expect(robotComponentsService.robotControllers).toBeDefined();
     expect(robotComponentsService.actuators.length).toBe(1);

@@ -89,50 +89,46 @@
 
     parseRobotModelProperties(rosRobotProperties) {
       /* eslint-disable camelcase */
-      this.sensors = {
-        cameras: []
-      };
+      this.sensors = [];
+
       if (
         rosRobotProperties.sensor_names &&
         rosRobotProperties.sensor_names.length > 0
       ) {
         for (let i = 0; i < rosRobotProperties.sensor_names.length; i = i + 1) {
-          if (rosRobotProperties.sensor_types[i] === 'camera') {
-            let sensorName = rosRobotProperties.sensor_names[i];
-            // (Luc) The logic below is flawed as a DVS sensor is no references in
-            // sensor_names_ROS and sensor_ros_message_type, but only in sensor_types
-            let sensorType = rosRobotProperties.sensor_types[i];
-            let cameraName =
-              rosRobotProperties.sensor_names_ROS[this.sensors.cameras.length];
-            let topicURL = this.getCameraTopicURL(
-              rosRobotProperties.rostopic_sensor_urls,
-              cameraName
-            );
+          let sensorName = rosRobotProperties.sensor_names[i];
+          let sensorType = rosRobotProperties.sensor_types[i];
+          let sensorModelHierarchy = sensorName.split('::');
+          let sensorObject = this.robot.getObjectByName(
+            sensorModelHierarchy[sensorModelHierarchy.length - 1]
+          );
 
-            let sensorModelHierarchy = sensorName.split('::');
-            let sensorObject = this.robot.getObjectByName(
-              sensorModelHierarchy[sensorModelHierarchy.length - 1]
-            );
-            let topicObject = new THREE.Object3D();
-            topicObject.name = 'ROS: /' + topicURL;
-            topicObject.sensorname = sensorName;
-            topicObject.sensortype = sensorType;
-            topicObject.userData.gazeboType = 'rostopic';
+          let topicObject = new THREE.Object3D();
+          topicObject.sensorname = sensorName;
+          topicObject.sensortype = sensorType;
+          topicObject.userData.gazeboType = 'rostopic';
+          topicObject.userData.type = 'sensor';
+          topicObject.name = 'URL to topic could not be retrieved';
+
+          if (
+            rosRobotProperties.sensor_ros_message_type &&
+            rosRobotProperties.sensor_ros_message_type[i] &&
+            //this is a very important check, cause there are some robots for which the
+            //ros sensors are not setup properly and thus we have no way to map the sensor names
+            // to the sensor_names_ROS if the two arrays are not sized the same
+            rosRobotProperties.sensor_names_ROS.length ==
+              rosRobotProperties.sensor_names.length
+          ) {
+            let topicURL = rosRobotProperties.rostopic_sensor_urls[i];
             topicObject.userData.rosTopic = '/' + topicURL;
-            topicObject.userData.type = 'sensor';
-            if (
-              rosRobotProperties.sensor_ros_message_type &&
-              rosRobotProperties.sensor_ros_message_type[i]
-            ) {
-              topicObject.userData.rosType = rosRobotProperties.sensor_ros_message_type[
-                i
-              ].replace('/', '.msg.');
-            } else topicObject.userData.rosType = 'unknown';
+            topicObject.name = 'ROS: /' + topicURL;
+            topicObject.userData.rosType = rosRobotProperties.sensor_ros_message_type[
+              i
+            ].replace('/', '.msg.');
+          } else topicObject.userData.rosType = 'unknown';
 
-            sensorObject.add(topicObject);
-
-            this.sensors.cameras.push(sensorObject);
-          }
+          sensorObject.add(topicObject);
+          this.sensors.push(sensorObject);
         }
       }
 
