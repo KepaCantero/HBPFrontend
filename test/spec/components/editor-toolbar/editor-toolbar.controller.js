@@ -319,6 +319,8 @@ describe('Controller: EditorToolbarController', function() {
     it('should make correct reset calls when server reset happened', function() {
       spyOn(editorToolbarController, 'notifyResetToWidgets').and.callThrough();
       spyOn(editorToolbarController, 'updatePanelUI').and.callThrough();
+      editorToolbarController.request = { resetType: RESET_TYPE.RESET_BRAIN };
+
       editorToolbarController.gz3d.scene = gz3d.scene;
 
       editorsPanelService.showEditorPanel = true;
@@ -478,6 +480,9 @@ describe('Controller: EditorToolbarController', function() {
         .getCurrentState()
         .then.calls.mostRecent()
         .args[0]();
+
+      editorToolbarController.request = { resetType: RESET_TYPE.RESET_BRAIN };
+
       stateService.currentState = STATE.STOPPED;
       $scope.sceneLoading = false;
       //Test the messageCallback

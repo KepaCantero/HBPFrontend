@@ -240,8 +240,13 @@
         this.editorsPanelService.toggleEditors();
       }
       //Workaround for resseting correctly the PBR textures
-      this.gz3d.scene.composerSettings.pbrMaterial = this.pbrMaterial;
-      this.gz3d.scene.applyComposerSettings();
+      if (
+        this.request.resetType == this.RESET_TYPE.RESET_WORLD ||
+        this.request.resetType == this.RESET_TYPE.RESET_FULL
+      ) {
+        this.gz3d.scene.composerSettings.pbrMaterial = this.pbrMaterial;
+        this.gz3d.scene.applyComposerSettings();
+      }
       // Close opened object inspectors. ResetType is 1
       this.notifyResetToWidgets(this.RESET_TYPE.RESET_FULL);
       this.updatePanelUI();
@@ -500,9 +505,14 @@
               });
             });
             //Workaround for resseting correctly the PBR textures
-            this.pbrMaterial = this.gz3d.scene.composerSettings.pbrMaterial;
-            this.gz3d.scene.composerSettings.pbrMaterial = false;
-            this.gz3d.scene.applyComposerSettings();
+            if (
+              resetType == this.RESET_TYPE.RESET_WORLD ||
+              resetType == this.RESET_TYPE.RESET_FULL
+            ) {
+              this.pbrMaterial = this.gz3d.scene.composerSettings.pbrMaterial;
+              this.gz3d.scene.composerSettings.pbrMaterial = false;
+              this.gz3d.scene.applyComposerSettings();
+            }
             this.backendInterfaceService.resetCollab(
               request,
               this.splash.closeSplash,
