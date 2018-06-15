@@ -380,10 +380,19 @@ GZ3D.VisualMuscleModel = function(scene, robotName) {
   this.robotName = robotName;
   this.last_muscle_count = -1;
   this.radius = 1;
+  this.rootGroup = new THREE.Group();
+  this.rootGroup.name = 'VisualMuscleModel';
+  scene.scene.add(this.rootGroup);
+  this.rootGroup.visible = scene.composer.isSkinVisibleForMuscle(this);
 };
 
+GZ3D.VisualMuscleModel.prototype.setVisible = function(visible) {
+
+  this.rootGroup.visible = visible;
+};
 
 GZ3D.VisualMuscleModel.prototype.updateVisualization = function(message) {
+
   if (message.robot_name === this.robotName) {
     if (this.last_muscle_count !== message.muscle.length)
     {
@@ -432,7 +441,7 @@ GZ3D.VisualMuscleModel.prototype.updateVisualization = function(message) {
             wireframe: false,
             flatShading: THREE.FlatShading
           }));
-          this.scene.add(cylinder);
+          this.rootGroup.add(cylinder);
           cylinders.push(cylinder);
         }
 
@@ -474,7 +483,7 @@ GZ3D.VisualMuscleModel.prototype.updateVisualization = function(message) {
             wireframe: false,
             flatShading: THREE.FlatShading
           }));
-          this.scene.add(s);
+          this.rootGroup.add(s);
           spheres.push(s);
         }
         // Put it at the right place with the right size.
@@ -2272,6 +2281,11 @@ GZ3D.Composer.prototype.applyComposerSettings = function (updateColorCurve, forc
         cs.dynamicEnvMap = false;
     }
 
+    if (!this.skinsInitialized)
+    {
+        this.buildSkin();
+    }
+
     this.normalizedMasterSetting = null;
     this.updateComposerWithMasterSettings();
     this.applyUserCameraSettings();
@@ -2635,6 +2649,7 @@ GZ3D.Composer.prototype.render = function (view)
 
 
     this.gz3dScene.labelManager.onRender();
+    this.updateSkin();
 
     var camera = view.camera;
     var width = view.container.clientWidth;
@@ -2869,7 +2884,168 @@ GZ3D.Composer.prototype.isSupportedByMasterSetting = function (setting)
     return true;
 };
 
+/**
+ * Manage skin visibility
+ *
+ */
 
+GZ3D.Composer.prototype.setSkinVisibility = function (skinnedObject, visible)
+{
+    var that = this;
+
+    skinnedObject.skinMesh.visible = visible;
+
+    skinnedObject.skinBoneMap.forEach(function(jointBonePair){
+
+        jointBonePair.joint.visible = !visible;
+    });
+
+    if (skinnedObject.definition.hideParentMeshWhenVisible)
+    {
+        skinnedObject.parentMesh.traverse( function ( object ) {
+            if ( object instanceof THREE.Mesh && !object._isPartOfTheSkin) {
+                object.visible = !visible;
+            }
+        } );
+    }
+
+    // For now muscle visualization does not seems to be properly linked to a specific robot/model. So
+    // I use the 'all_of_them' keyword to find show/hide them.
+
+    if ('all_of_them' in this.gz3dScene.muscleVisuzalizations)
+    {
+        this.gz3dScene.muscleVisuzalizations['all_of_them'].setVisible(!visible);
+    }
+};
+
+/**
+ * Check is skin visible for a muscle *
+ */
+
+GZ3D.Composer.prototype.isSkinVisibleForMuscle = function (muscle)
+{
+    // For now muscles are not associated to a robot/model name. So I just show/hide them
+    // based on first skinned mesh visibility state
+
+    if (this.skinnedObjects && this.skinnedObjects.length)
+    {
+        var skinnedObject = this.skinnedObjects[0];
+        return !skinnedObject.skinMesh.visible;
+    }
+
+    return true;
+};
+
+/**
+ * Build skin
+ *
+ */
+
+GZ3D.Composer.prototype.buildSkin = function ()
+{
+    var cs = this.gz3dScene.composerSettings;
+    var that = this;
+
+    if (!cs.skins)
+    {
+        this.skinsInitialized = true;
+        return;
+    }
+
+    this.skinnedObjects = [];
+
+    cs.skins.forEach(function(skin)
+    {
+        var parent = that.scene.getObjectByName(skin.parentObject, true);
+        if (parent)
+        {
+            var loader = new THREE.ColladaLoader();
+
+            loader.load(GZ3D.assetsPath+'/'+skin.mesh, function (collada)
+            {
+                var dae = collada.scene;
+                var mapToMesh = that.scene.getObjectByName(skin.mapTo);
+
+                parent.add(dae);
+                that.gz3dScene.refresh3DViews();
+
+                dae.traverse( function ( object ) {
+                    object._isPartOfTheSkin = true;
+                } );
+
+                var skinBoneMap = [];
+                var skinnedObject = {'skinBoneMap':skinBoneMap, 'definition': skin, 'skinMesh':dae, 'mapToMesh':mapToMesh, 'parentMesh':parent};
+
+                that.skinnedObjects.push(skinnedObject);
+
+                dae.traverse( function ( bone ) {
+                    if ( bone instanceof THREE.Bone ) {
+                        var r = mapToMesh.getObjectByName(skin.bonePrefix+bone.name);
+                        if (r)
+                        {
+                            skinBoneMap.push({'joint':r,'bone':bone, });
+                            that.setSkinVisibility(skinnedObject, skin.visible );
+                        }
+                    }
+                } );
+            });
+        }
+    });
+    this.skinsInitialized = true;
+};
+
+/**
+ * Update skin
+ *
+ */
+
+GZ3D.Composer.prototype.updateSkin = function ()
+{
+    if (!this.skinnedObjects) return;
+
+    this.scene.updateMatrixWorld();
+
+    for(var si in this.skinnedObjects)
+    {
+        var skinnedObject = this.skinnedObjects[si];
+        var skinBoneMap = skinnedObject.skinBoneMap;
+
+        for(var i in skinBoneMap)
+        {
+            var bone = skinBoneMap[i].bone,
+                joint = skinBoneMap[i].joint;
+
+            var invM = new THREE.Matrix4();
+            invM.getInverse(bone.parent.matrixWorld);
+
+            var p = joint.getWorldPosition();
+
+            var jM = new THREE.Matrix4();
+            var bp = new THREE.Vector3(),br = new THREE.Quaternion(),bs = new THREE.Vector3();
+
+            jM.multiplyMatrices(invM, joint.matrixWorld);
+            jM.decompose(bp,br,bs);
+
+            var boneCorrection = skinnedObject.definition.jointToBoneAngleCorrection;
+
+            var tx=0,ty=0,tz=0;
+
+            if (boneCorrection[bone.name])
+            {
+                tx = boneCorrection[bone.name][0];
+                ty = boneCorrection[bone.name][1];
+                tz = boneCorrection[bone.name][2];
+            }
+
+            var tq = new THREE.Quaternion();
+            tq.setFromEuler(new THREE.Euler(tx,ty,tz) );
+            br.multiply(tq);
+
+            bone.position.copy(bp);
+            bone.quaternion.copy(br);
+        }
+    }
+};
 
 
 /**
@@ -5060,9 +5236,6 @@ GZ3D.GZIface = function(scene, gui)
   // Stores AnimatedModel instances
   this.animatedModels = {};
 
-  // Stores muscle visualization geometries
-  this.muscleVisuzalizations = {};
-
   this.waitingForScaleNewObjects = [];
 
   GZ3D.assetProgressData = {};
@@ -5419,12 +5592,12 @@ GZ3D.GZIface.prototype.onConnected = function()
 
   // function for updating clien system visualization
   var updateMuscleVisualization = function (message) {
-    if (!(message.robot_name in this.muscleVisuzalizations)) {
-      this.muscleVisuzalizations[message.robot_name] = new GZ3D.VisualMuscleModel(this.scene, message.robot_name);
+    if (!(message.robot_name in this.scene.muscleVisuzalizations)) {
+      this.scene.muscleVisuzalizations[message.robot_name] = new GZ3D.VisualMuscleModel(this.scene, message.robot_name);
     }
 
-    if (message.robot_name in this.muscleVisuzalizations) {
-      this.muscleVisuzalizations[message.robot_name].updateVisualization(message);
+    if (message.robot_name in this.scene.muscleVisuzalizations) {
+      this.scene.muscleVisuzalizations[message.robot_name].updateVisualization(message);
     }
   };
 
@@ -10056,6 +10229,9 @@ GZ3D.Scene.prototype.init = function()
 
   // Loaded models cache
   this.cachedModels = {};
+
+  // Stores muscle visualization geometries
+  this.muscleVisuzalizations = {};
 
   // only support one heightmap for now.
   this.heightmap = null;
