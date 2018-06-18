@@ -35,6 +35,7 @@
     '$stateParams',
     '$timeout',
     'clbConfirm',
+    'environmentService',
     function(
       $q,
       $window,
@@ -45,7 +46,8 @@
       newExperimentProxyService,
       $stateParams,
       $timeout,
-      clbConfirm
+      clbConfirm,
+      environmentService
     ) {
       return {
         templateUrl: 'views/esv/new-experiment-wizard.html',
@@ -62,6 +64,7 @@
           $scope.newExperiment = 'newExperiment';
           $scope.experimentCloned = false;
           $scope.paths = {};
+          $scope.maturity = environmentService.isDevMode() ? '' : 'production';
 
           var RobotUploader = {
             name: 'Robot',
@@ -398,6 +401,7 @@
                 name: entity.name,
                 custom: entity.custom ? entity.custom : false,
                 description: entity.description,
+                maturity: entity.maturity,
                 thumbnail: entity.thumbnail
               };
             });
