@@ -273,6 +273,19 @@
                 visible: false
               },
               {
+                text: 'Show Skin',
+                callback: function(event) {
+                  if (gz3d.scene.selectedEntity)
+                    gz3d.scene.setSkinVisible(
+                      gz3d.scene.selectedEntity,
+                      !gz3d.scene.skinVisible(gz3d.scene.selectedEntity)
+                    );
+                  contextMenuState.toggleContextMenu(false);
+                  event.stopPropagation();
+                },
+                visible: false
+              },
+              {
                 text: 'Delete',
                 callback: function(event) {
                   scope.deleteModel();
@@ -283,7 +296,7 @@
             ],
 
             hide: function() {
-              this.visible = this.items[0].visible = this.items[1].visible = this.items[2].visible = this.items[3].visible = false;
+              this.visible = this.items[0].visible = this.items[1].visible = this.items[2].visible = this.items[3].visible = this.items[4].visible = false;
             },
 
             show: function(model) {
@@ -294,8 +307,12 @@
               this.items[1].visible = true;
               this.items[2].visible =
                 canDelete && gz3d.gui.canModelBeDuplicated(model.name);
-              this.items[3].visible = canDelete;
+              this.items[3].visible = gz3d.scene.hasSkin(model);
+              this.items[3].text = gz3d.scene.skinVisible(model)
+                ? 'Hide Skin'
+                : 'Show Skin';
 
+              this.items[4].visible = canDelete;
               return true;
             }
           });
