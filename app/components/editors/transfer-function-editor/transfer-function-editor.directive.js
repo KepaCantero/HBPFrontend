@@ -1623,23 +1623,26 @@ def {0}(t):
                 return;
               }
 
-              clbConfirm
-                .open({
-                  title: 'Uploading Transfer Functions',
-                  confirmLabel: 'Add',
-                  cancelLabel: 'Replace',
-                  template:
-                    'Add to the current transfer functions or replace then with the new ones ?',
-                  closable: false
-                })
-                .then(
-                  () => {
-                    addUploadedTransferFunctions(tfs, false);
-                  },
-                  () => {
-                    addUploadedTransferFunctions(tfs, true);
-                  }
-                );
+              if (scope.transferFunctions.length === 0)
+                addUploadedTransferFunctions(tfs, false);
+              else
+                clbConfirm
+                  .open({
+                    title: 'Uploading Transfer Functions',
+                    confirmLabel: 'Add',
+                    cancelLabel: 'Replace',
+                    template:
+                      'Add to the current transfer functions or replace then with the new ones ?',
+                    closable: false
+                  })
+                  .then(
+                    () => {
+                      addUploadedTransferFunctions(tfs, false);
+                    },
+                    () => {
+                      addUploadedTransferFunctions(tfs, true);
+                    }
+                  );
             }
 
             scope.upload = function(file) {
