@@ -189,7 +189,7 @@ def {0}(t):
             scope.newVariableName = '';
             scope.nTransferFunctionDirty = 0;
             scope.collabDirty = false;
-
+            scope.lastTFupdated = null;
             scope.localHelpVisible = {
               populations: false,
               connectToBrain: false,
@@ -321,6 +321,19 @@ def {0}(t):
                       codeMirrorLineNumber,
                       'background',
                       'alert-danger'
+                    );
+                  }
+                  if (flawedTransferFunction.active) {
+                    flawedTransferFunction.active = false;
+                    backendInterfaceService.setActivateTransferFunction(
+                      flawedTransferFunction.name,
+                      null,
+                      flawedTransferFunction.active,
+                      function() {},
+                      function(data) {
+                        flawedTransferFunction.active = !flawedTransferFunction.active;
+                        serverError.displayHTTPError(data);
+                      }
                     );
                   }
                 }
@@ -1352,8 +1365,8 @@ def {0}(t):
             };
 
             scope.toggleActive = function(tf) {
+              if (Object.keys(tf.error).length > 0) return;
               tf.active = !tf.active;
-
               backendInterfaceService.setActivateTransferFunction(
                 tf.name,
                 null,
