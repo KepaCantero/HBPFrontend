@@ -66,7 +66,7 @@
               <div style="display:flex; width: 100%; justify-content: space-between;">
 
                 <div ng-show="tf.editName" style= "width: 80%">
-                  <input maxlength="35" ng-blur = "setNameTf()" ng-model="tf.name">
+                  <input ng-blur="setNameTf()" ng-model="tf.name">
                 </div>
                 <div ng-hide="tf.editName" ng-class="{'tfNameDeactivated':!tf.active}" style="text-overflow: ellipsis; overflow: hidden; width: 80%">
                   {{tf.name}}
