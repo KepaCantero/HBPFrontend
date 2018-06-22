@@ -38,7 +38,7 @@
     '$timeout',
     'simulationInfo',
     'clbConfirm',
-    'autoSaveService',
+    'autoSaveFactory',
     'downloadFileService',
     'RESET_TYPE',
     'codeEditorsServices',
@@ -47,6 +47,7 @@
     'userContextService',
     'bbpConfig',
     'editorToolbarService',
+    'storageServer',
     function(
       $q,
       backendInterfaceService,
@@ -61,7 +62,7 @@
       $timeout,
       simulationInfo,
       clbConfirm,
-      autoSaveService,
+      autoSaveFactory,
       downloadFileService,
       RESET_TYPE,
       codeEditorsServices,
@@ -69,7 +70,8 @@
       environmentService,
       userContextService,
       bbpConfig,
-      editorToolbarService
+      editorToolbarService,
+      storageServer
     ) {
       var DIRTY_TYPE = 'SM';
 
@@ -82,8 +84,6 @@
         },
         link: function(scope, element) {
           scope.isPrivateExperiment = environmentService.isPrivateExperiment();
-          scope.isSavingToCollab = false;
-          scope.collabDirty = false;
 
           scope.editorOptions = codeEditorsServices.getDefaultEditorOptions();
           scope.editorOptions = codeEditorsServices.ownerOnlyOptions(
@@ -97,6 +97,9 @@
           var ScriptObject = pythonCodeHelper.ScriptObject;
           var addedStateMachineCount = 0;
 
+          let autoSaveService = autoSaveFactory.createService('State machines');
+          autoSaveService.onsave(() => scope.saveSMIntoCollabStorage());
+
           var docs = documentationURLs.getDocumentationURLs();
           scope.backendDocumentationURL = docs.backendDocumentationURL;
           scope.platformDocumentationURL = docs.platformDocumentationURL;
@@ -109,25 +112,27 @@
           });
 
           function loadStateMachines() {
-            return backendInterfaceService.getStateMachines(function(response) {
-              _.forEach(response.data, function(code, id) {
-                var stateMachine = new ScriptObject(id, code);
-                stateMachine.name = scope.getStateMachineName(id);
-                // If we already have local changes, we do not update
-                var sm = _.find(scope.stateMachines, { id: id });
-                var found = angular.isDefined(sm);
-                if (found && !sm.dirty) {
-                  sm = stateMachine;
-                } else if (!found) {
-                  scope.stateMachines.unshift(stateMachine);
-                }
+            return storageServer
+              .getStateMachines(simulationInfo.experimentID)
+              .then(response => {
+                _.forEach(response.data, (code, id) => {
+                  var stateMachine = new ScriptObject(id, code);
+                  stateMachine.name = scope.getStateMachineName(id);
+                  // If we already have local changes, we do not update
+                  var sm = _.find(scope.stateMachines, { id: id });
+                  var found = angular.isDefined(sm);
+                  if (found && !sm.dirty) {
+                    sm = stateMachine;
+                  } else if (!found) {
+                    scope.stateMachines.unshift(stateMachine);
+                  }
+                });
+                return scope.stateMachines;
               });
-              return scope.stateMachines;
-            });
           }
 
           scope.refresh = function() {
-            if (scope.collabDirty) {
+            if (autoSaveService.isDirty()) {
               codeEditorsServices.refreshAllEditors(
                 scope.stateMachines.map(function(sm) {
                   return 'state-machine-' + sm.id;
@@ -215,15 +220,13 @@
             resetType
           ) {
             if (resetType === RESET_TYPE.RESET_FULL) {
-              scope.collabDirty = false;
               scope.stateMachines = [];
             }
           });
 
           scope.onStateMachineChange = function(stateMachine) {
             stateMachine.dirty = true;
-            scope.collabDirty = environmentService.isPrivateExperiment();
-            autoSaveService.setDirty(DIRTY_TYPE, scope.stateMachines);
+            autoSaveService.setDirty();
           };
 
           scope.create = function(code) {
@@ -300,8 +303,7 @@
             scope.stateMachines.unshift(stateMachine);
             addedStateMachineCount = addedStateMachineCount + 1;
             scope.update(stateMachine);
-            scope.collabDirty = environmentService.isPrivateExperiment();
-            autoSaveService.setDirty(DIRTY_TYPE, scope.stateMachines);
+            autoSaveService.setDirty();
 
             $timeout(function() {
               codeEditorsServices.refreshEditor(
@@ -333,7 +335,7 @@
                   }
                 })
               )
-              .then(() => (scope.collabDirty = true));
+              .then(() => autoSaveService.setDirty());
           };
 
           scope.getStateMachineName = function(id) {
@@ -383,51 +385,18 @@
           };
 
           scope.saveSMIntoCollabStorage = function() {
-            scope.isSavingToCollab = true;
-            var errors = false;
             var stateMachines = {};
             _.forEach(scope.stateMachines, function(stateMachine) {
               stateMachines[stateMachine.id] = stateMachine.code;
-              if (Object.keys(stateMachine.error).length !== 0) {
-                errors = true;
-              }
             });
-            if (errors) {
-              clbConfirm
-                .open({
-                  title: 'State Machine  errors.',
-                  template:
-                    'There are errors inside your State Machines. Are you sure you want to save?',
-                  confirmLabel: 'Yes',
-                  cancelLabel: 'No',
-                  closable: false
-                })
-                .then(function() {
-                  return saveErrorsService
-                    .saveDirtyData(DIRTY_TYPE, scope.stateMachines)
-                    .then(function() {
-                      return autoSaveService.clearDirty(DIRTY_TYPE);
-                    });
-                })
-                .finally(function() {
-                  scope.isSavingToCollab = false;
-                });
-              return;
-            }
-            backendInterfaceService.saveStateMachines(
-              stateMachines,
-              function() {
+
+            return storageServer
+              .saveStateMachines(simulationInfo.experimentID, stateMachines)
+              .then(() => {
                 // Success callback
-                scope.isSavingToCollab = false;
-                scope.collabDirty = false;
-                autoSaveService.clearDirty(DIRTY_TYPE);
+                autoSaveService.reset();
                 saveErrorsService.clearDirty(DIRTY_TYPE);
-              },
-              function() {
-                // Failure callback
-                scope.isSavingToCollab = false;
-              }
-            );
+              });
           };
 
           scope.onNewErrorMessageReceived = function(msg) {
@@ -495,24 +464,6 @@
           saveErrorsService.registerCallback(DIRTY_TYPE, function(newSMs) {
             scope.stateMachines = newSMs;
           });
-
-          userContextService.isOwner() &&
-            autoSaveService.registerFoundAutoSavedCallback(DIRTY_TYPE, function(
-              autoSaved,
-              applyChanges
-            ) {
-              scope.collabDirty = true;
-              if (applyChanges)
-                loadStateMachines()
-                  .then(function() {
-                    return scope.delete(scope.stateMachines);
-                  })
-                  .then(function() {
-                    scope.stateMachines = autoSaved;
-                    scope.update(scope.stateMachines);
-                  });
-              else scope.stateMachines = autoSaved;
-            });
         }
       };
     }

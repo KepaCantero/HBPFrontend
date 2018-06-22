@@ -4,15 +4,6 @@
         ng-click="create()">
   <i class="glyphicon glyphicon-star"></i><span> New</span>
 </button>
-<button ng-show="isPrivateExperiment" type="button" class="btn btn-default"
-        owner-only
-        ng-click="saveSMIntoCollabStorage()"
-        ng-disabled="stateService.currentState === STATE.INITIALIZED || !collabDirty"
-        v-busy="isSavingToCollab"
-        v-busy-label="Saving to Storage"
-        v-pressable>
-  <i class="glyphicon glyphicon-book"></i><span> Save</span>
-</button>
 <button class="btn btn-default btn-md"
         owner-only
         ng-click="save()" ng-disabled="stateMachines.length === 0">

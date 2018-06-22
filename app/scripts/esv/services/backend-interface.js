@@ -192,19 +192,6 @@
         );
       };
 
-      var resourceBrainExperiment = function(backendBaseUrl) {
-        return $resource(
-          backendBaseUrl + '/experiment/:experimentId/brain',
-          {},
-          {
-            save: {
-              method: 'PUT',
-              interceptor: { responseError: serverError.displayHTTPError }
-            }
-          }
-        );
-      };
-
       var resourceSDFExperiment = function(backendBaseUrl) {
         return $resource(
           backendBaseUrl + '/experiment/:experimentId/sdf_world',
@@ -324,37 +311,14 @@
             failureCallback
           );
         },
-        saveBrain: function(
-          pynnScript,
-          brainPopulations,
-          successCallback,
-          failureCallback
-        ) {
-          return resourceBrainExperiment(simulationInfo.serverBaseUrl).save(
-            { experimentId: simulationInfo.experimentID },
-            {
-              context_id: $stateParams.ctx,
-              data: pynnScript,
-              additional_populations: brainPopulations
-            },
-            successCallback,
-            failureCallback
-          );
-        },
-        reloadBrain: function(callback) {
-          resourceBrainExperiment(simulationInfo.serverBaseUrl).get(
-            { exp_id: simulationInfo.experimentID },
-            function(response) {
-              callback(response);
-            }
-          );
-        },
+
         getPopulations: function(callback) {
           return resourceBrainPopulations(simulationInfo.serverBaseUrl).get(
             { sim_id: simulationInfo.simulationID },
             callback
           ).$promise;
         },
+
         getTopics: function(callback) {
           resourceTopics(simulationInfo.serverBaseUrl).get({}, function(data) {
             callback(data);

@@ -60,26 +60,6 @@ describe('Services: backendInterfaceService', function() {
     $httpBackend.flush();
   });
 
-  it('should make a PUT request on /experiment/:context_id/brain', function() {
-    var somePopulations = { population1: [1, 2, 3], population2: [3, 4, 5] };
-    var contextObject = {
-      data: 'some source',
-      //eslint-disable-next-line camelcase
-      additional_populations: somePopulations
-    };
-    $httpBackend
-      .expectPUT(
-        simulationInfo.serverBaseUrl +
-          '/experiment/' +
-          simulationInfo.experimentID +
-          '/brain',
-        contextObject
-      )
-      .respond(200);
-    backendInterfaceService.saveBrain('some source', somePopulations);
-    $httpBackend.flush();
-  });
-
   it('should call serverError.displayHTTPError when the saveSDF PUT request fails', function() {
     $httpBackend.whenPOST(urlRegex).respond(500);
     backendInterfaceService.saveSDF(simulationInfo.experimentID);
@@ -363,14 +343,6 @@ describe('Services: backendInterfaceService', function() {
       function() {},
       callback
     );
-    $httpBackend.flush();
-    expect(callback).toHaveBeenCalled();
-  });
-
-  it('should call the success callback when the reloadBrain GET request succeeds', function() {
-    $httpBackend.whenGET(urlRegex).respond(200);
-    var callback = jasmine.createSpy('callback');
-    backendInterfaceService.reloadBrain(callback);
     $httpBackend.flush();
     expect(callback).toHaveBeenCalled();
   });

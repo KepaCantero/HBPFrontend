@@ -13,14 +13,4 @@
   <i class="glyphicon glyphicon-ok-circle" aria-hidden="true"></i>
   <span> Apply</span>
 </button>
-<button ng-show="isPrivateExperiment" type="button" class="btn btn-default"
-        owner-only
-        ng-click="saveIntoCollabStorage()"
-        ng-disabled="loading || stateService.statePending || !populationForm.$valid || !collabDirty"
-        v-busy="isSavingToCollab"
-        v-busy-label="Saving to Storage"
-        v-pressable>
-  <i class="glyphicon glyphicon-book"></i>
-  <span> Save</span>
-</button>
 <span class="alert alert-danger" ng-if="!populationForm.$valid">Invalid population definition.</span>

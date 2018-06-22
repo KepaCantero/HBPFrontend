@@ -7,6 +7,7 @@ describe('Directive: smachEditor', function() {
     $compile,
     $scope,
     isolateScope,
+    storageServer,
     element,
     backendInterfaceService,
     pythonCodeHelper,
@@ -15,29 +16,32 @@ describe('Directive: smachEditor', function() {
     $timeout,
     SOURCE_TYPE,
     codeEditorsServices,
-    clbConfirm,
     environmentService,
     editorToolbarService,
     $q;
 
   var backendInterfaceServiceMock = {
-    getStateMachines: jasmine
-      .createSpy('getStateMachines')
-      .and.callFake(function() {
-        return $q.when();
-      }),
     setStateMachine: jasmine
       .createSpy('setStateMachine')
       .and.callFake(function() {
         return $q.when();
       }),
-    saveStateMachines: jasmine.createSpy('saveStateMachines'),
     deleteStateMachine: jasmine
       .createSpy('deleteStateMachine')
       .and.callFake(function() {
         return $q.when();
       }),
     getServerBaseUrl: jasmine.createSpy('getServerBaseUrl')
+  };
+
+  let getStateMachinesResponse = null;
+  let storageServerMock = {
+    getStateMachines: jasmine
+      .createSpy('setStateMachine')
+      .and.callFake(() => window.$q.when(getStateMachinesResponse)),
+    saveStateMachines: jasmine
+      .createSpy('saveStateMachines')
+      .and.callFake(() => window.$q.when())
   };
 
   var autoSaveServiceMock = {
@@ -90,6 +94,7 @@ describe('Directive: smachEditor', function() {
       $provide.value('autoSaveService', autoSaveServiceMock);
       $provide.value('saveErrorsService', saveErrorsServiceMock);
       $provide.value('downloadFileService', downloadFileServiceMock);
+      $provide.value('storageServer', storageServerMock);
     })
   );
 
@@ -104,10 +109,10 @@ describe('Directive: smachEditor', function() {
       _$timeout_,
       _SOURCE_TYPE_,
       _codeEditorsServices_,
-      _clbConfirm_,
       _$q_,
       _environmentService_,
-      _editorToolbarService_
+      _editorToolbarService_,
+      _storageServer_
     ) {
       $rootScope = _$rootScope_;
       $compile = _$compile_;
@@ -117,10 +122,10 @@ describe('Directive: smachEditor', function() {
       SOURCE_TYPE = _SOURCE_TYPE_;
       $timeout = _$timeout_;
       codeEditorsServices = _codeEditorsServices_;
-      clbConfirm = _clbConfirm_;
       $q = _$q_;
       environmentService = _environmentService_;
       editorToolbarService = _editorToolbarService_;
+      storageServer = _storageServer_;
 
       editorMock.addLineClass = jasmine.createSpy('addLineClass');
       editorMock.removeLineClass = jasmine.createSpy('removeLineClass');
@@ -140,7 +145,7 @@ describe('Directive: smachEditor', function() {
   it('should init the stateMachines variable', function() {
     isolateScope.refresh();
     expect(isolateScope.stateMachines).toEqual([]);
-    expect(backendInterfaceService.getStateMachines).toHaveBeenCalled();
+    expect(storageServer.getStateMachines).toHaveBeenCalled();
     expect(isolateScope.backendDocumentationURL).toEqual(
       'backendDocumentationURL'
     );
@@ -165,7 +170,7 @@ describe('Directive: smachEditor', function() {
       var smId = 'SM' + i;
       data[smId] = 'class ' + smId + '(DefaultStateMachine):\n';
     }
-    var response = { data: data };
+    getStateMachinesResponse = { data: data };
     var expected = [];
 
     beforeEach(function() {
@@ -181,9 +186,6 @@ describe('Directive: smachEditor', function() {
     });
 
     it('should handle the retrieved stateMachines properly', function() {
-      backendInterfaceService.getStateMachines.calls
-        .mostRecent()
-        .args[0](response);
       expect(_.findIndex(stateMachines, expected[0])).not.toBe(-1);
       expect(_.findIndex(stateMachines, expected[1])).not.toBe(-1);
       expect(_.findIndex(stateMachines, expected[2])).not.toBe(-1);
@@ -255,57 +257,13 @@ describe('Directive: smachEditor', function() {
     it('should save state machine code to collab', function() {
       var sm = new ScriptObject('SM', 'Code of SM');
       isolateScope.stateMachines = [sm];
-      expect(isolateScope.isSavingToCollab).toEqual(false);
       isolateScope.saveSMIntoCollabStorage();
       var sms = {};
       sms[sm.id] = sm.code;
-      expect(backendInterfaceService.saveStateMachines).toHaveBeenCalledWith(
-        sms,
-        jasmine.any(Function),
-        jasmine.any(Function)
+      expect(storageServer.saveStateMachines).toHaveBeenCalledWith(
+        'experimentID',
+        sms
       );
-      expect(isolateScope.isSavingToCollab).toEqual(true);
-      backendInterfaceService.saveStateMachines.calls.argsFor(0)[1]();
-      expect(isolateScope.isSavingToCollab).toBe(false);
-      isolateScope.isSavingToCollab = true;
-      backendInterfaceService.saveStateMachines.calls.argsFor(0)[2]();
-      expect(isolateScope.isSavingToCollab).toBe(false);
-    });
-
-    it('should save error file when SMs contain errors', function() {
-      var userResponse = $q.when();
-      spyOn(clbConfirm, 'open').and.callFake(function() {
-        return userResponse;
-      });
-      backendInterfaceService.saveStateMachines.calls.reset();
-      expect(
-        backendInterfaceServiceMock.saveStateMachines
-      ).not.toHaveBeenCalled();
-      isolateScope.stateMachines = [
-        { id: '1', code: 'code', error: { errorMsg: 'an error message' } }
-      ];
-      expect(isolateScope.isSavingToCollab).toEqual(false);
-      isolateScope.saveSMIntoCollabStorage();
-      $rootScope.$digest();
-      expect(
-        backendInterfaceServiceMock.saveStateMachines
-      ).not.toHaveBeenCalled();
-      expect(isolateScope.isSavingToCollab).toEqual(false);
-      expect(saveErrorsServiceMock.saveDirtyData).toHaveBeenCalled();
-      expect(autoSaveServiceMock.clearDirty).toHaveBeenCalled();
-      isolateScope.isSavingToCollab = true;
-      saveErrorsServiceMock.saveDirtyData.calls.reset();
-      autoSaveServiceMock.clearDirty.calls.reset();
-      backendInterfaceServiceMock.saveStateMachines.calls.reset();
-      userResponse = $q.reject(); // no
-      isolateScope.saveSMIntoCollabStorage();
-      $rootScope.$digest();
-      expect(
-        backendInterfaceServiceMock.saveStateMachines
-      ).not.toHaveBeenCalled();
-      expect(saveErrorsServiceMock.saveDirtyData).not.toHaveBeenCalled();
-      expect(autoSaveServiceMock.clearDirty).not.toHaveBeenCalled();
-      expect(isolateScope.isSavingToCollab).toEqual(false);
     });
 
     it('should overwrite SMs with new error data', function() {
@@ -426,32 +384,6 @@ describe('Directive: smachEditor', function() {
       });
       isolateScope.onNewErrorMessageReceived(msg);
       expect(Object.keys(_.find.calls.mostRecent().args[1])[0]).toBe('name');
-    });
-
-    it('should set pyNN script & population when auto saved data found', function() {
-      var autosavedData = [{ id: '0', error: [] }];
-      expect(isolateScope.collabDirty).toBe(false);
-      expect(isolateScope.stateMachines).not.toBe(autosavedData);
-      backendInterfaceServiceMock.getStateMachines.calls.reset();
-      $rootScope.$digest();
-      expect(
-        autoSaveServiceMock.registerFoundAutoSavedCallback.calls.count()
-      ).toBe(1);
-      autoSaveServiceMock.registerFoundAutoSavedCallback.calls
-        .mostRecent()
-        .args[1](autosavedData, false);
-      expect(isolateScope.collabDirty).toBe(true);
-      expect(isolateScope.stateMachines).toBe(autosavedData);
-      expect(
-        backendInterfaceServiceMock.getStateMachines
-      ).not.toHaveBeenCalled();
-      autoSaveServiceMock.registerFoundAutoSavedCallback.calls
-        .mostRecent()
-        .args[1](autosavedData, true);
-      expect(backendInterfaceServiceMock.getStateMachines).toHaveBeenCalled();
-      $rootScope.$digest();
-      // autoSaveServiceMock.registerFoundAutoSavedCallback.calls.mostRecent().args[1](autosavedData, true);
-      // expect(isolateScope.agreeAction).toHaveBeenCalled();
     });
   });
   describe('Editing state machines', function() {

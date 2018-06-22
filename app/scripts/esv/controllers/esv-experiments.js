@@ -25,21 +25,10 @@
   'use strict';
   angular.module('exdFrontendApp').controller('esvExperimentsCtrl', [
     '$scope',
-    '$location',
     '$timeout',
-    '$window',
     'tipTooltipService',
     'TIP_CODES',
-    'storageServerTokenManager',
-    function(
-      $scope,
-      $location,
-      $timeout,
-      $window,
-      tipTooltipService,
-      TIP_CODES,
-      storageServerTokenManager
-    ) {
+    function($scope, $timeout, tipTooltipService, TIP_CODES) {
       $scope.reloadMyExperiments = () => {
         $scope.showMyExperiments = false;
         $timeout(() => ($scope.showMyExperiments = true));
@@ -66,11 +55,6 @@
       $scope.showTips = () => {
         tipTooltipService.toggleTip();
         $scope.updateTip();
-      };
-
-      this.logout = () => {
-        storageServerTokenManager.clearStoredToken();
-        $window.location.reload();
       };
 
       $scope.experimentEmpty = () => {
