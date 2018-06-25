@@ -28,7 +28,7 @@
     '$document',
     function($document) {
       var MARGIN = 8;
-      var BOTTOM_BAR_HEIGHT = 43;
+      var TOP_BAR_HEIGHT_PERCENTAGE = 0.05;
 
       return {
         restrict: 'A',
@@ -93,13 +93,15 @@
               element.css({ left: relativeLeft + '%' });
             }
             if (
-              coordinates.y < window.innerHeight - MARGIN - BOTTOM_BAR_HEIGHT &&
-              coordinates.y > MARGIN
+              coordinates.y < window.innerHeight - MARGIN &&
+              coordinates.y >
+                MARGIN + TOP_BAR_HEIGHT_PERCENTAGE * window.innerHeight
             ) {
               var relativeTop =
                 (initialBoundingRect.top + dY) /
                 window.innerHeight *
                 FRACTION_TO_PERCENTAGE;
+              relativeTop -= TOP_BAR_HEIGHT_PERCENTAGE * FRACTION_TO_PERCENTAGE;
               element.css({ top: relativeTop + '%' });
             }
           };

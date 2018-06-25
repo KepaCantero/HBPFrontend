@@ -55,15 +55,16 @@
       simulationInfo,
       contextMenuState,
       timeout,
-      window
+      window,
+      experimentViewService
     ) {
       this.element = element;
       this.userContextService = userContextService;
       this.simulationInfo = simulationInfo;
 
-      stateService.Initialize();
+      stateService.Initialize(); //TODO: (@SandroWeber) should be moved / handled inside service
 
-      //applyForceService.initialize(); // stupid call to avoid "not being used jshint"
+      experimentViewService.broadcastEnterSimulation();
 
       // Query the state of the simulation
       stateService.getCurrentState().then(function() {
@@ -79,7 +80,7 @@
           });
           nrpAnalytics.tickDurationEvent('Browser-initialization');
 
-          environmentRenderingService.init();
+          environmentRenderingService.init(); //TODO: (@SandroWeber) should be moved / handled inside service
         }
 
         // We restrict material changes to simple objects and screen glasses found in screen models of the 3D scene,
@@ -191,7 +192,7 @@
     'contextMenuState',
     '$timeout',
     '$window',
-    'applyForceService'
+    'experimentViewService'
   ];
 
   angular

@@ -3,7 +3,7 @@
         <div class="exit-panel-title">
             <button type="button"
                     class="close"
-                    ng-click="vm.destroyDialog()"
+                    ng-click="vm.nrpModalService.destroyModal()"
                     aria-hidden="true">x</button>
             <h4 style="font-size: 20px;">Exit menu</h4>
         </div>
@@ -12,17 +12,17 @@
         </div>
         <div class="exit-panel-buttons">
             <button class="btn btn-default btn-cancel exit-panel-left-button"
-                ng-click="vm.destroyDialog()">Cancel
+                ng-click="vm.nrpModalService.destroyModal()">Cancel
             </button>
             <button class="btn btn-default btn-danger exit-panel-right-button"
             ng-if="vm.userContextService.isOwner()"
             ng-disabled="vm.stateService.statePending"
-            ng-click="vm.destroyDialog();vm.stop()"
+            ng-click="vm.nrpModalService.destroyModal();vm.stopSimulation()"
             ng-show="(vm.stateService.currentState !== vm.STATE.STOPPED) &&
                       (vm.stateService.currentState !== vm.STATE.FAILED)">Stop
             </button>
             <button class="btn btn-default btn-leave exit-panel-right-button"
-                ng-click="vm.destroyDialog();vm.exit()">Leave
+                ng-click="vm.nrpModalService.destroyDialog();vm.exitSimulation()">Leave
             </button>
         </div>
     </div>

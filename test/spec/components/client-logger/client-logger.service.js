@@ -4,6 +4,7 @@ describe('Directive: client-logger', function() {
   beforeEach(module('exdFrontendApp'));
   beforeEach(module('simulationInfoMock'));
 
+  let $rootScope;
   var clientLoggerService;
   var dynamicViewOverlayService;
   var LOG_TYPE;
@@ -32,11 +33,13 @@ describe('Directive: client-logger', function() {
 
   beforeEach(
     inject(function(
+      _$rootScope_,
       _clientLoggerService_,
       _dynamicViewOverlayService_,
       _LOG_TYPE_,
       _DYNAMIC_VIEW_CHANNELS_
     ) {
+      $rootScope = _$rootScope_;
       clientLoggerService = _clientLoggerService_;
       dynamicViewOverlayService = _dynamicViewOverlayService_;
       LOG_TYPE = _LOG_TYPE_;
@@ -81,6 +84,24 @@ describe('Directive: client-logger', function() {
     expect(echo).toHaveBeenCalled();
   });
 
+  it('should add log when RESET occurs', function() {
+    spyOn(clientLoggerService, 'logMessage').and.callThrough();
+
+    $rootScope.$broadcast('RESET');
+    $rootScope.$digest();
+
+    expect(clientLoggerService.logMessage).toHaveBeenCalled();
+  });
+
+  it('should de-initialize on EXIT_SIMULATION event', function() {
+    spyOn(clientLoggerService, 'onExit').and.callThrough();
+
+    $rootScope.$broadcast('EXIT_SIMULATION');
+    $rootScope.$digest();
+
+    expect(clientLoggerService.onExit).toHaveBeenCalled();
+  });
+
   describe(' - test history log', function() {
     it('Counting of log message if no console is shown', function() {
       dynamicViewOverlayService
@@ -111,6 +132,12 @@ describe('Directive: client-logger', function() {
       clientLoggerService.resetLoggedMessages();
       expect(clientLoggerService.missedConsoleLogs).toBe(0);
       expect(clientLoggerService.logHistory.length).toBe(0);
+    });
+
+    it('getLogHistory getter', function() {
+      let mockHistory = {};
+      clientLoggerService.logHistory = mockHistory;
+      expect(clientLoggerService.getLogHistory).toBe(mockHistory);
     });
   });
 });

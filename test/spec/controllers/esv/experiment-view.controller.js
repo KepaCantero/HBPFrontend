@@ -283,7 +283,6 @@ describe('Controller: ExperimentViewController', function() {
         stateService: stateService,
         STATE: STATE,
         userContextService: userContextService,
-        nrpAnalytics: nrpAnalyticsMock,
         environmentRenderingService: environmentRenderingService,
         gz3d: gz3d,
         $log: log,
@@ -334,6 +333,38 @@ describe('Controller: ExperimentViewController', function() {
         true,
         eventMock
       );
+    });
+  });
+
+  describe('(joining stopped simulation)', function() {
+    beforeEach(function() {
+      stateService.currentState = STATE.STOPPED;
+
+      ExperimentViewController = controller('experimentViewController', {
+        $scope: scope,
+        $element: undefined,
+        stateService: stateService,
+        STATE: STATE,
+        userContextService: userContextService,
+        environmentRenderingService: environmentRenderingService,
+        gz3d: gz3d,
+        $log: log,
+        colorableObjectService: colorableObjectService,
+        simulationInfo: simulationInfo,
+        contextMenuState: contextMenuState,
+        $timeout: timeout,
+        $window: window
+      });
+    });
+
+    it('should set isJoiningStoppedSimulation to true when already stopped', function() {
+      /*expect(userContextService.isJoiningStoppedSimulation).toBe(false);
+      stateService.currentState = STATE.STOPPED;
+      stateService
+        .getCurrentState()
+        .then.calls.mostRecent()
+        .args[0](); //wtf!!!*/
+      expect(userContextService.isJoiningStoppedSimulation).toBe(true);
     });
   });
 });

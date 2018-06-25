@@ -2,24 +2,16 @@
 <link rel="stylesheet" href="styles/esv/esv-web.css" />
 <!-- endbuild -->
 
-
-<div class="neuro-title-box cssloaded" style="visibility: hidden">
-  <img style="height: 50px;" ng-src="img/esv/nrp-black-ontransp.png" />
-</div>
+<application-top-toolbar></application-top-toolbar>
 
 <div class="neuro-title-buttons cssloaded" style="visibility: hidden">
   <div ng-click="showTips()" ng-show="tipTooltipService.someTipsAreHidden()" class="title-top-button">
     <i class="fa fa-info-circle title-top-button-icon"></i>
     Tips
   </div>
-  <div ng-click="$ctrl.logout()" class="title-top-button">
-    <i class="fa fa-sign-out title-top-button-icon"></i>
-    Logout
-  </div>
-
 </div>
 
-<div class="container-with-navbar-margin cssloaded" style="visibility: hidden;height: calc(100% - 155px);">
+<div class="container-with-navbar-margin cssloaded" style="visibility: hidden;">
 
   <div style="display: flex; justify-content: space-between; max-height: 65px;">
 
