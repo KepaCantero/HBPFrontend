@@ -1364,7 +1364,7 @@ def tf2(t):
     });
 
     it('should support toggleActive', function() {
-      var tf = { active: false, code: 'some code' };
+      var tf = { active: false, code: 'some code', error: {} };
 
       isolateScope.toggleActive(tf);
       expect(tf.active).toBe(true);
