@@ -2916,6 +2916,8 @@ GZ3D.Composer.prototype.setSkinVisibility = function (skinnedObject, visible)
     {
         this.gz3dScene.muscleVisuzalizations['all_of_them'].setVisible(!visible);
     }
+
+    this.gz3dScene.refresh3DViews();
 };
 
 /**
@@ -2978,13 +2980,20 @@ GZ3D.Composer.prototype.buildSkin = function ()
 
                 that.skinnedObjects.push(skinnedObject);
 
+                dae._skinnedObject = skinnedObject;
+                parent._skinnedObject = skinnedObject;
+                mapToMesh._skinnedObject = skinnedObject;
+
                 dae.traverse( function ( bone ) {
                     if ( bone instanceof THREE.Bone ) {
                         var r = mapToMesh.getObjectByName(skin.bonePrefix+bone.name);
                         if (r)
                         {
-                            skinBoneMap.push({'joint':r,'bone':bone, });
+                            skinBoneMap.push({'joint':r,'bone':bone });
                             that.setSkinVisibility(skinnedObject, skin.visible );
+
+                            r._skinnedObject = skinnedObject;
+                            bone._skinnedObject = skinnedObject;
                         }
                     }
                 } );
@@ -13008,7 +13017,64 @@ GZ3D.Scene.prototype.setLabelInfoVisible = function (object, visible)
 
 };
 
+/**
+ * Find skin oject (if any) for a model
+ *
+*/
 
+GZ3D.Scene.prototype.findSkinObject= function (model)
+{
+  if (model)
+  {
+    if (model._skinnedObject) return model._skinnedObject;
+
+    var sko = null;
+
+    model.traverse( function ( obj ) {
+
+      if (obj._skinnedObject) sko=obj._skinnedObject;
+
+    } );
+
+    return sko;
+  }
+
+  return null;
+};
+
+/**
+ * Returns true if the model has a skin
+ *
+*/
+
+GZ3D.Scene.prototype.hasSkin = function (model)
+{
+  return !!(this.findSkinObject(model));
+};
+
+/**
+ * Show/hide skin for selection
+ *
+*/
+
+GZ3D.Scene.prototype.setSkinVisible = function (model, visible)
+{
+  var sko = this.findSkinObject(model);
+  if (sko) this.composer.setSkinVisibility(sko,visible);
+};
+
+/**
+ * Returns true if current selection's skin is visible
+ *
+*/
+
+GZ3D.Scene.prototype.skinVisible = function (model)
+{
+  var sko = this.findSkinObject(model);
+  if (sko) return sko.skinMesh.visible;
+
+  return false;
+};
 
 
 /**
