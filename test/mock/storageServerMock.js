@@ -34,6 +34,9 @@
             return $q.when([{ name: 'hbp-sp10-user-edit-rights' }]);
           });
 
+        this.getFileContent = jasmine.createSpy('getFileContent');
+        this.setFileContent = jasmine.createSpy('setFileContent');
+
         this.reset = function() {
           this.getCurrentUser.calls.reset();
           this.getUser.calls.reset();
