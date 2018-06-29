@@ -34,10 +34,8 @@
       RESET_BUTTON: 'Here you can activate the reset menu.',
       TIME_DISPLAY:
         "This shows the simulated time of the experiment on the server 'Simulation time', the actual elapsed time 'Real time' and the 'Timeout', after which the simulation is terminated.",
-      INCREASE_LIGHT:
-        'With this button, you can increase the global brightness of the lights in the simulation.',
-      DECREASE_LIGHT:
-        'With this button, you can decrease the global brightness of the lights in the simulation.',
+      MANIPULATE_LIGHT:
+        'Submenu: Increase or decrease the global brightness of the lights in the simulation.',
       CAMERA_TRANSLATION:
         'With those controls, you can change the viewpoint of your local camera. By clicking on the left/right/diagonal arrows, pressing the keys (WASD) or the arrow keys, you can move forward/left/backward/right. The up/down arrows, the keys (RF) or (Page-Up,Page-Down) let you move up and down. The circle in the middle lets you reset the position.',
       CAMERA_ROTATION:
@@ -54,6 +52,7 @@
         'This information appears when you are not the displayed owner of the experiment and thus you are in a view-only mode.',
       ENVIRONMENT_SETTINGS:
         'This button displays the 3D environment setting panel.',
+      PROFILE: 'Open Profile Menu',
       USER_NAVIGATION:
         'Open user navigation sub-menu: Camera Button - Freeflying Camera / Character Button - Character bound physical presence.',
       CODE_EDITOR:
@@ -65,6 +64,14 @@
       EXIT_BUTTON: 'Here you can leave the simulation.',
       INFO_BUTTON: 'This button shows information about the simulation.',
       FORCE_APPLY:
-        'This button opens the aply force dialog to activate dynamic application of forces on objects.'
+        'This button opens the aply force dialog to activate dynamic application of forces on objects.',
+      ENVIRONMENT_EDITOR: 'Toggle the environment (add models, etc.)',
+      TRANSFER_FUNCTION_EDITOR: 'Toggle the transfer function editor',
+      BRAIN_EDITOR: 'Toggle the PyNN brain editor',
+      SMACH_EDITOR: 'Toggle the SMACH state machine editor',
+      RESOURCES_EDITOR: 'Edit experiment resources like files, assets, etc.',
+      EXPERIMENT_NAME: "The experiment's name",
+      EDIT_EXPERIMENT_NAME: "Edit the experiment's name",
+      SIMTOOLS_SIDEBAR: 'Toggle the sidebar with simulation tools'
     });
 })();

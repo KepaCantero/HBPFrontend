@@ -113,11 +113,6 @@
     }
 
     randomizePosition() {
-      // do not randomize position if view is not resizeable, otherwise it seems to be placed to close to borders
-      if (!DynamicViewOverlayController.isResizeable(this.channelType)) {
-        return;
-      }
-
       let overlayWrapper = this.$element[0].getElementsByClassName(
         this.dynamicViewOverlayService.OVERLAY_WRAPPER_CLASS
       )[0];

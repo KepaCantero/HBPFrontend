@@ -31,13 +31,15 @@
       '$q',
       '$log',
       '$http',
-      'simulationInfo',
       'STREAM_URL',
-      function($q, $log, $http, simulationInfo, STREAM_URL) {
-        return {
-          getStreamUrls: getStreamUrls,
-          getStreamingUrlForTopic: getStreamingUrlForTopic
-        };
+      'simulationInfo',
+      function($q, $log, $http, STREAM_URL, simulationInfo) {
+        function checkIfVideoStreamsAvailable() {
+          getStreamUrls().then(videoStreams => {
+            videoStreamService.videoStreamsAvailable =
+              videoStreams && !!videoStreams.length;
+          });
+        }
 
         function getStreamUrls() {
           if (
@@ -85,6 +87,17 @@
 
           return deferredStreamUrl.promise;
         }
+
+        let videoStreamService = {
+          videoStreamsAvailable: false,
+          checkIfVideoStreamsAvailable: checkIfVideoStreamsAvailable,
+          getStreamUrls: getStreamUrls,
+          getStreamingUrlForTopic: getStreamingUrlForTopic
+        };
+
+        videoStreamService.checkIfVideoStreamsAvailable();
+
+        return videoStreamService;
       }
     ]);
 })();

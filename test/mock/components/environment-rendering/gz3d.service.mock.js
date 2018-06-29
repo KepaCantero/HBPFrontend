@@ -22,6 +22,7 @@
 
     var views = [
       {
+        name: 'main_view',
         type: 'camera',
         active: true,
         container: document.createElement('div'), //{ style: { visibility: 'visible' } }
@@ -31,6 +32,7 @@
         camera: new THREE.PerspectiveCamera()
       },
       {
+        name: 'robot_view',
         type: 'camera',
         active: false,
         container: document.createElement('div'), //{ style: { visibility: 'hidden' } }
@@ -132,6 +134,14 @@
         emitter: {
           _events: { entityCreated: jasmine.createSpy('entityCreated') }
         }
+      },
+      emitter: {
+        on: jasmine.createSpy('on').and.callFake(function(event, fn) {
+          fn();
+        })
+      },
+      modelInfoTopic: {
+        subscribe: jasmine.createSpy('subscribe')
       }
     };
   });

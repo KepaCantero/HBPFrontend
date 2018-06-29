@@ -252,6 +252,30 @@ describe('Service: dynamicViewOverlayService', function() {
     expect(dynamicViewOverlayService.createOverlay).toHaveBeenCalledTimes(2);
   });
 
+  it(' - toggleDynamicViewOverlay()', function() {
+    spyOn(dynamicViewOverlayService, 'createDynamicOverlay');
+    spyOn(dynamicViewOverlayService, 'closeAllOverlaysOfType');
+    spyOn(dynamicViewOverlayService, 'isOverlayOpen');
+
+    let isOpen = false;
+    dynamicViewOverlayService.isOverlayOpen.and.returnValue({
+      then: cb => {
+        cb(isOpen);
+      }
+    });
+
+    dynamicViewOverlayService.toggleDynamicViewOverlay('my-overlay');
+    expect(dynamicViewOverlayService.createDynamicOverlay).toHaveBeenCalledWith(
+      'my-overlay'
+    );
+
+    isOpen = true;
+    dynamicViewOverlayService.toggleDynamicViewOverlay('my-overlay');
+    expect(
+      dynamicViewOverlayService.closeAllOverlaysOfType
+    ).toHaveBeenCalledWith('my-overlay');
+  });
+
   describe(' - isOverlayOpen', function() {
     // prepare
     var defferedOverlayController;

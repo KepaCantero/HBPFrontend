@@ -15,6 +15,7 @@ describe('Directive: smachEditor', function() {
     stateMachines,
     $timeout,
     SOURCE_TYPE,
+    RESET_TYPE,
     codeEditorsServices,
     environmentService,
     editorToolbarService,
@@ -78,6 +79,8 @@ describe('Directive: smachEditor', function() {
   beforeEach(module('exd.templates')); // import html template
   beforeEach(module('simulationInfoMock'));
   beforeEach(module('userContextServiceMock'));
+  beforeEach(module('applyForceServiceMock'));
+
   beforeEach(
     module(function($provide) {
       $provide.value('backendInterfaceService', backendInterfaceServiceMock);
@@ -99,6 +102,7 @@ describe('Directive: smachEditor', function() {
       _pythonCodeHelper_,
       _$timeout_,
       _SOURCE_TYPE_,
+      _RESET_TYPE_,
       _codeEditorsServices_,
       _$q_,
       _environmentService_,
@@ -111,6 +115,7 @@ describe('Directive: smachEditor', function() {
       pythonCodeHelper = _pythonCodeHelper_;
       ScriptObject = pythonCodeHelper.ScriptObject;
       SOURCE_TYPE = _SOURCE_TYPE_;
+      RESET_TYPE = _RESET_TYPE_;
       $timeout = _$timeout_;
       codeEditorsServices = _codeEditorsServices_;
       $q = _$q_;
@@ -132,6 +137,12 @@ describe('Directive: smachEditor', function() {
     })
   );
 
+  it('should refresh on start', function() {
+    spyOn(isolateScope, 'refresh');
+    $timeout.flush();
+    expect(isolateScope.refresh).toHaveBeenCalled();
+  });
+
   it('should init the stateMachines variable', function() {
     isolateScope.refresh();
     expect(isolateScope.stateMachines).toEqual([]);
@@ -152,6 +163,18 @@ describe('Directive: smachEditor', function() {
     expect(isolateScope.resetListenerUnbindHandler).toHaveBeenCalledWith();
     expect(isolateScope.unbindWatcherResize).toHaveBeenCalledWith();
     expect(isolateScope.unbindListenerUpdatePanelUI).toHaveBeenCalledWith();
+  });
+
+  it('should refresh on event UPDATE_PANEL_UI', function() {
+    spyOn(isolateScope, 'refresh');
+    $rootScope.$broadcast('UPDATE_PANEL_UI');
+    expect(isolateScope.refresh).toHaveBeenCalled();
+  });
+
+  it('should reset stateMachines on event RESET_FULL', function() {
+    isolateScope.stateMachines = [{}, {}];
+    $rootScope.$broadcast('RESET', RESET_TYPE.RESET_FULL);
+    expect(isolateScope.stateMachines).toEqual([]);
   });
 
   describe('Retrieving, saving and deleting stateMachines', function() {

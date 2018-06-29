@@ -206,6 +206,17 @@
           minHeight: 300
         }
       },
+      RESOURCES_EDITOR: {
+        name: 'Resources Editor',
+        directive: 'resources-editor',
+        allowMultipleViews: false, // default true
+        overlayDefaultSize: {
+          widthPercent: 70,
+          heightPercent: 70,
+          minWidth: 700,
+          minHeight: 300
+        }
+      },
       PERFORMANCE_MONITOR: {
         name: 'Performance Monitor',
         directive: 'performance-monitor',

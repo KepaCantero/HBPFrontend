@@ -102,6 +102,7 @@ describe('Directive: pynnEditor', function() {
   beforeEach(module('exd.templates')); // import html template
   beforeEach(module('simulationInfoMock'));
   beforeEach(module('userContextServiceMock'));
+  beforeEach(module('applyForceServiceMock'));
 
   beforeEach(
     module(function($provide) {
@@ -145,6 +146,12 @@ describe('Directive: pynnEditor', function() {
       isolateScope = element.isolateScope();
     })
   );
+
+  it('should refresh on start', function() {
+    spyOn(isolateScope, 'refresh');
+    $timeout.flush();
+    expect(isolateScope.refresh).toHaveBeenCalled();
+  });
 
   describe('Get/Set brain, PyNN script', function() {
     var data = {

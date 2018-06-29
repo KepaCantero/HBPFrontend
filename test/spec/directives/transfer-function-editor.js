@@ -19,6 +19,7 @@ describe('Directive: transferFunctionEditor', function() {
     codeEditorsServices,
     $httpBackend,
     clbConfirmMock,
+    simulationInfo,
     storageServer,
     whenConvertRawTfToStructured;
 
@@ -132,6 +133,7 @@ describe('Directive: transferFunctionEditor', function() {
       _SIMULATION_FACTORY_CLE_ERROR_,
       _SOURCE_TYPE_,
       _TRANSFER_FUNCTION_TYPE_,
+      _simulationInfo_,
       _pythonCodeHelper_,
       _RESET_TYPE_,
       _downloadFileService_,
@@ -147,6 +149,11 @@ describe('Directive: transferFunctionEditor', function() {
       RESET_TYPE = _RESET_TYPE_;
       SOURCE_TYPE = _SOURCE_TYPE_;
       TRANSFER_FUNCTION_TYPE = _TRANSFER_FUNCTION_TYPE_;
+
+      simulationInfo = _simulationInfo_;
+      simulationInfo.serverBaseUrl = 'http://bbpce016.epfl.ch:8080';
+      simulationInfo.simulationID = 'mocked_simulation_id';
+
       backendInterfaceService = _backendInterfaceService_;
       currentStateMock = _currentStateMockFactory_.get().stateService;
       editorMock.getLineHandle = jasmine
@@ -188,6 +195,12 @@ describe('Directive: transferFunctionEditor', function() {
     })
   );
 
+  it('should refresh on start', function() {
+    spyOn(isolateScope, 'refresh');
+    $timeout.flush();
+    expect(isolateScope.refresh).toHaveBeenCalled();
+  });
+
   it('should refresh when offsetParent visible', function() {
     $timeout.flush();
     document.body.appendChild(element[0]);
@@ -198,7 +211,7 @@ describe('Directive: transferFunctionEditor', function() {
   });
 
   it('should init the populations, topics', function() {
-    $scope.control.refresh();
+    isolateScope.refresh();
     expect(isolateScope.populations).toEqual([]);
     expect(isolateScope.topics).toEqual([]);
     $rootScope.$digest();
@@ -207,12 +220,12 @@ describe('Directive: transferFunctionEditor', function() {
   });
 
   it('should populate the populations', function() {
-    $scope.control.refresh();
+    isolateScope.refresh();
     expect(backendInterfaceService.getPopulations).toHaveBeenCalled();
   });
 
   it('should populate the topics', function() {
-    $scope.control.refresh();
+    isolateScope.refresh();
     expect(backendInterfaceService.getTopics).toHaveBeenCalled();
   });
 
@@ -336,7 +349,7 @@ describe('Directive: transferFunctionEditor', function() {
 
     beforeEach(function() {
       let tfID = 0;
-      $scope.control.refresh();
+      isolateScope.refresh();
       $rootScope.$digest();
 
       expectedTf1 = new ScriptObject(tfID++, 'return 42');
@@ -1019,6 +1032,8 @@ def tf1(t):
 def tf1(t):
   pass)`
       };
+
+      $timeout.flush();
       isolateScope.transferFunctions = [isolateScope.transferFunction];
 
       whenConvertRawTfToStructured.respond(200, {

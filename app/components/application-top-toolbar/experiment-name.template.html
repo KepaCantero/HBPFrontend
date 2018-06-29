@@ -3,12 +3,13 @@
 <!-- endbuild -->
 
 <div class="experiment-name-wrapper">
-  <div class="experiment-name" ng-show="!vm.editing">{{vm.experimentName}}</div>
+  <div class="experiment-name" ng-show="!vm.editing" help-tooltip="EXPERIMENT_NAME">{{vm.experimentName}}</div>
   <form ng-show="vm.editing">
     <input type="text" value="{{vm.experimentName}}" size="{{vm.experimentName.length}}" ng-model="vm.experimentName"
            ng-blur="vm.stopEditExperimentName();" ng-keydown="vm.onKeyDown($event)" ng-required/>
   </form>
-  <md-button class="md-icon-button" aria-label="Edit Name" ng-click="vm.onEditExperimentName();" ng-show="!vm.editing">
+  <md-button class="md-icon-button" aria-label="Edit Name" ng-click="vm.onEditExperimentName();" ng-show="!vm.editing"
+             help-tooltip="EDIT_EXPERIMENT_NAME">
     <md-icon ng-bind="'edit'"></md-icon>
   </md-button>
 </div>

@@ -9,6 +9,7 @@
       this.Service = jasmine.createSpy('Service');
       this.ServiceRequest = jasmine.createSpy('ServiceRequest');
       this.createService = jasmine.createSpy('createService');
+      this.createTopic = jasmine.createSpy('createTopic');
     }
   ]);
 })();

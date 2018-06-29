@@ -30,10 +30,22 @@
       return this.gz3d.scene.viewManager.views;
     }
 
-    constructor($q, gz3d, environmentRenderingService) {
+    constructor(
+      $q,
+      DYNAMIC_VIEW_CHANNELS,
+      gz3d,
+      dynamicViewOverlayService,
+      environmentRenderingService,
+      nrpAnalytics
+    ) {
       this.$q = $q;
+
+      this.DYNAMIC_VIEW_CHANNELS = DYNAMIC_VIEW_CHANNELS;
+
       this.gz3d = gz3d;
+      this.dynamicViewOverlayService = dynamicViewOverlayService;
       this.environmentRenderingService = environmentRenderingService;
+      this.nrpAnalytics = nrpAnalytics;
     }
 
     hasCameraView() {
@@ -111,10 +123,52 @@
         view === this.gz3d.scene.viewManager.mainUserView
       );
     }
+
+    // robot view
+    onOpenRobotViews() {
+      if (!this.hasCameraView()) {
+        return;
+      }
+
+      var allHidden = true;
+
+      this.views.forEach(view => {
+        if (view.name !== 'main_view' && view.container !== undefined) {
+          allHidden = false;
+        }
+      });
+
+      if (allHidden) {
+        // open overlays for every view that doesn't have a container
+        this.views.forEach(view => {
+          if (view.container === undefined) {
+            this.dynamicViewOverlayService.createDynamicOverlay(
+              this.DYNAMIC_VIEW_CHANNELS.ENVIRONMENT_RENDERING
+            );
+          }
+        });
+      } else {
+        this.dynamicViewOverlayService.closeAllOverlaysOfType(
+          this.DYNAMIC_VIEW_CHANNELS.ENVIRONMENT_RENDERING
+        );
+      }
+
+      this.nrpAnalytics.eventTrack('Toggle-robot-view', {
+        category: 'Simulation-GUI',
+        value: true
+      });
+    }
   }
 
   GZ3DViewsService.$$ngIsClass = true;
-  GZ3DViewsService.$inject = ['$q', 'gz3d', 'environmentRenderingService'];
+  GZ3DViewsService.$inject = [
+    '$q',
+    'DYNAMIC_VIEW_CHANNELS',
+    'gz3d',
+    'dynamicViewOverlayService',
+    'environmentRenderingService',
+    'nrpAnalytics'
+  ];
 
   angular.module('gz3dModule').service('gz3dViewsService', GZ3DViewsService);
 })();

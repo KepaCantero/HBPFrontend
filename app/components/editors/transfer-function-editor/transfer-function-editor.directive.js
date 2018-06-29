@@ -165,7 +165,7 @@ def {0}(t):
           templateUrl:
             'components/editors/transfer-function-editor/transfer-function-editor.template.html',
           restrict: 'E',
-          scope: { control: '=' },
+          scope: {},
           link: function(scope, element, attrs) {
             /**************************************/
             // Initialize
@@ -331,7 +331,9 @@ def {0}(t):
                 }
               }
             };
-            var rosConnection = roslib.getOrCreateConnectionTo(attrs.server);
+            var rosConnection = roslib.getOrCreateConnectionTo(
+              simulationInfo.serverConfig.rosbridge.websocket
+            );
             scope.errorTopicSubscriber = roslib.createTopic(
               rosConnection,
               attrs.topic,
@@ -637,30 +639,6 @@ def {0}(t):
               scope.topics = response.topics;
             };
 
-            let refreshEditor = () => {
-              var editor = codeEditorsServices.getEditorChild(
-                'codeEditor',
-                element[0]
-              );
-              codeEditorsServices.refreshEditor(editor);
-
-              scope.updateNTransferFunctionDirty();
-            };
-
-            scope.refresh = function() {
-              refreshEditor();
-            };
-
-            scope.control.refresh = function() {
-              if (autoSaveService.isDirty()) refreshEditor();
-              else {
-                reloadTfs();
-                reloadPopulations();
-                reloadTopics();
-                refreshEditor();
-              }
-            };
-
             let structureTfCode = (tfName, tfCode) => {
               return rawTransferFunctionToStructured(
                 simulationInfo.serverBaseUrl +
@@ -746,7 +724,7 @@ def {0}(t):
                   return structuredTfs;
                 })
                 .then(() => {
-                  scope.refresh();
+                  refreshEditor();
                 })
                 .catch(err => alert('Failed to load TFS:\n' + err));
             };
@@ -766,6 +744,31 @@ def {0}(t):
             let reloadTopics = () => {
               backendInterfaceService.getTopics(scope.loadTopics);
             };
+
+            let refreshEditor = () => {
+              var editor = codeEditorsServices.getEditorChild(
+                'codeEditor',
+                element[0]
+              );
+              codeEditorsServices.refreshEditor(editor);
+
+              scope.updateNTransferFunctionDirty();
+            };
+
+            scope.refresh = function() {
+              if (autoSaveService.isDirty()) {
+                refreshEditor();
+              } else {
+                reloadTfs();
+                reloadPopulations();
+                reloadTopics();
+                refreshEditor();
+              }
+            };
+            // refresh editor on startup
+            $timeout(() => {
+              scope.refresh();
+            }, 100);
 
             /**************************************/
             // Loading TF content

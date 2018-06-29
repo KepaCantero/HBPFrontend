@@ -105,7 +105,8 @@
       'modal',
       'robotComponentsModule',
       'applicationTopToolbarModule',
-      'changelog'
+      'changelog',
+      'simToolsSidebarModule'
     ])
     // Routes
     .config([

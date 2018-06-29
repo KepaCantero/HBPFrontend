@@ -50,6 +50,7 @@
       this.$q = $q;
       this.$rootScope = $rootScope;
       this.$timeout = $timeout;
+
       this.nrpAnalytics = nrpAnalytics;
 
       this.overlays = {};
@@ -226,6 +227,16 @@
         });
       }
       return deferredIsOpen.promise;
+    }
+
+    toggleDynamicViewOverlay(channelType) {
+      this.isOverlayOpen(channelType).then(state => {
+        if (state) {
+          this.closeAllOverlaysOfType(channelType);
+        } else {
+          this.createDynamicOverlay(channelType);
+        }
+      });
     }
   }
 

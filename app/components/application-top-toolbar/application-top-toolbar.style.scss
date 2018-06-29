@@ -24,32 +24,43 @@
 
 @import '../../../bower_components/angular-material/angular-material.scss';
 
-$application-top-toolbar-height: 5%;
+$app-top-toolbar-height: 50px;
 
-.application-top-toolbar-wrapper {
-  .application-top-toolbar {
+.app-top-toolbar-wrapper {
+  .app-top-toolbar {
     box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.22);
     background: linear-gradient(to right bottom, #f1f1f1, #f3f3f3);
     min-height: 5%;
     border-bottom-width: 1px;
     border-bottom-style: solid;
     border-bottom-color: #bbbbbb;
-    min-height: $application-top-toolbar-height;
+    min-height: $app-top-toolbar-height;
 
     .md-toolbar-tools {
-      height: $application-top-toolbar-height;
+      height: $app-top-toolbar-height;
+      padding-left: 0px;
     }
   }
 
-  .application-top-toolbar-section-middle {
+  .app-top-toolbar-time-display {
+    margin-left: 10px;
+  }
+
+  .app-top-toolbar-section {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .app-top-toolbar-section-middle {
     text-align: center;
 
-    .application-top-toolbar-title h2 {
+    .app-top-toolbar-title h2 {
       font-family: inherit;
     }
   }
 
-  .application-top-toolbar-section-right {
+  .app-top-toolbar-section-right {
   }
 
   .vertical-divider {
@@ -58,9 +69,10 @@ $application-top-toolbar-height: 5%;
     border-right-style: solid;
     border-color: grey;
     height: 30px;
-    min-height: 50%;
+    min-height: 75%;
     margin-left: 20px;
     margin-right: 20px;
+    align-self: center;
   }
 }
 

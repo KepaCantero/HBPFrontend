@@ -26,5 +26,8 @@
             fn();
           })
         });
+      this.toggleDynamicViewOverlay = jasmine.createSpy(
+        'toggleDynamicViewOverlay'
+      );
     });
 })();

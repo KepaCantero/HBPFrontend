@@ -436,6 +436,23 @@
 
           isActiveNavigationMode: function(mode) {
             return this.navigationMode === mode;
+          },
+
+          // Camera manipulation
+          // This should be integrated to the tutorial story when
+          // it will be implemented !
+          requestCameraTransform(event, action) {
+            if (event.which === 1) {
+              // camera control uses left button only
+              gz3d.scene.controls.onMouseDownManipulator(action);
+            }
+          },
+
+          releaseCameraTransform(event, action) {
+            if (event.which === 1) {
+              // camera control uses left button only
+              gz3d.scene.controls.onMouseUpManipulator(action);
+            }
           }
         };
       }

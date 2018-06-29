@@ -221,6 +221,12 @@ describe('Services: environmentRenderingService', function() {
     ).not.toHaveBeenCalled();
   });
 
+  it(' - should return a promise for sceneInitialized', function() {
+    expect(environmentRenderingService.sceneInitialized()).toBe(
+      environmentRenderingService.deferredSceneInitialized.promise
+    );
+  });
+
   it(' - initialize requestAnimationFrame for any of its implementations', function() {
     spyOn(window.requestAnimationFrame, 'bind').and.returnValue(undefined);
     for (var i = 0; i < VENDORS.length; ++i) {

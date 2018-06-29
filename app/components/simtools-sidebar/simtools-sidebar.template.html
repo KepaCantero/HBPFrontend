@@ -1,0 +1,250 @@
+<!-- build:css(.tmp) components/simtools-sidebar/simtools-sidebar.style.css -->
+<link rel="stylesheet" href="components/simtools-sidebar/simtools-sidebar.style.css">
+<!-- endbuild -->
+
+<div class="simtools-sidebar-wrapper" ng-show="vm.show">
+  <md-sidenav id="simtools-sidebar" class="md-sidenav-left" md-component-id="simtools-sidebar"
+              md-disable-backdrop md-whiteframe="4" md-is-open="true"
+              ng-class="{'md-sidenav-submenu-expand': vm.isSubmenuSceneNavigationOpen || vm.isSubmenuLightingOpen}">
+
+    <!-- all tools directly influencing an experiment -->
+    <div id="simtools-sidebar-group-editors" class="simtools-sidebar-category"
+         ng-class="{'simtools-sidebar-category-shortened': vm.overflowing,
+         'simtools-sidebar-category-expanded': vm.expandedCategory === vm.SIMTOOLS_SIDEBAR_ID.GROUP_EDITORS,
+         'simtools-sidebar-category-minimized': vm.expandedCategory !== null && vm.expandedCategory !== vm.SIMTOOLS_SIDEBAR_ID.GROUP_EDITORS}">
+
+      <md-button class="md-raised tool-button tool-editor" aria-label="Environment Editor"
+                 ng-click="vm.onButtonToggleEditor(vm.DYNAMIC_VIEW_CHANNELS.ENVIRONMENT_EDITOR)"
+                 help-tooltip="ENVIRONMENT_EDITOR"
+                 ng-class="{'tool-help-highlight': vm.helpTooltipService.helpCode === 'ENVIRONMENT_EDITOR'}">
+        <md-tooltip md-direction="right">Environment Editor</md-tooltip>
+        <md-icon md-svg-src="img/esv/tools/environment_editor.svg"></md-icon>
+      </md-button>
+
+      <md-button class="md-raised tool-button tool-editor" aria-label="Transfer Function Editor"
+                 ng-click="vm.onButtonToggleEditor(vm.DYNAMIC_VIEW_CHANNELS.TRANSFER_FUNCTION_EDITOR)"
+                 help-tooltip="TRANSFER_FUNCTION_EDITOR"
+                 ng-class="{'tool-help-highlight': vm.helpTooltipService.helpCode === 'TRANSFER_FUNCTION_EDITOR'}">
+        <md-tooltip md-direction="right">Transfer Function Editor</md-tooltip>
+        <md-icon md-svg-src="img/esv/tools/transfer_function_editor.svg"></md-icon>
+      </md-button>
+
+      <md-button class="md-raised tool-button tool-editor" aria-label="Brain Editor"
+                 ng-click="vm.onButtonToggleEditor(vm.DYNAMIC_VIEW_CHANNELS.PYNN_EDITOR)"
+                 help-tooltip="BRAIN_EDITOR"
+                 ng-class="{'tool-help-highlight': vm.helpTooltipService.helpCode === 'BRAIN_EDITOR'}">
+        <md-tooltip md-direction="right">Brain Editor</md-tooltip>
+        <i class="fa fa-brain"></i>
+      </md-button>
+
+      <md-button class="md-raised tool-button tool-editor" aria-label="State Machine Editor"
+                 ng-click="vm.onButtonToggleEditor(vm.DYNAMIC_VIEW_CHANNELS.SMACH_EDITOR)"
+                 help-tooltip="SMACH_EDITOR"
+                 ng-class="{'tool-help-highlight': vm.helpTooltipService.helpCode === 'SMACH_EDITOR'}">
+        <md-tooltip md-direction="right">State Machine Editor</md-tooltip>
+        <md-icon md-svg-src="img/esv/tools/state_machine_editor.svg"></md-icon>
+      </md-button>
+
+      <md-button class="md-raised tool-button tool-editor" aria-label="Resources Editor"
+                 ng-click="vm.onButtonToggleEditor(vm.DYNAMIC_VIEW_CHANNELS.RESOURCES_EDITOR)"
+                 help-tooltip="RESOURCES_EDITOR"
+                 ng-class="{'tool-help-highlight': vm.helpTooltipService.helpCode === 'RESOURCES_EDITOR'}">
+        <md-tooltip md-direction="right">Resources Editor</md-tooltip>
+        <i class="fa fa-file-import"></i>
+      </md-button>
+
+      <md-button class="md-raised tool-button tool-editor" aria-label="ROS Terminal"
+                 ng-click="vm.editorToolbarService.toggleRosTerminal()" help-tooltip="ROS_TERMINAL"
+                 ng-class="{'tool-help-highlight': vm.helpTooltipService.helpCode === 'ROS_TERMINAL'}">
+        <md-tooltip md-direction="right">ROS Terminal</md-tooltip>
+        <span>ROS</span>
+      </md-button>
+
+      <md-button class="md-raised tool-button tool-editor" aria-label="Apply Force"
+                 ng-click="vm.editorToolbarService.toggleForceApplyMode()" help-tooltip="FORCE_APPLY"
+                 ng-class="{'tool-help-highlight': vm.helpTooltipService.helpCode === 'FORCE_APPLY'}">
+        <md-tooltip md-direction="right">Apply Force</md-tooltip>
+        <img src="img/esv/force_mode_icon.png">
+      </md-button>
+
+      <div class="simtools-sidebar-submenu">
+        <md-button class="md-raised tool-button tool-editor simtools-sidebar-submenu-trigger"
+                   aria-label="Global Lighting" help-tooltip="MANIPULATE_LIGHT"
+                   ng-click="vm.isSubmenuLightingOpen = !vm.isSubmenuLightingOpen"
+                   ng-class="{'tool-help-highlight': vm.helpTooltipService.helpCode === 'MANIPULATE_LIGHT'}">
+          <md-tooltip md-direction="right" ng-show="!vm.isSubmenuLightingOpen">Global Lighting</md-tooltip>
+          <i class="fa fa-lightbulb"></i>
+        </md-button>
+
+        <div ng-show="vm.isSubmenuLightingOpen" class="simtools-sidebar-submenu-items">
+          <md-button aria-label="Increase Global Lighting" class="md-fab md-raised md-mini subtool-button"
+                     ng-click="vm.onButtonLightIntensity(1)">
+            <i class="fa fa-arrow-up" ng-class="{'tool-disabled': vm.gz3d.isGlobalLightMaxReached()}"></i>
+          </md-button>
+          <md-button aria-label="Decrease Global Lighting" class="md-fab md-raised md-mini subtool-button"
+                     ng-click="vm.onButtonLightIntensity(-1)">
+            <i class="fa fa-arrow-down" ng-class="{'tool-disabled': vm.gz3d.isGlobalLightMinReached()}"></i>
+          </md-button>
+        </div>
+      </div>
+    </div>
+
+    <div class="tool-category-expand tool-editor" aria-label="Expand Editor Tools"
+         ng-show="vm.simToolsSidebarService.isOverflowingY(vm.SIMTOOLS_SIDEBAR_ID.GROUP_EDITORS) ||
+         vm.expandedCategory === vm.SIMTOOLS_SIDEBAR_ID.GROUP_EDITORS"
+         ng-click="vm.onButtonExpandCategory(vm.SIMTOOLS_SIDEBAR_ID.GROUP_EDITORS)">
+      <md-tooltip md-direction="right">Expand Editor Tools Section</md-tooltip>
+      <i class="fas fa-sort-down" ng-show="vm.expandedCategory !== vm.SIMTOOLS_SIDEBAR_ID.GROUP_EDITORS"></i>
+      <i class="fas fa-sort-up" ng-show="vm.expandedCategory === vm.SIMTOOLS_SIDEBAR_ID.GROUP_EDITORS"></i>
+    </div>
+
+    <!-- all tools monitoring the state of an experiment -->
+    <div id="simtools-sidebar-group-monitors" class="simtools-sidebar-category"
+         ng-class="{'simtools-sidebar-category-shortened': vm.overflowing && vm.expandedCategory === null,
+         'simtools-sidebar-category-expanded': vm.expandedCategory === vm.SIMTOOLS_SIDEBAR_ID.GROUP_MONITORS,
+         'simtools-sidebar-category-minimized': vm.expandedCategory !== null && vm.expandedCategory !== vm.SIMTOOLS_SIDEBAR_ID.GROUP_MONITORS}">
+      <md-button class="md-raised tool-button tool-monitor" aria-label="Spiketrain"
+                 ng-click="vm.editorToolbarService.toggleSpikeTrain()" help-tooltip="SPIKE_TRAIN"
+                 ng-class="{'tool-help-highlight': vm.helpTooltipService.helpCode === 'SPIKE_TRAIN'}">
+        <md-tooltip md-direction="right">Spiketrain</md-tooltip>
+        <md-icon md-svg-src="img/esv/tools/spiketrain.svg"></md-icon>
+      </md-button>
+
+      <md-button class="md-raised tool-button tool-monitor" aria-label="Joint Plot"
+                 ng-click="vm.dynamicViewOverlayService.createDynamicOverlay(vm.DYNAMIC_VIEW_CHANNELS.JOINT_PLOT)"
+                 help-tooltip="JOINT_PLOT"
+                 ng-class="{'tool-help-highlight': vm.helpTooltipService.helpCode === 'JOINT_PLOT'}">
+        <md-tooltip md-direction="right">Joint Plot</md-tooltip>
+        <md-icon md-svg-src="img/esv/tools/joint_plot.svg"></md-icon>
+      </md-button>
+
+      <md-button class="md-raised tool-button tool-monitor" aria-label="Brain Visualizer"
+                 ng-click="vm.editorToolbarService.toggleBrainvisualizer()" help-tooltip="BRAIN_VISUALIZER"
+                 ng-class="{'tool-help-highlight': vm.helpTooltipService.helpCode === 'BRAIN_VISUALIZER'}">
+        <md-tooltip md-direction="right">Brain Visualizer</md-tooltip>
+        <img src="img/esv/brainvisualizer.png">
+      </md-button>
+
+      <md-button class="md-raised tool-button tool-monitor" aria-label="Log Console"
+                 ng-click="vm.editorToolbarService.toggleLogConsole()" help-tooltip="LOG_CONSOLE"
+                 ng-class="{'tool-help-highlight': vm.helpTooltipService.helpCode === 'LOG_CONSOLE'}">
+        <md-tooltip md-direction="right">Log Console</md-tooltip>
+        <i class="fa fa-terminal"></i>
+      </md-button>
+
+      <md-button class="md-raised tool-button tool-monitor" aria-label="Video Streams"
+                 ng-click="vm.onButtonVideoStreams()"
+                 help-tooltip="SERVER_VIDEO_STREAM"
+                 ng-class="{'tool-help-highlight': vm.helpTooltipService.helpCode === 'SERVER_VIDEO_STREAM',
+                 'tool-disabled': !vm.videoStreamService.videoStreamsAvailable}">
+        <md-tooltip md-direction="right">Video Streams</md-tooltip>
+        <md-icon ng-bind="'ondemand_video'"></md-icon>
+      </md-button>
+
+      <md-button class="md-raised tool-button tool-monitor" aria-label="Performance Monitor"
+                 ng-click="vm.editorToolbarService.togglePerformanceView()" help-tooltip="PERFORMANCE_VIEW"
+                 ng-class="{'tool-help-highlight': vm.helpTooltipService.helpCode === 'PERFORMANCE_VIEW'}">
+        <md-tooltip md-direction="right">Performance Monitor</md-tooltip>
+        <img src="img/esv/performance-monitor.png">
+      </md-button>
+
+      <md-button class="md-raised tool-button tool-monitor" aria-label="Robot Cameras"
+                 ng-click="vm.gz3dViewsService.onOpenRobotViews()"
+                 help-tooltip="ROBOT_VIEW"
+                 ng-class="{'tool-help-highlight': vm.helpTooltipService.helpCode === 'ROBOT_VIEW',
+                 'tool-disabled': !vm.gz3dViewsService.hasCameraView()}">
+        <md-tooltip md-direction="right">Robot Cameras</md-tooltip>
+        <i class="fa fa-eye"></i>
+      </md-button>
+    </div>
+
+    <div class="tool-category-expand tool-monitor" aria-label="Expand Monitor Tools"
+         ng-show="vm.simToolsSidebarService.isOverflowingY(vm.SIMTOOLS_SIDEBAR_ID.GROUP_MONITORS) ||
+         vm.expandedCategory === vm.SIMTOOLS_SIDEBAR_ID.GROUP_MONITORS"
+         ng-click="vm.onButtonExpandCategory(vm.SIMTOOLS_SIDEBAR_ID.GROUP_MONITORS)">
+      <md-tooltip md-direction="right">Expand Monitor Tools Section</md-tooltip>
+      <i class="fas fa-sort-down" ng-show="vm.expandedCategory !== vm.SIMTOOLS_SIDEBAR_ID.GROUP_MONITORS"></i>
+      <i class="fas fa-sort-up" ng-show="vm.expandedCategory === vm.SIMTOOLS_SIDEBAR_ID.GROUP_MONITORS"></i>
+    </div>
+
+    <!-- all tools affecting only the client side -->
+    <div id="simtools-sidebar-group-client-settings" class="simtools-sidebar-category"
+         ng-class="{'simtools-sidebar-category-shortened': vm.overflowing,
+         'simtools-sidebar-category-expanded': vm.expandedCategory === vm.SIMTOOLS_SIDEBAR_ID.GROUP_CLIENT_SETTINGS,
+         'simtools-sidebar-category-minimized': vm.expandedCategory !== null && vm.expandedCategory !== vm.SIMTOOLS_SIDEBAR_ID.GROUP_CLIENT_SETTINGS}">
+
+      <md-button class="md-raised tool-button tool-client-settings" aria-label="Simulation Info"
+                 ng-click="vm.helpTooltipService.toggleInfo()" help-tooltip="INFO_BUTTON"
+                 ng-class="{'tool-help-highlight': vm.helpTooltipService.helpCode === 'INFO_BUTTON'}"
+                 dont-stop-propagation>
+        <md-tooltip md-direction="right">Simulation Info</md-tooltip>
+        <i class="fa fa-info-circle"></i>
+      </md-button>
+
+      <md-button class="md-raised tool-button tool-client-settings" aria-label="UI Help"
+                 ng-click="vm.helpTooltipService.toggleHelp()">
+        <md-tooltip md-direction="right">UI Help</md-tooltip>
+        <i class="fa fa-question-circle"></i>
+      </md-button>
+
+      <md-button class="md-raised tool-button tool-client-settings" aria-label="Camera Translation"
+                 help-tooltip="CAMERA_TRANSLATION"
+                 ng-class="{'tool-help-highlight': vm.helpTooltipService.helpCode === 'CAMERA_TRANSLATION'}"
+                 ng-mousedown="vm.onButtonCameraTranslate($event)"
+                 ng-mouseup="vm.onButtonCameraTranslate($event)" ng-mouseleave="vm.onButtonCameraTranslate($event)">
+        <md-tooltip md-direction="right">Camera Translation</md-tooltip>
+        <img src="img/esv/translation_icon.png">
+      </md-button>
+
+      <md-button class="md-raised tool-button tool-client-settings" aria-label="Camera Rotation"
+                 help-tooltip="CAMERA_ROTATION"
+                 ng-class="{'tool-help-highlight': vm.helpTooltipService.helpCode === 'CAMERA_ROTATION'}"
+                 ng-mousedown="vm.onButtonCameraRotate($event)"
+                 ng-mouseup="vm.onButtonCameraRotate($event)" ng-mouseleave="vm.onButtonCameraRotate($event)">
+        <md-tooltip md-direction="right">Camera Rotation</md-tooltip>
+        <img src="img/esv/rotation_icon.png">
+      </md-button>
+
+      <div class="simtools-sidebar-submenu">
+        <md-button class="md-raised tool-button tool-client-settings simtools-sidebar-submenu-trigger"
+                   aria-label="Scene Navigation" help-tooltip="USER_NAVIGATION"
+                   ng-click="vm.isSubmenuSceneNavigationOpen=!vm.isSubmenuSceneNavigationOpen"
+                   ng-class="{'tool-help-highlight': vm.helpTooltipService.helpCode === 'USER_NAVIGATION'}">
+          <md-tooltip md-direction="right" ng-show="!vm.isSubmenuSceneNavigationOpen">Scene Navigation</md-tooltip>
+          <!--<i class="fa fa-compass"></i>-->
+          <i class="fa fa-video" ng-if="vm.userNavigationService.navigationMode === vm.NAVIGATION_MODES.FREE_CAMERA"></i>
+          <img src="img/esv/lookatrobot_icon.png" ng-if="vm.userNavigationService.navigationMode === vm.NAVIGATION_MODES.LOOKAT_ROBOT">
+          <i class="fa fa-male" ng-if="vm.userNavigationService.navigationMode === vm.NAVIGATION_MODES.HUMAN_BODY"></i>
+        </md-button>
+
+        <div ng-show="vm.isSubmenuSceneNavigationOpen" class="simtools-sidebar-submenu-items">
+          <md-button aria-label="Free Camera" class="md-fab md-mini md-raised md-mini subtool-button"
+                     ng-click="vm.userNavigationService.setModeFreeCamera()">
+            <md-tooltip md-direction="top">Free Camera (Move: W/A/S/D/R/F, Rotate: hold left mouse button, arrow keys)</md-tooltip>
+            <i class="fa fa-video"></i>
+          </md-button>
+          <md-button aria-label="Robot Camera" class="md-fab md-raised md-mini subtool-button"
+                     ng-click="vm.userNavigationService.setLookatRobotCamera()">
+            <md-tooltip md-direction="top">Robot Camera</md-tooltip>
+            <img src="img/esv/lookatrobot_icon.png">
+          </md-button>
+          <md-button aria-label="Avatar" class="md-fab md-raised md-mini subtool-button"
+                     ng-click="vm.userNavigationService.setModeHumanBody()">
+            <md-tooltip md-direction="top">Avatar</md-tooltip>
+            <i class="fa fa-male"></i>
+          </md-button>
+        </div>
+      </div>
+    </div>
+
+    <div class="tool-category-expand tool-client-settings" aria-label="Expand Client Settings Tools"
+         ng-show="vm.simToolsSidebarService.isOverflowingY(vm.SIMTOOLS_SIDEBAR_ID.GROUP_CLIENT_SETTINGS) ||
+         vm.expandedCategory === vm.SIMTOOLS_SIDEBAR_ID.GROUP_CLIENT_SETTINGS"
+         ng-click="vm.onButtonExpandCategory(vm.SIMTOOLS_SIDEBAR_ID.GROUP_CLIENT_SETTINGS)">
+      <md-tooltip md-direction="right">Expand Client Settings Tools Section</md-tooltip>
+      <i class="fas fa-sort-down" ng-show="vm.expandedCategory !== vm.SIMTOOLS_SIDEBAR_ID.GROUP_CLIENT_SETTINGS"></i>
+      <i class="fas fa-sort-up" ng-show="vm.expandedCategory === vm.SIMTOOLS_SIDEBAR_ID.GROUP_CLIENT_SETTINGS"></i>
+    </div>
+
+  </md-sidenav>
+</div>

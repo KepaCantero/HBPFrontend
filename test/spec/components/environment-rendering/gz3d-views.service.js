@@ -1,24 +1,30 @@
 'use strict';
 
 describe('Service: gz3dViews', function() {
-  var gz3dViewsService;
+  let gz3dViewsService;
 
-  var $q, $rootScope;
-  var gz3d, environmentRenderingService;
+  let $q, $rootScope;
+  let DYNAMIC_VIEW_CHANNELS;
+  let dynamicViewOverlayService, gz3d, environmentRenderingService;
 
-  var deferredSceneInitialized;
+  let deferredSceneInitialized;
 
   beforeEach(module('gz3dModule'));
+  beforeEach(module('dynamicViewModule'));
 
   // mock modules
-  beforeEach(module('gz3dMock'));
+  beforeEach(module('dynamicViewOverlayServiceMock'));
   beforeEach(module('environmentRenderingServiceMock'));
+  beforeEach(module('gz3dMock'));
+  beforeEach(module('nrpAnalyticsMock'));
 
   beforeEach(
     inject(function(
       _gz3dViewsService_,
       _$q_,
       _$rootScope_,
+      _DYNAMIC_VIEW_CHANNELS_,
+      _dynamicViewOverlayService_,
       _gz3d_,
       _environmentRenderingService_
     ) {
@@ -26,6 +32,8 @@ describe('Service: gz3dViews', function() {
 
       $q = _$q_;
       $rootScope = _$rootScope_;
+      DYNAMIC_VIEW_CHANNELS = _DYNAMIC_VIEW_CHANNELS_;
+      dynamicViewOverlayService = _dynamicViewOverlayService_;
       gz3d = _gz3d_;
       environmentRenderingService = _environmentRenderingService_;
     })
@@ -174,5 +182,37 @@ describe('Service: gz3dViews', function() {
 
     gz3dViewsService.toggleCameraHelper(mockView);
     expect(mockView.camera.cameraHelper.visible).toBe(false);
+  });
+
+  it(' - isUserView()', function() {
+    expect(gz3dViewsService.isUserView({})).toBe(false);
+    expect(
+      gz3dViewsService.isUserView(gz3d.scene.viewManager.mainUserView)
+    ).toBe(true);
+  });
+
+  it(' - onOpenRobotViews()', function() {
+    spyOn(gz3dViewsService, 'hasCameraView').and.returnValue(false);
+    gz3dViewsService.onOpenRobotViews();
+    expect(
+      dynamicViewOverlayService.createDynamicOverlay
+    ).not.toHaveBeenCalled();
+    expect(
+      dynamicViewOverlayService.closeAllOverlaysOfType
+    ).not.toHaveBeenCalled();
+
+    // open views
+    gz3dViewsService.hasCameraView.and.callThrough();
+    gz3dViewsService.onOpenRobotViews();
+    expect(
+      dynamicViewOverlayService.closeAllOverlaysOfType
+    ).toHaveBeenCalledWith(DYNAMIC_VIEW_CHANNELS.ENVIRONMENT_RENDERING);
+
+    // closed views
+    gz3dViewsService.views[1].container = undefined;
+    gz3dViewsService.onOpenRobotViews();
+    expect(dynamicViewOverlayService.createDynamicOverlay).toHaveBeenCalledWith(
+      DYNAMIC_VIEW_CHANNELS.ENVIRONMENT_RENDERING
+    );
   });
 });

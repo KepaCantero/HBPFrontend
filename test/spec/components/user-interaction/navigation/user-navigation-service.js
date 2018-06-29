@@ -24,51 +24,11 @@ describe('Services: userNavigationService', function() {
   beforeEach(module('userNavigationModule'));
   beforeEach(module('userInteractionSettingsServiceMock'));
   beforeEach(module('nrpUserMock'));
+  beforeEach(module('gz3dMock'));
 
   // provide mock objects
   beforeEach(
     module(function($provide) {
-      // gz3d mock
-      var gz3dMock = {
-        iface: {
-          modelInfoTopic: {
-            subscribe: jasmine.createSpy('subscribe')
-          },
-          emitter: {
-            on: jasmine.createSpy('on').and.callFake(function(event, fn) {
-              fn();
-            })
-          }
-        },
-        scene: {
-          scene: new THREE.Scene(),
-          getByName: function() {
-            return 'robot';
-          },
-          selectedEntity: {
-            name: 'robot'
-          },
-          viewManager: {
-            mainUserView: {
-              camera: new THREE.PerspectiveCamera()
-            }
-          },
-          controls: {},
-          emitter: {
-            emit: jasmine.createSpy('emit')
-          }
-        },
-        gui: {
-          emitter: {
-            emit: jasmine.createSpy('emit')
-          }
-        },
-        container: {},
-        controls: {}
-      };
-      $provide.value('gz3d', gz3dMock);
-      $provide.value('camera', gz3dMock.scene.viewManager.mainUserView.camera);
-
       // avatar mocks
       var avatarMock = new THREE.Object3D();
       $provide.value('avatar', avatarMock);
@@ -139,7 +99,7 @@ describe('Services: userNavigationService', function() {
       _NAVIGATION_MODES_,
       _STATE_,
       _gz3d_,
-      _camera_,
+      //_camera_,
       _avatar_,
       _avatarControls_,
       _firstPersonControls_,
@@ -156,7 +116,7 @@ describe('Services: userNavigationService', function() {
       gz3d = _gz3d_;
       $rootScope = _$rootScope_;
 
-      camera = _camera_;
+      //camera = _camera_;
       avatar = _avatar_;
       avatarControls = _avatarControls_;
       firstPersonControls = _firstPersonControls_;
@@ -174,6 +134,7 @@ describe('Services: userNavigationService', function() {
 
     spyOn(gz3d.scene.scene, 'add').and.callThrough();
 
+    camera = gz3d.scene.viewManager.mainUserView.camera;
     spyOn(camera.position, 'set').and.callThrough();
     spyOn(camera.position, 'copy').and.callThrough();
     spyOn(camera, 'lookAt').and.callThrough();
@@ -643,5 +604,29 @@ describe('Services: userNavigationService', function() {
     expect(userNavigationService.navigationMode).toBe(NAVIGATION_MODES.LOOKAT);
 
     expect(gz3d.scene.controls).toBe(lookatControls);
+  });
+
+  it(' - requestCameraTransform()', function() {
+    let event = { which: 0 };
+    let action = 'left';
+
+    userNavigationService.requestCameraTransform(event, action);
+    expect(gz3d.scene.controls.onMouseDownManipulator).not.toHaveBeenCalled();
+
+    event.which = 1;
+    userNavigationService.requestCameraTransform(event, action);
+    expect(gz3d.scene.controls.onMouseDownManipulator).toHaveBeenCalled();
+  });
+
+  it(' - releaseCameraTransform()', function() {
+    let event = { which: 0 };
+    let action = 'left';
+
+    userNavigationService.releaseCameraTransform(event, action);
+    expect(gz3d.scene.controls.onMouseUpManipulator).not.toHaveBeenCalled();
+
+    event.which = 1;
+    userNavigationService.releaseCameraTransform(event, action);
+    expect(gz3d.scene.controls.onMouseUpManipulator).toHaveBeenCalled();
   });
 });

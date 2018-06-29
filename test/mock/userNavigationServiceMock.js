@@ -37,6 +37,8 @@
         lookAtTarget: jasmine.createSpy('setDistance')
       };
       this.navigationMode = 'FreeCamera';
+      this.requestCameraTransform = jasmine.createSpy('requestCameraTransform');
+      this.releaseCameraTransform = jasmine.createSpy('releaseCameraTransform');
     })
     .constant('NAVIGATION_MODES', {
       FREE_CAMERA: 'FreeCamera',

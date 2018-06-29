@@ -104,7 +104,7 @@
               let row = Math.floor(pos / 3) % 3;
               let column = pos % 3;
               overlayWrapper.style.top = (row * 33).toString() + '%';
-              overlayWrapper.style.left = (column * 33).toString() + '%';
+              overlayWrapper.style.left = (3 + column * 33).toString() + '%';
 
               // remove context menus from views other than user view
               if (this.view !== this.gz3dViewsService.views[0]) {

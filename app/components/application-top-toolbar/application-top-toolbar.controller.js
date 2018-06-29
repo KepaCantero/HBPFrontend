@@ -27,33 +27,46 @@
 
   class ApplicationTopToolbarController {
     constructor(
+      $injector,
+      $rootScope,
       $scope,
       $window,
-      EDIT_MODE,
       STATE,
       bbpConfig,
-      gz3d,
-      objectInspectorService,
-      simulationInfo,
+      nrpAnalytics,
       experimentViewService,
-      stateService,
       storageServerTokenManager,
       userContextService
     ) {
+      this.$injector = $injector;
       this.$scope = $scope;
       this.$window = $window;
 
-      this.EDIT_MODE = EDIT_MODE;
       this.STATE = STATE;
 
       this.bbpConfig = bbpConfig;
-      this.gz3d = gz3d;
-      this.objectInspectorService = objectInspectorService;
+      this.nrpAnalytics = nrpAnalytics;
       this.storageServerTokenManager = storageServerTokenManager;
-      this.simulationInfo = simulationInfo;
       this.experimentViewService = experimentViewService;
-      this.stateService = stateService;
       this.userContextService = userContextService;
+
+      if (this.experimentViewService.isInSimulationView()) {
+        // dynamically get the services that only apply during running experiment
+        this.editorToolbarService = this.$injector.get('editorToolbarService');
+        this.environmentRenderingService = this.$injector.get(
+          'environmentRenderingService'
+        );
+        this.simToolsSidebarService = this.$injector.get(
+          'simToolsSidebarService'
+        );
+        this.simulationInfo = this.$injector.get('simulationInfo');
+        this.stateService = this.$injector.get('stateService');
+      }
+
+      this.show = false;
+      $rootScope.$on('ASSETS_LOADED', () => {
+        this.show = true;
+      });
     }
 
     openMenu($mdMenu, event) {
@@ -82,24 +95,39 @@
       }
     }
 
+    onButtonEnvironmentSettings() {
+      if (this.environmentRenderingService.loadingEnvironmentSettingsPanel) {
+        return;
+      } else {
+        this.editorToolbarService.showEnvironmentSettingsPanel = !this
+          .editorToolbarService.showEnvironmentSettingsPanel;
+        this.nrpAnalytics.eventTrack('Toggle-environment-settings-panel', {
+          category: 'Simulation-GUI',
+          value: this.editorToolbarService.showEnvironmentSettingsPanel
+        });
+      }
+    }
+
     allowPlayPause() {
       return this.userContextService.isOwner();
+    }
+
+    toggleSimulationToolsSidebar() {
+      this.simToolsSidebarService.toggleSidebar();
     }
   }
 
   angular
     .module('applicationTopToolbarModule')
     .controller('ApplicationTopToolbarController', [
+      '$injector',
+      '$rootScope',
       '$scope',
       '$window',
-      'EDIT_MODE',
       'STATE',
       'bbpConfig',
-      'gz3d',
-      'objectInspectorService',
-      'simulationInfo',
+      'nrpAnalytics',
       'experimentViewService',
-      'stateService',
       'storageServerTokenManager',
       'userContextService',
       function(...args) {

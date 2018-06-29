@@ -79,9 +79,7 @@
         templateUrl:
           'components/editors/state-machine-editor/smach-editor.template.html',
         restrict: 'E',
-        scope: {
-          control: '='
-        },
+        scope: {},
         link: function(scope, element) {
           scope.isPrivateExperiment = environmentService.isPrivateExperiment();
 
@@ -199,8 +197,9 @@
               refreshEditor();
             });
           };
-
-          scope.control.refresh = scope.refresh;
+          $timeout(() => {
+            scope.refresh();
+          }, 100);
 
           // update UI
           scope.unbindListenerUpdatePanelUI = scope.$on(

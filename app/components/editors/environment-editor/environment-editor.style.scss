@@ -29,6 +29,10 @@ $addObjectIconHeight: 100px;
 $environmentDesignerMinWidth: 540px;
 $environmentDesignerMinHeight: 380px;
 
+environment-designer {
+  overflow: auto;
+}
+
 .environment-designer-container {
   position: relative;
   height: 100%;

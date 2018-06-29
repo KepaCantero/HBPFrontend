@@ -204,8 +204,9 @@
                   $timeout(() => (scope.localBrainDirty = false));
                 });
             };
-
-            scope.control.refresh = scope.refresh;
+            $timeout(() => {
+              scope.refresh();
+            }, 100);
 
             // update UI
             scope.unbindListenerUpdatePanelUI = scope.$on(

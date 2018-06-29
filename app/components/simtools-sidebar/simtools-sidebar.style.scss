@@ -1,0 +1,182 @@
+/**---LICENSE-BEGIN - DO NOT CHANGE OR MOVE THIS HEADER
+ * This file is part of the Neurorobotics Platform software
+ * Copyright (C) 2014,2015,2016,2017 Human Brain Project
+ * https://www.humanbrainproject.eu
+ *
+ * The Human Brain Project is a European Commission funded project
+ * in the frame of the Horizon2020 FET Flagship plan.
+ * http://ec.europa.eu/programmes/horizon2020/en/h2020-section/fet-flagships
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * ---LICENSE-END**/
+
+@import '../../../bower_components/angular-material/angular-material.scss';
+@import '../application-top-toolbar/application-top-toolbar.style.scss';
+
+$toolButtonSize: 45px;
+$toolButtonSpacing: 2px;
+$buttonImageSize: 25px;
+$subButtonImageSize: 20px;
+$sidebarWidth: 52px;
+$sidebarWidthSubmenuExpanded: 230px;
+
+$colorSubmenu: rgba(100, 100, 100, 0.2);
+
+.simtools-sidebar-wrapper {
+  md-sidenav {
+    width: $sidebarWidth;
+    background: -webkit-linear-gradient(
+      left,
+      #e5e7e6,
+      #e5e7e6 $sidebarWidth,
+      $colorSubmenu $sidebarWidth,
+      $colorSubmenu
+    );
+    box-shadow: none;
+    overflow: visible;
+    z-index: 999;
+
+    margin-top: $app-top-toolbar-height;
+  }
+
+  .md-sidenav-submenu-expand {
+    width: $sidebarWidthSubmenuExpanded;
+  }
+
+  .simtools-sidebar-category {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin: 5px 0px 5px 0px;
+    padding: 0px $toolButtonSpacing 0px $toolButtonSpacing;
+
+    transition: max-height 0.5s;
+  }
+
+  .simtools-sidebar-category-shortened {
+    max-height: 25%;
+    overflow: hidden;
+  }
+
+  .simtools-sidebar-category-expanded {
+    max-height: 80%;
+  }
+
+  .simtools-sidebar-category-minimized {
+    max-height: 10%;
+    overflow: hidden;
+  }
+
+  .simtools-sidebar-submenu {
+    display: flex;
+    flex-direction: row;
+    height: $toolButtonSize;
+
+    margin: $toolButtonSpacing 0px $toolButtonSpacing 0px;
+  }
+
+  .simtools-sidebar-submenu-items {
+    display: flex;
+    flex-direction: row;
+
+    padding-left: 10px;
+  }
+
+  .tool-button {
+    min-width: $toolButtonSize;
+    min-height: $toolButtonSize;
+    margin: $toolButtonSpacing;
+
+    font-size: 12px;
+    font-weight: bold;
+
+    box-shadow: none !important;
+
+    md-icon {
+      color: black;
+    }
+
+    i.fa {
+      color: black;
+      font-size: $buttonImageSize;
+      vertical-align: middle;
+    }
+
+    img {
+      width: $buttonImageSize;
+      height: $buttonImageSize;
+    }
+  }
+
+  .subtool-button {
+    min-width: $toolButtonSize;
+    min-height: $toolButtonSize;
+    margin: 0px $toolButtonSpacing 0px $toolButtonSpacing;
+
+    font-size: 12px;
+    font-weight: bold;
+
+    md-icon {
+      color: black;
+    }
+
+    i.fa {
+      color: black;
+      font-size: $subButtonImageSize;
+      vertical-align: middle;
+    }
+
+    img {
+      width: $subButtonImageSize;
+      height: $subButtonImageSize;
+    }
+  }
+
+  .tool-editor {
+    background-color: #94b68d;
+  }
+
+  .tool-monitor {
+    background-color: #6abfcf;
+  }
+
+  .tool-client-settings {
+    background-color: #fbd931;
+  }
+
+  .tool-disabled {
+    opacity: 0.2;
+  }
+
+  .tool-help-highlight {
+    background-color: lawngreen;
+  }
+
+  .tool-category-expand {
+    min-width: $toolButtonSize;
+    width: 45px;
+    height: 15px;
+    margin: $toolButtonSpacing $toolButtonSpacing $toolButtonSpacing 4px;
+
+    font-size: 12px;
+
+    text-align: center;
+    vertical-align: top;
+
+    i {
+      vertical-align: center;
+    }
+  }
+}

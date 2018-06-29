@@ -5,17 +5,28 @@ describe('Controller: ApplicationTopToolbarController', function() {
 
   let $controller, $rootScope, $scope, $window;
   let bbpConfig,
+    editorToolbarService,
+    environmentRenderingService,
     experimentViewService,
+    nrpAnalytics,
+    simToolsSidebarService,
     simulationInfo,
     storageServerTokenManager,
     userContextService;
 
   beforeEach(module('exdFrontendApp'));
 
+  // used outside simulation
   beforeEach(module('experimentViewServiceMock'));
-  beforeEach(module('simulationInfoMock'));
+  beforeEach(module('nrpAnalyticsMock'));
   beforeEach(module('storageServerMock'));
   beforeEach(module('userContextServiceMock'));
+  // used inside simulation
+  beforeEach(module('editorToolbarServiceMock'));
+  beforeEach(module('environmentRenderingServiceMock'));
+  beforeEach(module('simToolsSidebarServiceMock'));
+  beforeEach(module('simulationInfoMock'));
+  beforeEach(module('stateServiceMock'));
 
   beforeEach(
     inject(function(
@@ -23,7 +34,11 @@ describe('Controller: ApplicationTopToolbarController', function() {
       _$rootScope_,
       _$window_,
       _bbpConfig_,
+      _editorToolbarService_,
+      _environmentRenderingService_,
       _experimentViewService_,
+      _nrpAnalytics_,
+      _simToolsSidebarService_,
       _simulationInfo_,
       _storageServerTokenManager_,
       _userContextService_
@@ -32,7 +47,11 @@ describe('Controller: ApplicationTopToolbarController', function() {
       $rootScope = _$rootScope_;
       $window = _$window_;
       bbpConfig = _bbpConfig_;
+      editorToolbarService = _editorToolbarService_;
+      environmentRenderingService = _environmentRenderingService_;
       experimentViewService = _experimentViewService_;
+      nrpAnalytics = _nrpAnalytics_;
+      simToolsSidebarService = _simToolsSidebarService_;
       simulationInfo = _simulationInfo_;
       storageServerTokenManager = _storageServerTokenManager_;
       userContextService = _userContextService_;
@@ -140,6 +159,37 @@ describe('Controller: ApplicationTopToolbarController', function() {
           $scope: $scope
         }
       );
+    });
+
+    it(' - constructor()', function() {
+      expect(
+        applicationTopToolbarController.editorToolbarService
+      ).toBeDefined();
+      expect(
+        applicationTopToolbarController.environmentRenderingService
+      ).toBeDefined();
+      expect(
+        applicationTopToolbarController.simToolsSidebarService
+      ).toBeDefined();
+      expect(applicationTopToolbarController.simulationInfo).toBeDefined();
+      expect(applicationTopToolbarController.stateService).toBeDefined();
+    });
+
+    it(' - onButtonEnvironmentSettings()', function() {
+      editorToolbarService.showEnvironmentSettingsPanel = false;
+      environmentRenderingService.loadingEnvironmentSettingsPanel = true;
+      applicationTopToolbarController.onButtonEnvironmentSettings();
+      expect(editorToolbarService.showEnvironmentSettingsPanel).toBe(false);
+
+      environmentRenderingService.loadingEnvironmentSettingsPanel = false;
+      applicationTopToolbarController.onButtonEnvironmentSettings();
+      expect(editorToolbarService.showEnvironmentSettingsPanel).toBe(true);
+      expect(nrpAnalytics.eventTrack).toHaveBeenCalled();
+    });
+
+    it(' - toggleSimulationToolsSidebar()', function() {
+      applicationTopToolbarController.toggleSimulationToolsSidebar();
+      expect(simToolsSidebarService.toggleSidebar).toHaveBeenCalled();
     });
   });
 });

@@ -142,14 +142,6 @@ describe('Controller: DynamicViewOverlayController', function() {
     );
   });
 
-  it(' - randomizePosition(), channel is not resizeable', function() {
-    spyOn(element[0], 'getElementsByClassName');
-
-    overlayController.channelType = DYNAMIC_VIEW_CHANNELS.OBJECT_INSPECTOR;
-    overlayController.randomizePosition();
-    expect(element[0].getElementsByClassName).not.toHaveBeenCalled();
-  });
-
   it(' - randomizePosition()', function() {
     var mockWrapper = {
       style: { width: '20px', height: '10px' },

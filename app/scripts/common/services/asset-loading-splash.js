@@ -85,6 +85,7 @@
   ]);
 
   module.controller('AssetLoadingSplashCtrl', [
+    '$rootScope',
     '$scope',
     '$timeout',
     'assetLoadingSplash',
@@ -92,6 +93,7 @@
     'gz3d',
     '$location',
     function(
+      $rootScope,
       $scope,
       $timeout,
       assetLoadingSplash,
@@ -125,6 +127,7 @@
         if (data.prepared && isDone && !$scope.isError) {
           $scope.preparing3DScene = true;
 
+          $rootScope.$broadcast('ASSETS_LOADED');
           environmentRenderingService.onSceneLoaded();
 
           $scope.$watch(

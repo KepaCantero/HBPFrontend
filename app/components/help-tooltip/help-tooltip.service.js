@@ -37,6 +37,7 @@
       this.nrpAnalytics = nrpAnalytics;
 
       this.visible = false;
+      this.helpCode = null;
 
       $(window).on('keydown', e => {
         if (e.keyCode !== 27)
