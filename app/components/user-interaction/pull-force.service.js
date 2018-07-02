@@ -243,37 +243,33 @@
           this.dist.subVectors(mouse, mouseStart);
         };
 
-        const onApplyPulling = () => {
-          if (this.dist.length() === 0) return;
-
+        const computedForce = () => {
           const gizmo = this.pullForceGizmos[this.pullForceGizmos.length - 1];
-          // update force vector in case robot moved in case of a running experiment
+          // Update the force vector. The origin of the vector is attached to a solid and this solid might have moved
+          // if the simulation is running.
           mouseStart = gizmo.getWorldPosition().clone();
           const mouse = raycaster.ray.intersectPlane(intersectionPlane);
           this.dist.subVectors(mouse, mouseStart);
           const dist = this.dist;
 
           let forceDir = dist.clone().normalize();
+          const d = dist.length();
+          const forceLength = d * d * d;
 
-          const distThreshold = 0.2;
-          const distRangeLimit = 0.8;
-          const forceMultiplier = 52;
-          const maxForce = 150;
-          const minForce = 0;
-          const force = Math.max(
-            minForce,
-            Math.min(
-              Math.log2(distThreshold + dist.length() / distRangeLimit) *
-                forceMultiplier,
-              maxForce
-            )
-          );
+          return { length: forceLength, direction: forceDir };
+        };
+
+        const onApplyPulling = () => {
+          if (this.dist.length() === 0) return;
+
+          const gizmo = this.pullForceGizmos[this.pullForceGizmos.length - 1];
+          const force = computedForce();
 
           // update gizmo orientation to current
           let gizmoOrientation = new THREE.Quaternion();
           gizmoOrientation.setFromUnitVectors(
             new THREE.Vector3(0, 0, 1),
-            forceDir
+            force.direction
               .clone()
               .multiplyScalar(-1)
               .normalize()
@@ -289,10 +285,15 @@
             rootOrientation.w
           );
 
-          if (force < maxForce) {
-            gizmo.children[0].position.set(0, 0, -dist.length());
-            gizmo.children[1].scale.set(1, dist.length() - 0.25, 1);
-            gizmo.children[1].position.set(0, 0, -0.5 * dist.length() + 0.125);
+          const maxForce = 150;
+          if (force.length < maxForce) {
+            gizmo.children[0].position.set(0, 0, -this.dist.length());
+            gizmo.children[1].scale.set(1, this.dist.length() - 0.25, 1);
+            gizmo.children[1].position.set(
+              0,
+              0,
+              -0.5 * this.dist.length() + 0.125
+            );
           }
           let innerCone = gizmo.children[0].children[1];
           const scaleFactor = Math.max(0.03, force / maxForce);
@@ -301,18 +302,28 @@
           // refresh scene so change of force vector is displayed
           gz3d.scene.refresh3DViews();
 
-          // use a factor related to mass the object to provide a more general experience
-          const pausedMultiplier =
-            stateService.currentState === STATE.PAUSED ? 75 : 1;
-          applyForceService.applyForceToLink(
-            startPullLink,
-            forceDir,
-            force * this.forceAmplifier * pausedMultiplier
-          );
+          // forceAmplifier is a user-defined factor providing a more general experience
+          if (stateService.currentState !== STATE.PAUSED) {
+            applyForceService.applyForceToLink(
+              startPullLink,
+              force.direction,
+              force.length * this.forceAmplifier
+            );
+          }
         };
 
         const onStopPulling = () => {
           userNavigationService.controls.enabled = true;
+          if (stateService.currentState === STATE.PAUSED) {
+            const force = computedForce();
+            const pausedMultiplier = 75;
+            applyForceService.applyForceToLink(
+              startPullLink,
+              force.direction,
+              force.length * this.forceAmplifier * pausedMultiplier
+            );
+          }
+
           if (stateService.currentState === STATE.STARTED) {
             const gizmo = this.pullForceGizmos[this.pullForceGizmos.length - 1];
             // remove only if play, wait until play to remove gizmo

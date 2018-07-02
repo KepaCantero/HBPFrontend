@@ -282,7 +282,6 @@ describe('Services: pullForceService', function() {
 
       it('move event should change dist value', function(done) {
         expect(myService.dist).toBeDefined();
-        //expect(myService.mouseStart).toBeDefined();
 
         eventDispatcherService.triggerMouseEvent(
           container,
@@ -360,7 +359,7 @@ describe('Services: pullForceService', function() {
         done();
       });
 
-      it('handle frame before mouse has moved', function(done) {
+      it('handle frame after mouse has moved', function(done) {
         eventDispatcherService.triggerMouseEvent(
           container,
           'mousemove',
@@ -370,7 +369,20 @@ describe('Services: pullForceService', function() {
         );
         environmentRenderingService.fakeRenderingUpdate(0);
 
-        expect(applyForceService.applyForceToLink).toHaveBeenCalled();
+        expect(applyForceService.applyForceToLink).toHaveBeenCalledTimes(1);
+
+        stateService.currentState = STATE.PAUSED;
+
+        eventDispatcherService.triggerMouseEvent(
+          container,
+          'mousemove',
+          0,
+          5,
+          5
+        );
+        environmentRenderingService.fakeRenderingUpdate(0);
+        // When the simulation is paused, apply the force only when pulling is over (mouse out/mouse up)
+        expect(applyForceService.applyForceToLink).toHaveBeenCalledTimes(1);
 
         done();
       });
@@ -425,7 +437,11 @@ describe('Services: pullForceService', function() {
         done
       ) {
         myService.pullForceGizmos = [
-          {},
+          {
+            getWorldPosition: function() {
+              return new THREE.Vector3();
+            }
+          },
           { parent: { remove: jasmine.createSpy('remove') } }
         ];
 
@@ -450,12 +466,21 @@ describe('Services: pullForceService', function() {
 
       it('do not remove gizmos if state is stopped', function(done) {
         stateService.currentState = STATE.PAUSED;
+        const getWorldPosition = function() {
+          return new THREE.Vector3();
+        };
         myService.pullForceGizmos = [
-          {},
-          { parent: { remove: jasmine.createSpy('remove') } }
+          { getWorldPosition: getWorldPosition },
+          {
+            parent: { remove: jasmine.createSpy('remove') },
+            getWorldPosition: getWorldPosition
+          }
         ];
 
         eventDispatcherService.triggerMouseEvent(container, 'mouseup', 0, 0, 0);
+
+        // If the simulation is paused, we release the force on mouseup/mouseout event
+        expect(applyForceService.applyForceToLink).toHaveBeenCalledTimes(1);
 
         expect(myService.pullForceGizmos.length).toBe(2);
         expect(container.removeEventListener).toHaveBeenCalledTimes(4);
@@ -471,9 +496,18 @@ describe('Services: pullForceService', function() {
           stateCallback = fn;
         });
         stateService.currentState = STATE.PAUSED;
+        const getWorldPosition = function() {
+          return new THREE.Vector3();
+        };
         myService.pullForceGizmos = [
-          { parent: { remove: jasmine.createSpy('remove') } },
-          { parent: { remove: jasmine.createSpy('remove') } }
+          {
+            parent: { remove: jasmine.createSpy('remove') },
+            getWorldPosition: getWorldPosition
+          },
+          {
+            parent: { remove: jasmine.createSpy('remove') },
+            getWorldPosition: getWorldPosition
+          }
         ];
 
         eventDispatcherService.triggerMouseEvent(container, 'mouseup', 0, 0, 0);
