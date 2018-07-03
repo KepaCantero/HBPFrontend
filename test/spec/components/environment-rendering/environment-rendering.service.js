@@ -490,4 +490,17 @@ describe('Services: environmentRenderingService', function() {
 
     done();
   });
+
+  it(' should display camera hint when needed', function() {
+    environmentRenderingService.lastCameraTransform = {
+      position: { x: 0, y: 0, z: 0 },
+      quaternion: { x: 0, y: 0, z: 0, w: 1 }
+    };
+    environmentRenderingService.sceneLoading = false;
+    environmentRenderingService.showCameraHintWhenNeeded();
+
+    expect(
+      environmentRenderingService.tipTooltipService.setCurrentTip
+    ).toHaveBeenCalled();
+  });
 });

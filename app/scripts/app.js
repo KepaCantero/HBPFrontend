@@ -95,6 +95,7 @@
       'clusterReservation',
       'demoCarousel',
       'experimentExplorer',
+      'newExperiment',
       'tipTooltipModule',
       'experimentList',
       'rosTerminalModule',

@@ -12,7 +12,8 @@ describe('Directive: environment-designer', function() {
     clbErrorDialog,
     dynamicViewOverlayService,
     DYNAMIC_VIEW_CHANNELS,
-    httpBackend;
+    httpBackend,
+    userNavigationService;
 
   beforeEach(module('exdFrontendApp'));
   beforeEach(module('exd.templates'));
@@ -63,7 +64,8 @@ describe('Directive: environment-designer', function() {
       _clbErrorDialog_,
       _environmentService_,
       _dynamicViewOverlayService_,
-      _$httpBackend_
+      _$httpBackend_,
+      _userNavigationService_
     ) {
       $scope = $rootScope.$new();
       $scope.EDIT_MODE = EDIT_MODE;
@@ -78,6 +80,7 @@ describe('Directive: environment-designer', function() {
       clbErrorDialog = _clbErrorDialog_;
       dynamicViewOverlayService = _dynamicViewOverlayService_;
       httpBackend = _$httpBackend_;
+      userNavigationService = _userNavigationService_;
 
       var modelLibraryMock = [
         {
@@ -198,6 +201,25 @@ describe('Directive: environment-designer', function() {
     spyOn($scope, 'duplicateModel');
     itemGroup.items[2].callback(eventMock);
     expect($scope.duplicateModel).toHaveBeenCalled();
+    expect(eventMock.stopPropagation).toHaveBeenCalled();
+
+    // check call to look at
+    spyOn(userNavigationService, 'setLookatRobotCamera');
+    itemGroup.items[1].callback(eventMock);
+    expect(userNavigationService.setLookatRobotCamera).toHaveBeenCalled();
+    expect(contextMenuState.toggleContextMenu).toHaveBeenCalledWith(false);
+    expect(eventMock.stopPropagation).toHaveBeenCalled();
+
+    // check show skin
+    $scope.gz3d.scene.selectedEntity = {};
+    $scope.gz3d.scene.setSkinVisible = function() {};
+    $scope.gz3d.scene.skinVisible = function() {
+      return false;
+    };
+    spyOn($scope.gz3d.scene, 'setSkinVisible');
+    itemGroup.items[3].callback(eventMock);
+    expect($scope.gz3d.scene.setSkinVisible).toHaveBeenCalled();
+    expect(contextMenuState.toggleContextMenu).toHaveBeenCalledWith(false);
     expect(eventMock.stopPropagation).toHaveBeenCalled();
 
     // check call to delete item

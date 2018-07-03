@@ -520,6 +520,24 @@ def tf1(t):
       expect(transferFunctions[1].error[errorType]).toEqual(msg);
     });
 
+    it('should fill the error field of the flawed active transfer function', function() {
+      var errorType = isolateScope.ERROR.RUNTIME;
+      var msg = {
+        functionName: 'tf1',
+        message: 'You nearly broke the platform!',
+        errorType: errorType,
+        severity: 1,
+        sourceType: SOURCE_TYPE.TRANSFER_FUNCTION
+      };
+      transferFunctions[0].active = true;
+      isolateScope.onNewErrorMessageReceived(msg);
+      expect(transferFunctions[0].error[errorType]).toEqual(msg);
+      msg.functionName = 'tf2';
+      msg.errorType = errorType = isolateScope.ERROR.LOADING;
+      isolateScope.onNewErrorMessageReceived(msg);
+      expect(transferFunctions[1].error[errorType]).toEqual(msg);
+    });
+
     it('should cleanCompileErrors', function() {
       const msg = {
         functionName: 'tf1',

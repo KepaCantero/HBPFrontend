@@ -41,7 +41,8 @@
           MyExperiments: TIP_CODES.MY_EXPERIMENTS,
           ExperimentFiles: TIP_CODES.EXPERIMENT_FILES,
           CloneExperiment: TIP_CODES.TEMPLATES,
-          RunningExperiments: TIP_CODES.RUNNING_SIMULATIONS
+          RunningExperiments: TIP_CODES.RUNNING_SIMULATIONS,
+          NewExperiment: TIP_CODES.NEW_EXPERIMENT
         };
 
         $scope.tipTooltipService.setCurrentTip(tabToTip[$scope.tabSelection]);

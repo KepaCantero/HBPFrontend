@@ -299,6 +299,13 @@ describe('Directive: brainvisualizer', function() {
       expect(window.BRAIN3D.MainView).toHaveBeenCalled();
     });
 
+    it('should display spike when received', function() {
+      $rootScope.$broadcast('$destroy');
+      $rootScope.$digest();
+
+      expect(window.BRAIN3D.MainView).toHaveBeenCalled();
+    });
+
     it('export neurons position', function() {
       simulationConfigServiceMock.saveConfigFile = jasmine
         .createSpy('saveConfigFile')

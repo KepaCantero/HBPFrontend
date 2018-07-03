@@ -47,6 +47,10 @@
     RUNNING_SIMULATIONS: {
       text: 'The running simulations are listed here.'
     },
+    NEW_EXPERIMENT: {
+      text:
+        'Create a new experiment here. Simply choose an environment and press next to add robots and configure a brain.'
+    },
     NAVIGATION: {
       text:
         'Use the <b>w, s, a, d</b> keys to translate the camera. Move your <b>mouse</b> whilst pressing the <b>left button</b> to rotate the camera. The translation/rotation sensibility can be changed in the settings under the <b>User camera</b> section.',

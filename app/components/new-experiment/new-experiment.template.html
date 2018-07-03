@@ -1,0 +1,138 @@
+<!-- build:css(.tmp) /components/new-experiment/new-experiment.style.css -->
+<link rel="stylesheet" href="/components/new-experiment/new-experiment.style.css" />
+<!-- endbuild -->
+
+<div style="height: 100%;">
+
+  <div ng-show="!tipTooltipService.someTipsAreHidden()">
+
+    <div class="tip-tooltip-place">
+      <tip-tooltip style="display:block;margin-right:16px"></tip-tooltip>
+    </div>
+
+    <div style="padding-bottom: 80px;"></div>
+
+  </div>
+
+  <div style="display:flex; height: 100%;">
+
+
+    <div style="display:flex; flex-direction: column; width: 60%;">
+      <div class="env-title">Choose an environment</div>
+
+      <div class="environment-list-container">
+
+        <div ng-show="!vm.environments">
+          <i class="fa fa-2x fa-spinner fa-spin"></i>&nbsp;
+          <i>Loading environment list...</i>
+          <hr class="list-separator">
+        </div>
+
+        <div ng-repeat="envGroup in vm.environments">
+
+          <div ng-hide="vm.environments[0].environments.length===0" class="envGroupSeparator">{{envGroup.name}}</div>
+
+          <div ng-repeat="entity in envGroup.environments | filter:query" class="experiment-box" ng-mouseenter="isHovered = true" ng-mouseleave="isHovered = false"
+            ng-mouseup="isHovered = false" ng-click="vm.selectEnvironment(entity)">
+            <div class="list-entry-container left-right" ng-show="entity.thumbnail!==''" ng-class="{selected: (entity.path == entityPageState.selected.path) || isHovered}">
+              <div class="list-entry-left" ng-class="{selected: entity.path == entityPageState.selected.path}">
+                <img ng-if="!entity.thumbnail" class="entity-thumbnail" src="img/esv/environment.png" />
+                <img ng-if="entity.thumbnail" class="entity-thumbnail" ng-src="{{entity.thumbnail}}" />
+              </div>
+              <div class="list-entry-middle list-entry-container up-down">
+                <div class="list-entry-container left-right title-line">
+                  <div class="h4">{{entity.name}}
+                  </div>
+                </div>
+                <div ng-if="entity.path != entityPageState.selected.path">{{entity.description | limitTo: 200}}...</div>
+              </div>
+            </div>
+            <hr class="list-separator">
+          </div>
+        </div>
+      </div>
+
+      <div>
+
+        <hr style="margin-top: 0px;margin-bottom: 0px;">
+        <div style="display:flex;     align-items: center;">
+          <button class="btn btn-default" style="margin: 10px; font-size: 12px;" ng-click="vm.uploadEnvironment()">Upload an environment...</button>
+          <div uib-collapse="!vm.uploadingModel">
+              <i class="fa fa-spinner fa-spin"></i>&nbsp;
+              <i>Uploading model to the storage.This might take some time, so please be patient...</i>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <div style="width: 40%; margin-right: 10px; ">
+      <div class="env-title">Create and launch an experiment</div>
+
+      <div style="margin:50px; height: calc(100% - 140px);">
+
+        <div style="display:flex;">
+
+          <div style="margin-right: 10px; margin-top: 5px; font-size: 16px;min-width: 110px;">Name</div>
+          <div style="flex-grow: 1;">
+            <input ng-model="vm.experimentName" style="font-size: 16px;" type="text" class="top-buttons form-control input-sm ng-pristine ng-untouched ng-valid ng-empty"
+              placeholder="Name of your experiment...">
+          </div>
+
+        </div>
+
+
+        <div style="display:flex; margin-top:30px; height: 28%;">
+
+          <div style="margin-right: 10px; margin-top: 5px; font-size: 16px;min-width: 110px;">Environment</div>
+          <div style="flex-grow: 1;
+          background-color: #f6f9fd;;
+          height: 200px;
+          margin-left: 6px;
+          height: 100%;
+          border-radius: 10px;">
+
+            <div style="height: 100%;
+            display: flex;
+            width: 100%;">
+              <img ng-if="vm.environment && !vm.environment.thumbnail" style="width: 100%;
+              object-fit: contain;
+              object-position: center;" src="img/esv/environment.png" />
+              <img ng-if="vm.environment && vm.environment.thumbnail" style="width: 100%;
+              object-fit: contain;
+              object-position: center;" ng-src="{{vm.environment.thumbnail}}" />
+            </div>
+
+          </div>
+
+        </div>
+
+        <div style="margin-left: 125px;
+        text-align: center;
+        margin-top: 7px;
+        color: #5f5f5f;
+        font-size: 13px;">{{(vm.environment)?vm.environment.name:"No environment defined"}}</div>
+
+        <div style="margin-left: 125px;margin-top: 40px;">
+          <button class="btn btn-default enable-tooltip" style="width:100%;" ng-click="vm.cloneAndLaunch()" ng-disabled="vm.isCloneRequested || vm.experimentName.length===0 || !vm.environment || vm.launchingExperiment">Next</button>
+        </div>
+
+       <div ng-show="vm.launchingExperiment" style="margin-left: 125px;margin-top: 20px;">
+          <i class="fa fa-spinner fa-spin"></i>&nbsp;
+          <i>{{vm.launchingExperimentText}}</i>
+       </div>
+
+       <div ng-show="vm.isCloneRequested" style="margin-left: 125px;margin-top: 20px;">
+          <i class="fa fa-spinner fa-spin"></i>&nbsp;
+          <i>Copying files to the storage. This might take some time...</i>
+       </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+

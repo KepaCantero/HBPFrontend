@@ -275,8 +275,9 @@
       return this.proxyRsc.cloneTemplate({ expPath, contextId }).$promise;
     }
 
-    cloneNew(modelsPaths, contextId) {
-      return this.proxyRsc.cloneNew({ modelsPaths, contextId }).$promise;
+    cloneNew(modelsPaths, contextId, experimentName) {
+      return this.proxyRsc.cloneNew({ modelsPaths, contextId, experimentName })
+        .$promise;
     }
 
     getMaintenanceMode() {

@@ -24,6 +24,13 @@
         <div ng-show="tabSelection=='MyExperiments'" class="underlined-box"></div>
       </div>
 
+      <div class="underlined-tab" ng-click="tabChanged('NewExperiment')">
+        <div ng-class="{'underlined-tab-selected':tabSelection=='NewExperiment'}">
+          New experiment
+        </div>
+        <div ng-show="tabSelection=='NewExperiment'" class="underlined-box"></div>
+      </div>
+
       <div class="underlined-tab" ng-click="tabChanged('ExperimentFiles')">
         <div ng-class="{'underlined-tab-selected':tabSelection=='ExperimentFiles'}">
           Experiment files
@@ -51,7 +58,7 @@
       <div style="display:flex; position: relative;">
         <i class="fa fa-search" style="margin-top: 20px; margin-right: 5px;"></i>
         <input ng-model="query" style="width:auto;margin-top: 15px;font-size: 11px;  height: 25px;" type="text" class="top-buttons form-control input-sm"
-          placeholder="Experiment Filter...">
+          placeholder="Filter...">
         <i ng-click="query =''" ng-show="query && query.length" class="fa fa-times-circle" style="    margin-top: 20px;
         margin-left: 2px;
         margin-right: 6px;
@@ -67,18 +74,20 @@
 
   <hr style="margin-bottom: 3px; margin-top: 2px; width: 100%; margin-right:10px; margin-bottom:15px;">
 
-  <div style="overflow-y: auto; height: 100%;">
+  <div style="overflow-y: auto; height: calc(100% - 150px);">
     <experiment-list ng-if="tabSelection=='MyExperiments' && showMyExperiments" query="query" experiment-empty="experimentEmpty()"
       reinit="reloadMyExperiments()" running="false" private="true"></experiment-list>
     <div ng-if="tabSelection=='ExperimentFiles'" style="height: 100%;">
       <experiment-explorer></experiment-explorer>
     </div>
+
     <experiment-list ng-if="tabSelection=='CloneExperiment'" query="query" running="false" experiment-empty="experimentEmpty()"
       private="false" load-private-experiments="reloadMyExperiments()"></experiment-list>
 
     <experiment-list ng-if="tabSelection=='RunningExperiments' && showMyExperiments" experiment-empty="experimentEmpty()" query="query"
       reinit="reloadMyExperiments()" running="true" private="true"></experiment-list>
 
+    <new-experiment ng-if="tabSelection=='NewExperiment'"></new-experiment>
 
   </div>
 
