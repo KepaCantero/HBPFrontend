@@ -44,14 +44,6 @@ describe('Directive: smachEditor', function() {
       .and.callFake(() => window.$q.when())
   };
 
-  var autoSaveServiceMock = {
-    registerFoundAutoSavedCallback: jasmine.createSpy(
-      'registerFoundAutoSavedCallback'
-    ),
-    setDirty: jasmine.createSpy('setDirty'),
-    clearDirty: jasmine.createSpy('clearDirty')
-  };
-
   var saveErrorsServiceMock = {
     registerCallback: jasmine.createSpy('registerCallback'),
     saveDirtyData: jasmine.createSpy('saveDirtyData').and.callFake(function() {
@@ -91,7 +83,6 @@ describe('Directive: smachEditor', function() {
       $provide.value('backendInterfaceService', backendInterfaceServiceMock);
       $provide.value('documentationURLs', documentationURLsMock);
       $provide.value('roslib', roslibMock);
-      $provide.value('autoSaveService', autoSaveServiceMock);
       $provide.value('saveErrorsService', saveErrorsServiceMock);
       $provide.value('downloadFileService', downloadFileServiceMock);
       $provide.value('storageServer', storageServerMock);
@@ -130,7 +121,6 @@ describe('Directive: smachEditor', function() {
       editorMock.addLineClass = jasmine.createSpy('addLineClass');
       editorMock.removeLineClass = jasmine.createSpy('removeLineClass');
 
-      autoSaveServiceMock.registerFoundAutoSavedCallback.calls.reset();
       $scope = $rootScope.$new();
       $templateCache.put(VIEW, '');
       $scope.control = {};

@@ -123,7 +123,7 @@ def {0}(t):
       'editorsPanelService',
       'clbErrorDialog',
       'RESET_TYPE',
-      'autoSaveService',
+      'autoSaveFactory',
       'saveErrorsService',
       'clbConfirm',
       'downloadFileService',
@@ -131,6 +131,7 @@ def {0}(t):
       '$q',
       'structuredTransferFunctionToRaw',
       'rawTransferFunctionToStructured',
+      'storageServer',
       function(
         $log,
         backendInterfaceService,
@@ -150,14 +151,15 @@ def {0}(t):
         editorsPanelService,
         clbErrorDialog,
         RESET_TYPE,
-        autoSaveService,
+        autoSaveFactory,
         saveErrorsService,
         clbConfirm,
         downloadFileService,
         DEFAULT_RAW_TF_CODE,
         $q,
         structuredTransferFunctionToRaw,
-        rawTransferFunctionToStructured
+        rawTransferFunctionToStructured,
+        storageServer
       ) {
         return {
           templateUrl:
@@ -180,7 +182,8 @@ def {0}(t):
 
             scope.transferFunction = null;
             scope.selectedTF = null;
-            scope.isSavingToCollab = false;
+
+            scope.dirtyTFNames = new Set();
 
             scope.selectedTopic = null;
             scope.selectedPopulation = null;
@@ -188,7 +191,6 @@ def {0}(t):
             scope.addMode = null;
             scope.newVariableName = '';
             scope.nTransferFunctionDirty = 0;
-            scope.collabDirty = false;
             scope.lastTFupdated = null;
             scope.localHelpVisible = {
               populations: false,
@@ -256,21 +258,10 @@ def {0}(t):
               editor.on('update', scope.contentChanged);
             };
 
-            autoSaveService.registerFoundAutoSavedCallback(
-              DIRTY_TYPE,
-              (autoSaved, applyChanges) => {
-                scope.collabDirty = true;
-                scope.transferFunctions = autoSaved;
-                if (scope.transferFunctions.length)
-                  scope.selectTransferFunction(scope.transferFunctions[0].name);
-
-                if (applyChanges) {
-                  _.forEach(autoSaved, tf =>
-                    scope.applyScript(tf, angular.noop)
-                  );
-                }
-              }
+            let autoSaveService = autoSaveFactory.createService(
+              'Tranfer functions'
             );
+            autoSaveService.onsave(() => scope.saveTFIntoCollabStorage());
 
             /**************************************/
             // Cleanup
@@ -279,6 +270,7 @@ def {0}(t):
               scope.resetListenerUnbindHandler();
               scope.unbindWatcherResize && scope.unbindWatcherResize();
               scope.unbindListenerUpdatePanelUI();
+              autoSaveService.dispose();
             });
 
             /**************************************/
@@ -612,8 +604,8 @@ def {0}(t):
 
             scope.setDirty = function(transferFunction) {
               transferFunction.dirty = true;
-              scope.collabDirty = true;
-              autoSaveService.setDirty(DIRTY_TYPE, scope.transferFunctions);
+              scope.dirtyTFNames.add(getTfCodeName(transferFunction.rawCode));
+              autoSaveService.setDirty();
               scope.updateNTransferFunctionDirty();
             };
 
@@ -634,19 +626,11 @@ def {0}(t):
                 scope.selectedPopulation = null;
                 scope.isNeuronsSelected = false;
                 scope.nTransferFunctionDirty = 0;
-                scope.collabDirty = false;
-                scope.updateCurrentTFContent();
               }
             });
 
             /**************************************/
             // Refreshing TF
-
-            scope.updateCurrentTFContent = function() {
-              scope.populateTransferFunctionsWithRawCode().then(function() {
-                scope.refresh();
-              });
-            };
 
             scope.loadTopics = function(response) {
               scope.topics = [];
@@ -668,11 +652,119 @@ def {0}(t):
             };
 
             scope.control.refresh = function() {
-              if (scope.collabDirty) refreshEditor();
+              if (autoSaveService.isDirty()) refreshEditor();
               else {
-                scope.populateTransferFunctionsWithRawCode();
-                scope.populateStructuredTransferFunctions();
+                reloadTfs();
+                reloadPopulations();
+                reloadTopics();
+                refreshEditor();
               }
+            };
+
+            let structureTfCode = (tfName, tfCode) => {
+              return rawTransferFunctionToStructured(
+                simulationInfo.serverBaseUrl +
+                  '/simulation/' +
+                  simulationInfo.simulationID
+              )
+                .put({}, { name: tfName, source: tfCode })
+                .$promise.then(res => {
+                  if (res.error) return {};
+                  return res.structuredScript;
+                });
+            };
+
+            let createTf = (name, code, active) => {
+              let newTFId = scope.transferFunctions.length;
+
+              let tf = new ScriptObject(newTFId);
+              tf.name = tf.oldName = name;
+              tf.rawCode = code;
+              tf.active = active !== false;
+              tf.local = false;
+              tf.devices = [];
+              tf.variables = [];
+              tf.topics = [];
+              tf.dirty = scope.dirtyTFNames.has(name);
+              tf.decorators = extractTFDecoratorFromTF(code);
+              tf.functionDef = (code.match(
+                new RegExp('^def*.' + tf.name + '.*', 'gm')
+              ) || [''])[0];
+
+              return tf;
+            };
+
+            let decorateTf = (tf, structured) => {
+              if (!structured) return;
+              tf.type = structured.type;
+              tf.code = structured.code;
+              tf.devices = structured.devices || [];
+              tf.variables = structured.variables || [];
+              tf.topics = structured.topics || [];
+              _.forEach(tf.variables, scope.parseFilenameAndHeaders);
+            };
+
+            let getTfCodeName = tfCode => {
+              let tfName = /def +([^\\(]*)/gm.exec(tfCode);
+              if (tfName) tfName = tfName[1];
+              return tfName;
+            };
+
+            let reloadTfs = () => {
+              scope.transferFunctions = [];
+
+              return $q
+                .all([
+                  backendInterfaceService.getTransferFunctions(),
+                  storageServer.getTransferFunctions(
+                    simulationInfo.experimentID
+                  )
+                ])
+                .then(([simulationTfs, experimentTfs]) => {
+                  let structuredTfs = $q.all(
+                    _.map(experimentTfs.data, tfCode => {
+                      let tfName = getTfCodeName(tfCode);
+                      let tf = createTf(
+                        tfName,
+                        tfCode,
+                        simulationTfs.active[tfName]
+                      );
+                      scope.transferFunctions.push(tf);
+
+                      return $q
+                        .all([tf, structureTfCode(tfName, tfCode)])
+                        .then(args => decorateTf(...args));
+                    })
+                  );
+                  if (scope.transferFunction) {
+                    scope.selectTransferFunction(scope.transferFunction.name);
+                  } else if (scope.transferFunctions.length) {
+                    scope.selectTransferFunction(
+                      scope.transferFunctions[0].name
+                    );
+                  }
+                  return structuredTfs;
+                })
+                .then(() => {
+                  scope.refresh();
+                })
+                .catch(err => alert('Failed to load TFS:\n' + err));
+            };
+
+            let reloadPopulations = () => {
+              let tf2select =
+                editorsPanelService.openOptions &&
+                editorsPanelService.openOptions.selectTF;
+
+              backendInterfaceService
+                .getPopulations(scope.loadPopulations)
+                .then(() => {
+                  tf2select && scope.selectTransferFunction(tf2select);
+                });
+            };
+
+            let reloadTopics = () => {
+              backendInterfaceService.getTopics(scope.loadTopics);
             };
 
             /**************************************/
@@ -706,59 +798,6 @@ def {0}(t):
               });
             };
 
-            scope.populateStructuredTransferFunctions = function() {
-              backendInterfaceService.getStructuredTransferFunctions(
-                scope.loadTransferFunctions
-              );
-              let tf2select =
-                editorsPanelService.openOptions &&
-                editorsPanelService.openOptions.selectTF;
-              backendInterfaceService
-                .getPopulations(scope.loadPopulations)
-                .then(() => {
-                  tf2select && scope.selectTransferFunction(tf2select);
-                });
-              backendInterfaceService.getTopics(scope.loadTopics);
-              refreshEditor();
-            };
-
-            scope.populateTransferFunctionsWithRawCode = function() {
-              return backendInterfaceService.getTransferFunctions(function(
-                response
-              ) {
-                _.forEach(response.data, function(code, tfName) {
-                  // If we already have local changes, we do not update
-
-                  let tf = _.find(scope.transferFunctions, { name: tfName });
-
-                  let found = angular.isDefined(tf);
-                  if (found) {
-                    tf.rawCode = code;
-                    tf.active = response.active[tf.name];
-                    tf.decorators = extractTFDecoratorFromTF(code);
-                    tf.functionDef = (code.match(
-                      new RegExp('^def*.' + tf.name + '.*', 'gm')
-                    ) || [''])[0];
-                  } else {
-                    //add a faulty TF
-                    let newTFId = scope.transferFunctions.length;
-
-                    let faultyTF = new ScriptObject(newTFId, null);
-                    faultyTF.name = faultyTF.oldName = tfName;
-                    faultyTF.rawCode = code;
-                    faultyTF.active = response.active[faultyTF.name];
-                    faultyTF.local = false;
-                    faultyTF.decorators = extractTFDecoratorFromTF(code);
-                    faultyTF.functionDef = (code.match(
-                      new RegExp('^def*.' + faultyTF.name + '.*', 'gm')
-                    ) || [''])[0];
-
-                    scope.transferFunctions.push(faultyTF);
-                  }
-                });
-              });
-            };
-
             scope.parseFilenameAndHeaders = function(v) {
               if (v.type === 'csv') {
                 if (v.initial_value) {
@@ -776,47 +815,6 @@ def {0}(t):
                 v.filename = undefined;
                 v.headers = undefined;
               }
-            };
-
-            scope.loadTransferFunctions = function(response) {
-              _.forEach(response.transferFunctions, function(remoteTf, id) {
-                var transferFunction = new ScriptObject(id, remoteTf.code);
-                transferFunction.type = remoteTf.type;
-                transferFunction.name = remoteTf.name;
-                transferFunction.oldName = remoteTf.name;
-                transferFunction.local = false;
-                transferFunction.dirty = false;
-                transferFunction.devices = remoteTf.devices;
-                transferFunction.topics = remoteTf.topics;
-                transferFunction.variables = remoteTf.variables;
-                _.forEach(
-                  transferFunction.variables,
-                  scope.parseFilenameAndHeaders
-                );
-                _.forEach(transferFunction.topics, detectDefaultTopic);
-                // If we already have local changes, we do not update
-                var tf = _.find(scope.transferFunctions, {
-                  name: remoteTf.name
-                });
-                var found = angular.isDefined(tf);
-                if (found && !tf.dirty) {
-                  tf.type = transferFunction.type;
-                  tf.code = transferFunction.code;
-                  tf.oldName = transferFunction.name;
-                  tf.devices = transferFunction.devices;
-                  tf.variables = transferFunction.variables;
-                  tf.topics = transferFunction.topics;
-                } else if (!found) {
-                  scope.transferFunctions.push(transferFunction);
-                }
-              });
-              if (scope.transferFunction) {
-                scope.selectTransferFunction(scope.transferFunction.name);
-              } else if (scope.transferFunctions.length) {
-                scope.selectTransferFunction(scope.transferFunctions[0].name);
-              }
-
-              scope.populateTransferFunctionsWithRawCode().then(scope.refresh);
             };
 
             /**************************************/
@@ -1137,8 +1135,6 @@ def {0}(t):
                 }
               });
 
-              autoSaveService.clearDirty(DIRTY_TYPE);
-
               if (!oneFound) doneCallback();
             };
 
@@ -1192,16 +1188,10 @@ def {0}(t):
                   )
                   .then(function() {
                     transferFunction.dirty = false;
+                    scope.dirtyTFNames.delete(transferFunction.name);
                     transferFunction.local = false;
 
                     scope.updateNTransferFunctionDirty();
-                    if (scope.nTransferFunctionDirty == 0)
-                      autoSaveService.clearDirty(DIRTY_TYPE);
-                    else
-                      autoSaveService.setDirty(
-                        DIRTY_TYPE,
-                        scope.transferFunctions
-                      );
                     transferFunction.oldName = transferFunction.name = pythonCodeHelper.getFunctionName(
                       transferFunction.rawCode
                     );
@@ -1220,7 +1210,6 @@ def {0}(t):
                       }
                     }, 1.0);
                   })
-                  .then(scope.updateCurrentTFContent)
                   .catch(function(data) {
                     serverError.displayHTTPError(data);
                     _doneCallback();
@@ -1287,6 +1276,7 @@ def {0}(t):
               tf.variables = [];
               tf.local = true;
               tf.dirty = true;
+              scope.dirtyTFNames.add(tf.name);
               tf.rawCode = rawcode;
               tf.active = true;
               tf.editName = true;
@@ -1335,10 +1325,6 @@ def {0}(t):
               scope.addMode = null;
             };
 
-            var detectDefaultTopic = function(t) {
-              t.isDefault = t.name === '__return__';
-            };
-
             scope.setNameTf = function() {
               scope.renamingTF = true;
               var active = scope.transferFunction.active;
@@ -1362,6 +1348,8 @@ def {0}(t):
                 scope.toggleActive(scope.transferFunction);
                 scope.renamingTF = false;
               });
+
+              autoSaveService.setDirty();
             };
 
             scope.toggleActive = function(tf) {
@@ -1403,15 +1391,14 @@ def {0}(t):
                     angular.noop
                   );
                   scope.transferFunctions.splice(index, 1);
-                  scope.collabDirty = environmentService.isPrivateExperiment();
                 }
               });
-              autoSaveService.setDirty(DIRTY_TYPE, scope.transferFunctions);
+              autoSaveService.setDirty();
             };
 
             var deleteInternal = function(scope, index) {
               scope.transferFunctions.splice(index, 1);
-              autoSaveService.setDirty(DIRTY_TYPE, scope.transferFunctions);
+              autoSaveService.setDirty();
               if (scope.transferFunctions.length > 0) {
                 scope.selectTransferFunction(scope.transferFunctions[0].name);
               } else {
@@ -1433,7 +1420,7 @@ def {0}(t):
                   deleteInternal(scope, index);
                 }
 
-                scope.collabDirty = true;
+                autoSaveService.setDirty();
               }
             };
 
@@ -1600,6 +1587,7 @@ def {0}(t):
                 tf.variables = [];
                 tf.local = true;
                 tf.dirty = true;
+                scope.dirtyTFNames.add(tf.name);
                 tf.rawCode =
                   codeName === tf.name
                     ? transferFunction.code
@@ -1673,65 +1661,20 @@ def {0}(t):
             /**************************************/
             // Saving
 
-            var saveTFtoBackend = function() {
-              backendInterfaceService.saveTransferFunctions(
-                _.map(scope.transferFunctions, 'rawCode'),
-                function() {
-                  // Success callback
-                  scope.isSavingToCollab = false;
-                  scope.collabDirty = false;
-                  autoSaveService.clearDirty(DIRTY_TYPE);
-                  saveErrorsService.clearDirty(DIRTY_TYPE);
-                },
-                function() {
-                  // Failure callback
+            scope.saveTFIntoCollabStorage = function() {
+              return storageServer
+                .saveTransferFunctions(
+                  simulationInfo.experimentID,
+                  _.map(scope.transferFunctions, 'rawCode')
+                )
+                .then(() => saveErrorsService.clearDirty(DIRTY_TYPE))
+                .catch(() =>
                   clbErrorDialog.open({
                     type: 'BackendError.',
                     message:
                       'Error while saving transfer functions to the Storage.'
-                  });
-                  scope.isSavingToCollab = false;
-                }
-              );
-            };
-
-            scope.saveTFIntoCollabStorage = function() {
-              scope.applyAllDirtyScripts(() => {
-                scope.doSaveTFIntoCollabStorage();
-              });
-            };
-
-            scope.doSaveTFIntoCollabStorage = function() {
-              scope.isSavingToCollab = true;
-              var errors = false;
-              scope.transferFunctions.forEach(function(tf) {
-                if (Object.keys(tf.error).length !== 0) {
-                  errors = true;
-                }
-              });
-              if (errors) {
-                clbConfirm
-                  .open({
-                    title: 'Transfer Function errors.',
-                    template:
-                      'There are errors inside your Transfer Functions. Are you sure you want to save?',
-                    confirmLabel: 'Yes',
-                    cancelLabel: 'No',
-                    closable: false
                   })
-                  .then(function() {
-                    saveTFtoBackend();
-                    return saveErrorsService.saveDirtyData(
-                      DIRTY_TYPE,
-                      scope.transferFunctions
-                    );
-                  })
-                  .finally(function() {
-                    scope.isSavingToCollab = false;
-                  });
-                return;
-              }
-              saveTFtoBackend();
+                );
             };
           }
         };

@@ -34,14 +34,6 @@ describe('Directive: pynnEditor', function() {
       .and.callFake(() => window.$q.resolve())
   };
 
-  var autoSaveServiceMock = {
-    registerFoundAutoSavedCallback: jasmine.createSpy(
-      'registerFoundAutoSavedCallback'
-    ),
-    clearDirty: jasmine.createSpy('clearDirty'),
-    setDirty: jasmine.createSpy('setDirty')
-  };
-
   var documentationURLsMock = {
     getDocumentationURLs: function() {
       return {
@@ -108,7 +100,6 @@ describe('Directive: pynnEditor', function() {
       $provide.value('storageServer', storageServerMock);
       $provide.value('documentationURLs', documentationURLsMock);
       $provide.value('downloadFileService', downloadFileServiceMock);
-      $provide.value('autoSaveService', autoSaveServiceMock);
     })
   );
 
@@ -135,7 +126,6 @@ describe('Directive: pynnEditor', function() {
       codeEditorsServices = _codeEditorsServices_;
       simulationInfo = _simulationInfo_;
 
-      autoSaveServiceMock.registerFoundAutoSavedCallback.calls.reset();
       $scope = $rootScope.$new();
       $templateCache.put('views/esv/pynn-editor.html', '');
       $scope.control = {};

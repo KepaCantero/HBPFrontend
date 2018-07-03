@@ -34,6 +34,10 @@
             return $q.when([{ name: 'hbp-sp10-user-edit-rights' }]);
           });
 
+        this.getTransferFunctions = jasmine.createSpy('getTransferFunctions');
+        this.saveTransferFunctions = jasmine
+          .createSpy('saveTransferFunctions')
+          .and.returnValue($q.resolve());
         this.getFileContent = jasmine.createSpy('getFileContent');
         this.setFileContent = jasmine.createSpy('setFileContent');
 
