@@ -1,6 +1,6 @@
 {
   "name": "exdfrontend", 
-  "version": "2.0.2", 
+  "version": "2.0.3", 
   "description": "Neurorobotics experiment designer", 
   "dependencies": {
     "rxjs": "^5.4.2", 
