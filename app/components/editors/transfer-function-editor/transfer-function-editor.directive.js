@@ -801,6 +801,7 @@ def {0}(t):
                 });
                 var found = angular.isDefined(tf);
                 if (found && !tf.dirty) {
+                  tf.type = transferFunction.type;
                   tf.code = transferFunction.code;
                   tf.oldName = transferFunction.name;
                   tf.devices = transferFunction.devices;
