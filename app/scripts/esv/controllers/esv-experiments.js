@@ -53,6 +53,14 @@
         $scope.updateTip();
       };
 
+      $scope.$on('explorer', () => {
+        $scope.tabChanged('ExperimentFiles');
+      });
+
+      $scope.$on('MyExperiments', () => {
+        $scope.tabChanged('MyExperiments');
+      });
+
       $scope.showTips = () => {
         tipTooltipService.toggleTip();
         $scope.updateTip();

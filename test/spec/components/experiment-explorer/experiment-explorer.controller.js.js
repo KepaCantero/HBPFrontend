@@ -24,6 +24,16 @@ describe('Controller: ExperimentExplorerController', function() {
       private: true
     }
   ];
+  var experimentSharedServiceMock = {
+    getExperiment: function() {
+      return {};
+    },
+    setExperiment: function() {},
+    resetExperiment: function() {},
+    isEmpty: function() {
+      return true;
+    }
+  };
 
   var privateExperimentsService = {
     initialize: function() {
@@ -74,6 +84,7 @@ describe('Controller: ExperimentExplorerController', function() {
 
   beforeEach(
     module(function($provide) {
+      $provide.value('selectedSharedExperiment', experimentSharedServiceMock);
       $provide.value('slurminfoService', { subscribe: angular.noop });
       $provide.value('$uibModal', {
         open: function() {
@@ -196,6 +207,14 @@ describe('Controller: ExperimentExplorerController', function() {
     $httpBackend.flush();
 
     expect(controller.selectParent).toHaveBeenCalled();
+  });
+
+  it('should go back to experiment List', function() {
+    var controller = loadExperiments();
+    spyOn($rootScope, '$broadcast').and.callThrough();
+    controller.selectedExperiment = { name: 'exp1' };
+    controller.backToExperimentList();
+    expect($rootScope.$broadcast, 'MyExperiments').toHaveBeenCalled();
   });
 
   it('should set selected file', function() {

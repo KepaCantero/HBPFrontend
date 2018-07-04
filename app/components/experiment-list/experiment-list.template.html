@@ -23,7 +23,7 @@
       No experiments...
       <hr class="list-separator">
     </div>
-
+  
   <div ng-show="experiments && (!running || (config.canLaunchExperiments && exp.joinableServers.length > 0))" ng-repeat="exp in filteredExperiments | orderBy:'configuration.name':false"
     class="experiment-box" ng-mouseenter="isHovered = true" ng-mouseleave="isHovered = false" ng-mouseup="isHovered = false"
     ng-click="selectExperiment(exp);" editable-experiment experiment-details="exp">
@@ -139,6 +139,11 @@
               analytics-label="Collab" analytics-value="exp.id" class="btn btn-default" ng-click="clone(exp)"
               ng-disabled="isCloneRequested || pageState.deletingExperiment">
           <i class="fa fa-pencil"></i> Clone
+        </button>
+        <button ng-if="config.canLaunchExperiments" analytics-on analytics-event="Explorer" class="btn btn-default"
+          analytics-label="Collab" analytics-value="exp.id" class="btn btn-default" ng-click="exploreExpFiles(exp)">
+
+          <i class="fa fa-list-alt"></i> Files
         </button>
 
           </div>

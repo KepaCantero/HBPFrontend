@@ -246,6 +246,7 @@
       .exp-file-date {
         width: 15%;
         text-align: right;
+        padding-right: 27px;
       }
 
       .exp-file-actions {
@@ -253,7 +254,7 @@
         flex-grow: 0;
         flex-shrink: 0;
         color: #404040;
-        padding-right: 10px !important;
+        padding-right: 1px !important;
         display: flex;
         flex-direction: row-reverse;
 

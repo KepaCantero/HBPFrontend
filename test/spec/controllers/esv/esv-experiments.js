@@ -97,7 +97,8 @@
       $q,
       clbErrorDialog,
       clbConfirm,
-      $window;
+      $window,
+      selectedSharedExperiment;
 
     var serverErrorMock = {
       displayHTTPError: jasmine
@@ -149,8 +150,10 @@
         _storageServer_,
         _$q_,
         _clbErrorDialog_,
-        _clbConfirm_
+        _clbConfirm_,
+        _selectedSharedExperiment_
       ) {
+        selectedSharedExperiment = _selectedSharedExperiment_;
         $http = _$http_;
         $controller = _$controller_;
         $httpBackend = _$httpBackend_;
@@ -247,6 +250,31 @@
         .element(page.find('[load-private-experiments]'))
         .isolateScope();
     }
+
+    it('should broadcast explorer signal', function() {
+      spyOn($rootScope, '$broadcast').and.callThrough();
+      spyOn(selectedSharedExperiment, 'setExperiment').and.callThrough();
+      $httpBackend
+        .whenGET(new RegExp(proxyUrl + '/storage/experiments'))
+        .respond(200, []);
+      $httpBackend.whenGET(new RegExp(proxyUrl + '/storage')).respond(200, []);
+      $httpBackend
+        .whenGET(new RegExp(proxyUrl + '/joinableServers/undefined'))
+        .respond(200, []);
+      var page = renderEsvWebPage({
+        experiments: {}
+      });
+      var exp = {
+        files: [],
+        folder: [],
+        name: 'name',
+        uuid: 'uuid'
+      };
+      var scope = getExperimentListScope(page);
+      scope.exploreExpFiles(exp);
+      expect($rootScope.$broadcast, 'explorer').toHaveBeenCalled();
+      $httpBackend.flush();
+    });
 
     it('should reload on logout', () => {
       $window.location.reload.calls.reset();
@@ -866,6 +894,20 @@
           expect(scope.pageState.selected).toBeUndefined();
         });
 
+        it('should call selectExperiment', function() {
+          spyOn(selectedSharedExperiment, 'getExperiment').and.returnValue({
+            files: [],
+            folder: [],
+            name: 'name',
+            uuid: 'uuid'
+          });
+          spyOn(selectedSharedExperiment, 'isEmpty').and.returnValue(false);
+          var page = renderEsvWebPage();
+          var scope = getExperimentListScope(page);
+          spyOn(scope, 'selectExperiment');
+          scope.selectExpFromFileExplorer();
+          expect(scope.selectExperiment).toHaveBeenCalled();
+        });
         it('should only show the launch button when the experiment exists in collab', function() {
           var page = renderEsvWebPage({ collab: true });
 

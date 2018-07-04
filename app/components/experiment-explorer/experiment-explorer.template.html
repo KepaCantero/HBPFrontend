@@ -69,6 +69,11 @@
           <div class="exp-file-size">Size</div>
           <div class="exp-file-date">Modified</div>
           <div class="exp-file-actions" ng-show="vm.selectedParent">
+            <span class="action-button" ng-click="vm.backToExperimentList(vm.selectedParent)">
+              <span class="delete-folder-button"  ng-if="!vm.selectedParent.creating && !vm.selectedParent.loadingFile && vm.selectedParent.name != 'resources'"  disable-animate title="Back to My Experiments tab">
+                <i class="fa fa-chevron-left"></i>
+              </span>
+            </span>
             <span class="action-button" ng-if="vm.selectedParent.parentFolder && vm.selectedParent.name != 'resources'" ng-click="!vm.selectedParent.deleting && vm.deleteFolder(vm.selectedParent)">
               <span class="delete-folder-button"  ng-if="!vm.selectedParent.deleting && !vm.selectedParent.loadingFiles" disable-animate title="Delete folder">
                 <i class="fa fa-folder"></i>

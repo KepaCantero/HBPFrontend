@@ -39,8 +39,12 @@
       clbConfirm,
       experimentsFactory,
       tipTooltipService,
-      baseEventHandler
+      baseEventHandler,
+      $rootScope,
+      selectedSharedExperiment
     ) {
+      this.selectedSharedExperiment = selectedSharedExperiment;
+      this.$rootScope = $rootScope;
       this.$scope = $scope;
       this.$window = $window;
       this.$location = $location;
@@ -110,10 +114,22 @@
     suppressKeyPress(event) {
       this.baseEventHandler.suppressAnyKeyPress(event);
     }
+
     loadExperimentList() {
       this.storageServer
         .getExperiments()
-        .then(exps => (this.experimentList = exps))
+        .then(exps => {
+          this.experimentList = exps;
+          if (!this.selectedSharedExperiment.isEmpty()) {
+            var experiment = this.selectedSharedExperiment.getExperiment();
+            this.experimentList.forEach(exp => {
+              if (exp.name == experiment.id) {
+                this.selectExperiment(exp);
+                this.selectedSharedExperiment.resetExperiment();
+              }
+            });
+          }
+        })
         .catch(err => this.onError('Failed to load experiments', err))
         .finally(() => (this.experimentsLoaded = true));
     }
@@ -193,6 +209,11 @@
 
     selectFile(fileId) {
       this.selectedFileId = fileId;
+    }
+
+    backToExperimentList() {
+      this.selectedSharedExperiment.setExperiment(this.selectedExperiment.name);
+      this.$rootScope.$broadcast('MyExperiments');
     }
 
     createFolder() {
@@ -403,7 +424,9 @@
     'clbConfirm',
     'experimentsFactory',
     'tipTooltipService',
-    'baseEventHandler'
+    'baseEventHandler',
+    '$rootScope',
+    'selectedSharedExperiment'
   ];
   class ResourcesExplorerController extends ExperimentExplorerController {
     constructor(
@@ -506,9 +529,9 @@
     'tipTooltipService',
     'simulationInfo',
     'baseEventHandler',
-    'backendInterfaceService'
+    'backendInterfaceService',
+    '$rootScope'
   ];
-  //window.ExperimentExplorerController = ExperimentExplorerController;
   angular
     .module('experimentExplorer', ['storageServer'])
     .controller('ExperimentExplorerController', ExperimentExplorerController)
