@@ -108,6 +108,7 @@ describe('Directive: transferFunctionEditor', function() {
               } else {
                 failure();
               }
+              return { finally: function() {} };
             }
           };
         }
@@ -177,6 +178,15 @@ describe('Directive: transferFunctionEditor', function() {
       transferFunctions = isolateScope.transferFunctions;
     })
   );
+
+  it('should refresh when offsetParent visible', function() {
+    $timeout.flush();
+    document.body.appendChild(element[0]);
+    //codeEditorsServices.getEditorChild is called when the watch on element[0].offsetParent changes
+    spyOn(codeEditorsServices, 'getEditorChild');
+    $scope.$digest();
+    expect(codeEditorsServices.getEditorChild).toHaveBeenCalled();
+  });
 
   it('should init the populations, topics', function() {
     $scope.control.refresh();
@@ -382,6 +392,10 @@ def tf1(t):
       expectedTf1.type = TRANSFER_FUNCTION_TYPE.NEURON2ROBOT;
       expectedTf1.name = expectedTf1.oldName = 'tf1';
       expectedTf1.local = false;
+      expectedTf1.active = true;
+      var msg = {};
+      msg[isolateScope.ERROR.COMPILE] = {};
+      expectedTf1.error = msg;
       expectedTf1.rawCode = '\n\n\n\n\n\n\n\n\n';
       expectedTf1.devices = [
         {
@@ -410,6 +424,8 @@ def tf1(t):
       expectedTf2.type = TRANSFER_FUNCTION_TYPE.NEURON2ROBOT;
       expectedTf2.name = expectedTf2.oldName = 'tf2';
       expectedTf2.local = true;
+      msg[isolateScope.ERROR.NO_OR_MULTIPLE_NAMES] = {};
+      expectedTf2.error = msg;
       expectedTf2.devices = [
         {
           name: 'device1',
@@ -850,7 +866,8 @@ def tf1(t):
 
     it('rawToStructured should convert raw script', function() {
       var callbackHasBeenCalled = false;
-
+      var msg = {};
+      msg[isolateScope.ERROR.LOADING] = {};
       var tf = {
         name: 'test',
         rawCode: `@nrp.Robot2Neuron()
@@ -858,7 +875,11 @@ def tf1(t):
           pass)`
       };
 
-      isolateScope.transferFunction = { name: 'tf1', code: 'return 42' };
+      isolateScope.transferFunction = {
+        name: 'tf1',
+        code: 'return 42',
+        error: msg
+      };
       isolateScope.transferFunctions = [isolateScope.transferFunction];
       var structuredTransferFunction = {
         name: 'tf1',

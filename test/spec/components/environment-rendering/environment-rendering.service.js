@@ -3,7 +3,7 @@
 describe('Services: environmentRenderingService', function() {
   beforeEach(module('tipTooltipModule'));
 
-  var STATE;
+  var STATE, VENDORS;
 
   var environmentRenderingService;
   var stateService,
@@ -85,6 +85,7 @@ describe('Services: environmentRenderingService', function() {
     inject(function(
       _$rootScope_,
       _STATE_,
+      _VENDORS_,
       _environmentRenderingService_,
       _stateService_,
       _gz3d_,
@@ -96,6 +97,7 @@ describe('Services: environmentRenderingService', function() {
       _collab3DSettingsService_
     ) {
       STATE = _STATE_;
+      VENDORS = _VENDORS_;
       $rootScope = _$rootScope_;
       environmentRenderingService = _environmentRenderingService_;
       stateService = _stateService_;
@@ -193,6 +195,23 @@ describe('Services: environmentRenderingService', function() {
     expect(
       environmentRenderingService.updateInitialCameraPose
     ).not.toHaveBeenCalled();
+  });
+
+  it(' - initialize requestAnimationFrame for any of its implementations', function() {
+    spyOn(window.requestAnimationFrame, 'bind').and.returnValue(undefined);
+    for (var i = 0; i < VENDORS.length; ++i) {
+      var raf = window[VENDORS[i] + 'RequestAnimationFrame'];
+      var caf = window[VENDORS[i] + 'CancelAnimationFrame'];
+      if (raf) {
+        spyOn(raf, 'bind').and.returnValue(undefined);
+      }
+      if (caf) {
+        spyOn(caf, 'bind').and.returnValue(undefined);
+      }
+    }
+    environmentRenderingService.initAnimationFrameFunctions();
+    expect(environmentRenderingService.requestAnimationFrame).toBeDefined();
+    expect(environmentRenderingService.cancelAnimationFrame).toBeDefined();
   });
 
   it(' - deinit()', function() {

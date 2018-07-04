@@ -35,10 +35,12 @@
       FPS_60: 60,
       FPS_INFINITE: Infinity
     })
+    .constant('VENDORS', ['ms', 'moz', 'webkit', 'o'])
     .service('environmentRenderingService', [
       '$q',
       'STATE',
       'FPS_LIMIT',
+      'VENDORS',
       'gz3d',
       'userNavigationService',
       'simulationInfo',
@@ -55,6 +57,7 @@
         $q,
         STATE,
         FPS_LIMIT,
+        VENDORS,
         gz3d,
         userNavigationService,
         simulationInfo,
@@ -211,7 +214,7 @@
              * global requestAnimationFrame() and cancelAnimationFrame()
              *
              * these global functions serve as wrappers of a native $window method (see https://css-tricks.com/using-requestanimationframe/ for detailed explanation)
-             * in order to cover different API conventions and browser versions (see vendors)
+             * in order to cover different API conventions and browser versions (see VENDORS)
              *
              * both functions are needed within Initialize() / deInitialize()
              * taken from three.js r62, where it was exposed globally in this fashion
@@ -225,22 +228,26 @@
             this.requestAnimationFrame = window.requestAnimationFrame.bind(
               window
             );
+
             this.cancelAnimationFrame = window.cancelAnimationFrame.bind(
               window
             );
 
-            var vendors = ['ms', 'moz', 'webkit', 'o'];
             for (
               var x = 0;
-              x < vendors.length && !this.requestAnimationFrame;
-              x = x + 1
+              x < VENDORS.length && !this.requestAnimationFrame;
+              ++x
             ) {
-              this.requestAnimationFrame = window[
-                vendors[x] + 'RequestAnimationFrame'
-              ].bind(window);
-              this.cancelAnimationFrame =
-                window[vendors[x] + 'CancelAnimationFrame'].bind(window) ||
-                window[vendors[x] + 'CancelRequestAnimationFrame'].bind(window);
+              var raf = window[VENDORS[x] + 'RequestAnimationFrame'];
+              this.requestAnimationFrame = raf ? raf.bind(window) : undefined;
+              var caf = window[VENDORS[x] + 'CancelAnimationFrame'];
+              this.cancelAnimationFrame = caf
+                ? caf.bind(window)
+                : this.cancelAnimationFrame;
+              var carf = window[VENDORS[x] + 'CancelRequestAnimationFrame'];
+              if (!caf && carf) {
+                this.cancelAnimationFrame = carf;
+              }
             }
 
             if (
