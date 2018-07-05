@@ -395,18 +395,18 @@
     }
 
     exitSimulation() {
-      this.autosaveOnExitService.onExit().then(() => {
+      let isDemoMode = this.bbpConfig.get('demomode.demoCarousel', false);
+      if (isDemoMode) {
         this.cleanUp();
-
         this.splash.splashScreen = null; // do not reopen splashscreen if further messages happen
-
-        let isDemoMode = this.bbpConfig.get('demomode.demoCarousel', false);
-        if (isDemoMode) {
-          this.$location.path('esv-demo');
-        } else {
+        this.$location.path('esv-demo');
+      } else {
+        this.autosaveOnExitService.onExit().then(() => {
+          this.cleanUp();
+          this.splash.splashScreen = null; // do not reopen splashscreen if further messages happen
           this.$location.path('esv-private');
-        }
-      });
+        });
+      }
     }
 
     stopSimulation() {
