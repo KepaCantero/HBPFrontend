@@ -37,6 +37,7 @@
       this.CLIENT_ID = bbpConfig.get('auth.clientId');
       this.PROXY_URL = bbpConfig.get('api.proxy.url');
       this.STORAGE_BASE_URL = `${this.PROXY_URL}/storage`;
+      this.EXPERIMENT_BASE_URL = `${this.PROXY_URL}/experiment`;
       this.IDENTITY_BASE_URL = `${this.PROXY_URL}/identity`;
       this.CUSTOM_MODELS_URL = `/custommodels`;
 
@@ -149,6 +150,22 @@
           logActivity: buildAction({
             method: 'POST',
             url: `${this.PROXY_URL}/activity_log/:activity`,
+            transformRequest: []
+          }),
+          getBrain: buildAction({
+            url: `${this.EXPERIMENT_BASE_URL}/:experimentId/brain`
+          }),
+          saveBrain: buildAction({
+            method: 'PUT',
+            url: `${this.EXPERIMENT_BASE_URL}/:experimentId/brain`,
+            transformRequest: []
+          }),
+          getStateMachines: buildAction({
+            url: `${this.EXPERIMENT_BASE_URL}/:experimentId/stateMachines`
+          }),
+          saveStateMachines: buildAction({
+            method: 'PUT',
+            url: `${this.EXPERIMENT_BASE_URL}/:experimentId/stateMachines`,
             transformRequest: []
           })
         }
@@ -269,6 +286,28 @@
     logActivity(activity, logObject) {
       return this.proxyRsc.logActivity({ activity }, JSON.stringify(logObject))
         .$promise;
+    }
+
+    getBrain(experimentId) {
+      return this.proxyRsc.getBrain({ experimentId }).$promise;
+    }
+
+    saveBrain(experimentId, brain, populations) {
+      return this.proxyRsc.saveBrain(
+        { experimentId },
+        JSON.stringify({ brain, populations })
+      ).$promise;
+    }
+
+    getStateMachines(experimentId) {
+      return this.proxyRsc.getStateMachines({ experimentId }).$promise;
+    }
+
+    saveStateMachines(experimentId, stateMachines) {
+      return this.proxyRsc.saveStateMachines(
+        { experimentId },
+        JSON.stringify({ stateMachines })
+      ).$promise;
     }
   }
 

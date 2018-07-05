@@ -1,52 +1,52 @@
 <!-- build:css(.tmp) styles/esv/gz3d-view.css -->
-<link rel="stylesheet" href="components/environment-rendering/environment-rendering.style.css"/>
-<link rel="stylesheet" href="styles/esv/ros-reconnecting.css"/>
+<link rel="stylesheet" href="components/environment-rendering/environment-rendering.style.css" />
+<link rel="stylesheet" href="styles/esv/ros-reconnecting.css" />
 <!-- endbuild -->
 
 <div class="gz3d-container">
-  <!-- WEBGL-context -->
-  <div class="gz3d-webgl" ng-mousedown="onContainerMouseDown($event);" ng-hide="vm.showServerStream"></div>
-  <!-- WEBGL-context -->
+    <!-- WEBGL-context -->
+    <div class="gz3d-webgl" ng-mousedown="onContainerMouseDown($event);" ng-hide="vm.showServerStream"></div>
+    <!-- WEBGL-context -->
 
-  <!-- video stream -->
-  <div class="camera-server-stream-not-available" ng-show="vm.showServerStream">
-    <span ng-hide="stateService.currentState === STATE.STARTED">Start the simulation to start streaming camera image</span>
-    <span ng-show="stateService.currentState === STATE.STARTED">Connecting...</span>
-  </div>
-  <img class="camera-server-stream-image" ng-show="vm.showServerStream" ng-src="{{vm.getVideoUrlSource()}}" alt="Smiley face">
-  <!-- video stream -->
-
-  <!-- options panel -->
-  <div class="view-options" ng-show="vm.isCameraView()">
-    <div class="options-panel-icons">
-      <!-- info icon -->
-      <div class="options-icon" ng-mouseenter="vm.showInfoDiv=true" ng-mouseleave="vm.showInfoDiv=false">
-        <i class="fa fa-info-circle fa-lg" aria-hidden="true"
-           ng-class="{'options-icon-enabled' : vm.showInfoDiv}"></i>
-      </div>
-      <!-- camera frustum icon -->
-      <span class="glyphicon glyphicon-modal-window options-icon"
-            ng-class="{'options-icon-enabled' : vm.view.camera.cameraHelper.visible}" title="Show frustum"
-            ng-click="vm.onClickFrustumIcon()" aria-hidden="true"></span>
-      <!-- camera stream icon -->
-      <i class="fa fa-video-camera options-icon" ng-class="{'options-icon-enabled' : vm.showServerStream}"
-         ng-show="vm.view.topic" title="Stream&nbsp;server&nbsp;image"
-         ng-click="vm.onClickCameraStream()" aria-hidden="true"></i>
+    <!-- video stream -->
+    <div class="camera-server-stream-not-available" ng-show="vm.showServerStream">
+        <span ng-hide="stateService.currentState === STATE.STARTED">Start the simulation to start streaming camera image</span>
+        <span ng-show="stateService.currentState === STATE.STARTED">Connecting...</span>
     </div>
-    <div class="options-panel-info-area">
-      <div ng-show="vm.showInfoDiv">
-        <div class="view-info-text">name: {{vm.view.name}}</div>
-        <div class="view-info-text">type: {{vm.view.type}}</div>
-      </div>
+    <img class="camera-server-stream-image" ng-show="vm.showServerStream" ng-src="{{vm.getVideoUrlSource()}}" alt="Smiley face">
+    <!-- video stream -->
+
+    <!-- options panel -->
+    <div class="view-options" ng-show="vm.isCameraView()">
+        <div class="options-panel-icons">
+            <!-- info icon -->
+            <div class="options-icon" ng-mouseenter="vm.showInfoDiv=true" ng-mouseleave="vm.showInfoDiv=false">
+                <i class="fa fa-info-circle fa-lg" aria-hidden="true" ng-class="{'options-icon-enabled' : vm.showInfoDiv}"></i>
+            </div>
+            <!-- camera frustum icon -->
+            <span class="glyphicon glyphicon-modal-window options-icon" ng-class="{'options-icon-enabled' : vm.view.camera.cameraHelper.visible}"
+                title="Show frustum" ng-click="vm.onClickFrustumIcon()" aria-hidden="true"></span>
+            <!-- camera stream icon -->
+            <i class="fa fa-video-camera options-icon" ng-class="{'options-icon-enabled' : vm.showServerStream}" ng-show="vm.view.topic"
+                title="Stream&nbsp;server&nbsp;image" ng-click="vm.onClickCameraStream()" aria-hidden="true"></i>
+        </div>
+        <div class="options-panel-info-area">
+            <div ng-show="vm.showInfoDiv">
+                <div class="view-info-text">name: {{vm.view.name}}</div>
+                <div class="view-info-text">type: {{vm.view.type}}</div>
+            </div>
+        </div>
+
     </div>
-  </div>
-  <!-- options panel -->
+    <!-- options panel -->
 
-  <div show-on-top class="human-navigation-info ng-hide" ng-show="vm.gz3dViewsService.isUserView(vm.view) && vm.userNavigationService.showHumanNavInfoDiv">
-    <span>When paused, avatar navigation is not possible</span>
-  </div>
+    <div show-on-top class="human-navigation-info ng-hide" ng-show="vm.gz3dViewsService.isUserView(vm.view) && vm.userNavigationService.showHumanNavInfoDiv">
+        <span>When paused, avatar navigation is not possible</span>
+    </div>
 
-  <context-menu></context-menu>
+    <context-menu></context-menu>
+
+    <auto-save-widget/>
 
 </div>
 <!-- container -->

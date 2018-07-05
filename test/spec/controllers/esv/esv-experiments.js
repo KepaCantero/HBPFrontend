@@ -258,6 +258,19 @@
       expect($window.location.reload).toHaveBeenCalled();
     });
 
+    it('should show tips by default', () => {
+      let page = renderEsvWebPage();
+      let tooltip = page.find('tip-tooltip:visible');
+      expect(tooltip).toBeDefined();
+    });
+
+    it('should toggleTip on scope showTips', () => {
+      renderEsvWebPage();
+      spyOn($rootScope, 'updateTip').and.callThrough();
+      $rootScope.showTips();
+      expect($rootScope.updateTip).toHaveBeenCalled();
+    });
+
     it('should upload tip on tabChanged', () => {
       renderEsvWebPage();
       spyOn($rootScope, 'updateTip');

@@ -40,7 +40,7 @@
     'STATE',
     'PYNN_ERROR',
     'stateService',
-    'autoSaveService',
+    'autoSaveFactory',
     'RESET_TYPE',
     'codeEditorsServices',
     'environmentService',
@@ -48,6 +48,7 @@
     'userContextService',
     'baseEventHandler',
     'editorToolbarService',
+    'storageServer',
     function(
       $timeout,
       $rootScope,
@@ -60,17 +61,16 @@
       STATE,
       PYNN_ERROR,
       stateService,
-      autoSaveService,
+      autoSaveFactory,
       RESET_TYPE,
       codeEditorsServices,
       environmentService,
       downloadFileService,
       userContextService,
       baseEventHandler,
-      editorToolbarService
+      editorToolbarService,
+      storageServer
     ) {
-      var DIRTY_TYPE = 'BRAIN';
-
       return {
         templateUrl:
           'components/editors/brain-editor/pynn-editor.template.html',
@@ -89,18 +89,19 @@
 
           scope.isPrivateExperiment = environmentService.isPrivateExperiment();
           scope.loading = false;
-          scope.collabDirty = false;
           scope.localBrainDirty = false;
-          scope.isSavingToCollab = false;
 
           var ScriptObject = pythonCodeHelper.ScriptObject;
-          scope.pynnScript = new ScriptObject(0, '');
+          scope.pynnScript = new ScriptObject(0, 'empty');
 
           scope.editorOptions = codeEditorsServices.getDefaultEditorOptions();
 
           scope.editorOptions = codeEditorsServices.ownerOnlyOptions(
             scope.editorOptions
           );
+          let autoSaveService = autoSaveFactory.createService('Brain');
+          autoSaveService.onsave(() => scope.saveIntoStorage());
+
           scope.resetListenerUnbindHandler = scope.$on('RESET', function(
             event,
             resetType
@@ -109,7 +110,7 @@
               resetType === RESET_TYPE.RESET_FULL ||
               resetType === RESET_TYPE.RESET_BRAIN
             ) {
-              scope.collabDirty = false;
+              autoSaveService.reset();
               scope.localBrainDirty = false;
               scope.pynnScript.error = {};
             }
@@ -148,27 +149,29 @@
           // * env poses reset
           scope.refresh = function(forceRefresh = false) {
             refreshEditor();
-            if (!forceRefresh && scope.collabDirty) return;
+            if (!forceRefresh && autoSaveService.isDirty()) return;
             scope.loading = true;
-            backendInterfaceService.getBrain(function(response) {
-              scope.loading = false;
-              if (response.brain_type === 'py') {
-                scope.pynnScript.code = response.data;
-                scope.populations = scope.preprocessPopulations(
-                  response.additional_populations
-                );
-                refreshEditor();
-                setTimeout(function() {
-                  refreshEditor(true);
-                  scope.searchToken('si');
-                }, 100);
-              } else {
-                scope.pynnScript.code = '# Write PyNN script here';
-                scope.populations = [];
-                refreshEditor();
-              }
-              $timeout(() => (scope.localBrainDirty = false));
-            });
+            storageServer
+              .getBrain(simulationInfo.experimentID)
+              .then(response => {
+                scope.loading = false;
+                if (response.brainType === 'py') {
+                  scope.pynnScript.code = response.brain;
+                  scope.populations = scope.preprocessPopulations(
+                    response.populations
+                  );
+                  refreshEditor();
+                  setTimeout(function() {
+                    refreshEditor(true);
+                    scope.searchToken('si');
+                  }, 100);
+                } else {
+                  scope.pynnScript.code = '# Write PyNN script here';
+                  scope.populations = [];
+                  refreshEditor();
+                }
+                $timeout(() => (scope.localBrainDirty = false));
+              });
           };
 
           scope.control.refresh = scope.refresh;
@@ -374,31 +377,25 @@
             );
           };
 
-          scope.saveIntoCollabStorage = function() {
-            scope.isSavingToCollab = true;
-            backendInterfaceService.saveBrain(
-              scope.pynnScript.code,
-              scope.stringsToLists(scope.populations),
-              function() {
-                // Success callback
-                scope.isSavingToCollab = false;
-                scope.collabDirty = false;
-                autoSaveService.clearDirty(DIRTY_TYPE);
-
+          scope.saveIntoStorage = function() {
+            return storageServer
+              .saveBrain(
+                simulationInfo.experimentID,
+                scope.pynnScript.code,
+                scope.stringsToLists(scope.populations)
+              )
+              .then(() => {
                 if (scope.tfNeedsSave) {
                   scope.tfNeedsSave = false;
                   $rootScope.$broadcast('pynn.tfNeedsSave');
                 }
-              },
-              function() {
-                // Failure callback
+              })
+              .catch(() => {
                 clbErrorDialog.open({
                   type: 'BackendError.',
                   message: 'Error while saving pyNN script to the Storage.'
                 });
-                scope.isSavingToCollab = false;
-              }
-            );
+              });
           };
 
           scope.searchToken = function(name) {
@@ -443,12 +440,8 @@
           };
 
           scope.onPynnChange = function() {
-            scope.collabDirty = environmentService.isPrivateExperiment();
             scope.localBrainDirty = true;
-            autoSaveService.setDirty(DIRTY_TYPE, [
-              scope.pynnScript.code,
-              scope.populations
-            ]);
+            autoSaveService.setDirty();
           };
 
           scope.$watch('pynnScript.code', function(after, before) {
@@ -460,7 +453,8 @@
           });
 
           scope.$watchCollection('populations', function(after, before) {
-            if (before) scope.onPynnChange();
+            if (before && angular.toJson(after) != angular.toJson(before))
+              scope.onPynnChange();
           });
 
           scope.addList = function() {
@@ -567,17 +561,6 @@
           var docs = documentationURLs.getDocumentationURLs();
           scope.backendDocumentationURL = docs.backendDocumentationURL;
           scope.platformDocumentationURL = docs.platformDocumentationURL;
-
-          userContextService.isOwner() &&
-            autoSaveService.registerFoundAutoSavedCallback(DIRTY_TYPE, function(
-              autoSaved,
-              applyChanges
-            ) {
-              scope.pynnScript.code = autoSaved[0];
-              scope.populations = autoSaved[1];
-              scope.collabDirty = true;
-              if (applyChanges) scope.agreeAction();
-            });
 
           scope.download = function() {
             var href = URL.createObjectURL(
