@@ -31,7 +31,10 @@
       </md-button>
 
       <div flex md-truncate class="application-top-toolbar-section-middle">
-        <h2 id="application-top-toolbar-title">Toolbar Title Placeholder</h2>
+        <div class="application-top-toolbar-title">
+          <h2 ng-show="!vm.experimentViewService.isInSimulationView()">Experiment Overview</h2>
+          <experiment-name ng-show="vm.experimentViewService.isInSimulationView()"></experiment-name>
+        </div>
       </div>
 
       <div class="application-top-toolbar-section-right">

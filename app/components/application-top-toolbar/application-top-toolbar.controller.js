@@ -54,14 +54,6 @@
       this.experimentViewService = experimentViewService;
       this.stateService = stateService;
       this.userContextService = userContextService;
-
-      this.titleDOM = document.getElementById('application-top-toolbar-title');
-
-      if (this.experimentViewService.isInSimulationView()) {
-        this.setTitle(this.simulationInfo.experimentDetails.name);
-      } else {
-        this.setTitle('Experiment Overview');
-      }
     }
 
     openMenu($mdMenu, event) {
@@ -88,10 +80,6 @@
       } else {
         this.experimentViewService.openExitDialog();
       }
-    }
-
-    setTitle(title) {
-      this.titleDOM.innerHTML = title;
     }
 
     allowPlayPause() {

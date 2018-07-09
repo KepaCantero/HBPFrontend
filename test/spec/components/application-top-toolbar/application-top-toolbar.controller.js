@@ -10,8 +10,6 @@ describe('Controller: ApplicationTopToolbarController', function() {
     storageServerTokenManager,
     userContextService;
 
-  let titleDOM;
-
   beforeEach(module('exdFrontendApp'));
 
   beforeEach(module('experimentViewServiceMock'));
@@ -42,16 +40,6 @@ describe('Controller: ApplicationTopToolbarController', function() {
   );
 
   beforeEach(function() {
-    titleDOM = document.createElement('div');
-    titleDOM.id = 'application-top-toolbar-title';
-    spyOn(document, 'getElementById').and.callFake(id => {
-      if (id === 'application-top-toolbar-title') {
-        return titleDOM;
-      } else {
-        return undefined;
-      }
-    });
-
     $scope = $rootScope.$new();
     applicationTopToolbarController = $controller(
       'ApplicationTopToolbarController',
@@ -112,12 +100,6 @@ describe('Controller: ApplicationTopToolbarController', function() {
     expect(experimentViewService.exitSimulation).toHaveBeenCalled();
   });
 
-  it(' - setTitle()', function() {
-    let title = 'test title';
-    applicationTopToolbarController.setTitle(title);
-    expect(titleDOM.innerHTML).toBe(title);
-  });
-
   it(' - allowPlayPause()', function() {
     userContextService.isOwner.and.returnValue(false);
     expect(applicationTopToolbarController.allowPlayPause()).toBe(false);
@@ -141,10 +123,6 @@ describe('Controller: ApplicationTopToolbarController', function() {
         }
       );
     });
-
-    it(' - should set title to experiment overview', function() {
-      expect(titleDOM.innerHTML).toBe('Experiment Overview');
-    });
   });
 
   describe('inside a running experiment/simulation view', function() {
@@ -162,10 +140,6 @@ describe('Controller: ApplicationTopToolbarController', function() {
           $scope: $scope
         }
       );
-    });
-
-    it(' - should set title to experiment overview', function() {
-      expect(titleDOM.innerHTML).toBe(simulationInfo.experimentDetails.name);
     });
   });
 });

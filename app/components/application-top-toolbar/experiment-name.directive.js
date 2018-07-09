@@ -22,45 +22,17 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  * ---LICENSE-END**/
 
-@import '../../../bower_components/angular-material/angular-material.scss';
+(function() {
+  'use strict';
 
-$application-top-toolbar-height: 5%;
-
-.application-top-toolbar-wrapper {
-  .application-top-toolbar {
-    box-shadow: 0px 5px 5px grey;
-
-    min-height: $application-top-toolbar-height;
-
-    .md-toolbar-tools {
-      height: $application-top-toolbar-height;
-    }
-  }
-
-  .application-top-toolbar-section-middle {
-    text-align: center;
-
-    .application-top-toolbar-title h2 {
-      font-family: inherit;
-    }
-  }
-
-  .application-top-toolbar-section-right {
-  }
-
-  .vertical-divider {
-    border-top-width: 0;
-    border-right-width: 2px;
-    border-right-style: solid;
-    border-color: grey;
-    height: 30px;
-    min-height: 50%;
-    margin-left: 20px;
-    margin-right: 20px;
-  }
-}
-
-// unfortunately necessary as md-menu will manipulate hmtl.style.overflowY when opened, causing a scrollbar to appear
-html {
-  overflow-y: auto !important;
-}
+  angular.module('applicationTopToolbarModule').directive('experimentName', [
+    () => ({
+      templateUrl:
+        'components/application-top-toolbar/experiment-name.template.html',
+      restrict: 'E',
+      scope: {},
+      controller: 'ExperimentNameController',
+      controllerAs: 'vm'
+    })
+  ]);
+})();

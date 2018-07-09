@@ -8,13 +8,15 @@ describe('Services: environmentRenderingService', function() {
   var environmentRenderingService;
   var stateService,
     $rootScope,
+    $timeout,
     gz3d,
     userContextService,
     assetLoadingSplash,
     simulationInfo,
     isNotARobotPredicate,
     userNavigationService,
-    collab3DSettingsService;
+    collab3DSettingsService,
+    tipTooltipService;
 
   var frameInterval, lastFrameTime;
 
@@ -80,10 +82,12 @@ describe('Services: environmentRenderingService', function() {
     module('simulationInfoMock');
     module('bbpConfigMock');
     module('gz3dMock');
+    module('tipTooltipServiceMock');
 
     // inject service for testing.
     inject(function(
       _$rootScope_,
+      _$timeout_,
       _STATE_,
       _VENDORS_,
       _environmentRenderingService_,
@@ -94,11 +98,13 @@ describe('Services: environmentRenderingService', function() {
       _assetLoadingSplash_,
       _simulationInfo_,
       _userNavigationService_,
-      _collab3DSettingsService_
+      _collab3DSettingsService_,
+      _tipTooltipService_
     ) {
       STATE = _STATE_;
       VENDORS = _VENDORS_;
       $rootScope = _$rootScope_;
+      $timeout = _$timeout_;
       environmentRenderingService = _environmentRenderingService_;
       stateService = _stateService_;
       gz3d = _gz3d_;
@@ -108,6 +114,7 @@ describe('Services: environmentRenderingService', function() {
       simulationInfo = _simulationInfo_;
       userNavigationService = _userNavigationService_;
       collab3DSettingsService = _collab3DSettingsService_;
+      tipTooltipService = _tipTooltipService_;
     });
   });
 
@@ -461,5 +468,26 @@ describe('Services: environmentRenderingService', function() {
     environmentRenderingService.removeOnUpdateRenderingCallback(testFunction2);
     expect(testFunction).not.toHaveBeenCalled();
     expect(testFunction2).not.toHaveBeenCalled();
+  });
+
+  it(' - showCameraHintWhenNeeded()', function(done) {
+    spyOn(
+      environmentRenderingService,
+      'showCameraHintWhenNeeded'
+    ).and.callThrough();
+    environmentRenderingService.sceneLoading = false;
+    environmentRenderingService.lastCameraTransform = new THREE.Object3D();
+    environmentRenderingService.lastCameraTransform.position.set(1, 2, 3);
+    environmentRenderingService.lastCameraTransform.quaternion.set(1, 2, 3, 4);
+
+    environmentRenderingService.showCameraHintWhenNeeded();
+
+    expect(tipTooltipService.setCurrentTip).toHaveBeenCalled();
+    $timeout.flush();
+    expect(
+      environmentRenderingService.showCameraHintWhenNeeded.calls.count()
+    ).toBe(2);
+
+    done();
   });
 });
