@@ -653,13 +653,12 @@ def {0}(t):
               scope.topics = response.topics;
             };
 
-            let refreshEditor = reset => {
+            let refreshEditor = () => {
               var editor = codeEditorsServices.getEditorChild(
                 'codeEditor',
                 element[0]
               );
               codeEditorsServices.refreshEditor(editor);
-              if (reset) codeEditorsServices.resetEditor(editor);
 
               scope.updateNTransferFunctionDirty();
             };
