@@ -259,6 +259,6 @@
   ];
 
   angular
-    .module('newExperiment', [])
+    .module('newExperiment')
     .controller('NewExperimentController', NewExperimentController);
 })();

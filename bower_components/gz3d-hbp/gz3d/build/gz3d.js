@@ -2283,7 +2283,7 @@ GZ3D.Composer.prototype.applyComposerSettings = function (updateColorCurve, forc
 
     if (!this.skinsInitialized)
     {
-        this.buildSkin();
+        this.buildSkins();
     }
 
     this.normalizedMasterSetting = null;
@@ -2943,21 +2943,13 @@ GZ3D.Composer.prototype.isSkinVisibleForMuscle = function (muscle)
  *
  */
 
-GZ3D.Composer.prototype.buildSkin = function ()
+GZ3D.Composer.prototype.buildSkin = function (skin)
 {
-    var cs = this.gz3dScene.composerSettings;
     var that = this;
 
-    if (!cs.skins)
+    if (!skin.initialized)
     {
-        this.skinsInitialized = true;
-        return;
-    }
-
-    this.skinnedObjects = [];
-
-    cs.skins.forEach(function(skin)
-    {
+        skin.initialized = true;
         var parent = that.scene.getObjectByName(skin.parentObject, true);
         if (parent)
         {
@@ -2967,6 +2959,9 @@ GZ3D.Composer.prototype.buildSkin = function ()
             {
                 var dae = collada.scene;
                 var mapToMesh = that.scene.getObjectByName(skin.mapTo);
+
+                if (skin.scale)
+                    dae.scale.copy(new THREE.Vector3(skin.scale,skin.scale,skin.scale));
 
                 parent.add(dae);
                 that.gz3dScene.refresh3DViews();
@@ -2999,7 +2994,32 @@ GZ3D.Composer.prototype.buildSkin = function ()
                 } );
             });
         }
-    });
+    }
+};
+
+/**
+ * Build all skins
+ *
+ */
+
+GZ3D.Composer.prototype.buildSkins = function ()
+{
+    var cs = this.gz3dScene.composerSettings;
+    var that = this;
+
+    if (!this.skinnedObjects)
+       this.skinnedObjects = [];
+
+    // Skins created from the .ini file of the experiment
+
+    if (cs.skins)
+        cs.skins.forEach((skin)=>that.buildSkin(skin));
+
+    // Skins created dynamically from the frontend
+
+    if (this.skins)
+        this.skins.forEach((skin)=>that.buildSkin(skin));
+
     this.skinsInitialized = true;
 };
 
@@ -3035,11 +3055,10 @@ GZ3D.Composer.prototype.updateSkin = function ()
             jM.multiplyMatrices(invM, joint.matrixWorld);
             jM.decompose(bp,br,bs);
 
-            var boneCorrection = skinnedObject.definition.jointToBoneAngleCorrection;
-
             var tx=0,ty=0,tz=0;
 
-            if (boneCorrection[bone.name])
+            var boneCorrection = skinnedObject.definition.jointToBoneAngleCorrection;
+            if (boneCorrection && boneCorrection[bone.name])
             {
                 tx = boneCorrection[bone.name][0];
                 ty = boneCorrection[bone.name][1];
@@ -3052,8 +3071,23 @@ GZ3D.Composer.prototype.updateSkin = function ()
 
             bone.position.copy(bp);
             bone.quaternion.copy(br);
+
+            bone.updateMatrixWorld();
         }
     }
+};
+
+/**
+ * Add a skin mesh
+ *
+*/
+
+GZ3D.Composer.prototype.addSkinMesh = function (skinMeshDefinition)
+{
+    if (!this.skins) this.skins = [];
+    this.skins.push(skinMeshDefinition);
+
+    this.skinsInitialized = false;
 };
 
 
@@ -13074,6 +13108,16 @@ GZ3D.Scene.prototype.skinVisible = function (model)
   if (sko) return sko.skinMesh.visible;
 
   return false;
+};
+
+/**
+ * Add a skin mesh
+ *
+*/
+
+GZ3D.Scene.prototype.addSkinMesh = function (skinMeshDefinition)
+{
+  this.composer.addSkinMesh(skinMeshDefinition);
 };
 
 

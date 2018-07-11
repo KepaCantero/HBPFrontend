@@ -53,6 +53,8 @@
       '$timeout',
       'tipTooltipService',
       'TIP_CODES',
+      'storageServer',
+      '$http',
       function(
         $q,
         STATE,
@@ -69,7 +71,9 @@
         collab3DSettingsService,
         $timeout,
         tipTooltipService,
-        TIP_CODES
+        TIP_CODES,
+        storageServer,
+        $http
       ) {
         function EnvironmentRenderingService() {
           var that = this;
@@ -81,6 +85,8 @@
           this.deferredSceneInitialized = $q.defer();
           this.scene3DSettingsReady = false;
           this.tipTooltipService = tipTooltipService;
+          this.storageServer = storageServer;
+          this.$http = $http;
 
           this.sceneInitialized = function() {
             return this.deferredSceneInitialized.promise;
@@ -127,6 +133,8 @@
                   simulationInfo.experimentDetails.cameraPose
                 );
 
+                that.initRobotSkin();
+
                 that.animate();
               }
             });
@@ -134,6 +142,41 @@
             this.deferredSceneInitialized.promise.then(function() {
               that.initComposerSettings();
             });
+          };
+
+          this.initRobotSkin = function() {
+            this.storageServer
+              .getRobotConfigPath(simulationInfo.experimentID)
+              .then(robotConfigPath => {
+                this.$http.get(robotConfigPath).then(xml => {
+                  let config = new X2JS().xml_str2json(xml.data);
+                  if (config.model.frontend_skin_model) {
+                    // I need to build a relative path for the mesh from the config
+                    let proxyStr = 'proxy/models/';
+                    let modelPath = robotConfigPath.substring(
+                      robotConfigPath.indexOf(proxyStr) + proxyStr.length
+                    );
+                    modelPath = modelPath.substring(
+                      0,
+                      modelPath.lastIndexOf('/')
+                    );
+
+                    if (modelPath.indexOf('robots/') === 0)
+                      modelPath = modelPath.substring(7);
+
+                    let skinDefinition = {};
+                    skinDefinition.mesh =
+                      modelPath + '/' + config.model.frontend_skin_model.mesh;
+                    skinDefinition.mapTo = 'robot';
+                    skinDefinition.visible = true;
+                    skinDefinition.parentObject = 'robot';
+                    skinDefinition.bonePrefix = 'robot::';
+                    skinDefinition.scale =
+                      config.model.frontend_skin_model.scale;
+                    gz3d.scene.addSkinMesh(skinDefinition);
+                  }
+                });
+              });
           };
 
           this.deinit = function() {

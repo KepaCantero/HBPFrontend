@@ -38,6 +38,13 @@
         this.saveTransferFunctions = jasmine
           .createSpy('saveTransferFunctions')
           .and.returnValue($q.resolve());
+
+        this.getRobotConfigPath = jasmine
+          .createSpy('storageServerMock.getRobotConfigPath')
+          .and.callFake(function() {
+            return $q.when('robotpath');
+          });
+
         this.getFileContent = jasmine.createSpy('getFileContent');
         this.setFileContent = jasmine.createSpy('setFileContent');
 

@@ -82,63 +82,7 @@
           scope.OBJECT_VIEW_MODE = OBJECT_VIEW_MODE;
 
           storageServer
-            .getFileContent(
-              simulationInfo.experimentID,
-              'experiment_configuration.exc',
-              true
-            )
-            .then(exc => {
-              const xml = $.parseXML(exc.data);
-              const bibiConf = xml.getElementsByTagNameNS('*', 'bibiConf')[0];
-
-              return storageServer.getFileContent(
-                simulationInfo.experimentID,
-                bibiConf.attributes.src.value,
-                true
-              );
-            })
-            .then(bibi => {
-              const xml = $.parseXML(bibi.data);
-              const bodyModel = xml.getElementsByTagNameNS('*', 'bodyModel')[0];
-
-              if (!bodyModel.attributes.customAsset) {
-                //no custom asset attribute => backwards compatbility mode
-                return (
-                  bbpConfig.get('api.proxy.url') +
-                  `/storage/${simulationInfo.experimentID}/robot.config?byname=true`
-                );
-              }
-
-              if (bodyModel.attributes.customAsset.value == 'true') {
-                //robot is a custom model
-                return storageServer
-                  .getCustomModels('robots')
-                  .then(robots =>
-                    robots.find(robot =>
-                      robot.path.endsWith(
-                        window.encodeURIComponent(
-                          `/robots/${bodyModel.attributes.assetPath.value}`
-                        )
-                      )
-                    )
-                  )
-                  .then(robot =>
-                    window.encodeURIComponent(
-                      `${storageServer.STORAGE_BASE_URL}/custommodelconfig/${robot.path}`
-                    )
-                  );
-              } else {
-                //robot comes from the templates
-                let robotId = bodyModel.attributes.assetPath.value
-                  .split('/')
-                  .slice(-1)
-                  .pop();
-
-                return `${newExperimentProxyService.getModelUrl(
-                  'robots'
-                )}/${robotId}/config`;
-              }
-            })
+            .getRobotConfigPath(simulationInfo.experimentID)
             .then(robotConfigPath => (scope.robotConfigPath = robotConfigPath));
 
           scope.suppressKeyPress = function(event) {

@@ -26,13 +26,16 @@
       $q,
       $stateParams,
       bbpConfig,
-      storageServerTokenManager
+      storageServerTokenManager,
+      newExperimentProxyService
     ) {
       this.$resource = $resource;
       this.$window = $window;
       this.$q = $q;
       this.$stateParams = $stateParams;
       this.storageServerTokenManager = storageServerTokenManager;
+      this.bbpConfig = bbpConfig;
+      this.newExperimentProxyService = newExperimentProxyService;
 
       this.CLIENT_ID = bbpConfig.get('auth.clientId');
       this.PROXY_URL = bbpConfig.get('api.proxy.url');
@@ -329,6 +332,65 @@
         JSON.stringify({ transferFunctions })
       ).$promise;
     }
+
+    getRobotConfigPath(experimentID) {
+      return this.getFileContent(
+        experimentID,
+        'experiment_configuration.exc',
+        true
+      )
+        .then(exc => {
+          const xml = $.parseXML(exc.data);
+          const bibiConf = xml.getElementsByTagNameNS('*', 'bibiConf')[0];
+
+          return this.getFileContent(
+            experimentID,
+            bibiConf.attributes.src.value,
+            true
+          );
+        })
+        .then(bibi => {
+          const xml = $.parseXML(bibi.data);
+          const bodyModel = xml.getElementsByTagNameNS('*', 'bodyModel')[0];
+
+          if (!bodyModel.attributes.customAsset) {
+            //no custom asset attribute => backwards compatbility mode
+            return (
+              this.bbpConfig.get('api.proxy.url') +
+              `/storage/${experimentID}/robot.config?byname=true`
+            );
+          }
+
+          if (bodyModel.attributes.customAsset.value == 'true') {
+            //robot is a custom model
+            return this.getCustomModels('robots')
+              .then(robots =>
+                robots.find(robot =>
+                  robot.path.endsWith(
+                    window.encodeURIComponent(
+                      `/robots/${bodyModel.attributes.assetPath.value}`
+                    )
+                  )
+                )
+              )
+              .then(robot =>
+                window.encodeURIComponent(
+                  `${this.STORAGE_BASE_URL}/custommodelconfig/${robot.path}`
+                )
+              );
+          } else {
+            //robot comes from the templates
+            let robotId = bodyModel.attributes.assetPath.value
+              .split('/')
+              .slice(-1)
+              .pop();
+
+            return `${this.newExperimentProxyService.getModelUrl(
+              'robots'
+            )}/${robotId}/config`;
+          }
+        });
+    }
   }
 
   StorageServer.$inject = [
@@ -337,7 +399,8 @@
     '$q',
     '$stateParams',
     'bbpConfig',
-    'storageServerTokenManager'
+    'storageServerTokenManager',
+    'newExperimentProxyService'
   ];
 
   class StorageServerTokenManager {
@@ -395,7 +458,12 @@
   StorageServerTokenManager.$inject = ['$location', 'bbpConfig'];
 
   angular
-    .module('storageServer', ['ngResource', 'bbpConfig', 'ui.router'])
+    .module('storageServer', [
+      'ngResource',
+      'bbpConfig',
+      'ui.router',
+      'newExperiment'
+    ])
     .service('storageServer', StorageServer)
     .service('storageServerTokenManager', StorageServerTokenManager);
 })();

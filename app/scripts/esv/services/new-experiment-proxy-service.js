@@ -23,7 +23,7 @@
  * ---LICENSE-END**/
 (function() {
   'use strict';
-  angular.module('exdFrontendApp').service('newExperimentProxyService', [
+  angular.module('newExperiment', []).service('newExperimentProxyService', [
     '$http',
     'bbpConfig',
     function($http, bbpConfig) {

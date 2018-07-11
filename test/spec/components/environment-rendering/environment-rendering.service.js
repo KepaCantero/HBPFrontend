@@ -16,7 +16,8 @@ describe('Services: environmentRenderingService', function() {
     isNotARobotPredicate,
     userNavigationService,
     collab3DSettingsService,
-    tipTooltipService;
+    tipTooltipService,
+    $httpBackend;
 
   var frameInterval, lastFrameTime;
 
@@ -83,6 +84,7 @@ describe('Services: environmentRenderingService', function() {
     module('bbpConfigMock');
     module('gz3dMock');
     module('tipTooltipServiceMock');
+    module('storageServerMock');
 
     // inject service for testing.
     inject(function(
@@ -99,7 +101,8 @@ describe('Services: environmentRenderingService', function() {
       _simulationInfo_,
       _userNavigationService_,
       _collab3DSettingsService_,
-      _tipTooltipService_
+      _tipTooltipService_,
+      _$httpBackend_
     ) {
       STATE = _STATE_;
       VENDORS = _VENDORS_;
@@ -115,6 +118,7 @@ describe('Services: environmentRenderingService', function() {
       userNavigationService = _userNavigationService_;
       collab3DSettingsService = _collab3DSettingsService_;
       tipTooltipService = _tipTooltipService_;
+      $httpBackend = _$httpBackend_;
     });
   });
 
@@ -135,6 +139,8 @@ describe('Services: environmentRenderingService', function() {
     ).and.callThrough();
     spyOn(environmentRenderingService, 'isElementVisible').and.callThrough();
     spyOn(environmentRenderingService, 'update').and.callThrough();
+
+    $httpBackend.whenGET('robotpath').respond({});
   });
 
   afterEach(function() {
