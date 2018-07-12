@@ -73,7 +73,7 @@
           return storageServer
             .getFileContent(simulationInfo.experimentID, SAVE_FILE, true)
             .then(file => {
-              if (!file.uuid) return $q.reject();
+              if (!file.uuid) return $q.resolve();
 
               var content = angular.fromJson(file.data);
               delete content[dirtyType];

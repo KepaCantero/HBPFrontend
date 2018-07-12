@@ -128,7 +128,12 @@
                 JSON.stringify(userdata, null, '\t')
               )
               .then(() => scope.reload())
-              .catch(err => alert(`Failed to save settings: \n${err}`));
+              .catch(err =>
+                clbErrorDialog.open({
+                  type: 'BackendError.',
+                  message: `Failed to save settings: \n${err}`
+                })
+              );
           };
 
           let initBrainSettings = () => {

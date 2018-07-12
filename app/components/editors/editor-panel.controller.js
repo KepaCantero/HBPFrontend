@@ -33,7 +33,6 @@
     'bbpConfig',
     'gz3d',
     'baseEventHandler',
-    'autoSaveService',
     'saveErrorsService',
     'editorsPanelService',
     'userContextService',
@@ -44,7 +43,6 @@
       bbpConfig,
       gz3d,
       baseEventHandler,
-      autoSaveService,
       saveErrorsService,
       editorsPanelService,
       userContextService
@@ -84,11 +82,7 @@
       $scope.openCallback = function() {
         // The Panel is opened
 
-        userContextService.isOwner() &&
-          autoSaveService.checkAutoSavedWork().catch(function() {
-            // auto saved data will always be the freshest data, so only load the error data if there is no autosave data or it was discarded.
-            saveErrorsService.getErrorSavedWork();
-          });
+        saveErrorsService.getErrorSavedWork();
 
         $scope.panelIsOpen = true;
         if (

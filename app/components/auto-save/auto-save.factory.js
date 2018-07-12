@@ -57,6 +57,10 @@
       return this.dirty;
     }
 
+    dispose() {
+      this.saveDebounced && this.saveDebounced.cancel();
+    }
+
     reset() {
       this.saveDebounced && this.saveDebounced.cancel();
     }

@@ -67,20 +67,6 @@ describe('Services: backendInterfaceService', function() {
     expect(serverError.displayHTTPError).toHaveBeenCalled();
   });
 
-  it('should make a PUT request on /experiment/:context_id/transfer_functions', function() {
-    var tfMock = ['someTF1', 'someTF2'];
-    $httpBackend
-      .expectPUT(
-        simulationInfo.serverBaseUrl +
-          '/experiment/' +
-          simulationInfo.experimentID +
-          '/transfer-functions'
-      )
-      .respond(200);
-    backendInterfaceService.saveTransferFunctions(tfMock);
-    $httpBackend.flush();
-  });
-
   it('should call the success callback when the setTransferFunction PUT request succeeds', function() {
     $httpBackend.whenPUT(urlRegex).respond(200);
     var callback = jasmine.createSpy('callback');
@@ -144,38 +130,10 @@ describe('Services: backendInterfaceService', function() {
     expect(callback).toHaveBeenCalled();
   });
 
-  it('should call the success callback when the setStructuredTransferFunction PUT request succeeds', function() {
-    $httpBackend.whenPUT(urlRegex).respond(200);
-    var callback = jasmine.createSpy('callback');
-    backendInterfaceService.setStructuredTransferFunction({}, callback);
-    $httpBackend.flush();
-    expect(callback).toHaveBeenCalled();
-  });
-
-  it('should call the failure callback when the setStructuredTransferFunction PUT request fails', function() {
-    $httpBackend.whenPUT(urlRegex).respond(500);
-    var callback = jasmine.createSpy('callback');
-    backendInterfaceService.setStructuredTransferFunction(
-      {},
-      function() {},
-      callback
-    );
-    $httpBackend.flush();
-    expect(callback).toHaveBeenCalled();
-  });
-
   it('should call the success callback when the getTransferFunctions GET request succeeds', function() {
     $httpBackend.whenGET(urlRegex).respond(200);
     var callback = jasmine.createSpy('callback');
     backendInterfaceService.getTransferFunctions(callback);
-    $httpBackend.flush();
-    expect(callback).toHaveBeenCalled();
-  });
-
-  it('should call the success callback when the getStructuredTransferFunctions GET request succeeds', function() {
-    $httpBackend.whenGET(urlRegex).respond(200);
-    var callback = jasmine.createSpy('callback');
-    backendInterfaceService.getStructuredTransferFunctions(callback);
     $httpBackend.flush();
     expect(callback).toHaveBeenCalled();
   });
@@ -194,15 +152,6 @@ describe('Services: backendInterfaceService', function() {
     backendInterfaceService.getTopics(callback);
     $httpBackend.flush();
     expect(callback).toHaveBeenCalled();
-  });
-
-  it('should call serverError.displayHTTPError when the saveTransferFunctions PUT request fails', function() {
-    $httpBackend.whenPUT(urlRegex).respond(500);
-    backendInterfaceService.saveTransferFunctions(
-      '97923877-13ea-4b43-ac31-6b79e130d344'
-    );
-    $httpBackend.flush();
-    expect(serverError.displayHTTPError).toHaveBeenCalled();
   });
 
   it('should call /simulation/:sim_id/reset with the right params when calling reset from a given simulation', function() {

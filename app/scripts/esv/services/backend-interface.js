@@ -134,22 +134,6 @@
         );
       };
 
-      var resourceStructuredTransferFunctions = function(backendBaseUrl) {
-        return $resource(
-          backendBaseUrl +
-            '/simulation/:sim_id/simulation-structured-transfer-functions',
-          {},
-          {
-            get: {
-              method: 'GET',
-              interceptor: { responseError: serverError.displayHTTPError }
-            },
-            patch: {
-              method: 'PUT'
-            }
-          }
-        );
-      };
       var resourceTopics = function(backendBaseUrl) {
         return $resource(
           backendBaseUrl + '/simulation/topics',
@@ -227,19 +211,6 @@
               interceptor: {
                 responseError: _.curry(serverError.displayHTTPError)(_, true)
               }
-            }
-          }
-        );
-      };
-
-      var resourceTransferFunctionExperiment = function(backendBaseUrl) {
-        return $resource(
-          backendBaseUrl + '/experiment/:experimentId/transfer-functions',
-          {},
-          {
-            save: {
-              method: 'PUT',
-              interceptor: { responseError: serverError.displayHTTPError }
             }
           }
         );
@@ -344,24 +315,6 @@
             callback
           );
         },
-        saveTransferFunctions: function(
-          transferFunctions,
-          successCallback,
-          errorCallback
-        ) {
-          var data = {
-            experimentId: simulationInfo.experimentID,
-            transfer_functions: transferFunctions
-          };
-          return resourceTransferFunctionExperiment(
-            simulationInfo.serverBaseUrl
-          ).save(
-            { experimentId: simulationInfo.experimentID },
-            data,
-            successCallback,
-            errorCallback
-          );
-        },
         saveCSVRecordersFiles: function(successCallback, errorCallback) {
           resourceCSVRecordesFiles(simulationInfo.serverBaseUrl).dump(
             {
@@ -444,16 +397,6 @@
             callback
           ).$promise;
         },
-        getStructuredTransferFunctions: function(callback) {
-          return resourceStructuredTransferFunctions(
-            simulationInfo.serverBaseUrl
-          ).get(
-            {
-              sim_id: simulationInfo.simulationID
-            },
-            callback
-          ).$promise;
-        },
         setActivateTransferFunction: function(
           name,
           data,
@@ -501,22 +444,6 @@
             successCallback,
             errorCallback
           );
-        },
-        setStructuredTransferFunction: function(
-          data,
-          successCallback,
-          errorCallback
-        ) {
-          return resourceStructuredTransferFunctions(
-            simulationInfo.serverBaseUrl
-          ).patch(
-            {
-              sim_id: simulationInfo.simulationID
-            },
-            data,
-            successCallback,
-            errorCallback
-          ).$promise;
         },
         resetCollab: function(resetData, successCallback, errorCallback) {
           return resourceResetCollab(simulationInfo.serverBaseUrl).reset(

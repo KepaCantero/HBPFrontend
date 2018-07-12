@@ -167,6 +167,14 @@
             method: 'PUT',
             url: `${this.EXPERIMENT_BASE_URL}/:experimentId/stateMachines`,
             transformRequest: []
+          }),
+          getTransferFunctions: buildAction({
+            url: `${this.EXPERIMENT_BASE_URL}/:experimentId/transferFunctions`
+          }),
+          saveTransferFunctions: buildAction({
+            method: 'PUT',
+            url: `${this.EXPERIMENT_BASE_URL}/:experimentId/transferFunctions`,
+            transformRequest: []
           })
         }
       );
@@ -308,6 +316,17 @@
       return this.proxyRsc.saveStateMachines(
         { experimentId },
         JSON.stringify({ stateMachines })
+      ).$promise;
+    }
+
+    getTransferFunctions(experimentId) {
+      return this.proxyRsc.getTransferFunctions({ experimentId }).$promise;
+    }
+
+    saveTransferFunctions(experimentId, transferFunctions) {
+      return this.proxyRsc.saveTransferFunctions(
+        { experimentId },
+        JSON.stringify({ transferFunctions })
       ).$promise;
     }
   }

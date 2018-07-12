@@ -30,12 +30,7 @@
         templateUrl:
           'components/editors/transfer-function-editor/transfer-function-editor-buttons.template.html',
         restrict: 'E',
-        scope: true,
-        link: function(scope, element, attrs) {
-          scope.createTf = function() {
-            scope.create(attrs.appendAtEnd);
-          };
-        }
+        scope: true
       };
     }
   ]);

@@ -1,5 +1,5 @@
 'use strict';
-
+/* eslint-disable camelcase */
 describe('Directive: transferFunctionEditor', function() {
   var $rootScope,
     $compile,
@@ -17,10 +17,10 @@ describe('Directive: transferFunctionEditor', function() {
     RESET_TYPE,
     downloadFileService,
     codeEditorsServices,
-    clbErrorDialog,
     $httpBackend,
-    registerFoundAutoSavedCallback,
-    clbConfirmMock;
+    clbConfirmMock,
+    storageServer,
+    whenConvertRawTfToStructured;
 
   var shouldUseErrorCallback = false;
 
@@ -33,13 +33,9 @@ describe('Directive: transferFunctionEditor', function() {
     getPopulations: jasmine
       .createSpy('getPopulations')
       .and.callFake(() => window.$q.resolve()),
-    getStructuredTransferFunctions: jasmine.createSpy(
-      'getStructuredTransferFunctions'
-    ),
-    getTransferFunctions: function(callback) {
-      callback(getTransferFunctionResponse);
-      return window.$q.resolve();
-    },
+    getTransferFunctions: jasmine
+      .createSpy('back_getTransferFunctions')
+      .and.callFake(() => window.$q.resolve(getTransferFunctionResponse)),
     setStructuredTransferFunction: jasmine
       .createSpy('setStructuredTransferFunction')
       .and.callFake(() => window.$q.resolve()),
@@ -58,7 +54,6 @@ describe('Directive: transferFunctionEditor', function() {
       .and.callFake(() => window.$q.resolve()),
     deleteTransferFunction: jasmine.createSpy('deleteTransferFunction'),
     getServerBaseUrl: jasmine.createSpy('getServerBaseUrl'),
-    saveTransferFunctions: jasmine.createSpy('saveTransferFunctions'),
     getTopics: jasmine.createSpy('getTopics'),
     saveCSVRecordersFiles: jasmine.createSpy('backendInterfaceServiceMock')
   };
@@ -92,6 +87,7 @@ describe('Directive: transferFunctionEditor', function() {
   beforeEach(module('exd.templates')); // import html template
   beforeEach(module('currentStateMockFactory'));
   beforeEach(module('simulationInfoMock'));
+  beforeEach(module('storageServerMock'));
   beforeEach(
     module(function($provide) {
       $provide.value('backendInterfaceService', backendInterfaceServiceMock);
@@ -140,11 +136,9 @@ describe('Directive: transferFunctionEditor', function() {
       _RESET_TYPE_,
       _downloadFileService_,
       _codeEditorsServices_,
-      _clbErrorDialog_,
-      _autoSaveService_
+      _storageServer_
     ) {
       $httpBackend = _$httpBackend_;
-      clbErrorDialog = _clbErrorDialog_;
       codeEditorsServices = _codeEditorsServices_;
       downloadFileService = _downloadFileService_;
       $rootScope = _$rootScope_;
@@ -162,11 +156,14 @@ describe('Directive: transferFunctionEditor', function() {
       editorMock.removeLineClass = jasmine.createSpy('removeLineClass');
       pythonCodeHelper = _pythonCodeHelper_;
       ScriptObject = pythonCodeHelper.ScriptObject;
-      registerFoundAutoSavedCallback = spyOn(
-        _autoSaveService_,
-        'registerFoundAutoSavedCallback'
-      );
+      storageServer = _storageServer_;
 
+      storageServer.getTransferFunctions.and.returnValue(
+        window.$q.resolve(getTransferFunctionResponse)
+      );
+      let debounced = jasmine.createSpy('saveTFs');
+      debounced.cancel = angular.noop;
+      spyOn(_, 'debounce').and.returnValue(debounced);
       $scope = $rootScope.$new();
       $templateCache.put('views/esv/transfer-function-editor.html', '');
       $scope.control = {};
@@ -176,6 +173,18 @@ describe('Directive: transferFunctionEditor', function() {
       $scope.$digest();
       isolateScope = element.isolateScope();
       transferFunctions = isolateScope.transferFunctions;
+
+      whenConvertRawTfToStructured = $httpBackend.whenPUT(
+        'http://bbpce016.epfl.ch:8080/simulation/mocked_simulation_id/convert-raw-tf-to-structured'
+      );
+
+      whenConvertRawTfToStructured.respond(200, {
+        structuredScript: {
+          name: 'tf1',
+          code: 'return 42',
+          devices: []
+        }
+      });
     })
   );
 
@@ -192,9 +201,9 @@ describe('Directive: transferFunctionEditor', function() {
     $scope.control.refresh();
     expect(isolateScope.populations).toEqual([]);
     expect(isolateScope.topics).toEqual([]);
-    expect(
-      backendInterfaceService.getStructuredTransferFunctions
-    ).toHaveBeenCalled();
+    $rootScope.$digest();
+    expect(storageServer.getTransferFunctions).toHaveBeenCalled();
+    expect(backendInterfaceService.getTransferFunctions).toHaveBeenCalled();
   });
 
   it('should populate the populations', function() {
@@ -205,6 +214,13 @@ describe('Directive: transferFunctionEditor', function() {
   it('should populate the topics', function() {
     $scope.control.refresh();
     expect(backendInterfaceService.getTopics).toHaveBeenCalled();
+  });
+
+  it('should populate the topics', function() {
+    spyOn(isolateScope, 'refresh');
+    isolateScope.$broadcast('UPDATE_PANEL_UI');
+    isolateScope.$digest();
+    expect(isolateScope.refresh).toHaveBeenCalled();
   });
 
   it('should print populations nicely', function() {
@@ -259,73 +275,6 @@ describe('Directive: transferFunctionEditor', function() {
     expect(isolateScope.transferFunction).toBeNull();
     isolateScope.apply();
     isolateScope.delete();
-  });
-
-  it('loads transfer functions correctly', function() {
-    isolateScope.transferFunction = { name: 'tf1', code: 'return 42' };
-    isolateScope.transferFunctions = [isolateScope.transferFunction];
-    /* eslint-disable camelcase*/
-    isolateScope.loadTransferFunctions({
-      transferFunctions: [
-        {
-          name: 'tf1',
-          type: 1,
-          devices: [0, 8, 15],
-          topics: [
-            {
-              name: 'sub'
-            }
-          ],
-          variables: [
-            {
-              type: 'csv',
-              initial_value:
-                '{"filename":"results.csv", "headers": ["Name", "Value"]}'
-            }
-          ],
-          code: 'pass',
-          rawCode: `@nrp.Robot2Neuron()
-def tf1(t):
-    pass)`
-        },
-        {
-          name: 'tf2',
-          type: 2,
-          devices: [],
-          variables: [],
-          topics: [
-            {
-              name: '__return__'
-            }
-          ],
-          code: 'raise Exception()',
-          rawCode: `@nrp.Robot2Neuron()
-    def tf2(t):
-        raise Exception()`
-        }
-      ]
-    });
-    expect(isolateScope.transferFunctions.length).toEqual(3);
-    expect(isolateScope.transferFunctions[0].devices).toEqual([0, 8, 15]);
-    expect(isolateScope.transferFunctions[0].topics).toEqual([
-      { name: 'sub', isDefault: false }
-    ]);
-    expect(isolateScope.transferFunctions[0].variables).toEqual([
-      {
-        type: 'csv',
-        initial_value:
-          '{"filename":"results.csv", "headers": ["Name", "Value"]}',
-        headers: ['Name', 'Value'],
-        filename: 'results.csv'
-      }
-    ]);
-    expect(isolateScope.transferFunctions[0].code).toEqual('pass');
-    expect(isolateScope.transferFunctions[1].devices).toEqual([]);
-    expect(isolateScope.transferFunctions[1].topics).toEqual([
-      { name: '__return__', isDefault: true }
-    ]);
-    expect(isolateScope.transferFunctions[1].variables).toEqual([]);
-    expect(isolateScope.transferFunctions[1].code).toEqual('raise Exception()');
   });
 
   it('loads populations correctly', function() {
@@ -388,6 +337,8 @@ def tf1(t):
     beforeEach(function() {
       let tfID = 0;
       $scope.control.refresh();
+      $rootScope.$digest();
+
       expectedTf1 = new ScriptObject(tfID++, 'return 42');
       expectedTf1.type = TRANSFER_FUNCTION_TYPE.NEURON2ROBOT;
       expectedTf1.name = expectedTf1.oldName = 'tf1';
@@ -869,19 +820,6 @@ def tf1(t):
       });
     });
 
-    it(' updateCurrentTFContent should refresh its content', function() {
-      spyOn(isolateScope, 'refresh').and.callThrough();
-      spyOn(
-        isolateScope,
-        'populateTransferFunctionsWithRawCode'
-      ).and.callThrough();
-
-      isolateScope.updateCurrentTFContent();
-      expect(
-        isolateScope.populateTransferFunctionsWithRawCode
-      ).toHaveBeenCalled();
-    });
-
     it('rawToStructured should convert raw script', function() {
       var callbackHasBeenCalled = false;
       var msg = {};
@@ -899,17 +837,7 @@ def tf1(t):
         error: msg
       };
       isolateScope.transferFunctions = [isolateScope.transferFunction];
-      var structuredTransferFunction = {
-        name: 'tf1',
-        code: 'return 42',
-        devices: []
-      };
 
-      $httpBackend
-        .whenPUT(
-          'http://bbpce016.epfl.ch:8080/simulation/mocked_simulation_id/convert-raw-tf-to-structured'
-        )
-        .respond(200, { structuredScript: structuredTransferFunction });
       isolateScope.rawToStructured(tf, () => {
         callbackHasBeenCalled = true;
       });
@@ -1063,8 +991,6 @@ def tf1(t):
       isolateScope.decoratorsChangedFromUI();
       $httpBackend.flush();
 
-      console.log();
-
       expect(isolateScope.transferFunction.rawCode).toBe(convertedRawCode);
     });
 
@@ -1086,6 +1012,7 @@ def tf1(t):
         type: 1,
         devices: [],
         topics: [],
+        error: {},
         variables: [],
         rawCode: `@nrp.MapCSVRecorder("recorder", filename="all_spikes.csv", headers=["id", "time"])
 @nrp.Robot2Neuron()
@@ -1094,11 +1021,9 @@ def tf1(t):
       };
       isolateScope.transferFunctions = [isolateScope.transferFunction];
 
-      $httpBackend
-        .whenPUT(
-          'http://bbpce016.epfl.ch:8080/simulation/mocked_simulation_id/convert-raw-tf-to-structured'
-        )
-        .respond(200, { structuredScript: structuredTransferFunction });
+      whenConvertRawTfToStructured.respond(200, {
+        structuredScript: structuredTransferFunction
+      });
 
       isolateScope.contentChanged();
       $timeout.flush();
@@ -1187,12 +1112,6 @@ def tf2(t):
       expect(isolateScope.transferFunction.local).toBeTruthy();
       isolateScope.apply();
       expect(isolateScope.transferFunction.local).toBeTruthy();
-    });
-
-    it('populateTransferFunctionsWithRawCode should populate raw function', function() {
-      isolateScope.populateTransferFunctionsWithRawCode();
-      let tfs = isolateScope.transferFunctions;
-      expect(tfs[0].rawCode).toBe('pass');
     });
 
     it('should decide on a tf type correctly', function() {
@@ -1328,45 +1247,11 @@ def tf2(t):
       $timeout.flush();
     });
 
-    it('should correctly saveTFIntoCollabStorage with rawscript', function() {
-      expect(isolateScope.isSavingToCollab).toEqual(false);
-      isolateScope.saveTFIntoCollabStorage();
-
-      // isolateScope.$apply;
-
-      expect(
-        backendInterfaceService.saveTransferFunctions
-      ).toHaveBeenCalledWith(
-        _.map(isolateScope.transferFunctions, 'rawCode'),
-        jasmine.any(Function),
-        jasmine.any(Function)
-      );
-
-      expect(isolateScope.isSavingToCollab).toEqual(true);
-      backendInterfaceService.saveTransferFunctions.calls.argsFor(0)[1]();
-      expect(isolateScope.isSavingToCollab).toBe(false);
-      isolateScope.isSavingToCollab = true;
-
-      spyOn(clbErrorDialog, 'open');
-      backendInterfaceService.saveTransferFunctions.calls.argsFor(0)[2]();
-      expect(isolateScope.isSavingToCollab).toBe(false);
-      expect(clbErrorDialog.open).toHaveBeenCalled();
-      clbErrorDialog.open.calls.reset();
-    });
-
-    it('should correctly saveTFIntoCollabStorage with script', function() {
-      expect(isolateScope.isSavingToCollab).toEqual(false);
-      isolateScope.saveTFIntoCollabStorage();
-
-      isolateScope.$apply();
-
-      expect(
-        backendInterfaceService.saveTransferFunctions
-      ).toHaveBeenCalledWith(
-        _.map(isolateScope.transferFunctions, 'rawCode'),
-        jasmine.any(Function),
-        jasmine.any(Function)
-      );
+    it('should correctly saveTFIntoCollabStorage', function() {
+      isolateScope.setDirty(isolateScope.transferFunctions[0]);
+      expect(_.debounce).toHaveBeenCalled();
+      _.debounce.calls.mostRecent().args[0]();
+      isolateScope.$digest();
     });
 
     it('should set the saving flag correctly if csv saving succeed', function() {
@@ -1393,13 +1278,6 @@ def tf2(t):
         .mostRecent()
         .args[1]();
       expect(isolateScope.isSavingCSVToCollab).toBe(false);
-    });
-
-    it('autosave should call callback if autosave work found', function() {
-      const data = [{ name: 'tf1', error: {} }];
-      registerFoundAutoSavedCallback.calls.first().args[1](data, false);
-
-      expect(isolateScope.transferFunctions[0].name).toBe('tf1');
     });
 
     it('should support toggleActive', function() {
