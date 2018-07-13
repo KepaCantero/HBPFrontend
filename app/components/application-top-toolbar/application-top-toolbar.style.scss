@@ -28,8 +28,12 @@ $application-top-toolbar-height: 5%;
 
 .application-top-toolbar-wrapper {
   .application-top-toolbar {
-    box-shadow: 0px 5px 5px grey;
-
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.22);
+    background: linear-gradient(to right bottom, #f1f1f1, #f3f3f3);
+    min-height: 5%;
+    border-bottom-width: 1px;
+    border-bottom-style: solid;
+    border-bottom-color: #bbbbbb;
     min-height: $application-top-toolbar-height;
 
     .md-toolbar-tools {
