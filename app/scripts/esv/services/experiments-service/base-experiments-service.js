@@ -54,10 +54,28 @@
 
     syncExperimentsList(exps) {
       exps.forEach(exp => {
-        if (!this.experimentsDict[exp.id]) {
+        let expd = this.experimentsDict[exp.id];
+        let conf = Boolean(expd && expd.configuration);
+        if (!expd) {
           this.experimentsDict[exp.id] = exp;
           this.experimentsArray.push(exp);
+          // Users may have changed configuration files in storage's experiment folders
+        } else if (
+          conf &&
+          (!exp.configuration.experimentFile ||
+            !expd.configuration.experimentFile)
+        ) {
+          expd.configuration = exp.configuration;
+          expd.imageUrl = exp.configuration.experimentFile
+            ? exp.imageUrl
+            : undefined;
+        } else if (
+          conf &&
+          (!exp.configuration.bibiConfSrc || !expd.configuration.bibiConfSrc)
+        ) {
+          expd.configuration.bibiConfSrc = exp.configuration.bibiConfSrc;
         }
+
         let cachedExp = this.experimentsDict[exp.id];
         cachedExp.onlyLocalServers = exp.availableServers.every(
           s => s.serverJobLocation === 'local'
@@ -66,7 +84,17 @@
           prop => (cachedExp[prop] = exp[prop])
         );
       });
-      this.experimentsDefered.resolve(this.experimentsArray);
+
+      let expIds = exps.map(experiment => experiment.id);
+      this.experimentsArray = this.experimentsArray.filter(
+        experiment => expIds.indexOf(experiment.id) !== -1
+      );
+      this.experimentsDict = _.pickBy(
+        this.experimentsDict,
+        (value, key) => expIds.indexOf(key) !== -1
+      );
+
+      this.experimentsDefered.notify(this.experimentsArray);
     }
 
     updateMissingImages() {

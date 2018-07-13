@@ -44,6 +44,8 @@
           scope.experimentsService = scope.experimentsFactory.createExperimentsService();
           scope.experimentsService.initialize();
           scope.experimentsService.experiments.then(
+            null,
+            null,
             experiments => (scope.experiments = experiments)
           );
         }

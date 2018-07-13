@@ -25,6 +25,7 @@
   };
 
   var defaultPageOptions = {
+    tab: 'CloneExperiment', // This means 'Template Experiments' tab
     dev: false,
     collab: false,
     slurm: {
@@ -74,6 +75,15 @@
         ]
       }
     }
+  };
+
+  var expConfigMock = {
+    thumbnail: 'nail.jpg',
+    description: 'None',
+    name: 'Anonymous',
+    experimentFile: '<ExD>My Experiment </ExD>',
+    bibiConfSrc: 'conf.bibi',
+    timeout: 600
   };
 
   describe('Controller: esvExperimentsCtrl', function() {
@@ -187,7 +197,6 @@
       var slurmUrl = bbpConfig.get('api.slurmmonitor.url');
 
       var pageOptions = _.defaults({}, options, defaultPageOptions);
-      //var experimentIds = _.map(pageOptions.experiments, function (val, key) { return key; });
 
       if (pageOptions.dev) {
         spyOn($location, 'search').and.returnValue({ dev: true });
@@ -217,6 +226,9 @@
         .whenGET(proxyUrl + '/identity/me/groups')
         .respond(200, pageOptions.groups);
       $httpBackend.whenGET(/api\/collab\/configuration/).respond(200);
+      spyOn(storageServer, 'getExperimentConfig').and.returnValue(
+        $q.when(expConfigMock)
+      );
 
       let $ctrl = $controller('esvExperimentsCtrl', {
         $rootScope: $rootScope,
@@ -227,10 +239,11 @@
       });
 
       $rootScope.$ctrl = $ctrl;
+      if (pageOptions.tab) {
+        $rootScope.tabSelection = pageOptions.tab;
+      }
       var template = $templateCache.get('views/esv/esv-experiments.html');
       var page = $compile(template)($rootScope);
-
-      if (!pageOptions.collab) $rootScope.tabSelection = 'CloneExperiment';
 
       $rootScope.$digest();
       $timeout.flush();
@@ -462,7 +475,15 @@
     }
 
     it('should allow launching when available servers', function() {
-      var page = renderEsvWebPage({ dev: true });
+      $httpBackend
+        .whenGET(new RegExp(proxyUrl + '/joinableServers/'))
+        .respond(200, []);
+
+      spyOn(storageServer, 'getExperiments').and.returnValue(
+        $q.when([{ uuid: 'fakeUUID' }])
+      );
+      spyOn(storageServer, 'getBase64Content').and.returnValue($q.when({}));
+      var page = renderEsvWebPage({ dev: true, tab: 'MyExperiments' });
       page
         .find('.experiment-box')
         .last()
@@ -480,7 +501,14 @@
     });
 
     it('should trigger the right requests when launching an experiment', function() {
-      var page = renderEsvWebPage();
+      $httpBackend
+        .whenGET(new RegExp(proxyUrl + '/joinableServers/'))
+        .respond(200, []);
+      spyOn(storageServer, 'getExperiments').and.returnValue(
+        $q.when([{ uuid: 'matureExperiment' }])
+      );
+      spyOn(storageServer, 'getBase64Content').and.returnValue($q.when());
+      var page = renderEsvWebPage({ tab: 'MyExperiments' });
       page
         .find('.experiment-box')
         .last()
@@ -635,7 +663,15 @@
 
     describe('esvExperimentsCtrl without a context id', function() {
       it('should show the right buttons', function() {
-        var page = renderEsvWebPage();
+        $httpBackend
+          .whenGET(new RegExp(proxyUrl + '/joinableServers/'))
+          .respond(200, []);
+        spyOn(storageServer, 'getExperiments').and.returnValue(
+          $q.when([{ uuid: 'fakeUUID' }])
+        );
+        spyOn(storageServer, 'getBase64Content').and.returnValue($q.when());
+
+        var page = renderEsvWebPage({ tab: 'MyExperiments' });
         page
           .find('.experiment-box')
           .last()
@@ -762,7 +798,7 @@
         });
 
         it('should clone a cloned experiment successfully', function() {
-          var page = renderEsvWebPage();
+          var page = renderEsvWebPage({ tab: 'MyExperiments' });
           var scope = getExperimentListScope(page);
           spyOn(storageServer, 'cloneClonedExperiment').and.returnValue(
             $q.when({ clonedExp: 'fakeUUID', originalExp: 'fake_uuid' })
@@ -800,16 +836,12 @@
           );
           spyOn(storageServer, 'setFileContent').and.returnValue($q.when());
           scope.clone('Exp_0');
-          //expect(scope.cloneClonedExperiment).toHaveBeenCalled();
         });
 
         it('should call the clone with the correct parameters (cloneTemplate)', function() {
           var page = renderEsvWebPage();
           var scope = getExperimentListScope(page);
           scope.config.canLaunchExperiments = false;
-          // spyOn(collabConfigService, 'clone').and.returnValue(
-          //   $q.when({ clonedExp: 'fakeUUID', originalExp: 'fake_uuid' })
-          // );
           spyOn(scope, 'cloneExperiment');
           scope.clone('Exp_0');
           expect(scope.cloneExperiment).toHaveBeenCalled();
@@ -842,25 +874,13 @@
           $httpBackend
             .whenGET(new RegExp(proxyUrl + '/joinableServers/'))
             .respond(200, []);
-          $httpBackend
-            .whenGET(new RegExp(proxyUrl + '/availableServers/'))
-            .respond(200, matureExperiment.availableServers);
+
           spyOn(storageServer, 'getExperiments').and.returnValue(
-            $q.when([{ uuid: 'fakeUUID' }])
+            $q.when([{ uuid: 'fakeUUID' }, { uuid: 'dummyUUID' }])
           );
-          spyOn(storageServer, 'getFileContent').and.returnValue(
-            $q.when({
-              uuid: 'fakeUUID',
-              data:
-                '<xml><name>Name</name><thumbnail>thumbnail.png</thumbnail>\
-                <description>Desc</description><timeout>840.0</timeout>\
-                <bibiConf src="file.bibi"/>\
-                </xml>'
-            })
+          spyOn(storageServer, 'getBase64Content').and.returnValue(
+            window.$q.when()
           );
-          $httpBackend
-            .whenGET('http://proxy/storage/fakeUUID/thumbnail.png?byname=true')
-            .respond(new Blob());
         });
 
         it('should select first experiment if only one experiment is shown', function() {
@@ -908,14 +928,14 @@
           scope.selectExpFromFileExplorer();
           expect(scope.selectExperiment).toHaveBeenCalled();
         });
-        it('should only show the launch button when the experiment exists in collab', function() {
-          var page = renderEsvWebPage({ collab: true });
 
+        it('should only show the launch button when the experiment exists in collab', function() {
+          var page = renderEsvWebPage({ collab: true, tab: 'MyExperiments' });
           page
             .find('.experiment-box')
             .last()
             .click();
-          checkButtonsVisibility(page, { launch: 2, clone: 1 });
+          checkButtonsVisibility(page, { launch: 1, clone: 1 });
         });
       });
     });

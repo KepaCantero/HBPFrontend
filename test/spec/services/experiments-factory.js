@@ -169,11 +169,6 @@ describe('Services: experimentsFactory', function() {
       expect(experiments[0].configuration.timeout).toBe(100);
     });
     scope.$apply();
-    expect(storageServer.getFileContent).toHaveBeenCalledWith(
-      'folder_id',
-      'experiment_configuration.exc',
-      true
-    );
   });
 
   it('experiment xml should be stored', function() {

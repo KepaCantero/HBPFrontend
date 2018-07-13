@@ -170,7 +170,6 @@
       var slurmUrl = bbpConfig.get('api.slurmmonitor.url');
 
       var pageOptions = _.defaults({}, options, defaultPageOptions);
-      //var experimentIds = _.map(pageOptions.experiments, function (val, key) { return key; });
 
       if (pageOptions.dev) {
         spyOn($location, 'search').and.returnValue({ dev: true });
@@ -254,7 +253,7 @@
 
       renderDemoWebPage();
       $rootScope.vm.launchExperiment();
-      $rootScope.vm.joiningExperiment = false;
+      $rootScope.vm.cancelLaunch();
 
       $httpBackend.flush();
       $timeout.flush(2000);

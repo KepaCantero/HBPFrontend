@@ -32,9 +32,13 @@
         <img class="entity-thumbnail" ng-src="{{exp.imageUrl || ''}}" />
       </div>
       <div class="list-entry-middle list-entry-container up-down">
+        <div ng-show="exp.configuration.privateStorage && (!exp.configuration.experimentFile || !exp.configuration.bibiConfSrc)" class="alert alert-danger" role="alert">
+            <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+            Missing configuration file: <b>{{exp.configuration.experimentFile?'.bibi':'.exc'}}</b> file not found.
+        </div>
         <div class="list-entry-container left-right title-line">
           <div class="h4" ng-hide="!loadingEdit && editing[nameID] && isPrivateExperiment">{{exp.configuration.name}}
-            <a ng-if="exp.id == pageState.selected" style="font-size:15px;" name="edit-button" class="glyphicon glyphicon-pencil" href="javascript:void(0);"
+            <a ng-if="exp.id == pageState.selected && exp.configuration.experimentFile" style="font-size:15px;" name="edit-button" class="glyphicon glyphicon-pencil" href="javascript:void(0);"
               ng-show="!running && isPrivateExperiment && (!editing[nameID] && !editing[descID]) && (config.canCloneExperiments && config.canLaunchExperiments) && !pageState.deletingExperiment" id="edit-button"
               v-busy="loadingEdit" ng-click="editExperiment(nameID);"></a>
           </div>
@@ -48,7 +52,7 @@
         </div>
         <div ng-if="exp.id == pageState.selected" ng-show="!isPrivateExperiment || (config.canCloneExperiments && !config.canLaunchExperiments)">{{exp.configuration.description}}</div>
         <div ng-if="exp.id == pageState.selected" ng-hide="!private || (editing[descID] && !loadingEdit)">{{exp.configuration.description}}
-          <a style="font-size:15px;" name="edit-button" class="glyphicon glyphicon-pencil" href="javascript:void(0);" ng-show="!running && isPrivateExperiment && (!editing[nameID] && !editing[descID]) && !pageState.deletingExperiment"
+          <a style="font-size:15px;" name="edit-button" class="glyphicon glyphicon-pencil" href="javascript:void(0);" ng-show="exp.configuration.experimentFile && !running && isPrivateExperiment && (!editing[nameID] && !editing[descID]) && !pageState.deletingExperiment"
             v-busy="loadingEdit" ng-click="editExperiment(descID);"></a>
         </div>
         <form ng-show="editing[descID] && isPrivateExperiment && !loadingEdit">
@@ -106,45 +110,55 @@
         <div ng-show="!running" class="list-entry-buttons list-entry-container center" ng-if="exp.id == pageState.selected">
           <div class="btn-group" role="group" ng-hide="editing[nameID] || editing[descID] || loadingEdit">
             <!-- Servers are available and the user has edit rights: launch button enabled -->
-            <button analytics-on analytics-event="Launch" analytics-category="Experiment" ng-if="config.canLaunchExperiments && exp.availableServers.length > 0"
+            <button analytics-on analytics-event="Launch" analytics-category="Experiment" 
+             ng-if="config.canLaunchExperiments && exp.availableServers.length > 0 && 
+              exp.configuration.experimentFile && exp.configuration.bibiConfSrc"
               class="btn btn-default" ng-click="pageState.startingExperiment == exp.id || startNewExperiment(exp, false);"
               ng-disabled="pageState.startingExperiment == exp.id || pageState.deletingExperiment">
-          <i class="fa fa-plus"></i> Launch
-        </button>
+              <i class="fa fa-plus"></i> Launch
+            </button>
 
-        <!-- No server available but the user has edit rights: launch button disabled -->
-        <button ng-if="config.canLaunchExperiments && exp.availableServers.length == 0" class="btn btn-default disabled enable-tooltip"
-              title="Sorry, no available servers.">
-          <i class="fa fa-plus"></i> Launch
-        </button>
+            <!-- No server available but the user has edit rights: launch button disabled -->
+            <button ng-if="config.canLaunchExperiments && exp.availableServers.length == 0" class="btn btn-default disabled enable-tooltip"
+                  title="Sorry, no available servers.">
+              <i class="fa fa-plus"></i> Launch
+            </button>
 
-        <!-- Option to Launch in Single Process Mode -->
-        <button ng-if="config.canLaunchExperiments && exp.configuration.brainProcesses > 1 && exp.availableServers.length > 0"
-              class="btn btn-default" ng-click="pageState.startingExperiment == exp.id || startNewExperiment(exp, true);" ng-disabled="pageState.startingExperiment == exp.id">
-          <i class="fa fa-plus"></i> Launch in Single Process Mode
-        </button>
+            <!-- Option to Launch in Single Process Mode -->
+            <button ng-if="config.canLaunchExperiments && exp.configuration.brainProcesses > 1 && exp.availableServers.length > 0 && 
+              exp.configuration.experimentFile && exp.configuration.bibiConfSrc"
+                  class="btn btn-default" 
+                  ng-click="pageState.startingExperiment == exp.id || startNewExperiment(exp, true);" 
+                  ng-disabled="pageState.startingExperiment == exp.id">
+              <i class="fa fa-plus"></i> Launch in Single Process Mode
+            </button>
 
-        <button analytics-on analytics-event="Launch" analytics-category="Experiment" ng-if="isPrivateExperiment && config.canLaunchExperiments"
-          class="btn btn-default" ng-click="deleteExperiment(exp.id)" ng-disabled = "pageState.deletingExperiment || pageState.startingExperiment == exp.id  || (config.canLaunchExperiments && exp.joinableServers.length > 0)">
-         <i class="fa fa-times"></i> Delete
-        </button>
+            <!-- Delete button -->
+            <button analytics-on analytics-event="Delete" analytics-category="Experiment" ng-if="isPrivateExperiment && config.canLaunchExperiments"
+              class="btn btn-default" ng-click="deleteExperiment(exp.id)" ng-disabled = "pageState.deletingExperiment || pageState.startingExperiment == exp.id  || 
+              (config.canLaunchExperiments && exp.joinableServers.length > 0)">
+            <i class="fa fa-times"></i> Delete
+            </button>
 
-        <!-- Join button -->
-        <button analytics-on analytics-event="Join" analytics-category="Experiment" ng-if="config.canLaunchExperiments && exp.joinableServers.length > 0"
-              class="btn btn-default" ng-disabled="pageState.startingExperiment" ng-click="pageState.showJoin = !pageState.showJoin">
-          <i class="fa fa-sign-in"></i> Simulations »
-        </button>
+            <!-- Join button -->
+            <button analytics-on analytics-event="Join" analytics-category="Experiment" ng-if="config.canLaunchExperiments && exp.joinableServers.length > 0"
+                  class="btn btn-default" ng-disabled="pageState.startingExperiment" ng-click="pageState.showJoin = !pageState.showJoin">
+              <i class="fa fa-sign-in"></i> Simulations »
+            </button>
 
-        <button ng-if="config.canCloneExperiments" analytics-on analytics-event="Clone" class="btn btn-default"
-              analytics-label="Collab" analytics-value="exp.id" class="btn btn-default" ng-click="clone(exp)"
-              ng-disabled="isCloneRequested || pageState.deletingExperiment">
-          <i class="fa fa-pencil"></i> Clone
-        </button>
-        <button ng-if="config.canLaunchExperiments" analytics-on analytics-event="Explorer" class="btn btn-default"
-          analytics-label="Collab" analytics-value="exp.id" class="btn btn-default" ng-click="exploreExpFiles(exp)">
+            <!-- Clone button -->
+            <button ng-if="config.canCloneExperiments && (!exp.configuration.privateStorage || (exp.configuration.experimentFile && exp.configuration.bibiConfSrc))" analytics-on analytics-event="Clone" class="btn btn-default"
+                  analytics-label="Collab" analytics-value="exp.id" class="btn btn-default" ng-click="clone(exp)"
+                  ng-disabled="isCloneRequested || pageState.deletingExperiment">
+              <i class="fa fa-pencil"></i> Clone
+            </button>
 
-          <i class="fa fa-list-alt"></i> Files
-        </button>
+            <!-- Files button -->
+            <button ng-if="config.canLaunchExperiments" analytics-on analytics-event="Explorer" class="btn btn-default"
+              analytics-label="Collab" analytics-value="exp.id" class="btn btn-default" ng-click="exploreExpFiles(exp)">
+
+              <i class="fa fa-list-alt"></i> Files
+            </button>
 
           </div>
         </div>

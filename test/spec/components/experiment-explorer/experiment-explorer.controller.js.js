@@ -124,13 +124,27 @@ describe('Controller: ExperimentExplorerController', function() {
       .whenGET(STORAGE_URL + 'experiments')
       .respond(MOCKED_DATA.experiments);
 
+    /*$httpBackend
+      .whenGET(/^http:\/\/proxy\/experiment\/.*\/config/)
+      .respond({});
+    */
     spyOn(experimentProxyService, 'getAvailableServers').and.returnValue(
       $q.when([])
     );
     spyOn(experimentProxyService, 'getJoinableServers').and.returnValue(
       $q.when([])
     );
-    spyOn(storageServer, 'getFileContent').and.returnValue(window.$q.when({}));
+
+    spyOn(storageServer, 'getBase64Content').and.returnValue($q.when());
+
+    spyOn(storageServer, 'getExperimentConfig').and.returnValue(
+      $q.when({
+        thumbnail: 'my_exp.jpg',
+        description: 'No description',
+        timeout: 100,
+        name: 'Anonymous'
+      })
+    );
 
     $rootScope.$digest();
     var controller = element.scope().vm;

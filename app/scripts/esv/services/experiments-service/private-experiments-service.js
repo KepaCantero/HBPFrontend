@@ -67,39 +67,40 @@
     }
 
     loadExperimentDetails(exp) {
-      return this.storageServer
-        .getFileContent(exp.id, 'experiment_configuration.exc', true)
-        .then(file => {
-          if (!file.uuid) return this.$q.resolve(null);
+      return this.storageServer.getExperimentConfig(exp.id).then(details => {
+        if (!details.thumbnail) {
+          console.error(
+            'Experiment details: the text content for thumbnail is missing'
+          );
+        }
 
-          let xml = $.parseXML(file.data);
-          let thumbnail = xml.getElementsByTagNameNS('*', 'thumbnail')[0];
-          let thumbnailContent;
-          if (thumbnail) thumbnailContent = thumbnail.textContent;
-          else {
-            thumbnailContent = 'No text content for thumbnail';
-            console.error(
-              'Experiment details: text content for thumbnail is missing'
-            );
-          }
+        if (!details.name) {
+          details.name = 'No name available';
+          console.error('Experiment details: the experiment name is missing');
+        }
 
-          return {
-            name: xml.getElementsByTagNameNS('*', 'name')[0].textContent,
-            description: xml.getElementsByTagNameNS('*', 'description')[0]
-              .textContent,
-            thumbnail: thumbnailContent,
-            timeout: parseInt(
-              xml.getElementsByTagNameNS('*', 'timeout')[0].textContent
-            ),
-            brainProcesses: parseInt(
-              xml
-                .getElementsByTagNameNS('*', 'bibiConf')[0]
-                .getAttribute('processes') || 1
-            ),
-            experimentFile: file.data,
-            experimentConfiguration: ''
-          };
-        });
+        if (!details.description) {
+          details.description = 'No description available';
+          console.error(
+            'Experiment details: the experiment description is missing'
+          );
+        }
+
+        if (!details.timeout) {
+          details.timeout = 'Undefined timeout value';
+          console.error('Experiment details: the timeout value is missing');
+        } else {
+          details.timeout = parseInt(details.timeout);
+        }
+
+        if (!details.brainProcesses && details.bibiConfSrc) {
+          details.brainProcesses = 1;
+        }
+
+        details.experimentConfiguration = '';
+        details.privateStorage = true;
+        return details;
+      });
     }
   }
 

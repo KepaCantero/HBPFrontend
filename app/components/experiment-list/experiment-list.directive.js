@@ -38,33 +38,7 @@
       },
       replace: true,
       controller: 'ExperimentListController',
-      controllerAs: 'vm',
-      link: scope => {
-        let filterExperiments = () => {
-          if (!scope.experiments) return;
-
-          scope.filteredExperiments = scope.experiments.filter(exp => {
-            //filter experiements that query dont match the name nor the one of the tags
-            if (scope.query) {
-              let lowerQuery = scope.query.toLowerCase();
-              if (
-                !~exp.configuration.name.toLowerCase().indexOf(lowerQuery) &&
-                (!exp.configuration.tags ||
-                  !exp.configuration.tags.some(
-                    t => t.toLowerCase().indexOf(lowerQuery) == 0
-                  ))
-              )
-                return false;
-            }
-            //filter experiements that are not mature
-            return scope.devMode || exp.configuration.maturity === 'production';
-          });
-        };
-
-        scope.$watch('query', () => filterExperiments());
-
-        scope.$watch('experiments', () => filterExperiments());
-      }
+      controllerAs: 'vm'
     })
   ]);
 })();

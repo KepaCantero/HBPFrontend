@@ -221,12 +221,39 @@
           }
         };
 
+        let filterExperiments = () => {
+          if (!$scope.experiments) return;
+
+          $scope.filteredExperiments = $scope.experiments.filter(exp => {
+            //filter out experiments whose query doesn't match the name nor any of the tags
+            if ($scope.query) {
+              let lowerQuery = $scope.query.toLowerCase();
+              if (
+                !~exp.configuration.name.toLowerCase().indexOf(lowerQuery) &&
+                (!exp.configuration.tags ||
+                  !exp.configuration.tags.some(
+                    t => t.toLowerCase().indexOf(lowerQuery) == 0
+                  ))
+              )
+                return false;
+            }
+            //filter out experiments that are not mature
+            return (
+              $scope.devMode || exp.configuration.maturity === 'production'
+            );
+          });
+        };
+
+        $scope.$watch('query', () => filterExperiments());
+
         var loadExperiments = function(loadPrivateExperiments = false) {
           var experimentsService = ($scope.experimentsService = experimentsFactory.createExperimentsService(
             loadPrivateExperiments
           ));
           experimentsService.initialize();
-          experimentsService.experiments.then(function(experiments) {
+          experimentsService.experiments.then(null, null, function(
+            experiments
+          ) {
             $scope.experiments = experiments.filter(
               exp => exp.id != 'TemplateNew'
             );
@@ -247,10 +274,11 @@
                 }
               }
             }
-
             if (experiments.length === 0) {
               $scope.experimentEmpty();
             }
+
+            filterExperiments();
           });
 
           nrpUser.getCurrentUserInfo().then(function(userinfo) {

@@ -75,7 +75,6 @@
       if (!this.joiningExperiment) {
         return;
       }
-
       if (this.experiments) {
         for (let i = 0; i < this.experiments.length; i++) {
           let exp = this.experiments[i];
@@ -114,12 +113,13 @@
       if (!this.experimentsService) {
         this.experimentsService = this.experimentsFactory.createExperimentsService();
         this.experimentsService.initialize();
-        this.experimentsService.experiments.then(
-          experiments => (this.experiments = experiments)
-        );
+        this.experimentsService.experiments.then(null, null, experiments => {
+          this.experiments = experiments;
+          this.tryJoiningExperiment();
+        });
+      } else {
+        this.tryJoiningExperiment();
       }
-
-      this.tryJoiningExperiment();
     }
 
     cancelLaunch() {
