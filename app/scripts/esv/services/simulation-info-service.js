@@ -34,9 +34,9 @@
     .factory('simulationInfo', [
       '$q',
       'experimentProxyService',
-      'experimentList',
+      'storageServer',
       'environmentService',
-      function($q, experimentProxyService, experimentList, environmentService) {
+      function($q, experimentProxyService, storageServer, environmentService) {
         let initialized = $q.defer();
         var thisService = {
           initialize: initialize,
@@ -76,13 +76,9 @@
               };
 
               if (environmentService.isPrivateExperiment()) {
-                return experimentList(thisService.serverBaseUrl).experiments(
-                  { experimentId: experimentID },
-                  function(data) {
-                    var configuration = data.data.experiment_configuration;
-                    setExperimentDetails(configuration);
-                  }
-                ).$promise;
+                return storageServer
+                  .getExperimentConfig(experimentID)
+                  .then(config => setExperimentDetails(config));
               }
 
               return experimentProxyService

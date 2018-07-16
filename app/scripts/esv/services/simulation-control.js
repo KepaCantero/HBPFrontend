@@ -239,11 +239,15 @@
     function($resource, serverError) {
       return function(baseUrl) {
         return $resource(
-          baseUrl + '/simulation/sdf_world',
+          baseUrl + '/simulation/:simId/sdf_world',
           {},
           {
             export: {
               method: 'GET',
+              interceptor: { responseError: serverError.displayHTTPError }
+            },
+            save: {
+              method: 'POST',
               interceptor: { responseError: serverError.displayHTTPError }
             }
           }
@@ -263,28 +267,6 @@
           {
             updateMaterial: {
               method: 'PUT',
-              interceptor: { responseError: serverError.displayHTTPError }
-            }
-          }
-        );
-      };
-    }
-  ]);
-
-  module.factory('experimentList', [
-    '$resource',
-    'serverError',
-    'EXPERIMENTS_GET_TIMEOUT',
-    function($resource, serverError, EXPERIMENTS_GET_TIMEOUT) {
-      return function(baseUrl) {
-        return $resource(
-          baseUrl + '/experiment/:experimentId',
-          {},
-          {
-            experiments: {
-              method: 'GET',
-              // prevent the user to wait for long time since our servers can only handle one request at a time (yet).
-              timeout: EXPERIMENTS_GET_TIMEOUT,
               interceptor: { responseError: serverError.displayHTTPError }
             }
           }

@@ -178,6 +178,10 @@
             method: 'PUT',
             url: `${this.EXPERIMENT_BASE_URL}/:experimentId/transferFunctions`,
             transformRequest: []
+          }),
+          getExperimentConfig: buildAction({
+            method: 'GET',
+            url: `${this.EXPERIMENT_BASE_URL}/:experimentId/config`
           })
         }
       );
@@ -194,6 +198,10 @@
 
     getExperiments(filter) {
       return this.proxyRsc.getExperiments({ filter }).$promise;
+    }
+
+    getExperimentConfig(experimentId) {
+      return this.proxyRsc.getExperimentConfig({ experimentId }).$promise;
     }
 
     getExperimentFiles(experimentId) {
