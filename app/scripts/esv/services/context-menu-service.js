@@ -142,23 +142,23 @@
                       $timeout(this.checkForContextMenuPosition);
                     } else {
                       if (
-                        event.clientY + target.clientHeight >
+                        event.offsetY + target.clientHeight >
                         event.view.innerHeight - 10
                       ) {
                         this.contextMenuTop =
-                          event.clientY - target.clientHeight;
+                          event.offsetY - target.clientHeight;
                       } else {
-                        this.contextMenuTop = event.clientY;
+                        this.contextMenuTop = event.offsetY;
                       }
 
                       if (
-                        event.clientX + target.clientWidth >
+                        event.offsetX + target.clientWidth >
                         event.view.innerWidth - 10
                       ) {
                         this.contextMenuLeft =
-                          event.clientX - target.clientWidth;
+                          event.offsetX - target.clientWidth;
                       } else {
-                        this.contextMenuLeft = event.clientX;
+                        this.contextMenuLeft = event.offsetX;
                       }
                     }
                   }
@@ -204,7 +204,7 @@
           },
 
           _getModelUnderMouse: function(event) {
-            var pos = new THREE.Vector2(event.clientX, event.clientY);
+            var pos = new THREE.Vector2(event.offsetX, event.offsetY);
             var intersect = new THREE.Vector3();
             var model = gz3d.scene.getRayCastModel(pos, intersect);
             if (model) {
