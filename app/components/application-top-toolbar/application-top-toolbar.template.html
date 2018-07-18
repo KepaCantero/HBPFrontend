@@ -9,11 +9,13 @@
         <md-icon ng-bind="'menu'"></md-icon>
       </md-button>
       <md-divider class="vertical-divider" ng-show="vm.experimentViewService.isInSimulationView()"></md-divider>
-      <md-button class="md-icon-button" aria-label="Exit" ng-show="vm.experimentViewService.isInSimulationView()"
+      <md-button class="md-icon-button" aria-label="Exit" help-tooltip="EXIT_BUTTON"
+                ng-show="vm.experimentViewService.isInSimulationView()"
                  ng-click="vm.onButtonExit()">
         <md-icon ng-bind="'exit_to_app'" class="att-md-icon-size"></md-icon>
       </md-button>
-      <md-button class="md-icon-button" aria-label="Reset" ng-show="vm.experimentViewService.isInSimulationView()"
+      <md-button class="md-icon-button" aria-label="Reset" help-tooltip="RESET_BUTTON"
+                 ng-show="vm.experimentViewService.isInSimulationView()"
                  ng-click="vm.onButtonReset()">
         <md-icon ng-bind="'replay'"></md-icon>
       </md-button>
