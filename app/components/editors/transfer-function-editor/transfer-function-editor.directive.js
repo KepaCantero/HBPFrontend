@@ -705,9 +705,17 @@ def {0}(t):
             };
 
             let getTfCodeName = tfCode => {
-              let tfName = /def +([^\\(]*)/gm.exec(tfCode);
+              let tfName = /def +([^\\( ]*)/gm.exec(tfCode);
               if (tfName) tfName = tfName[1];
               return tfName;
+            };
+
+            let addNewTf = (tfName, tfCode, active) => {
+              let tf = createTf(tfName, tfCode, active && active[tfName]);
+              scope.transferFunctions.push(tf);
+              return $q
+                .all([tf, structureTfCode(tfName, tfCode)])
+                .then(args => decorateTf(...args));
             };
 
             let reloadTfs = () => {
@@ -724,16 +732,8 @@ def {0}(t):
                   let structuredTfs = $q.all(
                     _.map(experimentTfs.data, tfCode => {
                       let tfName = getTfCodeName(tfCode);
-                      let tf = createTf(
-                        tfName,
-                        tfCode,
-                        simulationTfs.active[tfName]
-                      );
-                      scope.transferFunctions.push(tf);
 
-                      return $q
-                        .all([tf, structureTfCode(tfName, tfCode)])
-                        .then(args => decorateTf(...args));
+                      return addNewTf(tfName, tfCode, simulationTfs.active);
                     })
                   );
                   if (scope.transferFunction) {
@@ -1541,7 +1541,7 @@ def {0}(t):
             };
 
             function findUniqueNameFromTFCode(code) {
-              var newName = pythonCodeHelper.getFunctionName(code);
+              var newName = getTfCodeName(code);
               var baseName = newName;
 
               var count = 2;
@@ -1571,34 +1571,18 @@ def {0}(t):
               }
 
               _.forEach(tfs, function(transferFunction) {
-                var tf = new ScriptObject(
-                  scope.selectedTF,
-                  transferFunction.code
-                );
-
-                var codeName = pythonCodeHelper.getFunctionName(
-                  transferFunction.code
-                );
-                tf.type = undefined;
-                tf.name = findUniqueNameFromTFCode(transferFunction.code);
-                tf.oldName = tf.name;
-                tf.devices = [];
-                tf.topics = [];
-                tf.variables = [];
-                tf.local = true;
-                tf.dirty = true;
-                scope.dirtyTFNames.add(tf.name);
-                tf.rawCode =
-                  codeName === tf.name
+                let tfName = getTfCodeName(transferFunction.code);
+                let tfNewName = findUniqueNameFromTFCode(transferFunction.code);
+                scope.dirtyTFNames.add(tfNewName);
+                transferFunction.code =
+                  tfName === tfNewName
                     ? transferFunction.code
                     : transferFunction.code.replace(
-                        new RegExp('def +' + codeName, 'gm'),
-                        'def ' + tf.name
+                        new RegExp('def +' + tfName, 'gm'),
+                        'def ' + tfNewName
                       );
-                tf.active = true;
-                tf.editName = false;
+                addNewTf(tfNewName, transferFunction.code);
                 scope.nTransferFunctionDirty++;
-                scope.transferFunctions.push(tf);
               });
 
               if (
