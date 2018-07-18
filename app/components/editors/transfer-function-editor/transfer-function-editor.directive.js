@@ -1607,6 +1607,8 @@ def {0}(t):
               ) {
                 scope.selectTransferFunction(scope.transferFunctions[0].name);
               }
+
+              autoSaveService.setDirty();
             }
 
             function applyUploadedTransferFunctions(tfs) {
