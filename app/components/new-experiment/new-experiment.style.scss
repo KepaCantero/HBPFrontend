@@ -33,6 +33,30 @@
   border-right-color: #dde4ec;
 }
 
+.private-tag {
+  width: 43px;
+  height: 18px;
+  background: #d25c2b;
+  color: white;
+  border-radius: 4px;
+  margin-left: 4px;
+  margin-top: 4px;
+  padding: 2px;
+  font-size: 11px;
+}
+
+.public-tag {
+  width: 40px;
+  height: 18px;
+  background: #3679b6;
+  color: white;
+  border-radius: 4px;
+  margin-left: 4px;
+  margin-top: 4px;
+  padding: 2px;
+  font-size: 11px;
+}
+
 .env-title {
   font-size: 14px;
   padding: 5px;
