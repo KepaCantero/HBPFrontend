@@ -1302,6 +1302,7 @@ GZ3D.AutoAlignModel.prototype.moveAlignModel = function (positionX, positionY)
       {
         point.x = Math.round(point.x / snapDist) * snapDist;
         point.y = Math.round(point.y / snapDist) * snapDist;
+        point.z = Math.round(point.z / snapDist) * snapDist;
       }
     }
 
