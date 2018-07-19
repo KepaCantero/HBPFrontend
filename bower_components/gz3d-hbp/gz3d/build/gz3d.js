@@ -4997,8 +4997,8 @@ GZ3D.Gui.prototype.openEntityPopup = function(event, entity)
     $('#view-wireframe').css('visibility','collapse');
     $('#view-joints').css('visibility','collapse');
     $('#model-popup').popup('open',
-      {x: event.clientX + emUnits(6),
-       y: event.clientY + emUnits(-8)});
+      {x: event.offsetX + emUnits(6),
+       y: event.offsetY + emUnits(-8)});
   }
   else
   {
@@ -5042,8 +5042,8 @@ GZ3D.Gui.prototype.openEntityPopup = function(event, entity)
     $('#view-wireframe').css('visibility','visible');
     $('#view-joints').css('visibility','visible');
     $('#model-popup').popup('open',
-      {x: event.clientX + emUnits(6),
-       y: event.clientY + emUnits(0)});
+      {x: event.offsetX + emUnits(6),
+       y: event.offsetY + emUnits(0)});
   }
 };
 
@@ -8790,7 +8790,7 @@ GZ3D.Manipulator = function(gz3dScene, mobile)
         return;
     }
 
-    var positionX = event.clientX, positionY = event.clientY;
+    var positionX = event.offsetX, positionY = event.offsetY;
     var raycaster = new THREE.Raycaster();
     var i;
     var distance = -1000;
@@ -9968,9 +9968,8 @@ GZ3D.RadialMenu.prototype.getPointer = function(event)
     event = event.originalEvent;
   }
   var pointer = event.touches ? event.touches[ 0 ] : event;
-  var rect = this.gz3dScene.viewManager.mainUserView.container.getBoundingClientRect();
-  var posX = (pointer.clientX - rect.left);
-  var posY = (pointer.clientY - rect.top);
+  var posX = pointer.offsetX;
+  var posY = pointer.offsetY;
 
   return {x: posX, y:posY};
 };
@@ -10582,7 +10581,7 @@ GZ3D.Scene.prototype.beginNaturalManipulation = function(event)
       if (event.touches.length === 1)
       {
         pos = new THREE.Vector2(
-            event.touches[0].clientX, event.touches[0].clientY);
+            event.touches[0].offsetX, event.touches[0].offsetY);
       }
       else
       {
@@ -10591,7 +10590,7 @@ GZ3D.Scene.prototype.beginNaturalManipulation = function(event)
     }
     else
     {
-      pos = new THREE.Vector2(event.clientX, event.clientY);
+      pos = new THREE.Vector2(event.offsetX, event.offsetY);
       if (event.button !== 0)
       {
         mainPointer = false;
@@ -10750,13 +10749,13 @@ GZ3D.Scene.prototype.onPointerUp = function(event)
       if (event.touches.length === 1)
       {
         pos = new THREE.Vector2(
-            event.touches[0].clientX, event.touches[0].clientY);
+            event.touches[0].offsetX, event.touches[0].offsetY);
       }
       else if (event.touches.length === 2)
       {
         pos = new THREE.Vector2(
-            (event.touches[0].clientX + event.touches[1].clientX)/2,
-            (event.touches[0].clientY + event.touches[1].clientY)/2);
+            (event.touches[0].offsetX + event.touches[1].offsetX)/2,
+            (event.touches[0].offsetY + event.touches[1].offsetY)/2);
       }
       else
       {
@@ -10766,7 +10765,7 @@ GZ3D.Scene.prototype.onPointerUp = function(event)
     else
     {
       pos = new THREE.Vector2(
-          event.clientX, event.clientY);
+          event.offsetX, event.offsetY);
       if (event.button !== 0)
       {
         mainPointer = false;
@@ -10838,7 +10837,7 @@ GZ3D.Scene.prototype.onMouseScroll = function(event)
 {
   event.preventDefault();
 
-  var pos = new THREE.Vector2(event.clientX, event.clientY);
+  var pos = new THREE.Vector2(event.offsetX, event.offsetY);
 
   var intersect = new THREE.Vector3();
   var model = this.getRayCastModel(pos, intersect);
@@ -10943,8 +10942,8 @@ GZ3D.Scene.prototype.prepareModelsForRaycast = function(before)
 GZ3D.Scene.prototype.getRayCastModel = function(pos, intersect)
 {
   var normalizedScreenCoords = new THREE.Vector2(
-    ((pos.x - this.viewManager.mainUserView.renderer.domElement.offsetLeft) / this.viewManager.mainUserView.container.clientWidth) * 2 - 1,
-    -((pos.y - this.viewManager.mainUserView.renderer.domElement.offsetTop) / this.viewManager.mainUserView.container.clientHeight) * 2 + 1
+    (pos.x / this.viewManager.mainUserView.container.clientWidth) * 2 - 1,
+    -(pos.y / this.viewManager.mainUserView.container.clientHeight) * 2 + 1
   );
 
   var raycaster = new THREE.Raycaster();
@@ -12358,7 +12357,7 @@ GZ3D.Scene.prototype.showRadialMenu = function(e)
   var event = e.originalEvent;
 
   var pointer = event.touches ? event.touches[ 0 ] : event;
-  var pos = new THREE.Vector2(pointer.clientX, pointer.clientY);
+  var pos = new THREE.Vector2(pointer.offsetX, pointer.offsetY);
 
   var intersect = new THREE.Vector3();
   var model = this.getRayCastModel(pos, intersect);
@@ -12498,7 +12497,7 @@ GZ3D.Scene.prototype.hideBoundingBox = function()
  */
 GZ3D.Scene.prototype.onRightClick = function(event, callback)
 {
-  var pos = new THREE.Vector2(event.clientX, event.clientY);
+  var pos = new THREE.Vector2(event.offsetX, event.offsetY);
   var model = this.getRayCastModel(pos, new THREE.Vector3());
 
   if(model && model.name !== '' && model.name !== 'plane' &&
@@ -14239,7 +14238,7 @@ GZ3D.SpawnModel.prototype.onMouseMove = function (event)
 
   event.preventDefault();
 
-  this.moveSpawnedModel(event.clientX, event.clientY);
+  this.moveSpawnedModel(event.offsetX, event.offsetY);
 };
 
 /**

@@ -97,16 +97,16 @@ describe('Services: contextMenuState', function() {
     expect(contextMenuState.isShown).toBe(true);
     expect(gz3d.scene.radialMenu.showing).toBe(true);
 
-    expect(contextMenuState.contextMenuTop).toBe(dummyEvent.clientY);
-    expect(contextMenuState.contextMenuLeft).toBe(dummyEvent.clientX);
+    expect(contextMenuState.contextMenuTop).toBe(dummyEvent.offsetY);
+    expect(contextMenuState.contextMenuLeft).toBe(dummyEvent.offsetX);
   });
 
   it('should align menu when near the right/bottom of container', function() {
     contextMenuState.pushItemGroup(dummyItemGroup); //add a menuItem
 
     var dummyEvent = {
-      clientX: 0,
-      clientY: 0,
+      offsetX: 0,
+      offsetY: 0,
       view: { innerWidth: 0, innerHeight: 0 }
     };
 

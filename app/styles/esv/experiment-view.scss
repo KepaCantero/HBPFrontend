@@ -25,6 +25,8 @@
 #experiment-view {
   width: 100%;
   height: 100%;
+  display: flex;
+  flex-direction: column;
 
   .tip-tooltip-place {
     left: 10px;
@@ -37,6 +39,9 @@
     position: absolute;
     width: 100%;
     height: 100%;
+    flex-grow: 1;
+    flex-shrink: 1;
+    position: relative;
 
     #experiment-view-backdrop {
       position: absolute;
