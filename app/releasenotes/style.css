@@ -8,6 +8,25 @@ aside {
   width: 250px;
 }
 
+.show-only-latest aside,
+.show-only-latest header,
+.show-only-latest .release-notes > * {
+  display: none;
+}
+
+.show-only-latest version:first-of-type {
+  display: block;
+}
+
+.show-only-latest version h2 {
+  margin-top: 10px;
+}
+
+.show-only-latest .release-notes {
+  margin: 0;
+  padding: 0;
+}
+
 .date {
   font-size: 1.3rem;
   font-weight: 400;

@@ -8,7 +8,7 @@
       () =>
         $('main').animate(
           {
-            scrollTop: target.offset().top - $('.release-notes').offset().top
+            scrollTop: target[0].offsetTop
           },
           150,
           () => {
@@ -20,11 +20,12 @@
     );
     return false;
   };
+
   $(() => {
     // generate release links list
     let releaseNotesList = $('.release-notes-list');
 
-    $('[version]').each((i, e) => {
+    $('version').each((i, e) => {
       let version = e.getAttribute('version');
       let newid = `version-${version.replace(/\./g, '_')}`;
       e.id = newid;
@@ -34,4 +35,8 @@
     // animate scroll to elements
     $('a[href^="#version"]').click(handleScroll);
   });
+
+  if (location.hash == '#latest') {
+    document.documentElement.classList.add('show-only-latest');
+  }
 })();

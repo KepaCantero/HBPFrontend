@@ -21,50 +21,37 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  * ---LICENSE-END**/
+
 (function() {
   'use strict';
 
-  angular
-    .module('helpTooltipPopoverModule', [
-      'exdFrontendApp.Constants',
-      'simulationStateServices',
-      'helpTooltipModule',
-      'experimentModule'
-    ])
-    .directive('helpTooltipPopover', [
-      'STATE',
-      'helpTooltipService',
-      'stateService',
-      'experimentService',
-      'simulationInfo',
-      'tipTooltipService',
-      '$rootScope',
-      function(
-        STATE,
-        helpTooltipService,
-        stateService,
-        experimentService,
-        simulationInfo,
-        tipTooltipService,
-        $rootScope
-      ) {
-        return {
-          restrict: 'E',
-          templateUrl:
-            'components/help-tooltip/popover/help-tooltip-popover.template.html',
-          scope: {},
-          link: function(scope) {
-            scope.showLatestChangeLog = () =>
-              $rootScope.$emit('SHOW_CHANGE_LOG');
+  const LOCAL_STORAGE_KEY = 'last-shown-changelog-version';
 
-            scope.STATE = STATE;
-            scope.helpTooltipService = helpTooltipService;
-            scope.stateService = stateService;
-            scope.experimentService = experimentService;
-            scope.simulationInfo = simulationInfo;
-            scope.tipTooltipService = tipTooltipService;
-          }
+  angular.module('changelog', []).directive('changelogWidget', [
+    '$http',
+    '$rootScope',
+    ($http, $rootScope) => ({
+      templateUrl: 'components/changelog-widget/changelog-widget.template.html',
+      replace: true,
+      restrict: 'E',
+      scope: true,
+      link: scope => {
+        scope.visible = false;
+
+        scope.close = () => {
+          localStorage.setItem(LOCAL_STORAGE_KEY, scope.version);
+          scope.visible = false;
         };
+
+        $rootScope.$on('SHOW_CHANGE_LOG', () => (scope.visible = true));
+        return $http.get('package.json').then(({ data: { version } }) => {
+          scope.version = version;
+          let lastShown = localStorage.getItem(LOCAL_STORAGE_KEY);
+          if (lastShown !== version) {
+            scope.visible = true;
+          }
+        });
       }
-    ]);
+    })
+  ]);
 })();

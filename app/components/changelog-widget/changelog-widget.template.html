@@ -1,0 +1,72 @@
+<div class="changelog-directive" ng-if="visible">
+    <style>
+        .changelog-directive {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, .5);
+            z-index: 999;
+        }
+
+        .changelog-widget {
+            background-color: white;
+            max-width: 900px;
+            max-height: 600px;
+            height: 80%;
+            width: 80%;
+            display: flex;
+            padding: 10px 15px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .changelog-title hr{
+            margin-bottom: 0;
+        }
+
+        .changelog-title .h3 {
+            font-size: 18px;
+        }
+
+        .changelog-body {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .changelog-body hr{
+            margin: 0;
+            border-top: 1px solid #eeeeee;
+        }
+        .changelog-body a{
+            margin-top: 8px;
+            font-size: 12px;
+            text-align: right;
+        }
+
+        .changelog-widget iframe {
+            flex-grow: 1;
+        }
+    </style>
+    <div class="changelog-widget modal-content">
+        <div class="changelog-title">
+            <button type="button" class="close" ng-click="close()" aria-label="Close">
+                <span aria-hidden="true">×</span>
+            </button>
+            <div class="h3">
+                Neuro­robotics Plat­form change log
+            </div>
+            <hr/>
+        </div>
+        <div class="changelog-body">
+            <iframe src="releasenotes/#latest" frameborder="0"></iframe>
+            <hr/>
+            <a href="releasenotes/" target="_blank">See previous change logs</a>
+        </div>
+    </div>
+</div>

@@ -33,7 +33,7 @@
 
 <body class="ng-cloak">
 
-  <!-- Google analytics -->
+    <!-- Google analytics -->
     <script>
         // Get analytics only for production/staging/development servers
         var hostname = document.location.hostname;
@@ -58,6 +58,8 @@
 
     <!-- Add your site or application content here -->
     <div ui-view></div>
+
+    <changelog-widget></changelog-widget>
 
     <!-- build:js(.) scripts/vendor.js -->
     <!-- bower:js -->
@@ -215,6 +217,7 @@
     <script src="components/alerts/browser-support/browser-support.service.js"></script>
     <script src="components/alerts/cluster-reservation/cluster-reservation.directive.js"></script>
     <script src="components/alerts/demo-carousel/demo-carousel.directive.js"></script>
+    <script src="components/changelog-widget/changelog-widget.js"></script>
     <script src="components/dynamic-view/dynamic-view.controller.js"></script>
     <script src="components/client-logger/client-logger.service.js"></script>
     <script src="components/client-logger/log-adverts/log-adverts.directive.js"></script>

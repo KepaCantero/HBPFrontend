@@ -104,7 +104,8 @@
       'adminModule',
       'modal',
       'robotComponentsModule',
-      'applicationTopToolbarModule'
+      'applicationTopToolbarModule',
+      'changelog'
     ])
     // Routes
     .config([
