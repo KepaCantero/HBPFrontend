@@ -5,7 +5,7 @@ describe('Directive: object-inspector', function() {
   var gz3d;
   var elementScope;
   var dynamicViewOverlayService;
-  var overlayWrapperMock, objectInspectorService, backendInterfaceService;
+  var overlayWrapperMock, objectInspectorService;
 
   var baseEventHandlerMock = {
     suppressAnyKeyPress: jasmine.createSpy('suppressAnyKeyPress')
@@ -39,7 +39,6 @@ describe('Directive: object-inspector', function() {
       gz3d = _gz3d_;
       dynamicViewOverlayService = _dynamicViewOverlayService_;
       objectInspectorService = _objectInspectorService_;
-      backendInterfaceService = _backendInterfaceService_;
       storageServer = _storageServer_;
 
       spyOn(gz3d.gui.guiEvents, 'on').and.callThrough();
@@ -137,10 +136,10 @@ describe('Directive: object-inspector', function() {
   });
 
   it('should create a new TF on createTopicTF', function() {
-    spyOn(backendInterfaceService, 'addTransferFunction').and.returnValue(
+    spyOn(storageServer, 'saveTransferFunctions').and.returnValue(
       window.$q.resolve()
     );
-    spyOn(backendInterfaceService, 'getTransferFunctions').and.returnValue(
+    spyOn(storageServer, 'getTransferFunctions').and.returnValue(
       window.$q.resolve({ data: {} })
     );
     objectInspectorService.selectedRobotComponent = {
@@ -152,6 +151,6 @@ describe('Directive: object-inspector', function() {
     };
     elementScope.createTopicTF();
     elementScope.$digest();
-    expect(backendInterfaceService.addTransferFunction).toHaveBeenCalled();
+    expect(storageServer.saveTransferFunctions).toHaveBeenCalled();
   });
 });

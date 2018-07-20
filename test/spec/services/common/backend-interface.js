@@ -101,14 +101,6 @@ describe('Services: backendInterfaceService', function() {
     expect(callbackSuccess).toHaveBeenCalled();
   });
 
-  it('should call the success callback when the addTransferFunction POST request succeeds', function() {
-    $httpBackend.whenPOST(urlRegex).respond(200);
-    var callback = jasmine.createSpy('callback');
-    backendInterfaceService.addTransferFunction({}, callback);
-    $httpBackend.flush();
-    expect(callback).toHaveBeenCalled();
-  });
-
   it('should call the failure callback when the editTransferFunction PUT request fails', function() {
     $httpBackend.whenPUT(urlRegex).respond(500);
     var callback = jasmine.createSpy('callback');
@@ -118,14 +110,6 @@ describe('Services: backendInterfaceService', function() {
       function() {},
       callback
     );
-    $httpBackend.flush();
-    expect(callback).toHaveBeenCalled();
-  });
-
-  it('should call the failure callback when the addTransferFunction POST request fails', function() {
-    $httpBackend.whenPOST(urlRegex).respond(500);
-    var callback = jasmine.createSpy('callback');
-    backendInterfaceService.addTransferFunction({}, function() {}, callback);
     $httpBackend.flush();
     expect(callback).toHaveBeenCalled();
   });

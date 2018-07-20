@@ -119,10 +119,6 @@
                 backendBaseUrl +
                 '/simulation/:sim_id/transfer-functions/:transfer_function_name'
             },
-            add: {
-              method: 'POST',
-              url: backendBaseUrl + '/simulation/:sim_id/transfer-functions'
-            },
             delete: {
               method: 'DELETE',
               url:
@@ -434,16 +430,6 @@
             successCallback,
             errorCallback
           ).$promise;
-        },
-        addTransferFunction: function(data, successCallback, errorCallback) {
-          resourceTransferFunctionSimulation(simulationInfo.serverBaseUrl).add(
-            {
-              sim_id: simulationInfo.simulationID
-            },
-            data,
-            successCallback,
-            errorCallback
-          );
         },
         resetCollab: function(resetData, successCallback, errorCallback) {
           return resourceResetCollab(simulationInfo.serverBaseUrl).reset(

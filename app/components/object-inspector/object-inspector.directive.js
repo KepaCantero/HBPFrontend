@@ -29,38 +29,30 @@
   angular.module('objectInspectorModule', []).directive('objectInspector', [
     'OBJECT_VIEW_MODE',
     '$timeout',
-    'dynamicViewOverlayService',
     'objectInspectorService',
     'baseEventHandler',
     'gz3d',
     'EDIT_MODE',
     'simulationInfo',
-    'backendInterfaceService',
     'serverError',
     'editorsPanelService',
     'tipTooltipService',
     'TIP_CODES',
     'storageServer',
-    'newExperimentProxyService',
-    'bbpConfig',
     'robotComponentsService',
     function(
       OBJECT_VIEW_MODE,
       $timeout,
-      dynamicViewOverlayService,
       objectInspectorService,
       baseEventHandler,
       gz3d,
       EDIT_MODE,
       simulationInfo,
-      backendInterfaceService,
       serverError,
       editorsPanelService,
       tipTooltipService,
       TIP_CODES,
       storageServer,
-      newExperimentProxyService,
-      bbpConfig,
       robotComponentsService
     ) {
       return {
@@ -127,33 +119,38 @@
           };
 
           scope.createTopicTF = () => {
-            return backendInterfaceService
-              .getTransferFunctions()
-              .then(({ data: tfNames }) => {
+            return storageServer
+              .getTransferFunctions(simulationInfo.experimentID)
+              .then(({ data: tfs }) => {
                 let selectedData =
                   objectInspectorService.selectedRobotComponent.userData;
                 let topicName = selectedData.rosTopic;
                 topicName = topicName.substr(1).replace(/\//g, '_');
                 let tfname = topicName;
                 let postfix = 2;
-                while (tfNames[tfname]) tfname = topicName + '_' + postfix++;
+                while (tfs[tfname]) tfname = topicName + '_' + postfix++;
 
                 let [parameters, decorator] = DECORATOR_BY_TYPE[
                   selectedData.type
                 ](selectedData);
 
-                backendInterfaceService.addTransferFunction(
-                  `${decorator}
+                let newTF = `${decorator}
 def ${tfname}(${['t', ...parameters].join(', ')}):
     # Auto generated TF for ${topicName}
     if t % 2 < 0.02:
-        clientLogger.info('TF ${topicName}:', t)`,
-                  () =>
+        clientLogger.info('TF ${topicName}:', t)`;
+
+                storageServer
+                  .saveTransferFunctions(simulationInfo.experimentID, [
+                    ..._.values(tfs),
+                    newTF
+                  ])
+                  .then(() =>
                     editorsPanelService.showEditor(TF_EDITOR_TAB, {
                       selectTF: tfname
-                    }),
-                  err => serverError.displayHTTPError(err)
-                );
+                    })
+                  )
+                  .catch(err => serverError.displayHTTPError(err));
               });
           };
 
