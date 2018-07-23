@@ -24,8 +24,8 @@
         <div ng-show="tabSelection=='MyExperiments'" class="underlined-box"></div>
       </div>
 
-      <div class="underlined-tab" ng-click="tabChanged('NewExperiment')">
-        <div ng-class="{'underlined-tab-selected':tabSelection=='NewExperiment'}">
+      <div ng-class="{'underlined-tab':devMode,'underlined-tab-disabled':!devMode}" ng-click="(devMode)?tabChanged('NewExperiment'):null">
+        <div ng-class="{'underlined-tab-selected':tabSelection=='NewExperiment' && devMode}">
           New experiment
         </div>
         <div ng-show="tabSelection=='NewExperiment'" class="underlined-box"></div>
@@ -71,10 +71,9 @@
 
   </div>
 
-
   <hr style="margin-bottom: 3px; margin-top: 2px; width: 100%; margin-right:10px; margin-bottom:15px;">
 
-  <div style="overflow-y: auto; height: calc(100% - 150px);">
+  <div ng-if="tabSelection!='NewExperiment'" style="overflow-y: auto; height: calc(100% - 150px);">
     <experiment-list ng-if="tabSelection=='MyExperiments' && showMyExperiments" query="query" experiment-empty="experimentEmpty()"
       reinit="reloadMyExperiments()" running="false" private="true"></experiment-list>
     <div ng-if="tabSelection=='ExperimentFiles'" style="height: 100%;">
@@ -87,8 +86,19 @@
     <experiment-list ng-if="tabSelection=='RunningExperiments' && showMyExperiments" experiment-empty="experimentEmpty()" query="query"
       reinit="reloadMyExperiments()" running="true" private="true"></experiment-list>
 
-    <new-experiment ng-if="tabSelection=='NewExperiment'"></new-experiment>
-
   </div>
+
+  <div ng-if="tabSelection=='NewExperiment'" style="height:100%">
+
+      <div ng-show="!tipTooltipService.someTipsAreHidden()" style="height: calc(100% - 250px)">
+        <new-experiment></new-experiment>
+      </div>
+
+      <div ng-show="tipTooltipService.someTipsAreHidden()" style="height: calc(100% - 200px)">
+        <new-experiment></new-experiment>
+      </div>
+
+    </div>
+
 
 </div>

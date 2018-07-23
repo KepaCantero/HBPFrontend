@@ -28,7 +28,14 @@
     '$timeout',
     'tipTooltipService',
     'TIP_CODES',
-    function($scope, $timeout, tipTooltipService, TIP_CODES) {
+    'environmentService',
+    function(
+      $scope,
+      $timeout,
+      tipTooltipService,
+      TIP_CODES,
+      environmentService
+    ) {
       $scope.reloadMyExperiments = () => {
         $scope.showMyExperiments = false;
         $timeout(() => ($scope.showMyExperiments = true));
@@ -80,6 +87,7 @@
         }
       };
 
+      $scope.devMode = environmentService.isDevMode();
       $scope.showMyExperiments = true;
       $scope.tabSelection = 'MyExperiments';
       $scope.didRedirectToTemplate = false;
