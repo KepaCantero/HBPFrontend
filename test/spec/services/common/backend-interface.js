@@ -47,26 +47,6 @@ describe('Services: backendInterfaceService', function() {
     );
   });
 
-  it('should make a PUT request on /experiment/:context_id/sdf_world', function() {
-    $httpBackend
-      .expectPOST(
-        simulationInfo.serverBaseUrl +
-          '/experiment/' +
-          simulationInfo.experimentID +
-          '/sdf_world'
-      )
-      .respond(200);
-    backendInterfaceService.saveSDF(simulationInfo.experimentID);
-    $httpBackend.flush();
-  });
-
-  it('should call serverError.displayHTTPError when the saveSDF PUT request fails', function() {
-    $httpBackend.whenPOST(urlRegex).respond(500);
-    backendInterfaceService.saveSDF(simulationInfo.experimentID);
-    $httpBackend.flush();
-    expect(serverError.displayHTTPError).toHaveBeenCalled();
-  });
-
   it('should call the success callback when the setTransferFunction PUT request succeeds', function() {
     $httpBackend.whenPUT(urlRegex).respond(200);
     var callback = jasmine.createSpy('callback');
@@ -211,43 +191,6 @@ describe('Services: backendInterfaceService', function() {
     expect(callback).toHaveBeenCalled();
   });
 
-  it('should make a PUT request on /experiment/:context_id/state_machines', function() {
-    var smMock = ['someSM1', 'someSM2'];
-    var successCallback = jasmine.createSpy('callback');
-    var failureCallback = jasmine.createSpy('callback');
-    $httpBackend
-      .expectPUT(
-        simulationInfo.serverBaseUrl +
-          '/experiment/' +
-          simulationInfo.experimentID +
-          '/state-machines'
-      )
-      .respond(200);
-    backendInterfaceService.saveStateMachines(
-      smMock,
-      successCallback,
-      failureCallback
-    );
-    $httpBackend.flush();
-
-    expect(successCallback).toHaveBeenCalled();
-    expect(failureCallback).not.toHaveBeenCalled();
-  });
-
-  it('should call failure callback when PUT state-machines fails', function() {
-    $httpBackend.whenPUT(urlRegex).respond(500);
-    var successCallback = jasmine.createSpy('callback');
-    var failureCallback = jasmine.createSpy('callback');
-    backendInterfaceService.saveStateMachines(
-      ['someSM1', 'someSM2'],
-      successCallback,
-      failureCallback
-    );
-    $httpBackend.flush();
-
-    expect(successCallback).not.toHaveBeenCalled();
-    expect(failureCallback).toHaveBeenCalled();
-  });
   it('should call the success callback when the getBrain GET request succeeds', function() {
     $httpBackend.whenGET(urlRegex).respond(200);
     var callback = jasmine.createSpy('callback');

@@ -49,16 +49,13 @@ describe('Services: server-info-service', function() {
     environmentService.setPrivateExperiment(true);
     /* eslint-disable camelcase */
     var experimentResponse = {
-      data: { experiment_configuration: { visualModel: 'mouse.dae' } }
+      visualModel: 'mouse.dae'
     };
     /* eslint-enable camelcase */
     httpBackend
-      .whenGET(
-        serverConfig.gzweb['nrp-services'] +
-          '/experiment/' +
-          simulationData.experimentID
-      )
+      .whenGET('http://proxy/experiment/AnimatedMouse/config')
       .respond(200, experimentResponse);
+
     simulationInfo.initialize(
       simulationData.serverID,
       simulationData.experimentID,
@@ -75,10 +72,8 @@ describe('Services: server-info-service', function() {
     expect(environmentService.isPrivateExperiment()).toBe(true);
     expect(simulationInfo.experimentID).toBe(simulationData.experimentID);
 
-    var visualUrl =
-      experimentResponse.data.experiment_configuration.visualModel;
     expect(simulationInfo.animatedModel.assetsPath).toBe(
-      serverConfig.gzweb.assets + '/' + visualUrl
+      serverConfig.gzweb.assets + '/' + experimentResponse.visualModel
     );
 
     // Non-Collab mode
@@ -104,7 +99,7 @@ describe('Services: server-info-service', function() {
     expect(simulationInfo.contextID).not.toBeDefined();
     expect(environmentService.isPrivateExperiment()).toBe(false);
     expect(simulationInfo.experimentID).toBe(simulationData.experimentID);
-    visualUrl =
+    let visualUrl =
       experimentResponse[simulationData.experimentID].configuration.visualModel;
     expect(simulationInfo.animatedModel.assetsPath).toBe(
       serverConfig.gzweb.assets + '/' + visualUrl

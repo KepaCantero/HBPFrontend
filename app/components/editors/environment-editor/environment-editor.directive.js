@@ -319,7 +319,7 @@
 
           scope.exportSDFWorld = function() {
             simulationSDFWorld(simulationInfo.serverBaseUrl).export(
-              {},
+              { simId: simulationInfo.simulationID },
               function(data) {
                 var linkHref =
                   'data:text/xml;charset=utf-8,' + encodeURIComponent(data.sdf);
@@ -328,16 +328,14 @@
             );
           };
 
-          scope.saveSDFIntoCollabStorage = function() {
+          scope.saveSDFIntoCollabStorage = () => {
             scope.isSavingToCollab = true;
-            backendInterfaceService.saveSDF(
-              simulationInfo.experimentID,
-              function() {
-                // Success callback
-                scope.isSavingToCollab = false;
-              },
-              function() {
-                // Failure callback
+
+            simulationSDFWorld(simulationInfo.serverBaseUrl).save(
+              { simId: simulationInfo.simulationID },
+              {},
+              () => (scope.isSavingToCollab = false),
+              () => {
                 clbErrorDialog.open({
                   type: 'BackendError.',
                   message: 'Error while saving SDF to the Storage.'

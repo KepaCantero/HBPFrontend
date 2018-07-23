@@ -8,7 +8,6 @@ describe('Directive: environment-designer', function() {
     contextMenuState,
     simulationSDFWorld,
     simulationInfo,
-    backendInterfaceService,
     clbErrorDialog,
     dynamicViewOverlayService,
     DYNAMIC_VIEW_CHANNELS,
@@ -60,7 +59,6 @@ describe('Directive: environment-designer', function() {
       _panels_,
       _simulationSDFWorld_,
       _simulationInfo_,
-      _backendInterfaceService_,
       _clbErrorDialog_,
       _environmentService_,
       _dynamicViewOverlayService_,
@@ -76,7 +74,6 @@ describe('Directive: environment-designer', function() {
       simulationInfo = _simulationInfo_;
       panels = _panels_;
       simulationSDFWorld = _simulationSDFWorld_;
-      backendInterfaceService = _backendInterfaceService_;
       clbErrorDialog = _clbErrorDialog_;
       dynamicViewOverlayService = _dynamicViewOverlayService_;
       httpBackend = _$httpBackend_;
@@ -409,20 +406,25 @@ describe('Directive: environment-designer', function() {
   });
 
   it('should correctly saveSDFIntoCollabStorage', function() {
-    spyOn(backendInterfaceService, 'saveSDF');
+    let saveSpy = jasmine.createSpy('saveSpy').and.callFake(() => {});
+    simulationSDFWorld.and.returnValue({
+      save: saveSpy
+    });
+
     expect($scope.isSavingToCollab).toEqual(false);
     $scope.saveSDFIntoCollabStorage();
-    expect(backendInterfaceService.saveSDF).toHaveBeenCalledWith(
-      simulationInfo.experimentID,
+    expect(saveSpy).toHaveBeenCalledWith(
+      { simId: simulationInfo.simulationID },
+      {},
       jasmine.any(Function),
       jasmine.any(Function)
     );
     expect($scope.isSavingToCollab).toEqual(true);
-    backendInterfaceService.saveSDF.calls.argsFor(0)[1]();
+    saveSpy.calls.argsFor(0)[2]();
     expect($scope.isSavingToCollab).toBe(false);
     $scope.isSavingToCollab = true;
     spyOn(clbErrorDialog, 'open');
-    backendInterfaceService.saveSDF.calls.argsFor(0)[2]();
+    saveSpy.calls.argsFor(0)[3]();
     expect($scope.isSavingToCollab).toBe(false);
     expect(clbErrorDialog.open).toHaveBeenCalled();
   });

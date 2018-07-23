@@ -172,31 +172,6 @@
         );
       };
 
-      var resourceSDFExperiment = function(backendBaseUrl) {
-        return $resource(
-          backendBaseUrl + '/experiment/:experimentId/sdf_world',
-          {},
-          {
-            save: {
-              method: 'POST',
-              interceptor: { responseError: serverError.displayHTTPError }
-            }
-          }
-        );
-      };
-
-      var resourceStateMachineExperiment = function(backendBaseUrl) {
-        return $resource(
-          backendBaseUrl + '/experiment/:experimentId/state-machines',
-          {},
-          {
-            save: {
-              method: 'PUT',
-              interceptor: { responseError: serverError.displayHTTPError }
-            }
-          }
-        );
-      };
       var resourceReset = function(backendBaseUrl) {
         return $resource(
           backendBaseUrl + '/simulation/:sim_id/reset',
@@ -324,14 +299,6 @@
         getServerBaseUrl: function() {
           return simulationInfo.serverBaseUrl;
         },
-        saveSDF: function(experimentId, successCallback, errorCallback) {
-          return resourceSDFExperiment(simulationInfo.serverBaseUrl).save(
-            { experimentId },
-            { context_id: $stateParams.ctx, experimentId },
-            successCallback,
-            errorCallback
-          );
-        },
         reset: function(resetData, successCallback, errorCallback) {
           return resourceReset(simulationInfo.serverBaseUrl).reset(
             { sim_id: simulationInfo.simulationID },
@@ -363,24 +330,6 @@
             },
             callback
           ).$promise;
-        },
-        saveStateMachines: function(
-          transferFunctions,
-          successCallback,
-          errorCallback
-        ) {
-          var data = {
-            experimentId: simulationInfo.experimentID,
-            state_machines: transferFunctions
-          };
-          return resourceStateMachineExperiment(
-            simulationInfo.serverBaseUrl
-          ).save(
-            { experimentId: simulationInfo.experimentID },
-            data,
-            successCallback,
-            errorCallback
-          );
         },
 
         getTransferFunctions: function(callback) {
