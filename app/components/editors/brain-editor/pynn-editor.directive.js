@@ -45,7 +45,6 @@
     'codeEditorsServices',
     'environmentService',
     'downloadFileService',
-    'userContextService',
     'baseEventHandler',
     'editorToolbarService',
     'storageServer',
@@ -66,7 +65,6 @@
       codeEditorsServices,
       environmentService,
       downloadFileService,
-      userContextService,
       baseEventHandler,
       editorToolbarService,
       storageServer
@@ -160,6 +158,11 @@
                   scope.populations = scope.preprocessPopulations(
                     response.populations
                   );
+
+                  for (let p of scope.populations) {
+                    if (!p.previousName) p.previousName = p.name;
+                  }
+
                   refreshEditor();
                   setTimeout(function() {
                     refreshEditor(true);
@@ -297,27 +300,16 @@
             return populations;
           };
 
-          scope.agreeAction = function() {
-            scope.apply(1);
-          };
-
-          /**
-           * @param {integer} [change_population]
-           */
-          scope.apply = function(changePopulation) {
+          scope.applyBackend = function() {
             var restart = stateService.currentState === STATE.STARTED;
-            scope.loading = true;
             var populations = objectifyPopulations(scope.populations);
 
-            if (changePopulation) {
-              scope.tfNeedsSave = true;
-            }
             backendInterfaceService.setBrain(
               scope.pynnScript.code,
               scope.stringsToLists(populations),
               'py',
               'text',
-              changePopulation,
+              true,
               function() {
                 // Success callback
                 scope.loading = false;
@@ -335,18 +327,7 @@
                 scope.loading = false;
                 scope.clearError();
 
-                if (result.data.handle_population_change) {
-                  clbConfirm
-                    .open({
-                      title: 'Confirm changing neural network',
-                      confirmLabel: 'Yes',
-                      cancelLabel: 'Cancel',
-                      template:
-                        'Applying your changes may update population references of your transfer functions. Do you wish to continue?',
-                      closable: false
-                    })
-                    .then(scope.agreeAction, function() {});
-                } else if (
+                if (
                   result.data.error_line === -1 &&
                   result.data.error_column === -1
                 ) {
@@ -377,6 +358,84 @@
             );
           };
 
+          scope.apply = function() {
+            scope.loading = true;
+
+            storageServer
+              .getTransferFunctions(simulationInfo.experimentID)
+              .then(result => {
+                let tfs = result.data;
+
+                // Check if we need to do some find and replace first
+
+                let mightNeedReplace = false;
+
+                for (let tf in tfs)
+                  for (let pop of scope.populations) {
+                    if (pop.previousName !== pop.name) {
+                      if (
+                        tfs[tf].match(
+                          new RegExp(
+                            '(?<=\\W)' + pop.previousName + '(?=\\W)',
+                            'igm'
+                          )
+                        )
+                      )
+                        mightNeedReplace = true;
+                    }
+                  }
+
+                if (mightNeedReplace) {
+                  clbConfirm
+                    .open({
+                      title: 'Confirm changing neural network',
+                      confirmLabel: 'Yes',
+                      cancelLabel: 'Cancel',
+                      template:
+                        'Applying your changes may update population references of your transfer functions. Do you wish to continue?',
+                      closable: false
+                    })
+                    .then(() => {
+                      // Find and replace
+
+                      let tflist = [];
+
+                      for (let tf in tfs) {
+                        for (let pop of scope.populations)
+                          if (pop.previousName !== pop.name)
+                            tfs[tf] = tfs[tf].replace(
+                              new RegExp(
+                                '(?<=\\W)' + pop.previousName + '(?=\\W)',
+                                'igm'
+                              ),
+                              pop.name
+                            );
+
+                        tflist.push(tfs[tf]);
+                      }
+
+                      storageServer
+                        .saveTransferFunctions(
+                          simulationInfo.experimentID,
+                          tflist
+                        )
+                        .then(() => scope.applyBackend())
+                        .catch(() =>
+                          clbErrorDialog.open({
+                            type: 'BackendError.',
+                            message:
+                              'Error while saving transfer functions to the Storage.'
+                          })
+                        );
+                    }, () => (scope.loading = false))
+                    .finally(() => {
+                      for (let p of scope.populations) p.previousName = p.name;
+                    });
+                } else scope.applyBackend();
+              })
+              .catch(err => alert('Failed to load TFS:\n' + err));
+          };
+
           scope.saveIntoStorage = function() {
             return storageServer
               .saveBrain(
@@ -384,12 +443,6 @@
                 scope.pynnScript.code,
                 scope.stringsToLists(scope.populations)
               )
-              .then(() => {
-                if (scope.tfNeedsSave) {
-                  scope.tfNeedsSave = false;
-                  $rootScope.$broadcast('pynn.tfNeedsSave');
-                }
-              })
               .catch(() => {
                 clbErrorDialog.open({
                   type: 'BackendError.',

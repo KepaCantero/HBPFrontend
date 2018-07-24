@@ -18,7 +18,8 @@ describe('Directive: pynnEditor', function() {
     storageServer,
     $timeout,
     codeEditorsServices,
-    simulationInfo;
+    simulationInfo,
+    clbConfirm;
 
   var backendInterfaceServiceMock = {
     setBrain: jasmine.createSpy('setBrain')
@@ -31,6 +32,14 @@ describe('Directive: pynnEditor', function() {
       .and.callFake(() => window.$q.resolve(getBrainresponse)),
     saveBrain: jasmine
       .createSpy('saveBrain')
+      .and.callFake(() => window.$q.resolve()),
+    getTransferFunctions: jasmine
+      .createSpy('getTransferFunctions')
+      .and.callFake(() =>
+        window.$q.resolve({ data: { tfname: 'def tf:\n\tbrain.index=0' } })
+      ),
+    saveTransferFunctions: jasmine
+      .createSpy('saveTransferFunctions')
       .and.callFake(() => window.$q.resolve())
   };
 
@@ -114,7 +123,8 @@ describe('Directive: pynnEditor', function() {
       $templateCache,
       _$timeout_,
       _codeEditorsServices_,
-      _simulationInfo_
+      _simulationInfo_,
+      _clbConfirm_
     ) {
       $rootScope = _$rootScope_;
       $compile = _$compile_;
@@ -125,6 +135,7 @@ describe('Directive: pynnEditor', function() {
       $timeout = _$timeout_;
       codeEditorsServices = _codeEditorsServices_;
       simulationInfo = _simulationInfo_;
+      clbConfirm = _clbConfirm_;
 
       $scope = $rootScope.$new();
       $templateCache.put('views/esv/pynn-editor.html', '');
@@ -159,19 +170,22 @@ describe('Directive: pynnEditor', function() {
       {
         list: '1,2,3',
         name: 'list1',
-        regex: '^\\b(?!\\bindex1\\b|\\bslice0\\b)([A-z_]+[\\w_]*)$'
+        regex: '^\\b(?!\\bindex1\\b|\\bslice0\\b)([A-z_]+[\\w_]*)$',
+        previousName: 'list1'
       },
       {
         list: '9',
         name: 'index1',
-        regex: '^\\b(?!\\blist1\\b|\\bslice0\\b)([A-z_]+[\\w_]*)$'
+        regex: '^\\b(?!\\blist1\\b|\\bslice0\\b)([A-z_]+[\\w_]*)$',
+        previousName: 'index1'
       },
       {
         from: 0,
         to: 10,
         step: 1,
         name: 'slice0',
-        regex: '^\\b(?!\\blist1\\b|\\bindex1\\b)([A-z_]+[\\w_]*)$'
+        regex: '^\\b(?!\\blist1\\b|\\bindex1\\b)([A-z_]+[\\w_]*)$',
+        previousName: 'slice0'
       }
     ];
 
@@ -216,45 +230,27 @@ describe('Directive: pynnEditor', function() {
     });
 
     it('should apply changes made on the pynn script and the brain population properly', function() {
+      spyOn(clbConfirm, 'open').and.returnValue(window.$q.when({}));
+
       isolateScope.pynnScript.code = expectedScript;
-      isolateScope.populations = [{ name: 'index', list: '1' }];
-      isolateScope.apply(0);
+      isolateScope.populations = [
+        { name: 'index2', list: '1', previousName: 'index' }
+      ];
+      isolateScope.apply();
+      isolateScope.$apply();
       expect(backendInterfaceService.setBrain).toHaveBeenCalledWith(
         isolateScope.pynnScript.code,
-        { index: { list: [1] } },
+        { index2: { list: [1], previousName: 'index' } },
         'py',
         'text',
-        0,
+        true,
         jasmine.any(Function),
         jasmine.any(Function)
       );
+
       expect(isolateScope.loading).toBe(true);
       backendInterfaceService.setBrain.calls.argsFor(0)[5](); // success callback
       expect(isolateScope.loading).toBe(false);
-    });
-
-    it('should set brain with change_population parameter', function() {
-      isolateScope.pynnScript.code = expectedScript;
-      isolateScope.populations = [{ name: 'index', list: '1' }];
-      isolateScope.apply(1);
-      expect(backendInterfaceService.setBrain).toHaveBeenCalledWith(
-        isolateScope.pynnScript.code,
-        { index: { list: [1] } },
-        'py',
-        'text',
-        1,
-        jasmine.any(Function),
-        jasmine.any(Function)
-      );
-      expect(isolateScope.loading).toBe(true);
-      backendInterfaceService.setBrain.calls.argsFor(0)[5](); // success callback
-      expect(isolateScope.loading).toBe(false);
-    });
-
-    it('should check set brain agree helper', function() {
-      spyOn(isolateScope, 'apply');
-      isolateScope.agreeAction();
-      expect(isolateScope.apply).toHaveBeenCalledWith(1);
     });
 
     it('should save the pynn script and the neuron populations properly', function() {
@@ -272,6 +268,7 @@ describe('Directive: pynnEditor', function() {
 
     it('should be able to repeat the same test twice', function() {
       isolateScope.apply();
+      isolateScope.$apply();
       expect(backendInterfaceService.setBrain).toHaveBeenCalled();
       expect(isolateScope.loading).toBe(true);
       backendInterfaceService.setBrain.calls.argsFor(0)[5](); // success callback
@@ -280,6 +277,7 @@ describe('Directive: pynnEditor', function() {
 
     it('should handle an error when sending a pynn script properly (1)', function() {
       isolateScope.apply();
+      isolateScope.$apply();
       expect(backendInterfaceService.setBrain).toHaveBeenCalled();
       expect(isolateScope.loading).toBe(true);
       backendInterfaceService.setBrain.calls.argsFor(0)[6](errorMock1); // error callback
@@ -288,6 +286,7 @@ describe('Directive: pynnEditor', function() {
 
     it('should handle an error when sending a pynn script properly (2)', function() {
       isolateScope.apply();
+      isolateScope.$apply();
       expect(backendInterfaceService.setBrain).toHaveBeenCalled();
       expect(isolateScope.loading).toBe(true);
       isolateScope.pynnScript.code = 'some pynn script';
