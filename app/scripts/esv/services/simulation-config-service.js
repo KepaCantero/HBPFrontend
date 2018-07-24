@@ -63,9 +63,7 @@
           return getBackendConfigFileNames(configType).then(function(response) {
             if (response) {
               if (environmentService.isPrivateExperiment()) {
-                var filename = response.file.substr(
-                  response.file.lastIndexOf('/') + 1
-                );
+                let filename = response.file.substr(response.file_offset);
 
                 return storageServer
                   .getFileContent(simulationInfo.experimentID, filename, true)
@@ -89,9 +87,7 @@
               response
             ) {
               if (response) {
-                var filename = response.file.substr(
-                  response.file.lastIndexOf('/') + 1
-                );
+                let filename = response.file.substr(response.file_offset);
 
                 return storageServer.setFileContent(
                   simulationInfo.experimentID,
