@@ -22,13 +22,26 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  * ---LICENSE-END**/
 
+.graphical-editor-pynn-container {
+  position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding-top: 10px;
+  padding-right: 10px;
+  padding-bottom: 0px;
+  padding-left: 10px;
+  min-height: 394px;
+}
+
 .pynn-editor-widget {
   height: 100%;
-  padding: 10px;
-  overflow: auto;
 
   input[type='text'] {
     margin-left: 5px;
+    max-height: 18px;
+    margin-bottom: 4px;
+    width: 120px;
   }
   input.ng-invalid {
     color: red;
@@ -38,12 +51,201 @@
     background-color: rgb(255, 226, 226) !important;
   }
   input.neuron-index-field {
-    width: 70px;
+    width: 120px;
+    max-height: 18px;
+    margin-bottom: 4px;
   }
   div.fixed-sized {
     width: 110px;
   }
   div.fixed-sized-short {
     width: 95px;
+  }
+}
+
+.pynn-edit-area {
+  display: flex;
+  width: 100%;
+  min-width: 830px;
+  height: calc(100% - 30px);
+}
+
+.pynn-center-panel {
+  flex-grow: 3;
+  flex-basis: 50%;
+  flex-direction: column;
+  display: flex;
+  margin-bottom: 10px;
+}
+
+.pynn-var-block-bottom-area {
+  display: flex;
+  justify-content: flex-end;
+  padding-right: 5px;
+  padding-top: 10px;
+}
+
+.pynn-right-panel {
+  flex-grow: 0;
+  flex-basis: 15%;
+  margin-left: 10px;
+  min-width: 200px;
+  max-width: 200px;
+  display: flex;
+  flex-direction: column;
+  margin-top: 3px;
+}
+
+.pynn-button-block {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  border-top-color: rgb(221, 221, 221);
+  border-top-style: solid;
+  border-top-width: 1px;
+  padding-top: 6px;
+}
+
+.pynn-param-title-background-populations {
+  background: #fffddb;
+}
+
+.pynn-param-title-background-populations-sub {
+  background: #fffef1;
+}
+
+.pynn-param-title-background-populations-sub:hover {
+  background: #f1eea9;
+}
+
+.pynn-param-title-background {
+  display: flex;
+  padding-left: 7px;
+  cursor: pointer;
+}
+
+.pynn-param-border {
+  width: 100%;
+  overflow: hidden;
+  border: 1px solid #e6e6e6;
+  margin-bottom: 10px;
+}
+
+.pynn-param-title-block {
+  display: flex;
+  justify-content: space-between;
+  padding-left: 10px;
+  padding-right: 2px;
+  padding-top: 2px;
+}
+
+.pynn-parameter-section-title {
+  text-align: left;
+  font-size: 13px;
+  padding-top: 2px;
+}
+
+.pynn-parameter-caret {
+  margin-right: 7px;
+  margin-top: 2px;
+}
+
+.very-small-button {
+  font-size: 12px;
+  padding: 6px;
+  min-width: 111px;
+  padding: 2px;
+}
+
+.small-button {
+  font-size: 12px;
+  padding: 6px;
+  min-width: 111px;
+}
+
+.parameter-small-button-label {
+  margin-left: 5px;
+  font-size: 12px;
+  min-width: 111px;
+}
+
+.pynn-param-section-box {
+  margin-bottom: 10px;
+  list-style-type: none;
+  border-top-color: rgb(230, 230, 230);
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-right-style: none;
+  border-bottom-style: none;
+  border-left-style: none;
+  border-image-source: initial;
+  border-image-slice: initial;
+  border-image-width: initial;
+  border-image-outset: initial;
+  border-image-repeat: initial;
+  box-shadow: none;
+  margin-left: 0px;
+  margin-right: 0px;
+  padding-right: 0px;
+  padding-left: 0px;
+}
+
+.pynn-population-param {
+  font-size: 12px;
+  margin-left: 10px;
+  display: flex;
+  justify-content: space-between;
+  margin-right: 10px;
+
+  border-bottom-color: #efefef;
+  border-bottom-style: solid;
+  border-bottom-width: 1px;
+}
+
+.pynn-small-icon-button-param {
+  margin-bottom: 2px;
+  font-size: 10px;
+  padding-top: 2px;
+  padding-bottom: 2px;
+  padding-right: 5px;
+  padding-left: 5px;
+}
+
+.pynn-parameter-title {
+  font-size: 12px;
+  margin-bottom: 0px;
+}
+
+.pynn-param-title-background-populations-sub {
+  background: #fffef1;
+}
+
+.pynn-param-title-background-populations-sub:hover {
+  background: #f1eea9;
+}
+
+.pynn-hint-small-help-block {
+  font-size: 12px;
+  margin-top: 2px;
+  margin-bottom: 2px;
+  padding: 5px;
+  border: 1px solid;
+  border-radius: 8px;
+  border-color: #f3f3f3;
+  padding-left: 15px;
+  padding-right: 15px;
+  margin-bottom: 12px;
+  display: flex;
+}
+
+.pynn-apply-changes-dirty {
+  color: #159fc1;
+  animation: colorblink 2s infinite;
+}
+@keyframes colorblink {
+  0% {
+  }
+  50% {
+    color: #0c4e58;
   }
 }
