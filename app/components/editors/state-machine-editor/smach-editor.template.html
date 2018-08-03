@@ -2,51 +2,136 @@
 <link rel="stylesheet" href="components/editors/state-machine-editor/smach-editor.style.css" />
 <!-- endbuild -->
 
-<div class="smach-editor-wrapper">
-  <h3>SMACH State Machine Editor</h3>
-  <div class="alert alert-info">
-    <p>
-      A <a target="_blank" href="http://wiki.ros.org/smach"><b>SMACH</b></a> 
-      state machine controls the overall experiment. It can monitor the simulation properties published on 
-      <a target="_blank" href="http://wiki.ros.org/Topics"><b>ROS topics</b></a> (e.g. simulation time, sensor output, spiking
-      activity of brain) and publish on these topics or call 
-      <a target="_blank" href="http://wiki.ros.org/Services"><b>ROS Services</b></a>. Get started with our
-      <a target="_blank" href="{{platformDocumentationURL}}/nrp/tutorials/experiment/state_machines.html"><b>tutorial</b></a>.
-    </p>
-  </div>
-  <div ng-show="stateMachines.length === 0" class="alert alert-info" role="alert">
-    There is no SMACH script available for this experiment.
-  </div>
-  <hr>
-  <div ng-include src="'components/editors/state-machine-editor/smach-editor-buttons.template.html'"></div>
-  <div ng-repeat="stateMachine in stateMachines">
-    <hr>
-    <h4><code class="CodeMirror cm-s-default"><span class="cm-def">{{stateMachine.name}}</span></code></h4>
-    <div ui-codemirror
-         ui-codemirror-opts="editorOptions"
-         ng-model="stateMachine.code"
-         ui-refresh="stateMachine.code"
-         ng-attr-id="state-machine-{{stateMachine.id}}"
-         ng-change="onStateMachineChange(stateMachine)">
-    </div>
-    <div ng-repeat="(type, error) in stateMachine.error">
-      <div class="alert alert-danger" role="alert">
-        {{error.message}} <b>({{type}})</b>
+<div class="smach-editor-container">
+
+    <div class="smach-ed-header">
+      <h3>SMACH State Machine Editor</h3>
+      <div class="alert alert-info">
+        <p>
+            A <a target="_blank" href="http://wiki.ros.org/smach"><b>SMACH</b></a>
+            state machine controls the overall experiment. It can monitor the simulation properties published on
+            <a target="_blank" href="http://wiki.ros.org/Topics"><b>ROS topics</b></a> (e.g. simulation time, sensor output, spiking
+            activity of brain) and publish on these topics or call
+            <a target="_blank" href="http://wiki.ros.org/Services"><b>ROS Services</b></a>. Get started with our
+            <a target="_blank" href="{{platformDocumentationURL}}/nrp/tutorials/experiment/state_machines.html"><b>tutorial</b></a>.
+
+            </p>
       </div>
+
     </div>
-    <button type="button" class="btn btn-default btn-md"
-            owner-only
-            ng-click="update(stateMachine)"
-            ng-disabled="!stateMachine.dirty || stateService.statePending">
-      <i class="glyphicon glyphicon-ok-circle"></i><span> Apply</span>
-    </button>
-    <button type="button" class="btn btn-default btn-md"
-            owner-only
-            ng-disabled="stateService.statePending"
-            ng-click="delete(stateMachine)">
-      <i class="glyphicon glyphicon-remove"></i><span> Delete</span>
-    </button>
+
+    <div class="smach-edit-area">
+      <div class="left-panel">
+
+        <div class="smach-title-box">
+          <div class="smach-title">State Machine Scripts</div>
+
+          <div>
+
+            <button type="button" class="btn btn-default smach-small-icon-button" ng-click="delete(stateMachine)" ng-disabled="(stateService.currentState === STATE.INITIALIZED) || stateService.statePending">
+              <i class="glyphicon glyphicon-trash"></i>
+            </button>
+
+            <button type="button" class="btn btn-default btn-md smach-small-icon-button" ng-disabled="(stateService.currentState === STATE.INITIALIZED) || stateService.statePending"
+              ng-click="create();">
+              <i class="glyphicon glyphicon-plus"></i>
+            </button>
+
+          </div>
+
+        </div>
+
+        <div class="smach-box">
+          <ul style="height: 100%; overflow-y: auto; padding: 5px;">
+            <li ng-repeat="sm in stateMachines" ng-class="{'smachDirty' : sm.dirty, 'smachSelected' : sm.id === stateMachine.id, 'smachNotSelected' : sm.id !== stateMachine.id}"
+              ng-click="selectStateMachine(sm)">
+              <div style="display: flex;">
+
+                <div style="min-width:17px">
+                  <i ng-show="sm.dirty" class="fa fa-circle" style="font-size: 9px;
+                      vertical-align: top;
+                      position: relative;
+                      top: 5px;
+                      left: 3px;"></i>
+                </div>
+
+                <div style="display:flex; width: 100%; justify-content: space-between;">
+
+                    <div style="text-overflow: ellipsis; overflow: hidden; width: 80%">
+                      {{sm.name}}
+                    </div>
+
+                  </div>
+              </div>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+      <div class="center-panel">
+        <div class="smach-content-box">
+
+          <div style="height: 100%;">
+
+            <div style="display:flex; height: 100%; ">
+
+                <div ng-show="stateMachines.length === 0" class="alert alert-info" role="alert" style="height: 53px; margin-top: 28px;width: 100%;background-color: white;">
+                    There is no SMACH script available for this experiment.
+                </div>
+
+              <div ng-show="stateMachines.length !== 0" style="display:flex; flex-direction:column; flex-grow: 1">
+
+                <div id="smachCodeEditor" ui-codemirror ui-refresh="stateMachine.code" ng-model="stateMachine.code"
+                  style="height: 100%; font-size:13px"
+                  ng-change="onStateMachineChange(stateMachine)">
+                </div>
+
+                <div ng-repeat="(type, error) in stateMachine.error">
+                  <div class="alert alert-danger" style="margin-top: 5px;" role="alert">
+                    {{error.message}}
+                    <b>({{type}})</b>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div>
+      <div class="smach-button-block" style="display:flex; min-width: 850px; justify-content: space-between;">
+
+        <div style="display:flex">
+            <div ng-show="stateMachines.length !== 0" ng-include src="'components/editors/state-machine-editor/smach-editor-buttons.template.html'"></div>
+        </div>
+
+        <div style="display:flex">
+
+          <button type="button" ng-class="{'smach-apply-changes-dirty':stateMachine.dirty}" class="btn btn-default btn-md"
+            ng-click="update(stateMachine)" ng-disabled="!stateMachine.dirty || (stateService.currentState === STATE.INITIALIZED) || stateService.statePending"
+            v-busy="stateMachine.dirty && stateService.statePending" v-busy-label="Applying changes" v-pressable style="display:flex;margin-right:10px;">
+            <i class="glyphicon glyphicon-ok-circle" ng-class="{'smach-apply-changes-dirty':stateMachine.dirty}" style="font-size: 15px; padding-right: 6px; padding-top: 1px;"></i>
+            <span> Apply</span>
+          </button>
+
+          <button type="button" ng-class="{'smach-apply-changes-dirty':nStateMachineDirty}" class="btn btn-default btn-md"
+            ng-click="update(stateMachines)" ng-disabled="!nStateMachineDirty || (stateService.currentState === STATE.INITIALIZED) || stateService.statePending"
+            v-busy="nStateMachineDirty && stateService.statePending" v-busy-label="Applying changes" v-pressable style="display:flex">
+            <i class="glyphicon glyphicon-ok-circle" ng-class="{'smach-apply-changes-dirty':nStateMachineDirty}" style="font-size: 15px; padding-right: 6px; padding-top: 1px;"></i>
+            <span> Apply All</span>
+          </button>
+
+        </div>
+
+      </div>
+
+
+
+    </div>
+
   </div>
-  <hr>
-  <div ng-show="stateMachines.length !== 0" ng-include src="'components/editors/state-machine-editor/smach-editor-buttons.template.html'" style="padding-bottom: 30px;"></div>
-</div>

@@ -22,8 +22,174 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  * ---LICENSE-END**/
 
-.smach-editor-wrapper {
+.smach-editor-container {
+  position: relative;
   height: 100%;
-  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  padding-top: 10px;
+  padding-right: 10px;
+  padding-bottom: 0px;
+  padding-left: 10px;
+  min-height: 394px;
+}
+
+.smach-title {
+  font-size: 16px;
+  margin-top: 2px;
+}
+
+.smachNotSelected {
+  color: black;
+  font-size: 14px;
+}
+
+.smachSelected {
+  color: black;
+  background-color: #ddecf9;
+  font-size: 14px;
+}
+
+.smachNameDeactivated {
+  color: rgb(117, 117, 117);
+}
+
+.smachDirty {
+  font-weight: 600;
+}
+
+.notSelected {
+  color: black;
+  font-size: 13px;
+}
+
+.selected {
+  color: black;
+  background-color: #ddecf9;
+  font-size: 13px;
+}
+
+.normal {
+  flex: 1;
+  min-width: 180px;
+  padding-right: 15px;
+  padding-left: 15px;
+  transition: all cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.5s;
+  background: white;
+}
+
+.normal.selected {
+  flex: 2;
+  min-width: 250px;
+}
+
+.normal.ng-hide {
+  opacity: 0;
+}
+
+.normal.ng-hide-add,
+.normal.ng-hide-remove {
+  transition: all cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.5s;
+}
+
+.smach-edit-area {
+  display: flex;
+  width: 100%;
+  min-width: 830px;
+  height: calc(100% - 210px);
+}
+
+.smallButtonBlock {
+  display: flex;
+  justify-content: space-evenly;
+  width: 100%;
+  margin-top: 10px;
+}
+
+.left-panel {
+  flex-grow: 0;
+  flex-basis: 20%;
+  margin-bottom: 10px;
+  min-width: 280px;
+  display: flex;
+  flex-direction: column;
+  max-width: 280px;
+}
+
+.center-panel {
+  flex-grow: 3;
+  flex-basis: 50%;
+  flex-direction: column;
+  display: flex;
+  margin-bottom: 10px;
+}
+
+.very-small-button {
+  font-size: 12px;
+  padding: 6px;
+  min-width: 111px;
+  padding: 2px;
+}
+
+.small-button {
+  font-size: 12px;
+  padding: 6px;
+  min-width: 111px;
+}
+
+.smach-ed-header {
   overflow: auto;
+  flex-shrink: 0;
+}
+
+.smach-box {
+  height: 100%;
+  border: 1px solid #dddddd;
+}
+
+.smach-content-box {
+  height: 100%;
+  padding-left: 20px;
+  flex-direction: column;
+  display: flex;
+}
+
+.smach-title-box {
+  display: flex;
+  justify-content: space-between;
+}
+
+.smach-small-icon-button {
+  margin-bottom: 4px;
+  font-size: 11px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-right: 8px;
+  padding-left: 8px;
+}
+
+.CodeMirror {
+  height: 100%;
+}
+
+.smach-button-block {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  border-top-color: rgb(221, 221, 221);
+  border-top-style: solid;
+  border-top-width: 1px;
+  padding-top: 6px;
+}
+
+.smach-apply-changes-dirty {
+  color: #159fc1;
+  animation: colorblink 2s infinite;
+}
+@keyframes colorblink {
+  0% {
+  }
+  50% {
+    color: #0c4e58;
+  }
 }
