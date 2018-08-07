@@ -103,6 +103,7 @@
           var docs = documentationURLs.getDocumentationURLs();
           scope.backendDocumentationURL = docs.backendDocumentationURL;
           scope.platformDocumentationURL = docs.platformDocumentationURL;
+          scope.nStateMachineDirty = 0;
 
           scope.$on('$destroy', () => {
             scope.resetListenerUnbindHandler();
@@ -110,6 +111,42 @@
             scope.unbindListenerUpdatePanelUI();
             editorToolbarService.showSmachEditor = false;
           });
+
+          $timeout(() => {
+            // refresh on resize
+            scope.unbindWatcherResize = scope.$watch(
+              () => {
+                if (element[0].offsetParent) {
+                  return [
+                    element[0].offsetParent.offsetWidth,
+                    element[0].offsetParent.offsetHeight
+                  ].join('x');
+                } else {
+                  return '';
+                }
+              },
+              () => {
+                refreshEditor();
+              }
+            );
+            refreshEditor();
+            scope.applyEditorOptions();
+          }, 100);
+
+          scope.selectStateMachine = function(stateMachine) {
+            scope.stateMachine = stateMachine;
+          };
+
+          scope.applyEditorOptions = function() {
+            var editor = codeEditorsServices.getEditorChild(
+              'smachCodeEditor',
+              element[0]
+            );
+
+            for (let opt in scope.editorOptions) {
+              editor.setOption(opt, scope.editorOptions[opt]);
+            }
+          };
 
           function loadStateMachines() {
             return storageServer
@@ -131,21 +168,35 @@
               });
           }
 
+          let refreshEditor = () => {
+            var editor = codeEditorsServices.getEditorChild(
+              'smachCodeEditor',
+              element[0]
+            );
+            codeEditorsServices.refreshEditor(editor);
+
+            if (scope.stateMachines.length && !scope.stateMachine)
+              scope.selectStateMachine(scope.stateMachines[0]);
+
+            scope.updateNStateMachineDirty();
+          };
+
+          scope.updateNStateMachineDirty = function() {
+            scope.nStateMachineDirty = 0;
+            _.forEach(scope.stateMachines, function(sm) {
+              if (sm.dirty) {
+                scope.nStateMachineDirty++;
+              }
+            });
+          };
+
           scope.refresh = function() {
             if (autoSaveService.isDirty()) {
-              codeEditorsServices.refreshAllEditors(
-                scope.stateMachines.map(function(sm) {
-                  return 'state-machine-' + sm.id;
-                })
-              );
+              refreshEditor();
               return;
             }
             loadStateMachines().then(function() {
-              codeEditorsServices.refreshAllEditors(
-                scope.stateMachines.map(function(sm) {
-                  return 'state-machine-' + sm.id;
-                })
-              );
+              refreshEditor();
             });
           };
 
@@ -200,6 +251,7 @@
                         stateMachine.dirty = false;
                         stateMachine.local = false;
                         scope.cleanCompileError(stateMachine);
+                        scope.updateNStateMachineDirty();
                       }
                     );
                   })
@@ -226,6 +278,7 @@
 
           scope.onStateMachineChange = function(stateMachine) {
             stateMachine.dirty = true;
+            scope.updateNStateMachineDirty();
             autoSaveService.setDirty();
           };
 
@@ -305,13 +358,7 @@
             scope.update(stateMachine);
             autoSaveService.setDirty();
 
-            $timeout(function() {
-              codeEditorsServices.refreshEditor(
-                codeEditorsServices.getEditor(
-                  'state-machine-' + stateMachine.id
-                )
-              );
-            });
+            scope.selectStateMachine(stateMachine);
 
             return stateMachine;
           };
@@ -330,6 +377,8 @@
                       stateMachine.id,
                       function() {
                         scope.stateMachines.splice(index, 1);
+                        scope.stateMachine = undefined;
+                        refreshEditor();
                       }
                     );
                   }
@@ -352,23 +401,43 @@
           };
 
           scope.generateID = function(count) {
-            return (
-              'statemachine_' + count + '_' + Date.now() + '_frontend_generated'
-            );
+            // Check if it does not already exists
+
+            do {
+              var found = true;
+              var id =
+                'statemachine_' +
+                count +
+                '_' +
+                Date.now() +
+                '_frontend_generated';
+              for (let sm of scope.stateMachines) {
+                if (
+                  scope.getStateMachineName(sm.id) ===
+                  scope.getStateMachineName(id)
+                ) {
+                  found = false;
+                  count++;
+                  break;
+                }
+              }
+            } while (!found);
+
+            return id;
           };
 
           scope.save = function() {
-            var stateMachinesCodeText = _.flatMap(scope.stateMachines, function(
-              stateMachine
-            ) {
-              return [stateMachine.code];
-            });
-            var file = new Blob(stateMachinesCodeText, {
-              type: 'plain/text',
-              endings: 'native'
-            });
-            var href = URL.createObjectURL(file);
-            downloadFileService.downloadFile(href, 'stateMachines.exd');
+            if (scope.stateMachine) {
+              var file = new Blob([scope.stateMachine.code], {
+                type: 'plain/text',
+                endings: 'native'
+              });
+              var href = URL.createObjectURL(file);
+              downloadFileService.downloadFile(
+                href,
+                scope.getStateMachineName(scope.stateMachine.id) + '.exd'
+              );
+            }
           };
 
           scope.loadStateMachine = function(file) {
@@ -376,8 +445,39 @@
               var textReader = new FileReader();
               textReader.onload = function(e) {
                 $timeout(function() {
-                  var code = e.target.result;
-                  scope.create(code);
+                  // Check if we have a state machine with the same name
+
+                  let smFound;
+
+                  _.forEach(scope.stateMachines, stateMachine => {
+                    if (
+                      scope.getStateMachineName(stateMachine.id) ===
+                      file.name.replace(/\.[^/.]+$/, '')
+                    )
+                      smFound = stateMachine;
+                  });
+
+                  if (smFound) {
+                    clbConfirm
+                      .open({
+                        title: 'Uploading State Machine',
+                        confirmLabel: 'Add',
+                        cancelLabel: 'Replace',
+                        template:
+                          'Add to the current state machines or replace the one with the same name ?',
+                        closable: false
+                      })
+                      .then(
+                        () => {
+                          scope.create(e.target.result);
+                        },
+                        () => {
+                          smFound.code = e.target.result;
+                          smFound.dirty = true;
+                          autoSaveService.setDirty();
+                        }
+                      );
+                  } else scope.create(e.target.result);
                 });
               };
               textReader.readAsText(file);

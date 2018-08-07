@@ -236,6 +236,7 @@ describe('Directive: smachEditor', function() {
       isolateScope.stateMachines = [
         { name: 'stateMachineName', code: 'Some code' }
       ];
+      isolateScope.stateMachine = isolateScope.stateMachines[0];
       isolateScope.save();
       expect(URLMock.createObjectURL).toHaveBeenCalled();
       expect(window.Blob.calls.mostRecent().args[0]).not.toContain(
