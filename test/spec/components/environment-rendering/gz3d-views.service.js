@@ -155,6 +155,11 @@ describe('Service: gz3dViews', function() {
     $rootScope.$digest();
   });
 
+  it(' - isUserView()', function() {
+    var view = gz3d.scene.viewManager.mainUserView;
+    expect(gz3dViewsService.isUserView(view)).toBe(true);
+  });
+
   it(' - toggleCameraHelper()', function() {
     var mockView = {
       camera: {

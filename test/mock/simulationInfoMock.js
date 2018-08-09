@@ -23,6 +23,9 @@
       this.Initialize = jasmine.createSpy('Initialize');
       this.mode = undefined;
       this.contextID = '97923877-13ea-4b43-ac31-6b79e130d344';
+      this.brain = {
+        robots: ['robot']
+      };
       this.experimentDetails = {
         description: 'The Husky robot plays chess with Icub',
         name: 'TrueBlue',

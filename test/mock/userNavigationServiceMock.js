@@ -32,8 +32,11 @@
         enabled: false
       };
       this.lookatRobotControls = {
-        setLookatTarget: jasmine.createSpy('setLookatTarget'),
-        setDistance: jasmine.createSpy('setDistance')
+        robot: {
+          setLookatTarget: jasmine.createSpy('setLookatTarget'),
+          setDistance: jasmine.createSpy('setDistance'),
+          lookAtTarget: jasmine.createSpy('setDistance')
+        }
       };
       this.navigationMode = 'FreeCamera';
     })

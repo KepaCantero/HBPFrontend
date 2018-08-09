@@ -230,6 +230,11 @@ describe('Services: objectInspectorService', function() {
   });
 
   it('should turn on/off robot mode', function() {
+    userNavigationService.setLookatRobotCamera();
+    var selectedObject = {
+      name: 'robot'
+    };
+    objectInspectorService.selectedObject = selectedObject;
     objectInspectorService.setRobotMode(true);
     expect(objectInspectorService.robotMode).toBe(true);
     objectInspectorService.setRobotMode(false);
@@ -238,6 +243,10 @@ describe('Services: objectInspectorService', function() {
 
   it('should reset navigation mode when exiting robot mode', function() {
     userNavigationService.navigationMode = NAVIGATION_MODES.GHOST;
+    var selectedObject = {
+      name: 'robot'
+    };
+    objectInspectorService.selectedObject = selectedObject;
     objectInspectorService.setRobotMode(true);
     objectInspectorService.setRobotMode(false);
     expect(userNavigationService.navigationMode).toBe(NAVIGATION_MODES.GHOST);

@@ -45,6 +45,9 @@ describe('Services: userNavigationService', function() {
           getByName: function() {
             return 'robot';
           },
+          selectedEntity: {
+            name: 'robot'
+          },
           viewManager: {
             mainUserView: {
               camera: new THREE.PerspectiveCamera()
@@ -461,8 +464,9 @@ describe('Services: userNavigationService', function() {
 
   it(' - initAvatar()', function() {
     spyOn(userNavigationService, 'getUserAvatar').and.callThrough();
+    userNavigationService.lookatRobotControls = [];
+    userNavigationService.lookatRobotControls['robot'] = lookatRobotControls;
     userNavigationService.freeCameraControls = firstPersonControls;
-    userNavigationService.lookatRobotControls = lookatRobotControls;
     userNavigationService.avatarControls = avatarControls;
     userNavigationService.navigationMode = NAVIGATION_MODES.HUMAN_BODY;
 
@@ -573,7 +577,8 @@ describe('Services: userNavigationService', function() {
     // test for switching modes
     userNavigationService.navigationMode = NAVIGATION_MODES.FREE_CAMERA;
     userNavigationService.freeCameraControls = firstPersonControls;
-    userNavigationService.lookatRobotControls = lookatRobotControls;
+    userNavigationService.lookatRobotControls = [];
+    userNavigationService.lookatRobotControls['robot'] = lookatRobotControls;
     userNavigationService.avatarControls = avatarControls;
     userNavigationService.userCamera = camera;
 
@@ -605,7 +610,8 @@ describe('Services: userNavigationService', function() {
     // test for switching modes
     userNavigationService.freeCameraControls = firstPersonControls;
     userNavigationService.userCamera = camera;
-    userNavigationService.lookatRobotControls = lookatRobotControls;
+    userNavigationService.lookatRobotControls = [];
+    userNavigationService.lookatRobotControls['robot'] = lookatRobotControls;
     userNavigationService.navigationMode = NAVIGATION_MODES.HUMAN_BODY;
     var positionMock = new THREE.Vector3(1, 2, 3);
     userNavigationService.currentPosition = positionMock;
@@ -633,7 +639,8 @@ describe('Services: userNavigationService', function() {
   it(' - setLookatRobotCamera()', function() {
     // test for already in LOOKAT_ROBOT mode
     userNavigationService.navigationMode = NAVIGATION_MODES.FREE_CAMERA;
-    userNavigationService.lookatRobotControls = lookatRobotControls;
+    userNavigationService.lookatRobotControls = [];
+    userNavigationService.lookatRobotControls['robot'] = lookatRobotControls;
     userNavigationService.freeCameraControls = firstPersonControls;
 
     userNavigationService.setLookatRobotCamera();

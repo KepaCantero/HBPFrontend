@@ -24,32 +24,18 @@
 (function() {
   'use strict';
 
-  angular.module('exdFrontendApp').service('isNotARobotPredicate', function() {
-    return function(entity) {
-      if (entity) {
-        var robotIdentifier = 'robot';
-
-        if (entity.name === robotIdentifier) {
-          return false;
+  angular.module('exdFrontendApp').service('isNotARobotPredicate', [
+    'simulationInfo',
+    function(simulationInfo) {
+      return function(entity) {
+        var ret = true;
+        if (entity) {
+          angular.forEach(simulationInfo.brain.robots, function(robot) {
+            if (entity.name === robot) ret = false;
+          });
         }
-
-        var idx = entity.name.indexOf(robotIdentifier);
-        if (idx === -1) {
-          return true;
-        }
-
-        if (idx + robotIdentifier.length < entity.name.length) {
-          if (
-            entity.name[idx + robotIdentifier.length] === ' ' ||
-            entity.name[idx + robotIdentifier.length] === '_'
-          ) {
-            return false;
-          }
-        }
-
-        return true;
-      }
-      return true;
-    };
-  });
+        return ret;
+      };
+    }
+  ]);
 })();

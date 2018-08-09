@@ -195,7 +195,10 @@ var GZ3D = GZ3D || {
   REVISION : '1',
   assetsPath: 'http://localhost:8080/assets',
   webSocketUrl: 'ws://localhost:7681',
-  webSocketToken: undefined
+  webSocketToken: undefined,
+  isRobot: function (model) {
+    return false;
+  }
 };
 
 GZ3D.AnimatedModel = function(scene) {
@@ -6256,7 +6259,7 @@ GZ3D.GZIface.prototype.createModelFromMsg = function(model)
 
   // Check for client-side-only animated model for robot
   var animatedModel = new GZ3D.AnimatedModel(this.scene);
-  if (model.name === 'robot' && GZ3D.animatedModel)
+  if (GZ3D.isRobot(model) && GZ3D.animatedModel)
   {
     animatedModel.loadAnimatedModel(model.name);
     this.animatedModels[model.name] = animatedModel;

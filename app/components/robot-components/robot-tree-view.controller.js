@@ -68,7 +68,7 @@
 
       $scope.filterThreeJSTree = node => {
         return (
-          node === robotComponentsService.robot ||
+          node === robotComponentsService.getRobot() ||
           isSensor(node) ||
           isRosTopic(node) ||
           isRobotLink(node) ||

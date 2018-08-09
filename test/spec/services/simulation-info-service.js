@@ -55,6 +55,9 @@ describe('Services: server-info-service', function() {
     httpBackend
       .whenGET('http://proxy/experiment/AnimatedMouse/config')
       .respond(200, experimentResponse);
+    httpBackend
+      .whenGET('http://proxy/experiment/AnimatedMouse/brain')
+      .respond(200, experimentResponse);
 
     simulationInfo.initialize(
       simulationData.serverID,

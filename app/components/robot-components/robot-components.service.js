@@ -50,9 +50,6 @@
       if (this.initialized) {
         return;
       }
-
-      this.robot = this.gz3d.scene.scene.getObjectByName('robot');
-
       // model property service
       this.rosWebsocketURL = this.simulationInfo.serverConfig.rosbridge.websocket;
       this.rosWebsocket = this.roslib.getOrCreateConnectionTo(
@@ -68,7 +65,12 @@
 
       this.initialized = true;
     }
-
+    getRobot() {
+      this.robot = this.gz3d.scene.selectedEntity;
+      console.info('*************');
+      console.info(this.robot);
+      return this.robot;
+    }
     getRobotModelProperties() {
       /* eslint-disable camelcase */
       var request = new this.roslib.ServiceRequest({

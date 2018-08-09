@@ -148,6 +148,7 @@
             this.storageServer
               .getRobotConfigPath(simulationInfo.experimentID)
               .then(robotConfigPath => {
+                if (!robotConfigPath) return;
                 this.$http.get(robotConfigPath).then(xml => {
                   let config = new X2JS().xml_str2json(xml.data);
                   if (config.model.frontend_skin_model) {

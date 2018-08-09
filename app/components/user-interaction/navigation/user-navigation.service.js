@@ -115,26 +115,33 @@
 
                   // set up controls
                   that.freeCameraControls = new THREE.FirstPersonControls(gz3d);
-
-                  if (gz3d.scene.getByName('robot')) {
-                    that.lookatRobotControls = new THREE.LookatRobotControls(
-                      gz3d.scene.viewManager.mainUserView,
-                      gz3d.scene.getByName('robot')
-                    );
-                    that.avatarControls = new THREE.AvatarControls(that, gz3d);
-                    that.avatarControls.createAvatarTopics(
-                      that.avatarObjectName
-                    );
-
-                    userInteractionSettingsService.settings //.loadSettings()
-                      .then(function(settings) {
-                        if (settings.camera.defaultMode === 'lookatrobot') {
-                          that.setLookatRobotCamera();
-                        } else {
-                          that.setModeFreeCamera();
-                        }
-                      });
+                  that.lookatRobotControls = [];
+                  if (!simulationInfo.brain || !simulationInfo.brain.robot) {
+                    angular.forEach(simulationInfo.brain.robots, function(
+                      robot
+                    ) {
+                      if (gz3d.scene.getByName(robot)) {
+                        that.lookatRobotControls[
+                          robot
+                        ] = new THREE.LookatRobotControls(
+                          gz3d.scene.viewManager.mainUserView,
+                          gz3d.scene.getByName(robot)
+                        );
+                      }
+                    });
+                  } else {
+                    // TODO: find default lookat. should fix bug NRRPLT-6773
                   }
+                  that.avatarControls = new THREE.AvatarControls(that, gz3d);
+                  that.avatarControls.createAvatarTopics(that.avatarObjectName);
+                  userInteractionSettingsService.settings //.loadSettings()
+                    .then(function(settings) {
+                      if (settings.camera.defaultMode === 'lookatrobot') {
+                        that.setLookatRobotCamera();
+                      } else {
+                        that.setModeFreeCamera();
+                      }
+                    });
                 });
               }
             });
@@ -267,7 +274,9 @@
 
             // avatar controls
             this.freeCameraControls.enabled = false;
-            this.lookatRobotControls.enabled = false;
+            this.lookatRobotControls.forEach(object => {
+              object.enabled = false;
+            });
             this.avatarControls.init(this.avatarObject, this.userCamera);
 
             switch (this.navigationMode) {
@@ -363,10 +372,14 @@
             this.navigationMode = NAVIGATION_MODES.HUMAN_BODY;
 
             this.freeCameraControls.enabled = false;
-            this.lookatRobotControls.enabled = false;
+            this.lookatRobotControls.forEach(object => {
+              object.enabled = false;
+            });
             this.controls = gz3d.scene.controls = undefined;
             this.freeCameraControls.detachEventListeners();
-            this.lookatRobotControls.detachEventListeners();
+            this.lookatRobotControls.forEach(object => {
+              object.detachEventListeners();
+            });
 
             this.removeAvatar();
             var avatarCollision = true;
@@ -407,8 +420,10 @@
             window.firstPersonControls = this.freeCameraControls;
             this.freeCameraControls.enabled = true;
 
-            this.lookatRobotControls.detachEventListeners();
-            this.lookatRobotControls.enabled = false;
+            this.lookatRobotControls.forEach(object => {
+              object.detachEventListeners();
+              object.enabled = false;
+            });
 
             this.controls = gz3d.scene.controls = this.freeCameraControls;
             this.freeCameraControls.attachEventListeners();
@@ -430,14 +445,22 @@
 
             this.removeAvatar();
 
-            window.lookatRobotControls = this.lookatRobotControls;
-            this.lookatRobotControls.attachEventListeners();
-            this.lookatRobotControls.enabled = true;
+            window.lookatRobotControls = this.lookatRobotControls[
+              gz3d.scene.selectedEntity.name
+            ];
+            this.lookatRobotControls[
+              gz3d.scene.selectedEntity.name
+            ].attachEventListeners();
+            this.lookatRobotControls[
+              gz3d.scene.selectedEntity.name
+            ].enabled = true;
 
             this.freeCameraControls.detachEventListeners();
             this.freeCameraControls.enabled = false;
 
-            this.controls = gz3d.scene.controls = this.lookatRobotControls;
+            this.controls = gz3d.scene.controls = this.lookatRobotControls[
+              gz3d.scene.selectedEntity.name
+            ];
           },
 
           isActiveNavigationMode: function(mode) {

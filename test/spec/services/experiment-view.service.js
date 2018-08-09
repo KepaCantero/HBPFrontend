@@ -405,23 +405,23 @@ describe('Service: ExperimentViewService', function() {
       mockResetRequest.resetType = RESET_TYPE.RESET_BRAIN;
       experimentViewService.resetSimulation();
       $timeout.flush(100);
-      expect(experimentViewService.notifyResetToWidgets.calls.count()).toBe(1);
+      expect(experimentViewService.notifyResetToWidgets.calls.count()).toBe(0);
 
       mockResetRequest.resetType = RESET_TYPE.RESET_CAMERA_VIEW;
       experimentViewService.resetSimulation();
       $timeout.flush(100);
-      expect(experimentViewService.notifyResetToWidgets.calls.count()).toBe(2);
+      expect(experimentViewService.notifyResetToWidgets.calls.count()).toBe(1);
 
       mockResetRequest.resetType = RESET_TYPE.RESET_ROBOT_POSE;
       experimentViewService.resetSimulation();
       $timeout.flush(100);
-      expect(experimentViewService.notifyResetToWidgets.calls.count()).toBe(3);
+      expect(experimentViewService.notifyResetToWidgets.calls.count()).toBe(2);
     });
 
     it('should make respective calls when resetting camera view', function() {
       mockResetRequest.resetType = RESET_TYPE.RESET_CAMERA_VIEW;
       experimentViewService.resetSimulation();
-      $timeout.flush(100);
+      $timeout.flush(150);
       expect(gz3d.scene.resetView).toHaveBeenCalled();
     });
 
@@ -430,7 +430,7 @@ describe('Service: ExperimentViewService', function() {
       mockResetRequest.resetType = RESET_TYPE.RESET_ROBOT_POSE;
 
       experimentViewService.resetSimulation();
-      $timeout.flush(100);
+      $timeout.flush(150);
 
       environmentService.setPrivateExperiment(false); //Collab IS NOT available
 
@@ -497,7 +497,7 @@ describe('Service: ExperimentViewService', function() {
           .args[1];
 
         resetFunction(); // call the callback
-        $timeout.flush(100);
+        $timeout.flush(150);
 
         //open splash
         expect(splash.open).toHaveBeenCalled();

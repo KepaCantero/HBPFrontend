@@ -537,12 +537,20 @@
                 this.previousCameraPosition = userNavigationService.userCamera.position.clone();
                 this.previousCameraRotation = userNavigationService.userCamera.rotation.clone();
                 this.previousLookAtObject =
-                  userNavigationService.lookatRobotControls.lookAtTarget;
+                  userNavigationService.lookatRobotControls[
+                    this.robotObject.name
+                  ].lookAtTarget;
 
-                userNavigationService.lookatRobotControls.setLookatTarget(null);
+                userNavigationService.lookatRobotControls[
+                  this.robotObject.name
+                ].setLookatTarget(null);
                 userNavigationService.setLookatRobotCamera();
-                userNavigationService.lookatRobotControls.setDistance(
-                  userNavigationService.lookatRobotControls.minDistance + 1.3
+                userNavigationService.lookatRobotControls[
+                  this.robotObject.name
+                ].setDistance(
+                  userNavigationService.lookatRobotControls[
+                    this.robotObject.name
+                  ].minDistance + 1.3
                 );
 
                 gz3d.scene.setViewAs(
@@ -582,9 +590,9 @@
                       break;
 
                     case NAVIGATION_MODES.LOOKAT_ROBOT:
-                      userNavigationService.lookatRobotControls.setLookatTarget(
-                        this.previousLookAtObject
-                      );
+                      userNavigationService.lookatRobotControls[
+                        this.robotObject.name
+                      ].setLookatTarget(this.previousLookAtObject);
                       userNavigationService.setLookatRobotCamera();
                       break;
                   }

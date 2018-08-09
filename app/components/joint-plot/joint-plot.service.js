@@ -73,7 +73,8 @@
 
       let modelreq = {};
       let jointreq = {};
-      modelreq[this.modelProp.param] = 'robot';
+      // TODO: add multirobots support
+      modelreq[this.modelProp.param] = simulationInfo.brain.robots[0];
 
       this.getModelPropertiesService.callService(
         new this.roslib.ServiceRequest(modelreq),

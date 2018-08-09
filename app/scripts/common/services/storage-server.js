@@ -361,6 +361,7 @@
           const xml = $.parseXML(bibi.data);
           const bodyModel = xml.getElementsByTagNameNS('*', 'bodyModel')[0];
 
+          if (!bodyModel) return null;
           if (!bodyModel.attributes.customAsset) {
             //no custom asset attribute => backwards compatbility mode
             return (

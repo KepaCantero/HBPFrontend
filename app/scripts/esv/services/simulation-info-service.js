@@ -56,6 +56,16 @@
           thisService.experimentDetails = null;
           thisService.simMaxTimeOutText = 300;
           thisService.simMaxAutoTimeOutText = 360;
+          storageServer
+            .getBrain(experimentID)
+            .then(res => (thisService.brain = res));
+          thisService.isRobot = function(model) {
+            if (thisService.brain && thisService.brain.robots)
+              thisService.brain.robots.map(robot => {
+                if (robot === model.name) return true;
+              });
+            return false;
+          };
 
           return experimentProxyService
             .getServerConfig(thisService.serverID)
