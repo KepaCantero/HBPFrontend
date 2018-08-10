@@ -1,6 +1,6 @@
 {
   "name": "brainvisualizer", 
-  "version": "2.0.3", 
+  "version": "2.0.4", 
   "description": "Javascript class for brain visualization", 
   "main": "Gruntfile.js", 
   "directories": {
