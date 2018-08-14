@@ -34,6 +34,38 @@
       expect(storageServer.proxyRsc).toBeDefined();
     });
 
+    it('should retrieve all customs models', function(done) {
+      var customModels = {
+        uuid: 'fileName',
+        fileName: 'fileName',
+        userId: 'token'
+      };
+      $httpBackend
+        .expectGET(/custommodels/)
+        .respond(200, angular.copy(customModels, []));
+      storageServer.getAllCustomModels().then(function(res) {
+        expect(res[0]).toBe(customModels[0]);
+        done();
+      });
+      $httpBackend.flush();
+      $rootScope.$digest();
+    });
+    it('should retrieve customs models', function(done) {
+      var customModels = {
+        uuid: 'fileName',
+        fileName: 'fileName',
+        userId: 'token'
+      };
+      $httpBackend
+        .expectGET(/custommodels/)
+        .respond(200, angular.copy(customModels, []));
+      storageServer.getCustomModels().then(function(res) {
+        expect(res[0]).toBe(customModels[0]);
+        done();
+      });
+      $httpBackend.flush();
+      $rootScope.$digest();
+    });
     it('should retrieve experiments', function(done) {
       var experiments = ['exp1', 'exp2'];
       $httpBackend

@@ -127,6 +127,11 @@
             url: `${this.STORAGE_BASE_URL}/clone/:experiment`,
             transformRequest: []
           }),
+          getAllCustomModels: buildAction({
+            method: 'GET',
+            isArray: true,
+            url: `${this.STORAGE_BASE_URL}/custommodels/all/:modelType`
+          }),
           getCustomModels: buildAction({
             method: 'GET',
             isArray: true,
@@ -186,7 +191,9 @@
         }
       );
     }
-
+    getAllCustomModels(modelType) {
+      return this.proxyRsc.getAllCustomModels({ modelType }).$promise;
+    }
     getCustomModels(modelType) {
       return this.proxyRsc.getCustomModels({ modelType }).$promise;
     }
