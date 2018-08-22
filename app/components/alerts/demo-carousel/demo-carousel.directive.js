@@ -28,8 +28,8 @@
         scope: true,
         link: function(scope) {
           // Basic Users are invited to join the Demo Carousel
-          var DEMO_MACHINE = '52.58.114.201';
-          scope.demoCarouselUrl = 'http://' + DEMO_MACHINE + ':9000/#/esv-demo';
+          var DEMO_MACHINE = '148.187.97.11';
+          scope.demoCarouselUrl = 'http://' + DEMO_MACHINE + '/#/esv-demo';
           // TEMPORARY disabling of the banner
           scope.displayWatchDemosButton = false;
         }
