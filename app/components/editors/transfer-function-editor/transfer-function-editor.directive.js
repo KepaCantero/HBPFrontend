@@ -1190,6 +1190,7 @@ def {0}(t):
                     transferFunction.dirty = false;
                     scope.dirtyTFNames.delete(transferFunction.name);
                     transferFunction.local = false;
+                    transferFunction.active = true;
 
                     scope.updateNTransferFunctionDirty();
                     transferFunction.oldName = transferFunction.name = pythonCodeHelper.getFunctionName(
