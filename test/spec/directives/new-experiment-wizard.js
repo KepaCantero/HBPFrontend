@@ -11,11 +11,13 @@
       scope,
       clbErrorDialog,
       newExperimentProxyService,
-      $timeout;
+      $timeout,
+      clbConfirm;
 
     beforeEach(module('exdFrontendApp'));
     beforeEach(module('exd.templates'));
     beforeEach(module('hbpCollaboratoryCore'));
+    beforeEach(module('nrpUserMock'));
 
     beforeEach(
       inject(function(
@@ -27,7 +29,8 @@
         _$q_,
         _clbErrorDialog_,
         _newExperimentProxyService_,
-        _$timeout_
+        _$timeout_,
+        _clbConfirm_
       ) {
         $httpBackend = _$httpBackend_;
         $rootScope = _$rootScope_;
@@ -38,7 +41,7 @@
         clbErrorDialog = _clbErrorDialog_;
         newExperimentProxyService = _newExperimentProxyService_;
         $timeout = _$timeout_;
-
+        clbConfirm = _clbConfirm_;
         $compile('<new-experiment-wizard></new-experiment-wizard>')($rootScope);
         $rootScope.$digest();
         scope = $rootScope.$$childHead;
@@ -450,6 +453,58 @@
       expect(document.body.appendChild).toHaveBeenCalled();
     });
 
+    it('should open the modal window that the ModelCustomExists works ok', function() {
+      var customModels = [
+        {
+          fileName: 'testEnv',
+          path: 'testPath',
+          userId: 'ownerDisplayName'
+        }
+      ];
+      spyOn(clbConfirm, 'open').and.callThrough();
+      scope.checkIfAppendExistsModelCustom(customModels, 'testEnv');
+      expect(clbConfirm.open).toHaveBeenCalled();
+    });
+
+    it('should not call checkIfAppendExistsModelCustom', function() {
+      var customModels = [
+        {
+          fileName: 'testEnv',
+          path: 'testPath',
+          userId: 'ownerDisplayName'
+        }
+      ];
+      spyOn(clbConfirm, 'open').and.callThrough();
+      scope.existsModelCustom(customModels, 'testEnv1');
+      expect(clbConfirm.open).not.toHaveBeenCalled();
+    });
+
+    it('should open the error that the ModelCustomExists works ok', function() {
+      var customModels = [
+        {
+          fileName: 'testEnv',
+          path: 'testPath',
+          userId: 'admin'
+        }
+      ];
+      spyOn(clbErrorDialog, 'open').and.callThrough();
+      scope.checkIfAppendExistsModelCustom(customModels, 'testEnv');
+      expect(clbErrorDialog.open).toHaveBeenCalled();
+    });
+
+    it('should call checkIfAppendExistsModelCustom if there is an existing custom model', function() {
+      var customModels = [
+        {
+          fileName: 'testEnv',
+          path: 'testPath',
+          userId: 'ownerDisplayName'
+        }
+      ];
+      spyOn(scope, 'checkIfAppendExistsModelCustom').and.returnValue();
+      scope.existsModelCustom(customModels, 'testEnv');
+      expect(scope.checkIfAppendExistsModelCustom).toHaveBeenCalled();
+    });
+
     it('should check that upload environment zip function works ok', function() {
       function blobToFile(theBlob, fileName) {
         theBlob.lastModifiedDate = new Date();
@@ -457,6 +512,9 @@
         return theBlob;
       }
       var fakeZip = new Blob([3, 7426, 78921], { type: 'application/zip' });
+      spyOn(scope, 'checkIfAppendExistsModelCustom').and.returnValue(
+        $q.when({})
+      );
       spyOn(window, 'FileReader').and.returnValue({
         readAsArrayBuffer: function() {
           this.onload({
@@ -468,15 +526,12 @@
       });
       spyOn(storageServer, 'setCustomModel').and.returnValue($q.when({}));
       spyOn(scope, 'destroyDialog');
-      spyOn(storageServer, 'getCustomModels').and.returnValue(
+      spyOn(storageServer, 'getAllCustomModels').and.returnValue(
         $q.when([
           {
-            name: 'testEnv',
-            custom: true,
-            path: 'testPath',
-            description: 'testDescription',
-            thumbnail: 'testThumbnail',
-            fileName: 'test'
+            uuid: 'testEnv',
+            fileName: true,
+            userId: 'user'
           }
         ])
       );
@@ -485,8 +540,9 @@
         blobToFile(fakeZip, 'test.zip'),
         'Environments'
       );
-      $timeout.flush();
-      $timeout.verifyNoPendingTasks();
+      //$timeout.flush();
+      //$timeout.verifyNoPendingTasks();
+
       res.then(function() {
         expect(scope.destroyDialog).toHaveBeenCalled();
         expect(scope.uploadingModel).toBe(false);
@@ -512,6 +568,16 @@
       });
       spyOn(storageServer, 'setCustomModel').and.returnValue($q.when({}));
       spyOn(scope, 'destroyDialog');
+      spyOn(scope, 'existsModelCustom').and.returnValue($q.when({}));
+      spyOn(storageServer, 'getAllCustomModels').and.returnValue(
+        $q.when([
+          {
+            uuid: 'testEnv',
+            fileName: true,
+            userId: 'user'
+          }
+        ])
+      );
       spyOn(storageServer, 'getCustomModels').and.returnValue(
         $q.when([
           {
@@ -553,6 +619,16 @@
       });
       spyOn(storageServer, 'setCustomModel').and.returnValue($q.when({}));
       spyOn(scope, 'destroyDialog');
+      spyOn(scope, 'existsModelCustom').and.returnValue($q.when({}));
+      spyOn(storageServer, 'getAllCustomModels').and.returnValue(
+        $q.when([
+          {
+            uuid: 'testEnv',
+            fileName: true,
+            userId: 'user'
+          }
+        ])
+      );
       spyOn(storageServer, 'getCustomModels').and.returnValue(
         $q.when([
           {
@@ -593,6 +669,16 @@
         }
       });
       spyOn(storageServer, 'getCustomModels').and.returnValue($q.resolve([]));
+      spyOn(scope, 'existsModelCustom').and.returnValue($q.when({}));
+      spyOn(storageServer, 'getAllCustomModels').and.returnValue(
+        $q.when([
+          {
+            uuid: 'testEnv',
+            fileName: true,
+            userId: 'user'
+          }
+        ])
+      );
       spyOn(storageServer, 'setCustomModel').and.returnValue(
         $q.reject({ data: 'Custom Model Failed' })
       );

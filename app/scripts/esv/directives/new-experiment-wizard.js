@@ -36,6 +36,7 @@
     '$timeout',
     'clbConfirm',
     'environmentService',
+    'nrpUser',
     function(
       $q,
       $window,
@@ -47,7 +48,8 @@
       $stateParams,
       $timeout,
       clbConfirm,
-      environmentService
+      environmentService,
+      nrpUser
     ) {
       return {
         templateUrl: 'views/esv/new-experiment-wizard.html',
@@ -64,8 +66,10 @@
           $scope.newExperiment = 'newExperiment';
           $scope.experimentCloned = false;
           $scope.paths = {};
+          nrpUser
+            .getOwnerDisplayName('me')
+            .then(owner => ($scope.owner = owner));
           $scope.maturity = environmentService.isDevMode() ? '' : 'production';
-
           var RobotUploader = {
             name: 'Robot',
             uploadFromTemplates: function() {
@@ -274,6 +278,42 @@
             document.body.removeChild(input[0]);
           };
 
+          $scope.checkIfAppendExistsModelCustom = function(
+            customModelFound,
+            filename
+          ) {
+            if (customModelFound[0].userId == $scope.owner) {
+              return clbConfirm
+                .open({
+                  title: `One of your CustomModels has already the name: ${filename}`,
+                  confirmLabel: 'Yes',
+                  cancelLabel: 'No',
+                  template:
+                    'Are you sure you would like to upload the file again?',
+                  closable: true
+                })
+                .catch(() => $q.resolve());
+            } else {
+              clbErrorDialog.open({
+                type: `A Custom Model already exists with the name ${filename}`,
+                message: 'The experiment already exists'
+              });
+              return $q.reject();
+            }
+          };
+          $scope.existsModelCustom = function(customModels, filename) {
+            var customModelFound = customModels.filter(customModel =>
+              customModel.fileName.includes(filename)
+            );
+            if (customModelFound.length) {
+              return $scope.checkIfAppendExistsModelCustom(
+                customModelFound,
+                filename
+              );
+            }
+            return $q.resolve();
+          };
+
           $scope.uploadModelZip = function(zip, entityType) {
             $scope.destroyDialog();
             return $timeout(() => {
@@ -290,42 +330,30 @@
               })
                 .then(([filename, filecontent]) => {
                   storageServer
-                    .getCustomModels((entityType + 's').toLowerCase())
+                    .getAllCustomModels((entityType + 's').toLowerCase())
                     .then(customModels => {
-                      return (customModels.filter(customModel =>
-                        customModel.fileName.includes(filename)
-                      ).length
-                        ? clbConfirm
-                            .open({
-                              title: `A file with the name ${filename} exists`,
-                              confirmLabel: 'Yes',
-                              cancelLabel: 'No',
-                              template:
-                                'Are you sure you would like to upload the file again?',
-                              closable: true
+                      return $scope
+                        .existsModelCustom(customModels, filename)
+                        .then(() => {
+                          return storageServer
+                            .setCustomModel(
+                              filename,
+                              (entityType += 's').toLowerCase(),
+                              filecontent
+                            )
+                            .catch(err => {
+                              $scope.destroyDialog();
+                              $scope.createErrorPopup(err.data);
+                              return $q.reject(err);
                             })
-                            .catch(() => $q.resolve())
-                        : $q.resolve()
-                      ).then(() => {
-                        return storageServer
-                          .setCustomModel(
-                            filename,
-                            (entityType += 's').toLowerCase(),
-                            filecontent
-                          )
-                          .catch(err => {
-                            $scope.destroyDialog();
-                            $scope.createErrorPopup(err.data);
-                            return $q.reject(err);
-                          })
-                          .then(() => {
-                            $scope.entityName = entityType;
-                            return $scope.entityUploader.uploadFromPrivateStorage(
-                              zip.name
-                            );
-                          })
-                          .finally(() => ($scope.uploadingModel = false));
-                      });
+                            .then(() => {
+                              $scope.entityName = entityType;
+                              return $scope.entityUploader.uploadFromPrivateStorage(
+                                zip.name
+                              );
+                            })
+                            .finally(() => ($scope.uploadingModel = false));
+                        });
                     });
                 })
                 .catch(() => {
