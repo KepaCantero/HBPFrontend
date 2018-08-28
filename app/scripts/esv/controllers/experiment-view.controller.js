@@ -56,11 +56,15 @@
       contextMenuState,
       timeout,
       window,
-      experimentViewService
+      experimentViewService,
+      userNavigationService,
+      NAVIGATION_MODES
     ) {
       this.element = element;
       this.userContextService = userContextService;
       this.simulationInfo = simulationInfo;
+      this.userNavigationService = userNavigationService;
+      this.NAVIGATION_MODES = NAVIGATION_MODES;
 
       stateService.Initialize(); //TODO: (@SandroWeber) should be moved / handled inside service
 
@@ -163,6 +167,10 @@
       });
     }
 
+    exitLookatCameraMode() {
+      this.userNavigationService.setModeFreeCamera();
+    }
+
     exit() {
       //calls the exit function that has been moved to the toolbar
       const editorToolbar = 'editor-toolbar';
@@ -192,7 +200,9 @@
     'contextMenuState',
     '$timeout',
     '$window',
-    'experimentViewService'
+    'experimentViewService',
+    'userNavigationService',
+    'NAVIGATION_MODES'
   ];
 
   angular

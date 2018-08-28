@@ -201,9 +201,9 @@ describe('Directive: environment-designer', function() {
     expect(eventMock.stopPropagation).toHaveBeenCalled();
 
     // check call to look at
-    spyOn(userNavigationService, 'setLookatRobotCamera');
+    spyOn(userNavigationService, 'setLookatCamera');
     itemGroup.items[1].callback(eventMock);
-    expect(userNavigationService.setLookatRobotCamera).toHaveBeenCalled();
+    expect(userNavigationService.setLookatCamera).toHaveBeenCalled();
     expect(contextMenuState.toggleContextMenu).toHaveBeenCalledWith(false);
     expect(eventMock.stopPropagation).toHaveBeenCalled();
 

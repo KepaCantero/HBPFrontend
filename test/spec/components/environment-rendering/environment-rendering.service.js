@@ -2,6 +2,7 @@
 
 describe('Services: environmentRenderingService', function() {
   beforeEach(module('tipTooltipModule'));
+  beforeEach(module('tipTooltipModule'));
 
   var STATE, VENDORS;
 
@@ -140,7 +141,17 @@ describe('Services: environmentRenderingService', function() {
     spyOn(environmentRenderingService, 'isElementVisible').and.callThrough();
     spyOn(environmentRenderingService, 'update').and.callThrough();
 
-    $httpBackend.whenGET('robotpath').respond({});
+    var xmlConfig = `<?xml version="1.0"?>
+<model>
+  <name>CDP1 Mouse forelimb attached to sled</name>
+  <version>1.0</version>
+  <sdf version='1.4'>model.sdf</sdf>
+  <frontend_skin_model>    <mesh>myskin.fbx</mesh>
+  </frontend_skin_model>
+</model>
+`;
+
+    $httpBackend.whenGET('robotpath').respond(xmlConfig);
   });
 
   afterEach(function() {
@@ -508,5 +519,15 @@ describe('Services: environmentRenderingService', function() {
     expect(
       environmentRenderingService.tipTooltipService.setCurrentTip
     ).toHaveBeenCalled();
+  });
+
+  it(' - should handle robot skin', function() {
+    gz3d.scene.addSkinMesh = jasmine.createSpy('addSkinMesh');
+
+    environmentRenderingService.initRobotSkin();
+
+    $httpBackend.flush();
+
+    expect(gz3d.scene.addSkinMesh).toHaveBeenCalled();
   });
 });

@@ -454,8 +454,8 @@ describe('Controller: EditorToolbarController', function() {
       editorToolbarController.setNavigationMode(NAVIGATION_MODES.HUMAN_BODY);
       expect(userNavigationService.setModeHumanBody).toHaveBeenCalled();
 
-      editorToolbarController.setNavigationMode(NAVIGATION_MODES.LOOKAT_ROBOT);
-      expect(userNavigationService.setLookatRobotCamera).toHaveBeenCalled();
+      editorToolbarController.setNavigationMode(NAVIGATION_MODES.LOOKAT);
+      expect(userNavigationService.setLookatCamera).toHaveBeenCalled();
     });
 
     it('change show state for navigation mode menu', function() {
