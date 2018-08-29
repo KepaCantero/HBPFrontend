@@ -184,6 +184,7 @@ describe('Directive: pynnEditor', function() {
         to: 10,
         step: 1,
         name: 'slice0',
+        displayMode: 'range',
         regex: '^\\b(?!\\blist1\\b|\\bindex1\\b)([A-z_]+[\\w_]*)$',
         previousName: 'slice0'
       }
@@ -217,6 +218,25 @@ describe('Directive: pynnEditor', function() {
       expect(angular.toJson(isolateScope.populations)).toEqual(
         angular.toJson(expectedPopulations)
       );
+    });
+
+    it('should show the population help', function() {
+      isolateScope.showLocalHelp(true, 'populations');
+      expect(isolateScope.localHelpVisible['populations']).toBe(true);
+    });
+
+    it('should start/stop editing a population', function() {
+      isolateScope.startEditing(isolateScope.populations[0]);
+      expect(isolateScope.populations[0].editing).toBe(true);
+
+      spyOn(isolateScope, 'apply').and.callThrough();
+
+      isolateScope.editingFocusLost(isolateScope.populations[0]);
+
+      $timeout.flush(310);
+      isolateScope.$apply();
+
+      expect(isolateScope.apply).toHaveBeenCalled();
     });
 
     it('should not load a h5 brain', function() {

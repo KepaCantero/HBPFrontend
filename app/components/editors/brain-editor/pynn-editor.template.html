@@ -2,93 +2,263 @@
   <!-- build:css(.tmp) components/editors/brain-editor/pynn-editor.style.css -->
   <link rel="stylesheet" href="components/editors/brain-editor/pynn-editor.style.css" />
   <!-- endbuild -->
-  <h3>PyNN Brain Editor</h3>
-  <div class="alert alert-info">
-    <p>
-      Network scripts use <a target="_blank" href="http://neuralensemble.org/PyNN/"><b>PyNN</b></a> API
-      for loading a network in the simulation. Browse our <a target="_blank" href="{{platformDocumentationURL}}/nrp/user_manual/simulation_setup/hard_reset.html">
-      <b>User Manual</b></a> to see how a neural network can be changed at run time.
-    </p>
-  </div>
-  <div ng-show="pynnScript === undefined" class="alert alert-info" role="alert">
-    There is no PyNN script available for this experiment.
-  </div>
-  <div ng-show="pynnScript !== undefined">
-    <p>Populations (set of neurons indices) can be defined here and referred to in transfer functions:
-    </p>
-    <form name="populationForm">
-      <table class="table table-striped">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th colspan="3">Neuron indices</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr class="singlePopulation" ng-repeat="(index, population) in populations" ng-form="singlePopulationForm">
-            <td>
-              <input type="text" size="25" owner-only ng-model="population.name" ng-focus="onFocusChange(index);" ng-change="onPynnChange()" ng-change="updateRegexPatterns();"
-                ng-pattern="population.regex" required>
-            </td>
-            <td ng-if-start="isSlice(population)">
-              <div class="fixed-sized">
-                <label>from</label>
-                <input size="5" type="number" owner-only class="neuron-index-field" ng-model="population.from" min="0" required ng-change="onPynnChange()">
+
+  <div class="graphical-editor-pynn-container">
+
+    <h3>PyNN Brain Editor</h3>
+
+    <div class="alert alert-info">
+      <p>
+        Network scripts use
+        <a target="_blank" href="http://neuralensemble.org/PyNN/">
+          <b>PyNN</b>
+        </a> API for loading a network in the simulation. Browse our
+        <a target="_blank" href="{{platformDocumentationURL}}/nrp/user_manual/simulation_setup/hard_reset.html">
+          <b>User Manual</b>
+        </a> to see how a neural network can be changed at run time.
+
+      </p>
+    </div>
+    <div ng-show="pynnScript === undefined" class="alert alert-info" role="alert">
+      There is no PyNN script available for this experiment.
+    </div>
+    <div ng-show="pynnScript !== undefined" style="height: calc(100% - 150px); display:flex;     flex-direction: column;">
+
+      <div class="pynn-edit-area">
+
+        <!-- Script -->
+
+        <div class="pynn-center-panel">
+
+          <div id="pynnEditor" ui-codemirror ui-codemirror-opts="editorOptions" ng-model="pynnScript.code" ui-refresh="pynnScript.code"
+            style="height: 100%; font-size:13px">
+          </div>
+          <div ng-repeat="(type, error) in pynnScript.error">
+            <div class="alert alert-danger" role="alert">
+              {{error.message}}
+              <b>({{type}})</b>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Populations -->
+
+        <div class="pynn-right-panel">
+
+          <div ng-show="!addMode" style="max-height: 100%;overflow-y: auto;">
+
+            <div style="margin-right:5px">
+
+              <!-- POPULATIONS -->
+
+              <div class="pynn-param-title-block pynn-param-title-background-populations">
+
+                <div class="pynn-parameter-section-title">Populations</div>
+
+                <div style="display:flex">
+
+                  <button ng-disabled="pop.editing" type="button" class="btn btn-default btn-md pynn-small-icon-button-param" ng-click="addSlice()">
+                    <i class="glyphicon glyphicon-plus"></i>
+                  </button>
+
+                  <div ng-show="!localHelpVisible.populations" style="display:flex;">
+
+                    <button type="button" class="btn btn-default btn-md pynn-small-icon-button-param" ng-click="showLocalHelp(true,'populations')"
+                      style="margin-left: 2px; min-width: 21px;">
+                      <i class="fa fa-question" style="font-size: 12px;"></i>
+                    </button>
+
+                  </div>
+                </div>
+
               </div>
-            </td>
-            <td>
-              <label>to</label>
-              <input size="5" type="number" owner-only class="neuron-index-field" ng-model="population.to" min="1" required ng-change="onPynnChange()">
-            </td>
-            <td ng-if-end>
-              <label>step</label>
-              <input size="5" type="number" owner-only class="neuron-index-field" ng-model="population.step" min="1" required ng-change="onPynnChange()">
-            </td>
-            <td ng-if="!isSlice(population)" colspan="3">
-              <input size="40" type="text" owner-only ng-model="population.list" ng-change="onPynnChange()" ng-pattern="/^\s*\d+\s*(\,\s*\d+\s*)*$/"
-                required>
-            </td>
-            <td>
-              <button type="button" owner-only class="btn btn-default btn-md" ng-disabled="!singlePopulationForm.$valid" ng-click="deletePopulation(index);">
-              <i class="glyphicon glyphicon-remove"></i><span> Delete</span>
+
+
+              <div class="well well-sm normal pynn-param-section-box">
+
+                <div ng-show="localHelpVisible.populations" class="pynn-hint-small-help-block pynn-param-title-background-populations">
+                  <div>
+                    Populations (set of neurons indices) can be defined here and referred to in transfer functions
+                  </div>
+                  <div>
+                    <button type="button" class="btn btn-default btn-md pynn-small-icon-button-param" ng-click="showLocalHelp(false,'populations')"
+                      style="margin-left: 2px;     height: 16px;
+                        width: 16px; position:relative; border: none;
+                        background: none;">
+                      <i class="fa fa-close" style="font-size: 14px;
+                            position: absolute;
+                            left: 3px;
+                            top: -2px;
+                            color: rgba(0,0,0,0.3);"></i>
+                    </button>
+
+                  </div>
+
+                </div>
+
+                <div class="pynn-param-border" style="margin-bottom: 3px;" ng-repeat="pop in populations">
+
+                  <div ng-click="pop.showDetails = !pop.showDetails" class="pynn-param-title-background pynn-param-title-background-populations-sub">
+
+                    <div style="display: flex; justify-content: space-between; width: 100%;">
+                      <div style="display:flex">
+                        <div ng-class="{'fa fa-caret-right':!pop.showDetails,'fa fa-caret-down':pop.showDetails}" class="pynn-parameter-caret">
+                        </div>
+
+                        <div class="pynn-parameter-title">{{pop.name}}</div>
+                      </div>
+
+                      <div ng-show="!pop.editing" style="display:flex;">
+
+                        <div ng-click="startEditing(pop);pop.showDetails=true; $event.stopPropagation()" style="margin-right: 7px;">
+                          <i class="fa fa-pencil" style="font-size: 12px;"></i>
+                        </div>
+
+                      </div>
+
+                    </div>
+                  </div>
+
+                  <div ng-show="pop.showDetails" ng-click="$event.stopPropagation()" style="margin-top: 5px;margin-bottom: 10px;">
+
+                    <form name="populationForm" ng-if="pop.editing">
+
+                      <div class="pynn-population-param">
+                        <div style="font-weight:600">Name</div>
+
+                        <input type="text" custom-autofocus ng-focus="pop.editingHasFocus=true" ng-blur="pop.editingHasFocus=false;editingFocusLost(pop)"
+                          size="25" owner-only ng-keyup="$event.keyCode==13 && apply()" ng-model="pop.name" ng-change="onPynnChange()"
+                          ng-change="updateRegexPatterns();" ng-pattern="pop.regex" required>
+
+                      </div>
+
+                      <div class="pynn-population-param">
+                        <div style="font-weight:600">Define</div>
+
+                        <select ng-disabled="true"
+                              ng-model="pop.displayMode" data-value="{{pop.displayMode}}" ng-change="onPopulationDefineModeChange(pop)"
+                              class="normal" style="max-height: 18px;
+                        margin-bottom: 5px;
+                        min-width: 20px;
+                        max-width: 120px;
+                        color: #848484;
+                        border-color: #d4d4d4;">      <!-- It is disabled for now, due to problems in the backend. To re-enable it
+                                                             remove ng-disabled and color/border-color style -->
+                            <option value="range">by slice</option>
+                            <option value="list">by list</option>
+                        </select>
+                      </div>
+
+                      <div ng-if-start="pop.displayMode=='range'" class="pynn-population-param">
+                        <div style="font-weight:600">From</div>
+                        <input size="5" type="number" ng-focus="pop.editingHasFocus=true" ng-blur="pop.editingHasFocus=false;editingFocusLost(pop)"
+                          owner-only ng-keyup="$event.keyCode==13 && apply()" class="neuron-index-field" ng-model="pop.from"
+                          min="0" required ng-change="onPynnChange()">
+                      </div>
+
+                      <div class="pynn-population-param">
+                        <div style="font-weight:600">To</div>
+                        <input size="5" type="number" ng-focus="pop.editingHasFocus=true" ng-blur="pop.editingHasFocus=false;editingFocusLost(pop)"
+                          owner-only ng-keyup="$event.keyCode==13 && apply()" class="neuron-index-field" ng-model="pop.to"
+                          min="1" required ng-change="onPynnChange()">
+                      </div>
+
+                      <div ng-if-end class="pynn-population-param">
+                        <div style="font-weight:600">Step</div>
+                        <input size="5" type="number" ng-focus="pop.editingHasFocus=true" ng-blur="pop.editingHasFocus=false;editingFocusLost(pop)"
+                          owner-only ng-keyup="$event.keyCode==13 && apply()" class="neuron-index-field" ng-model="pop.step"
+                          min="1" required ng-change="onPynnChange()">
+                      </div>
+
+                      <div ng-if="pop.displayMode=='list'" class="pynn-population-param">
+                        <div style="font-weight:600">Indexes</div>
+                        <input size="40" type="text" ng-focus="pop.editingHasFocus=true" ng-blur="pop.editingHasFocus=false;editingFocusLost(pop)"
+                          owner-only ng-keyup="$event.keyCode==13 && apply()" ng-model="pop.list" ng-change="onPynnChange()"
+                          ng-pattern="/^\s*\d+\s*(\,\s*\d+\s*)*$/" required>
+
+                      </div>
+
+                      <span class="alert alert-danger" ng-if="!populationForm.$valid" style="font-size: 10px;
+                      margin: 4px;
+                      padding: 5px;
+                      padding-left: 20px;
+                      padding-right: 20px;">Invalid population definition.</span>
+
+                    </form>
+
+                    <div ng-show="!pop.editing">
+                      <div ng-if-start="pop.displayMode=='range'" class="pynn-population-param">
+                        <div style="font-weight:600">From</div>
+                        <div>{{pop.from}}</div>
+                      </div>
+
+                      <div class="pynn-population-param">
+                        <div style="font-weight:600">To</div>
+                        <div>{{pop.to}}</div>
+                      </div>
+
+                      <div ng-if-end class="pynn-population-param">
+                        <div style="font-weight:600">Step</div>
+                        <div>{{pop.step}}</div>
+                      </div>
+
+                      <div ng-if="pop.displayMode=='list'" class="pynn-population-param">
+                        <div style="font-weight:600">Indexes</div>
+                        <div>{{pop.list}}</div>
+                      </div>
+
+                      <div class="pynn-var-block-bottom-area">
+
+                        <button type="button" class="btn btn-default tf-small-icon-button" ng-click="deletePopulation($index);">
+                          <i class="glyphicon glyphicon-trash"></i>
+                        </button>
+
+                      </div>
+
+                    </div>
+
+                  </div>
+
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+
+
+      <!-- Bottom bar -->
+
+      <div>
+
+        <div class="pynn-button-block" style="display:flex; min-width: 850px; justify-content: space-between;">
+
+          <div style="display:flex">
+
+            <button class="btn btn-default btn-md" owner-only ng-click="download()">
+              <i class="glyphicon glyphicon-download"></i>
+              <span> Download</span>
             </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      <div ng-include src="'components/editors/brain-editor/pynn-editor-buttons.template.html'"></div>
-    </form>
-    <hr>
-    <h4>PyNN Brain</h4>
-    <button class="btn btn-default btn-md" owner-only ng-click="download()">
-     <i class="glyphicon glyphicon-download"></i><span> Download</span>
-    </button>
-    <button class="btn btn-default btn-md" owner-only type="file" ngf-select="uploadFile($file)" accept=".py">
-      <i class="glyphicon glyphicon-upload"></i><span> Upload</span>
-    </button>
-    <hr>
-    <div id="pynnEditor" ui-codemirror ui-codemirror-opts="editorOptions"
-         ng-model="pynnScript.code"
-         ui-refresh="pynnScript.code">
+            <button class="btn btn-default btn-md" style="margin-left: 10px;" owner-only type="file" ngf-select="uploadFile($file)" accept=".py">
+              <i class="glyphicon glyphicon-upload"></i>
+              <span> Upload</span>
+            </button>
+          </div>
+
+          <button type="button" class="btn btn-default btn-md"  ng-class="{'pynn-apply-changes-dirty':localBrainDirty}" owner-only ng-click="apply(0)" ng-disabled="loading || stateService.statePending || (!localBrainDirty && !editingPopulation())"
+            v-busy="loading || stateService.statePending" v-busy-label="Applying changes" v-pressable>
+            <i class="glyphicon glyphicon-ok-circle" aria-hidden="true"></i>
+            <span> Apply</span>
+          </button>
+
+        </div>
+      </div>
     </div>
-    <div ng-repeat="(type, error) in pynnScript.error">
-     <div class="alert alert-danger" role="alert">
-      {{error.message}} <b>({{type}})</b>
-     </div>
-    </div>
-    <hr>
-    <div  style="padding-bottom: 30px;">
-      <button type="button" class="btn btn-default btn-md"
-              owner-only
-              ng-click="apply(0)"
-              ng-disabled="loading || stateService.statePending || !populationForm.$valid || !localBrainDirty"
-              v-busy="loading || stateService.statePending"
-              v-busy-label="Applying changes"
-              v-pressable>
-        <i class="glyphicon glyphicon-ok-circle" aria-hidden="true"></i>
-        <span> Apply</span>
-      </button>
-    </div>
+
   </div>
 </div>
