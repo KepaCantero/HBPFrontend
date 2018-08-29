@@ -2,201 +2,203 @@
 <link rel="stylesheet" href="styles/esv/demo-experiments.css" />
 <!-- endbuild -->
 
-<div class="demo-main-page">
+<div class="demo-main-page-container">
+  <div class="demo-main-page">
 
-  <div>
-    <img class="demo-experiments-title" src="img/demo/title.jpg" />
-  </div>
-
-  <div class="demo-social-networks">
-
-    <a href="https://twitter.com/HBPNeurorobotic" class="twitter-follow-button" data-show-count="false"></a>
-
-    <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
-
-    <iframe src="https://www.facebook.com/plugins/follow.php?href=https%3A%2F%2Fwww.facebook.com%2Fneurorobotics%2F&width=63&height=65&layout=button&size=small&show_faces=true&appId"
-      width="63" height="65" style="height:20px; border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true"></iframe>
-
-  </div>
-
-  <div class="demo-text-intro">
-    <div class="demo-text-intro-title">Welcome to The Neurorobotics Platform (NRP)</div>
-    The Neurorobotics Platform (NRP) developed in the Human Brain Project (HBP) is an Internet-accessible simulation system that
-    allows the simulation of robots controlled by spiking neural networks. It targets researchers of multiple fields. Prospected
-    users include but are not limited to neuroscientists wanting to validate brain models in the context of closed action-perception
-    loops as well as robotics researchers wanting to develop new neuro-inspired controllers.
-  </div>
-
-  <div class="demo-flex-columns">
-
-
-    <div class="demo-box-text ">
-
-      <uib-carousel active="active" id="textCarousel" interval="6000" no-wrap="false">
-
-        <uib-slide index="0">
-          <div class="demo-carousel-text-back-image">
-            <div class="demo-text-carousel-title"> Discover the Platform </div>
-
-            <div class="demo-text-carousel-content">
-              This demo allows you to test the <b>NRP</b> as an observer.
-              </br>
-              <img style="position: relative; left: 140px;top: 55px;" src="img/demo/demo-icub.png" />
-            </div>
-
-          </div>
-
-        </uib-slide>
-        <uib-slide index="1">
-          <div class="demo-carousel-text-back-image">
-            <div class="demo-text-carousel-title"> Explore the 3D scene </div>
-
-            <div class="demo-text-carousel-content">
-              Use the mouse and the keyboard to navigate the 3D scene.
-
-              <img style="position:relative;left:80px;top:30px;" src="img/demo/demo-keyboard.png" />
-
-            </div>
-
-          </div>
-        </uib-slide>
-
-        <uib-slide index="2">
-          <div class="demo-carousel-text-back-image">
-            <div class="demo-text-carousel-title"> Watch the spikes </div>
-
-            <div class="demo-text-carousel-content">
-              Open the Spike Monitor to watch the spike activity.
-
-              <img style="position:relative;left:80px;top:30px;" src="img/demo/demo-spike.png" />
-
-            </div>
-
-          </div>
-        </uib-slide>
-
-        <uib-slide index="3">
-          <div class="demo-carousel-text-back-image">
-            <div class="demo-text-carousel-title"> Monitor Joints </div>
-
-            <div class="demo-text-carousel-content">
-              Display curves of robot joints states data.
-
-              <img style="position:relative;left:75px;;top:30px;" src="img/demo/demo-joints.png" />
-
-            </div>
-
-          </div>
-        </uib-slide>
-
-        <uib-slide index="4">
-          <div class="demo-carousel-text-back-image">
-            <div class="demo-text-carousel-title"> Robot’s view  </div>
-
-            <div class="demo-text-carousel-content">
-              Open an overlaid view of the robot camera.
-
-              <img style="position:relative;left:145px;;top:30px;" src="img/demo/demo-camera.png" />
-
-            </div>
-
-          </div>
-        </uib-slide>
-
-        <uib-slide index="5">
-          <div class="demo-carousel-text-back-image">
-            <div class="demo-text-carousel-title"> Display scripts </div>
-
-            <div class="demo-text-carousel-content">
-              Display robot brain scripts.</br>
-
-              <img style="position:relative;left:170px;;top:30px;width:40%;" src="img/demo/demo-scripts.png" />
-
-            </div>
-
-          </div>
-        </uib-slide>
-
-        <uib-slide index="6">
-          <div class="demo-carousel-text-back-image">
-            <div class="demo-text-carousel-title"> Brainvisualizer </div>
-
-            <div class="demo-text-carousel-content">Display the neurons using the Brainvisualizer.
-              <img style="position:relative;left:165px;;top:30px;" src="img/demo/demo-brain.png" />
-            </div>
-
-          </div>
-        </uib-slide>
-
-
-        <uib-slide index="7">
-          <div class="demo-carousel-text-back-image">
-            <div class="demo-text-carousel-title"> Try Experiment </div>
-
-            <div class="demo-text-carousel-content">
-
-              You can join a running experiment at any time simply by clicking the
-              <i>TRY EXPERIMENT</i> button.
-
-              <img style="position: relative;left: 140px;top: 25px;width: 50%;" src="img/demo/demo-play.png" />
-
-            </div>
-
-          </div>
-        </uib-slide>
-    </uib-carousel>
+    <div>
+      <img class="demo-experiments-title" src="img/demo/title.jpg" />
     </div>
 
-    <div class="demo-box-joining-experiment"  ng-hide="!vm.joiningExperiment">
-      <div class="demo-joining-wait-message">Please wait</div>
-       <div class="demo-joining-joing-message">Joining experiment...</div>
+    <div class="demo-social-networks">
 
-        <div class="btn btn-default demo-cancel-button" ng-click="vm.cancelLaunch()" >
-          Cancel
-        </div>
+      <a href="https://twitter.com/HBPNeurorobotic" class="twitter-follow-button" data-show-count="false"></a>
 
-   </div>
+      <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
 
-    <div class="demo-box-carousel" ng-hide="vm.joiningExperiment">
-      <div>
-        <uib-carousel active="active" interval="5000" no-wrap="false">
-          <uib-slide ng-repeat="slide in vm.demoExperiments track by slide.id" index="slide.id">
-            <img ng-click="vm.launchExperiment()" ng-src="{{slide.image}}" class="demo-carousel-img" />
+      <iframe src="https://www.facebook.com/plugins/follow.php?href=https%3A%2F%2Fwww.facebook.com%2Fneurorobotics%2F&width=63&height=65&layout=button&size=small&show_faces=true&appId"
+        width="63" height="65" style="height:20px; border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true"></iframe>
+
+    </div>
+
+    <div class="demo-text-intro">
+      <div class="demo-text-intro-title">Welcome to The Neurorobotics Platform (NRP)</div>
+      The Neurorobotics Platform (NRP) developed in the Human Brain Project (HBP) is an Internet-accessible simulation system that
+      allows the simulation of robots controlled by spiking neural networks. It targets researchers of multiple fields. Prospected
+      users include but are not limited to neuroscientists wanting to validate brain models in the context of closed action-perception
+      loops as well as robotics researchers wanting to develop new neuro-inspired controllers.
+    </div>
+
+    <div class="demo-flex-columns">
+
+
+      <div class="demo-box-text ">
+
+        <uib-carousel active="active" id="textCarousel" interval="6000" no-wrap="false">
+
+          <uib-slide index="0">
+            <div class="demo-carousel-text-back-image">
+              <div class="demo-text-carousel-title"> Discover the Platform </div>
+
+              <div class="demo-text-carousel-content">
+                This demo allows you to test the <b>NRP</b> as an observer.
+                </br>
+                <img style="position: relative; left: 140px;top: 55px;" src="img/demo/demo-icub.png" />
+              </div>
+
+            </div>
+
           </uib-slide>
-        </uib-carousel>
+          <uib-slide index="1">
+            <div class="demo-carousel-text-back-image">
+              <div class="demo-text-carousel-title"> Explore the 3D scene </div>
 
-        <div class="btn btn-default demo-join-button" ng-click="vm.launchExperiment()" >
-          <div class="fa fa-play-circle-o demo-play-icon"></div>TRY EXPERIMENT
-        </div>
-        <div class="demo-text-server-restart">Server will be restarted every day at 21:00 and 05:00 UTC</div>
+              <div class="demo-text-carousel-content">
+                Use the mouse and the keyboard to navigate the 3D scene.
+
+                <img style="position:relative;left:80px;top:30px;" src="img/demo/demo-keyboard.png" />
+
+              </div>
+
+            </div>
+          </uib-slide>
+
+          <uib-slide index="2">
+            <div class="demo-carousel-text-back-image">
+              <div class="demo-text-carousel-title"> Watch the spikes </div>
+
+              <div class="demo-text-carousel-content">
+                Open the Spike Monitor to watch the spike activity.
+
+                <img style="position:relative;left:80px;top:30px;" src="img/demo/demo-spike.png" />
+
+              </div>
+
+            </div>
+          </uib-slide>
+
+          <uib-slide index="3">
+            <div class="demo-carousel-text-back-image">
+              <div class="demo-text-carousel-title"> Monitor Joints </div>
+
+              <div class="demo-text-carousel-content">
+                Display curves of robot joints states data.
+
+                <img style="position:relative;left:75px;;top:30px;" src="img/demo/demo-joints.png" />
+
+              </div>
+
+            </div>
+          </uib-slide>
+
+          <uib-slide index="4">
+            <div class="demo-carousel-text-back-image">
+              <div class="demo-text-carousel-title"> Robot’s view  </div>
+
+              <div class="demo-text-carousel-content">
+                Open an overlaid view of the robot camera.
+
+                <img style="position:relative;left:145px;;top:30px;" src="img/demo/demo-camera.png" />
+
+              </div>
+
+            </div>
+          </uib-slide>
+
+          <uib-slide index="5">
+            <div class="demo-carousel-text-back-image">
+              <div class="demo-text-carousel-title"> Display scripts </div>
+
+              <div class="demo-text-carousel-content">
+                Display robot brain scripts.</br>
+
+                <img style="position:relative;left:170px;;top:30px;width:40%;" src="img/demo/demo-scripts.png" />
+
+              </div>
+
+            </div>
+          </uib-slide>
+
+          <uib-slide index="6">
+            <div class="demo-carousel-text-back-image">
+              <div class="demo-text-carousel-title"> Brainvisualizer </div>
+
+              <div class="demo-text-carousel-content">Display the neurons using the Brainvisualizer.
+                <img style="position:relative;left:165px;;top:30px;" src="img/demo/demo-brain.png" />
+              </div>
+
+            </div>
+          </uib-slide>
+
+
+          <uib-slide index="7">
+            <div class="demo-carousel-text-back-image">
+              <div class="demo-text-carousel-title"> Try Experiment </div>
+
+              <div class="demo-text-carousel-content">
+
+                You can join a running experiment at any time simply by clicking the
+                <i>TRY EXPERIMENT</i> button.
+
+                <img style="position: relative;left: 140px;top: 25px;width: 50%;" src="img/demo/demo-play.png" />
+
+              </div>
+
+            </div>
+          </uib-slide>
+      </uib-carousel>
       </div>
+
+      <div class="demo-box-joining-experiment"  ng-hide="!vm.joiningExperiment">
+        <div class="demo-joining-wait-message">Please wait</div>
+        <div class="demo-joining-joing-message">Joining experiment...</div>
+
+          <div class="btn btn-default demo-cancel-button" ng-click="vm.cancelLaunch()" >
+            Cancel
+          </div>
+
+    </div>
+
+      <div class="demo-box-carousel" ng-hide="vm.joiningExperiment">
+        <div>
+          <uib-carousel active="active" interval="5000" no-wrap="false">
+            <uib-slide ng-repeat="slide in vm.demoExperiments track by slide.id" index="slide.id">
+              <img ng-click="vm.launchExperiment()" ng-src="{{slide.image}}" class="demo-carousel-img" />
+            </uib-slide>
+          </uib-carousel>
+
+          <div class="btn btn-default demo-join-button" ng-click="vm.launchExperiment()" >
+            <div class="fa fa-play-circle-o demo-play-icon"></div>TRY EXPERIMENT
+          </div>
+          <div class="demo-text-server-restart">Server will be restarted every day at 21:00 and 05:00 UTC</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="demo-bottom-page">
+
+      <div class="btn btn-default demo-website-button" onclick="window.open('http://neurorobotics.net/', '_blank')"  ng-mouseup="$event.stopPropagation(); focus('container');">
+          <div class="fa fa-link demo-bottom-button-icon"> </div>
+          <div>WEB SITE</div>
+      </div>
+
+      <div class="btn btn-default demo-website-button" onclick="window.open('http://neurorobotics.net/index_video.html?noMenu=0', '_blank')" ng-mouseup="$event.stopPropagation(); focus('container');">
+          <div class="fa fa-play demo-bottom-button-icon"> </div>
+          <div>VIDEO TUTORIALS</div>
+      </div>
+
+      <div class="btn btn-default demo-website-button" onclick="window.open('https://developer.humanbrainproject.eu/docs/projects/HBP%20Neurorobotics%20Platform/1.2/index.html', '_blank')" ng-mouseup="$event.stopPropagation(); focus('container');">
+          <div class="fa fa-book demo-bottom-button-icon"> </div>
+          <div>DOCUMENTATION</div>
+      </div>
+
+      <div class="btn btn-default demo-website-button" onclick="window.open('https://forum.humanbrainproject.eu/c/neurorobotics', '_blank')" ng-mouseup="$event.stopPropagation(); focus('container');">
+          <div class="fa fa-comments demo-bottom-button-icon"> </div>
+          <div>FORUMS</div>
+      </div>
+
     </div>
 
   </div>
 
-  <div class="demo-bottom-page">
-
-    <div class="btn btn-default demo-website-button" onclick="window.open('http://neurorobotics.net/', '_blank')"  ng-mouseup="$event.stopPropagation(); focus('container');">
-         <div class="fa fa-link demo-bottom-button-icon"> </div>
-         <div>WEB SITE</div>
-    </div>
-
-    <div class="btn btn-default demo-website-button" onclick="window.open('http://neurorobotics.net/index_video.html?noMenu=0', '_blank')" ng-mouseup="$event.stopPropagation(); focus('container');">
-         <div class="fa fa-play demo-bottom-button-icon"> </div>
-         <div>VIDEO TUTORIALS</div>
-    </div>
-
-    <div class="btn btn-default demo-website-button" onclick="window.open('https://developer.humanbrainproject.eu/docs/projects/HBP%20Neurorobotics%20Platform/1.2/index.html', '_blank')" ng-mouseup="$event.stopPropagation(); focus('container');">
-         <div class="fa fa-book demo-bottom-button-icon"> </div>
-         <div>DOCUMENTATION</div>
-    </div>
-
-    <div class="btn btn-default demo-website-button" onclick="window.open('https://forum.humanbrainproject.eu/c/neurorobotics', '_blank')" ng-mouseup="$event.stopPropagation(); focus('container');">
-         <div class="fa fa-comments demo-bottom-button-icon"> </div>
-         <div>FORUMS</div>
-    </div>
-
-  </div>
-
-</div>
-
+<div>
