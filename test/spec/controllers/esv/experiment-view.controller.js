@@ -39,6 +39,7 @@ describe('Controller: ExperimentViewController', function() {
   beforeEach(module('colorableObjectServiceMock'));
   beforeEach(module('environmentRenderingServiceMock'));
   beforeEach(module('applyForceServiceMock'));
+  beforeEach(module('userNavigationServiceMock'));
 
   beforeEach(
     module(function($provide) {

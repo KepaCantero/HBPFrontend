@@ -257,7 +257,7 @@
               {
                 text: 'Look At',
                 callback: function(event) {
-                  userNavigationService.setLookatRobotCamera();
+                  userNavigationService.setLookatCamera();
                   gz3d.gui.guiEvents.emit('lookat_entity');
                   contextMenuState.toggleContextMenu(false);
                   event.stopPropagation();

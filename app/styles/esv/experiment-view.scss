@@ -60,4 +60,34 @@
     top: 20px;
     right: 20px;
   }
+
+  .lookat-camera-message {
+    width: 220px;
+    position: relative;
+    padding-left: 16px;
+    left: 16px;
+    top: 16px;
+    z-index: 95;
+    background-color: rgba(0, 0, 0, 0.6);
+    color: rgba(255, 255, 255, 0.9);
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    font-size: 13px;
+    display: flex;
+  }
+
+  .lookat-camera-close {
+    cursor: pointer;
+    color: #ffffff;
+    border-radius: 5px;
+    height: 16px;
+    padding-left: 5px;
+    padding-right: 5px;
+    margin-left: 35px;
+    margin-top: 2px;
+  }
 }

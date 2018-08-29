@@ -249,8 +249,8 @@
           }
           break;
 
-        case this.NAVIGATION_MODES.LOOKAT_ROBOT:
-          this.userNavigationService.setLookatRobotCamera();
+        case this.NAVIGATION_MODES.LOOKAT:
+          this.userNavigationService.setLookatCamera();
           break;
       }
     }

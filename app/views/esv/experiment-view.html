@@ -36,11 +36,22 @@
 
         <help-tooltip-popover></help-tooltip-popover>
 
+        <div ng-show="vm.userNavigationService.navigationMode==vm.NAVIGATION_MODES.LOOKAT" class="lookat-camera-message">
+            <div style="margin-top: 2px; font-weight: 600; flex-grow: 1;">
+                Look at "{{vm.userNavigationService.lookatControls.lookAtTarget.name}}"
+            </div>
+
+            <div ng-click="vm.exitLookatCameraMode()" class="lookat-camera-close">
+                <i class="fa fa-times"></i>
+            </div>
+        </div>
+
         <div class="tip-tooltip-place">
             <tip-tooltip></tip-tooltip>
         </div>
-    </div>
 
+
+    </div>
 
 
 </div>

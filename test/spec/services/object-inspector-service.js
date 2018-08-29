@@ -229,8 +229,8 @@ describe('Services: objectInspectorService', function() {
     expect(objectInspectorService.getMeshByName('X').name).toBe('mock');
   });
 
-  it('should turn on/off robot mode', function() {
-    userNavigationService.setLookatRobotCamera();
+  it('should turn on/off mode', function() {
+    userNavigationService.setLookatCamera();
     var selectedObject = {
       name: 'robot'
     };

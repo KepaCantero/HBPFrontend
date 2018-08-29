@@ -1,28 +1,21 @@
 /**
- * Look at robot controls for the gz3d camera/scene.
+ * Look at object controls for the gz3d camera/scene.
  *
  */
 
 /* global THREE: true */
 /* global console: false */
 
-THREE.LookatRobotControls = function (userView, robot)
+THREE.LookatControls = function (userView)
 {
   'use strict';
 
   var that = this;
 
   this.userView = userView;
-  this.robot = robot;
-  this.lookAtTarget = robot;
+  this.lookAtTarget = null;
   this.activeLook = true;
-
-  var bbox = new THREE.Box3().setFromObject(this.lookAtTarget);
-  this.minDistance = bbox.getBoundingSphere().radius;
-  if (this.minDistance === Infinity)
-  {
-    this.minDistance = 0.25;
-  }
+  this.minDistance = 0.25;
 
   // Set to false to disable this control
   this.enabled = false;
@@ -84,20 +77,16 @@ THREE.LookatRobotControls = function (userView, robot)
 
   this.setLookatTarget = function (target)
   {
-    if (!target)
-    {
-      this.lookAtTarget = robot;
-    }
-    else
-    {
-      this.lookAtTarget = target;
-    }
+    this.lookAtTarget = target;
 
-    var bbox = new THREE.Box3().setFromObject(this.lookAtTarget);
-    this.minDistance = bbox.getBoundingSphere().radius;
-    if (this.minDistance === Infinity)
+    if (this.lookAtTarget)
     {
-      this.minDistance = 0.25;
+      var bbox = new THREE.Box3().setFromObject(this.lookAtTarget);
+      this.minDistance = bbox.getBoundingSphere().radius;
+      if (this.minDistance === Infinity)
+      {
+        this.minDistance = 0.25;
+      }
     }
 
   };
@@ -138,7 +127,7 @@ THREE.LookatRobotControls = function (userView, robot)
   this.onMouseWheel = function (event)
   {
     var delta = Math.max(-1, Math.min(1, (-event.wheelDelta || event.detail)));
-    window.lookatRobotControls.distanceDelta += delta * window.lookatRobotControls.mouseWheelSensitivity;
+    window.lookatControls.distanceDelta += delta * window.lookatControls.mouseWheelSensitivity;
   };
 
   this.onTouchStart = function (event)
@@ -485,4 +474,4 @@ THREE.LookatRobotControls = function (userView, robot)
 
 };
 
-THREE.LookatRobotControls.prototype = Object.create(THREE.EventDispatcher.prototype);
+THREE.LookatControls.prototype = Object.create(THREE.EventDispatcher.prototype);
