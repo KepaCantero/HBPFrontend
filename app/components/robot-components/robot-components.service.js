@@ -67,8 +67,6 @@
     }
     getRobot() {
       this.robot = this.gz3d.scene.selectedEntity;
-      console.info('*************');
-      console.info(this.robot);
       return this.robot;
     }
     getRobotModelProperties() {
