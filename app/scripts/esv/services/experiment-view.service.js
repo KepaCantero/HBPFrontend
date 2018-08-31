@@ -50,7 +50,8 @@
       simulationInfo,
       splash,
       stateService,
-      userContextService
+      userContextService,
+      storageServer
     ) {
       this.$location = $location;
       this.$rootScope = $rootScope;
@@ -78,6 +79,7 @@
       this.splash = splash;
       this.stateService = stateService;
       this.userContextService = userContextService;
+      this.storageServer = storageServer;
 
       //When resetting do something
       this.resetListenerUnbindHandler = $rootScope.$on(
@@ -411,6 +413,9 @@
 
     stopSimulation() {
       this.autosaveOnExitService.onExit().then(() => {
+        this.storageServer.logActivity('simulation_stop', {
+          simulationID: this.simulationInfo.experimentID
+        });
         this.setSimulationState(this.STATE.STOPPED);
       });
     }
@@ -488,7 +493,8 @@
     'simulationInfo',
     'splash',
     'stateService',
-    'userContextService'
+    'userContextService',
+    'storageServer'
   ];
 
   angular

@@ -3,15 +3,9 @@
 
   /*global BaseExperimentsService */
   class PrivateExperimentsService extends BaseExperimentsService {
-    constructor(
-      storageServer,
-      $stateParams,
-      experimentProxyService,
-      ...baseDependencies
-    ) {
+    constructor($stateParams, experimentProxyService, ...baseDependencies) {
       super(...baseDependencies);
 
-      this.storageServer = storageServer;
       this.$stateParams = $stateParams;
       this.experimentProxyService = experimentProxyService;
     }

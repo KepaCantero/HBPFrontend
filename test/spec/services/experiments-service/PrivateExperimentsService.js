@@ -26,11 +26,11 @@ describe('Services: PrivateExperimentsService', function() {
 
       /*global PrivateExperimentsService*/
       privateExperimentsService = new PrivateExperimentsService(
-        _storageServer_,
         $stateParams,
         experimentProxyService,
         SERVER_POLL_INTERVAL,
         experimentSimulationService,
+        storageServer,
         uptimeFilter,
         nrpUser,
         clbErrorDialog,

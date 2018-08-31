@@ -80,6 +80,7 @@
         const baseDependecies = [
           SERVER_POLL_INTERVAL,
           experimentSimulationService,
+          storageServer,
           uptimeFilter,
           nrpUser,
           clbErrorDialog,
@@ -93,7 +94,6 @@
             /*global PrivateExperimentsService,TemplateExperimentsService */
             if (loadPrivateExperiments)
               return new PrivateExperimentsService(
-                storageServer,
                 $stateParams,
                 experimentProxyService,
                 ...baseDependecies

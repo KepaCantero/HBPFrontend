@@ -603,7 +603,9 @@
       $httpBackend.whenGET(simulationUrl).respond(200, { state: 'halted' });
       //get simulation state
       $httpBackend.whenPUT(simulationUrl).respond(200);
-
+      $httpBackend
+        .whenPOST('http://proxy/activity_log/simulation_stop')
+        .respond({});
       page.find('[analytics-event="Stop"]').click();
       $httpBackend.flush();
     });
@@ -835,7 +837,11 @@
             })
           );
           spyOn(storageServer, 'setFileContent').and.returnValue($q.when());
+          $httpBackend
+            .whenPOST('http://proxy/activity_log/clone_experiment')
+            .respond({});
           scope.clone('Exp_0');
+          $httpBackend.flush();
         });
 
         it('should call the clone with the correct parameters (cloneTemplate)', function() {
@@ -843,8 +849,12 @@
           var scope = getExperimentListScope(page);
           scope.config.canLaunchExperiments = false;
           spyOn(scope, 'cloneExperiment');
+          $httpBackend
+            .whenPOST('http://proxy/activity_log/clone_experiment')
+            .respond({});
           scope.clone('Exp_0');
           expect(scope.cloneExperiment).toHaveBeenCalled();
+          $httpBackend.flush();
         });
 
         it('should throw in the changeExpName function', function() {

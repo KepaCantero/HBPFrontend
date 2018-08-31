@@ -236,6 +236,9 @@ describe('Controller: NewExperimentController', function() {
   });
 
   it('should clone an experiment', function() {
+    $httpBackend
+      .whenPOST('http://proxy/activity_log/create_experiment')
+      .respond({});
     spyOn(storageServer, 'cloneNew').and.returnValue($q.when({}));
     spyOn(newExperimentController, 'launchExperiment').and.returnValue(
       $q.when({})
