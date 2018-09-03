@@ -1,182 +1,187 @@
-<div class="container-with-navbar-margin container-fluid">
+<div style="overflow-y:auto; display: flex;flex-direction: column;">
+    <div class="container-with-navbar-margin container-fluid">
 
-  <div id="nrp-section" class="content-section-b">
-    <div class="container">
-      <div class="row">
-        <div class="col-lg-12 col-sm-12">
-          <div class="clearfix"></div>
-          <h2 class="section-heading">Get started with the Neurorobotics platform</h2>
-          <p class="lead">The Neurorobotics Platform is an Internet-accessible simulation system that allows the simulation of robots controlled
-            by spiking neural networks. For general information visit <a href="http://neurorobotics.net/fileadmin/platform"
-              target="_blank">neurorobotics.net</a>.
-          </p>
-          <p class="lead">
-            This page guides you through the menu items, telling you how to play around with template experiments, create a Collab and
-            populate it with custom experiments.
-          </p>
+        <div id="nrp-section" class="content-section-b">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-12 col-sm-12">
+                        <div class="clearfix"></div>
+                        <h2 class="section-heading">Get started with the Neurorobotics platform</h2>
+                        <p class="lead">The Neurorobotics Platform is an Internet-accessible simulation system that allows
+                            the simulation of robots controlled by spiking neural networks. For general information visit
+                            <a href="http://neurorobotics.net/fileadmin/platform" target="_blank">neurorobotics.net</a>.
+                        </p>
+                        <p class="lead">
+                            This page guides you through the menu items, telling you how to play around with template experiments, create a Collab and
+                            populate it with custom experiments.
+                        </p>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
+
+        <div id="video-tutorial" class="content-section-a">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-6 col-sm-6">
+                        <a href="{{getCollabItemUrl('tutorial')}}" target="_top">
+                            <img class="img-responsive" src="img/common/tutorial.png" style="box-shadow: 0px 1px 4px rgba(0,0,0,0.7);border-radius: 20px;"
+                                alt="Video tutorial">
+                        </a>
+                    </div>
+                    <div class="col-lg-6 col-sm-6">
+                        <div class="clearfix"></div>
+                        <h2 class="section-heading">Video tutorials</h2>
+                        <p class="lead">
+                            Watching a video tutorial is the fastest way to get started. Our tutorial covers all basic steps to customize your experiments.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="example-experiments" class="content-section-b">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-6 col-sm-6">
+                        <div class="clearfix"></div>
+                        <h2 class="section-heading">Example experiments</h2>
+                        <p class="lead">
+                            This menu item takes you to the list of our template experiments. With the basic account you can join experiments run by
+                            others.
+                        </p>
+                        <p class="lead">
+                            Request a <i>Test</i> or <i>Project</i> account to create and edit your own experiments, interact
+                            with the environment and download configurations to your computer.
+                        </p>
+                    </div>
+                    <div class="col-lg-6 col-sm-6">
+                        <a href="{{getCollabItemUrl('exampleExperiments')}}" target="_top">
+                            <img class="img-responsive" src="img/common/example-experiments.png" style="box-shadow: 0px 1px 4px rgba(0,0,0,0.7);border-radius: 20px;"
+                                alt="Example experiments">
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="create-collab" class="content-section-a">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-6 col-sm-6">
+                        <a href="{{getCollabItemUrl('createCollab')}}" target="_top">
+                            <img class="img-responsive" src="img/common/create_your_collab.png" style="box-shadow: 0px 1px 4px rgba(0,0,0,0.7);border-radius: 20px;"
+                                alt="Create your Collab">
+                        </a>
+                    </div>
+                    <div class="col-lg-6 col-sm-6">
+                        <div class="clearfix"></div>
+                        <h2 class="section-heading">Create your Collab</h2>
+                        <p class="lead">
+                            In order to set up your own experiments, create a new Collab you can fully edit. It is then possible to share data and experiments
+                            with invited team members. Experiments become customizable and changes become persistent.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="upgrade-account" class="content-section-b">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-6 col-sm-6">
+                        <div class="clearfix"></div>
+                        <h2 class="section-heading">Upgrade your account</h2>
+                        <p class="lead">
+                            In order to run experiments by yourself, upgrade your account to a Test or Project account. Such accounts are limited.
+                        </p>
+                        <p class="lead">
+                            Fill the form in <a href="{{getCollabItemUrl('upgrade')}}" target="_top">Upgrade your account</a>
+                            menu to request them.
+                        </p>
+                    </div>
+                    <div class="col-lg-6 col-sm-6">
+                        <a href="{{getCollabItemUrl('upgrade')}}" target="_top">
+                            <img class="img-responsive" src="img/common/accounts.png" alt="Upgrade your account" style="box-shadow: 0px 1px 4px rgba(0,0,0,0.7);border-radius: 20px;">
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="documentation-support" class="content-section-a">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-6 col-sm-6">
+                        <a href="{{getCollabItemUrl('documentation')}}" target="_top">
+                            <img class="img-responsive" src="img/common/documentation.png" style="box-shadow: 0px 1px 4px rgba(0,0,0,0.7);border-radius: 20px;"
+                                alt="Documentation and Support">
+                        </a>
+                    </div>
+                    <div class="col-lg-6 col-sm-6">
+                        <div class="clearfix"></div>
+                        <h2 class="section-heading">Documentation and Support</h2>
+                        <p class="lead">
+                            <a href="{{getCollabItemUrl('documentation')}}" target="_top">Documentation</a> provides you
+                            with an extensive user manual, for an in depth reference to user interface or editing features.
+                        </p>
+                        <p class="lead">
+                            <a href="{{getCollabItemUrl('support')}}" target="_top">Support</a> pro gives you all the ways
+                            to contact us and get help from the community.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="brought-to-you-by" class="content-section-b">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="clearfix"></div>
+                        <h2 class="section-heading">The Neurororobotics platform is brought to you by:</h2>
+                        <ul class="lead">
+                            <li>The Human Brain Project (<a href="https://www.humanbrainproject.eu/" target="_blank"><b>HBP</b></a>)</li>
+                            <li>Ecole Polytechnique F&eacute;d&eacute;rale de Lausanne (<a href="https://www.epfl.ch/" target="_blank"><b>EPFL</b></a>)</li>
+                            <li>Technische Universit&auml;t M&uuml;nchen (<a href="https://www.tum.de/" target="_blank"><b>TUM</b></a>
+                                - <a href="http://www6.in.tum.de/" target="_blank">Robotics and Embedded Systems</a>)
+                            </li>
+                            <li>Fortiss, an-Institut der Technischen Universit&auml;t M&uuml;nchen (<a href="http://www.fortiss.org/home/"
+                                    target="_blank"><b>Fortiss</b></a>)
+                            </li>
+                            <li>Forschungszentrum Informatik am Karlsruher Institut f&uuml;r Technologie (<a href="https://www.fzi.de/startseite/"
+                                    target="_blank"><b>FZI</b></a>)
+                            </li>
+                            <li>Scuola Superiore Sant'Anna (<a href="https://www.sssup.it/" target="_blank"><b>SSSUP</b></a>
+                                - <a href="https://www.sssup.it/ist_home.jsp?ID_LINK=10458&area=199" target="_blank">Istituto
+                                    di BioRobotica</a>)
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="row vertical-align-row">
+                    <div class="col-md-2 col-sm-4 col-xs-4 vertical-align-cell">
+                        <a href="https://www.humanbrainproject.eu/" target="_blank"><img class="img-responsive" src="img/common/hbp-logo.png"></a>
+                    </div>
+                    <div class="col-md-2 col-sm-4 col-xs-4 vertical-align-cell">
+                        <a href="https://www.epfl.ch/" target="_blank"><img class="img-responsive" src="img/common/Logo_EPFL.png"></a>
+                    </div>
+                    <div class="col-md-1 col-sm-2 col-xs-2 vertical-align-cell">
+                        <a href="https://www.tum.de/" target="_blank"><img class="img-responsive" src="img/common/Tum_logo.gif"></a>
+                    </div>
+                    <div class="col-md-2 col-sm-4 col-xs-4 vertical-align-cell">
+                        <a href="http://www.fortiss.org/home/" target="_blank"><img class="img-responsive" src="img/common/fortiss-logo.png"></a>
+                    </div>
+                    <div class="col-md-1 col-sm-2 col-xs-2 vertical-align-cell">
+                        <a href="https://www.fzi.de/startseite/" target="_blank"><img class="img-responsive" src="img/common/Fzi_logo.png"></a>
+                    </div>
+                    <div class="col-md-2 col-sm-4 col-xs-4 vertical-align-cell">
+                        <a href="https://www.sssup.it/" target="_blank"><img class="img-responsive" src="img/common/SSSA_logo_eng.png"></a>
+                    </div>
+                </div>
+            </div>
+            <div style="display: flex;justify-content: center;"><a href="http://neurorobotics.net/nrpPrivacy.html">Privacy Policy</a></div>
+        </div>
+
     </div>
-  </div>
-
-  <div id="video-tutorial" class="content-section-a">
-    <div class="container">
-      <div class="row">
-        <div class="col-lg-6 col-sm-6">
-          <a href="{{getCollabItemUrl('tutorial')}}" target="_top">
-            <img class="img-responsive" src="img/common/tutorial.png" style="box-shadow: 0px 1px 4px rgba(0,0,0,0.7);border-radius: 20px;"
-              alt="Video tutorial">
-          </a>
-        </div>
-        <div class="col-lg-6 col-sm-6">
-          <div class="clearfix"></div>
-          <h2 class="section-heading">Video tutorials</h2>
-          <p class="lead">
-            Watching a video tutorial is the fastest way to get started. Our tutorial covers all basic steps to customize your experiments.
-          </p>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div id="example-experiments" class="content-section-b">
-    <div class="container">
-      <div class="row">
-        <div class="col-lg-6 col-sm-6">
-          <div class="clearfix"></div>
-          <h2 class="section-heading">Example experiments</h2>
-          <p class="lead">
-            This menu item takes you to the list of our template experiments. With the basic account you can join experiments run by
-            others.
-          </p>
-          <p class="lead">
-            Request a <i>Test</i> or <i>Project</i> account to create and edit your own experiments, interact with the environment
-            and download configurations to your computer.
-          </p>
-        </div>
-        <div class="col-lg-6 col-sm-6">
-          <a href="{{getCollabItemUrl('exampleExperiments')}}" target="_top">
-            <img class="img-responsive" src="img/common/example-experiments.png" style="box-shadow: 0px 1px 4px rgba(0,0,0,0.7);border-radius: 20px;"
-              alt="Example experiments">
-          </a>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div id="create-collab" class="content-section-a">
-    <div class="container">
-      <div class="row">
-        <div class="col-lg-6 col-sm-6">
-          <a href="{{getCollabItemUrl('createCollab')}}" target="_top">
-            <img class="img-responsive" src="img/common/create_your_collab.png" style="box-shadow: 0px 1px 4px rgba(0,0,0,0.7);border-radius: 20px;"
-              alt="Create your Collab">
-          </a>
-        </div>
-        <div class="col-lg-6 col-sm-6">
-          <div class="clearfix"></div>
-          <h2 class="section-heading">Create your Collab</h2>
-          <p class="lead">
-            In order to set up your own experiments, create a new Collab you can fully edit. It is then possible to share data and experiments
-            with invited team members. Experiments become customizable and changes become persistent.
-          </p>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div id="upgrade-account" class="content-section-b">
-    <div class="container">
-      <div class="row">
-        <div class="col-lg-6 col-sm-6">
-          <div class="clearfix"></div>
-          <h2 class="section-heading">Upgrade your account</h2>
-          <p class="lead">
-            In order to run experiments by yourself, upgrade your account to a Test or Project account. Such accounts are limited.
-          </p>
-          <p class="lead">
-            Fill the form in <a href="{{getCollabItemUrl('upgrade')}}" target="_top">Upgrade your account</a> menu to request
-            them.
-          </p>
-        </div>
-        <div class="col-lg-6 col-sm-6">
-          <a href="{{getCollabItemUrl('upgrade')}}" target="_top">
-            <img class="img-responsive" src="img/common/accounts.png" alt="Upgrade your account" style="box-shadow: 0px 1px 4px rgba(0,0,0,0.7);border-radius: 20px;">
-          </a>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div id="documentation-support" class="content-section-a">
-    <div class="container">
-      <div class="row">
-        <div class="col-lg-6 col-sm-6">
-          <a href="{{getCollabItemUrl('documentation')}}" target="_top">
-            <img class="img-responsive" src="img/common/documentation.png" style="box-shadow: 0px 1px 4px rgba(0,0,0,0.7);border-radius: 20px;"
-              alt="Documentation and Support">
-          </a>
-        </div>
-        <div class="col-lg-6 col-sm-6">
-          <div class="clearfix"></div>
-          <h2 class="section-heading">Documentation and Support</h2>
-          <p class="lead">
-            <a href="{{getCollabItemUrl('documentation')}}" target="_top">Documentation</a> provides you with an extensive
-            user manual, for an in depth reference to user interface or editing features.
-          </p>
-          <p class="lead">
-            <a href="{{getCollabItemUrl('support')}}" target="_top">Support</a> pro gives you all the ways to contact us
-            and get help from the community.
-          </p>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div id="brought-to-you-by" class="content-section-b">
-    <div class="container">
-      <div class="row">
-        <div class="col-lg-12">
-          <div class="clearfix"></div>
-          <h2 class="section-heading">The Neurororobotics platform is brought to you by:</h2>
-          <ul class="lead">
-            <li>The Human Brain Project (<a href="https://www.humanbrainproject.eu/" target="_blank"><b>HBP</b></a>)</li>
-            <li>Ecole Polytechnique F&eacute;d&eacute;rale de Lausanne (<a href="https://www.epfl.ch/" target="_blank"><b>EPFL</b></a>)</li>
-            <li>Technische Universit&auml;t M&uuml;nchen (<a href="https://www.tum.de/" target="_blank"><b>TUM</b></a> - <a href="http://www6.in.tum.de/"
-                target="_blank">Robotics and Embedded Systems</a>)
-            </li>
-            <li>Fortiss, an-Institut der Technischen Universit&auml;t M&uuml;nchen (<a href="http://www.fortiss.org/home/" target="_blank"><b>Fortiss</b></a>)
-            </li>
-            <li>Forschungszentrum Informatik am Karlsruher Institut f&uuml;r Technologie (<a href="https://www.fzi.de/startseite/"
-                target="_blank"><b>FZI</b></a>)
-            </li>
-            <li>Scuola Superiore Sant'Anna (<a href="https://www.sssup.it/" target="_blank"><b>SSSUP</b></a> - <a href="https://www.sssup.it/ist_home.jsp?ID_LINK=10458&area=199"
-                target="_blank">Istituto di BioRobotica</a>)
-            </li>
-          </ul>
-        </div>
-      </div>
-      <div class="row vertical-align-row">
-        <div class="col-md-2 col-sm-4 col-xs-4 vertical-align-cell">
-          <a href="https://www.humanbrainproject.eu/" target="_blank"><img class="img-responsive" src="img/common/hbp-logo.png"></a>
-        </div>
-        <div class="col-md-2 col-sm-4 col-xs-4 vertical-align-cell">
-          <a href="https://www.epfl.ch/" target="_blank"><img class="img-responsive" src="img/common/Logo_EPFL.png"></a>
-        </div>
-        <div class="col-md-1 col-sm-2 col-xs-2 vertical-align-cell">
-          <a href="https://www.tum.de/" target="_blank"><img class="img-responsive" src="img/common/Tum_logo.gif"></a>
-        </div>
-        <div class="col-md-2 col-sm-4 col-xs-4 vertical-align-cell">
-          <a href="http://www.fortiss.org/home/" target="_blank"><img class="img-responsive" src="img/common/fortiss-logo.png"></a>
-        </div>
-        <div class="col-md-1 col-sm-2 col-xs-2 vertical-align-cell">
-          <a href="https://www.fzi.de/startseite/" target="_blank"><img class="img-responsive" src="img/common/Fzi_logo.png"></a>
-        </div>
-        <div class="col-md-2 col-sm-4 col-xs-4 vertical-align-cell">
-          <a href="https://www.sssup.it/" target="_blank"><img class="img-responsive" src="img/common/SSSA_logo_eng.png"></a>
-        </div>
-      </div>
-    </div>
-  </div>
-
 </div>
