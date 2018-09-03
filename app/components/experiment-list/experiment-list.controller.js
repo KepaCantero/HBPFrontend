@@ -129,6 +129,10 @@
         };
 
         $scope.clone = function(experiment) {
+          storageServer.logActivity('clone_experiment', {
+            experimentId: experiment.id
+          });
+
           if (
             $scope.config
               .canLaunchExperiments /* means we are cloning a cloned experiment*/

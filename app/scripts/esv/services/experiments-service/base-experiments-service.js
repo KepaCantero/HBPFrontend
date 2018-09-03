@@ -5,6 +5,7 @@
     constructor(
       serverRefreshTimer,
       experimentSimulationService,
+      storageServer,
       uptimeFilter,
       nrpUser,
       clbErrorDialog,
@@ -17,6 +18,7 @@
         throw new TypeError('BaseExperimentsService is an abstract class');
 
       this.experimentSimulationService = experimentSimulationService;
+      this.storageServer = storageServer;
       this.uptimeFilter = uptimeFilter;
       this.nrpUser = nrpUser;
       this.clbErrorDialog = clbErrorDialog;
@@ -143,6 +145,10 @@
       this.stoppingExperiments[simulation.server][
         simulation.runningSimulation.simulationID
       ] = true;
+
+      this.storageServer.logActivity('simulation_stop', {
+        simulationID: simulation.runningSimulation.experimentID
+      });
 
       return this.experimentSimulationService.stopExperimentOnServer(
         simulation

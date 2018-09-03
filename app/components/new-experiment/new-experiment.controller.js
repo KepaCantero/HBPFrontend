@@ -167,7 +167,7 @@
 
     launchExperiment(experiment, launchSingleMode) {
       this.storageServer.logActivity('simulation_start', {
-        experiment: experiment.id
+        experiment: experiment
       });
 
       this.experimentsService = this.experimentsFactory.createExperimentsService(
@@ -222,6 +222,11 @@
       };
 
       this.isCloneRequested = true;
+
+      this.storageServer.logActivity('create_experiment', {
+        template: this.environment.id,
+        experiment: this.experimentName
+      });
 
       this.storageServer
         .cloneNew(paths, this.$stateParams.ctx, this.experimentName)
