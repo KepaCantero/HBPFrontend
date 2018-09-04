@@ -75,7 +75,13 @@
 
   <div ng-if="tabSelection!='NewExperiment'" style="flex-shrink: 1;flex-grow:1;overflow-y: auto; flex-basis: 0;">
     <experiment-list ng-if="tabSelection=='MyExperiments' && showMyExperiments" query="query" experiment-empty="experimentEmpty()"
-      reinit="reloadMyExperiments()" running="false" private="true"></experiment-list>
+      reinit="reloadMyExperiments()" running="false" private="true">
+    </experiment-list>
+
+    <div ng-if="tabSelection=='MyExperiments'" style="display: flex;justify-content: flex-end;margin-bottom:10px;padding-right: 20px;">
+        <a href="http://neurorobotics.net/nrpPrivacy.html">Privacy Policy</a>
+    </div>
+
     <div ng-if="tabSelection=='ExperimentFiles'" style="height: 100%;">
       <experiment-explorer></experiment-explorer>
     </div>
