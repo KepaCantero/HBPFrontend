@@ -132,6 +132,7 @@ def {0}(t):
       'structuredTransferFunctionToRaw',
       'rawTransferFunctionToStructured',
       'storageServer',
+      'baseEventHandler',
       function(
         $log,
         backendInterfaceService,
@@ -159,7 +160,8 @@ def {0}(t):
         $q,
         structuredTransferFunctionToRaw,
         rawTransferFunctionToStructured,
-        storageServer
+        storageServer,
+        baseEventHandler
       ) {
         return {
           templateUrl:
@@ -200,6 +202,7 @@ def {0}(t):
             };
 
             scope.stateService = stateService;
+            scope.baseEventHandler = baseEventHandler;
             scope.STATE = STATE;
             scope.ERROR = SIMULATION_FACTORY_CLE_ERROR;
             scope.SOURCE_TYPE = SOURCE_TYPE;

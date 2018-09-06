@@ -48,6 +48,7 @@
     'bbpConfig',
     'editorToolbarService',
     'storageServer',
+    'baseEventHandler',
     function(
       $q,
       backendInterfaceService,
@@ -71,7 +72,8 @@
       userContextService,
       bbpConfig,
       editorToolbarService,
-      storageServer
+      storageServer,
+      baseEventHandler
     ) {
       var DIRTY_TYPE = 'SM';
 
@@ -81,6 +83,8 @@
         restrict: 'E',
         scope: {},
         link: function(scope, element) {
+          scope.baseEventHandler = baseEventHandler;
+
           scope.isPrivateExperiment = environmentService.isPrivateExperiment();
 
           scope.editorOptions = codeEditorsServices.getDefaultEditorOptions();

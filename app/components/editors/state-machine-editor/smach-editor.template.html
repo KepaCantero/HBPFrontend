@@ -2,7 +2,7 @@
 <link rel="stylesheet" href="components/editors/state-machine-editor/smach-editor.style.css"/>
 <!-- endbuild -->
 
-<div class="smach-editor-container">
+<div class="smach-editor-container" ng-keydown="baseEventHandler.suppressAnyKeyPress($event)">
 
   <div class="smach-ed-header">
     <h3>SMACH State Machine Editor</h3>

@@ -2,7 +2,7 @@
 <link rel="stylesheet" href="components/editors/transfer-function-editor/transfer-function-editor.style.css" />
 <!-- endbuild -->
 
-<div class="graphical-editor-tf-container">
+<div class="graphical-editor-tf-container" ng-keydown="baseEventHandler.suppressAnyKeyPress($event)">
 
   <div class="tf-ed-header">
     <h3>Transfer Functions Editor</h3>
@@ -710,21 +710,12 @@
                   </div>
 
                 </div>
-
-
               </div>
-
             </div>
-
           </div>
-
         </div>
       </div>
-
-
     </div>
-
-
   </div>
 
   <div>
@@ -751,11 +742,7 @@
         </button>
 
       </div>
-
     </div>
-
-
-
   </div>
 
 </div>
