@@ -36,7 +36,8 @@
       bbpConfig,
       nrpAnalytics,
       storageServerTokenManager,
-      userContextService
+      userContextService,
+      updateChecker
     ) {
       this.$injector = $injector;
       this.$scope = $scope;
@@ -47,6 +48,7 @@
       this.bbpConfig = bbpConfig;
       this.nrpAnalytics = nrpAnalytics;
       this.storageServerTokenManager = storageServerTokenManager;
+      this.updateChecker = updateChecker;
       this.userContextService = userContextService;
 
       this.show = true;
@@ -71,6 +73,10 @@
           this.show = true;
         });
       }
+
+      updateChecker
+        .checkForNewVersion()
+        .then(newVersion => (this.newVersion = newVersion));
     }
 
     openMenu($mdMenu, event) {
@@ -134,6 +140,7 @@
       'nrpAnalytics',
       'storageServerTokenManager',
       'userContextService',
+      'updateChecker',
       function(...args) {
         return new ApplicationTopToolbarController(...args);
       }

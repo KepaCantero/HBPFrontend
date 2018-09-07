@@ -80,6 +80,20 @@
       </div>
 
       <div class="app-top-toolbar-section-right">
+        <md-menu ng-if="vm.newVersion">
+            <md-button class="md-icon-button" aria-label="Notifications"
+                        title="Notifications"
+                        ng-click="vm.openMenu($mdMenu, $event)">
+                <md-icon ng-bind="'notifications'"></md-icon>
+                <div class="notification-badge">1</div>
+            </md-button>
+            <md-menu-content width="3">
+            <md-menu-item>
+                <p >NRP version <a style="text-decoration: underline;" href="{{vm.updateChecker.RELEASE_NOTES_URL}}" target="_blank">{{vm.newVersion}}</a> is available.</p>
+            </md-menu-item>
+            </md-menu-content>
+        </md-menu>
+
         <md-button class="md-icon-button" aria-label="Settings" help-tooltip="ENVIRONMENT_SETTINGS"
                    ng-show="vm.experimentViewService.isInSimulationView()" ng-click="vm.onButtonEnvironmentSettings()">
           <md-icon ng-bind="'settings'"></md-icon>

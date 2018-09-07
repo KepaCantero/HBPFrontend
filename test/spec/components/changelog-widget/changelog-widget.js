@@ -52,6 +52,7 @@ describe('Directive: logAdverts', function() {
       expect(childScope.visible).toBe(false);
       spyOn(localStorage, 'getItem').and.returnValue('1.0');
       $httpBackend.flush();
+
       expect(childScope.visible).toBe(true);
     })
   );

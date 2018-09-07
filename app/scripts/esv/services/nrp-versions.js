@@ -33,11 +33,7 @@
     result.toString = versionString;
     return result;
   };
-  var parseFrontendVersion = function(data) {
-    var result = {};
-    result.toString = 'Frontend: ' + angular.fromJson(data).version + '\n';
-    return result;
-  };
+
   angular
     .module('nrpBackendAbout', ['ngResource', 'nrpErrorHandlers'])
     // This service provides the versions of the Frontend and backend as a string
@@ -70,8 +66,7 @@
           {
             get: {
               method: 'GET',
-              interceptor: { responseError: serverError.displayHTTPError },
-              transformResponse: parseFrontendVersion
+              interceptor: { responseError: serverError.displayHTTPError }
             }
           }
         );

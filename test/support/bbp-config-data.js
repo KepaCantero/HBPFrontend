@@ -35,6 +35,10 @@ window.bbpConfig = {
     },
     collab: {
       v0: 'https://services.humanbrainproject.eu/collab/v0'
+    },
+    onlinePlatform: {
+      releaseNotes: 'http://148.187.97.48/releasenotes/',
+      checkUpdate: 'http://148.187.97.48/proxy/checkupdate'
     }
   },
   auth: {

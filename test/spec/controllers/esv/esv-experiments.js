@@ -202,11 +202,17 @@
         spyOn($location, 'search').and.returnValue({ dev: true });
       }
 
+      $httpBackend.whenGET('package.json').respond(200, { version: '1.0' });
+
       $httpBackend
         .whenGET(proxyUrl + '/identity/' + defaultPageOptions.me.id)
         .respond(200, pageOptions.userQuery);
 
       environmentService.setPrivateExperiment(pageOptions.collab);
+      $httpBackend
+        .whenPOST(bbpConfig.get('api.onlinePlatform.checkUpdate'))
+        .respond(200, { version: '1.0' });
+
       $httpBackend
         .whenGET(new RegExp(proxyUrl + '/experiments'))
         .respond(200, pageOptions.experiments);

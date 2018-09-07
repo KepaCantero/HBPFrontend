@@ -72,7 +72,8 @@
             if (scope.isCollapsed) return;
             scope.softwareVersions = '';
             nrpFrontendVersion.get(
-              data => (scope.softwareVersions += data.toString)
+              ({ version }) =>
+                (scope.softwareVersions += 'Frontend: ' + version + '\n')
             );
 
             if (!server) return;

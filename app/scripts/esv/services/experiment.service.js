@@ -46,8 +46,8 @@
       //this.experiment is a promise that resolves to the same value as the service
       this.experiment = simulationInfo.initialized.then(() => {
         this.versionString = '';
-        nrpFrontendVersion.get(data => {
-          this.versionString += data.toString;
+        nrpFrontendVersion.get(({ version: frontEndVersion }) => {
+          this.versionString += 'Frontend: ' + frontEndVersion + '\n';
         });
 
         nrpBackendVersions(simulationInfo.serverBaseUrl).get(data => {

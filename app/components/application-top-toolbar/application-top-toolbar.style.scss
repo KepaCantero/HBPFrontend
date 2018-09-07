@@ -63,6 +63,21 @@ $app-top-toolbar-height: 50px;
   .app-top-toolbar-section-right {
   }
 
+  .notification-badge {
+    width: 15px;
+    height: 15px;
+    border-radius: 10px;
+    background-color: #ff3500;
+    position: absolute;
+    top: 4px;
+    right: 5px;
+    color: white;
+    font-size: 11px;
+    line-height: 13px;
+    border: 1px solid #eee;
+    font-weight: 600;
+  }
+
   .vertical-divider {
     border-top-width: 0;
     border-right-width: 2px;

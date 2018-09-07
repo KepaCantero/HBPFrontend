@@ -71,9 +71,14 @@ describe('Services: nrp-versions', function() {
   });
 
   it('should parse the frontend version', function() {
-    httpBackend.expectGET('package.json').respond(200, '{"version":1}');
-    var response = nrpFrontendVersion.get();
-    httpBackend.flush();
-    expect(response.toString).toBe('Frontend: 1\n');
+    inject($rootScope => {
+      httpBackend.expectGET('package.json').respond(200, { version: '1' });
+      var response = nrpFrontendVersion.get();
+      httpBackend.flush();
+      response.$promise.then(res => {
+        expect(res.version).toBe('1');
+      });
+      $rootScope.$digest();
+    });
   });
 });

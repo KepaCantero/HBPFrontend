@@ -28,9 +28,9 @@
   const LOCAL_STORAGE_KEY = 'last-shown-changelog-version';
 
   angular.module('changelog', []).directive('changelogWidget', [
-    '$http',
     '$rootScope',
-    ($http, $rootScope) => ({
+    'nrpFrontendVersion',
+    ($rootScope, nrpFrontendVersion) => ({
       templateUrl: 'components/changelog-widget/changelog-widget.template.html',
       replace: true,
       restrict: 'E',
@@ -44,7 +44,7 @@
         };
 
         $rootScope.$on('SHOW_CHANGE_LOG', () => (scope.visible = true));
-        return $http.get('package.json').then(({ data: { version } }) => {
+        return nrpFrontendVersion.get(({ version }) => {
           scope.version = version;
           let lastShown = localStorage.getItem(LOCAL_STORAGE_KEY);
           if (lastShown !== version) {

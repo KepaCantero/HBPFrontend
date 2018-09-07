@@ -42,9 +42,9 @@ describe('Directive: experiment-details', function() {
       .respond(500, 'Error');
     scope.getSoftwareVersions('normalServer');
     $httpBackend.flush();
-    var frontendData = { toString: 'Frontend: 0.0.1\n' };
+    var frontendData = { version: '0.0.1' };
     nrpFrontendVersion.get.calls.mostRecent().args[0](frontendData);
-    expect(scope.softwareVersions).toBe(frontendData.toString);
+    expect(scope.softwareVersions).toBe('Frontend: 0.0.1\n');
   });
 
   it('should set scope.softwareVersions when backend returns normally', function() {
@@ -54,7 +54,7 @@ describe('Directive: experiment-details', function() {
       .respond(200, { gzweb: {} });
     scope.getSoftwareVersions('normalServer');
     $httpBackend.flush();
-    var frontendData = { toString: 'Frontend: 0.0.1\n' };
+    var frontendData = { version: '0.0.1' };
     var backendObj = {};
     backendObj.toJSON = function() {
       return backendObj.data;
@@ -64,7 +64,7 @@ describe('Directive: experiment-details', function() {
     nrpFrontendVersion.get.calls.mostRecent().args[0](frontendData);
     nrpBackendVersionsObject.get.calls.mostRecent().args[0](backendObj);
     expect(scope.softwareVersions).toBe(
-      frontendData.toString + backendObj.toString
+      'Frontend: 0.0.1\n' + backendObj.toString
     );
   });
 });
