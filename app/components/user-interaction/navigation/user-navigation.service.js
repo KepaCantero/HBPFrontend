@@ -152,11 +152,12 @@
           update: function(tElapsed) {
             if (angular.isDefined(this.controls)) {
               userInteractionSettingsService.settings.then(settings => {
-                this.controls.update(
-                  tElapsed,
-                  settings.camera.sensitivity.translation,
-                  settings.camera.sensitivity.rotation
-                );
+                this.controls &&
+                  this.controls.update(
+                    tElapsed,
+                    settings.camera.sensitivity.translation,
+                    settings.camera.sensitivity.rotation
+                  );
               });
             }
           },
