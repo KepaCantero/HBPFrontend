@@ -115,15 +115,13 @@ describe('Directive: object-inspector', function() {
     );
   });
 
-  it('should resolve experiment created from custom model robot path', function() {
+  it('should resolve experiment created from custom model robot fileName', function() {
     getFileContentDefer.resolve({
       uuid: 'uuid',
       data: '<ExD><bibiConf src="bibifile" /></ExD>'
     });
     spyOn(storageServer, 'getCustomModels').and.returnValue(
-      window.$q.resolve([
-        { path: window.encodeURIComponent('/robots/robot.zip') }
-      ])
+      window.$q.resolve([{ fileName: 'robots/robot.zip' }])
     );
     storageServer.getFileContent.and.returnValue({
       uuid: 'uuid',
@@ -131,7 +129,7 @@ describe('Directive: object-inspector', function() {
     });
     $rootScope.$digest();
     expect(elementScope.robotConfigPath).toBe(
-      'http%3A%2F%2Fproxy%2Fstorage%2Fcustommodelconfig%2F%252Frobots%252Frobot.zip'
+      'http://proxy/storage/custommodelconfig/robots/robot.zip'
     );
   });
 
