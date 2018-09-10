@@ -50,6 +50,8 @@
       this.experimentViewService = experimentViewService;
       this.userContextService = userContextService;
 
+      this.show = true;
+
       if (this.experimentViewService.isInSimulationView()) {
         // dynamically get the services that only apply during running experiment
         this.editorToolbarService = this.$injector.get('editorToolbarService');
@@ -61,12 +63,12 @@
         );
         this.simulationInfo = this.$injector.get('simulationInfo');
         this.stateService = this.$injector.get('stateService');
-      }
 
-      this.show = false;
-      $rootScope.$on('ASSETS_LOADED', () => {
-        this.show = true;
-      });
+        this.show = false;
+        $rootScope.$on('ASSETS_LOADED', () => {
+          this.show = true;
+        });
+      }
     }
 
     openMenu($mdMenu, event) {
