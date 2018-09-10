@@ -47,7 +47,7 @@
                   title="Activating this mode allows you to translate selected object in the 3D view.">
                     <button type="button" class="btn btn-xs btn-rounded" ng-class="{active:gz3d.scene.manipulationMode === EDIT_MODE.TRANSLATE}"
                       ng-click="objectInspectorService.setManipulationMode((gz3d.scene.manipulationMode === EDIT_MODE.TRANSLATE) ? EDIT_MODE.VIEW : EDIT_MODE.TRANSLATE)">
-                      <i class="fa fa-arrows" aria-hidden="true"></i>
+                      <i class="fas fa-arrows-alt" aria-hidden="true"></i>
                     </button>
                   </li>
                   <li class="inline-listitem" ng-show="objectInspectorService.selectedObject.scale"
@@ -62,7 +62,7 @@
                   title="Activating this mode allows you to rotate selected object in the 3D view.">
                     <button type="button" class="btn btn-xs btn-rounded" ng-class="{active:gz3d.scene.manipulationMode === EDIT_MODE.ROTATE}"
                       ng-click="objectInspectorService.setManipulationMode((gz3d.scene.manipulationMode === EDIT_MODE.ROTATE) ? EDIT_MODE.VIEW : EDIT_MODE.ROTATE)">
-                      <i class="fa fa-repeat" aria-hidden="true"></i>
+                      <i class="fas fa-sync-alt" aria-hidden="true"></i>
                     </button>
                   </li>
                 </ol>
