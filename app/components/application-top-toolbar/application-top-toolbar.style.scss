@@ -38,29 +38,48 @@ $app-top-toolbar-height: 50px;
 
     .md-toolbar-tools {
       height: $app-top-toolbar-height;
-      padding-left: 0px;
+      justify-content: space-between;
+      padding: 0px 5px 0px 5px;
+
+      .app-top-toolbar-section {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+
+        min-width: 33%;
+        max-width: 33%;
+        flex-basis: auto; /* default value */
+        flex-grow: 1;
+      }
+
+      .section-middle {
+        justify-content: center;
+      }
+
+      .section-right {
+        justify-content: flex-end;
+
+        md-menu {
+          margin: 0px;
+        }
+      }
     }
   }
 
   .app-top-toolbar-time-display {
     margin-left: 10px;
+    text-align: left;
+
+    width: 200px;
   }
 
-  .app-top-toolbar-section {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-  }
-
-  .app-top-toolbar-section-middle {
+  .app-top-toolbar-title {
     text-align: center;
 
-    .app-top-toolbar-title h2 {
+    h2 {
       font-family: inherit;
+      margin-left: 20px;
     }
-  }
-
-  .app-top-toolbar-section-right {
   }
 
   .vertical-divider {

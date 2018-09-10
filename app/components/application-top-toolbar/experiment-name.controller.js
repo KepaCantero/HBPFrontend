@@ -99,6 +99,25 @@
     suppressKeyPress(event) {
       this.baseEventHandler.suppressAnyKeyPress(event);
     }
+
+    isNameOverflowing() {
+      let element = document.getElementById('app-top-toolbar-experiment-name');
+      if (!(element && element.style)) {
+        return undefined;
+      }
+
+      let curOverflow = element.style.overflow;
+
+      if (!curOverflow || curOverflow === 'visible') {
+        element.style.overflow = 'hidden';
+      }
+
+      let isOverflowing = element.clientWidth < element.scrollWidth;
+
+      element.style.overflow = curOverflow;
+
+      return isOverflowing;
+    }
   }
 
   angular

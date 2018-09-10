@@ -163,4 +163,20 @@ describe('Controller: ApplicationTopToolbarController', function() {
       mockEvent
     );
   });
+
+  it(' - isNameOverflowing()', function() {
+    let mockElement = {
+      clientWidth: 9,
+      scrollWidth: 10,
+      style: {
+        overflow: 'hidden'
+      }
+    };
+    spyOn(document, 'getElementById').and.returnValue(mockElement);
+
+    expect(experimentNameController.isNameOverflowing()).toBe(true);
+
+    mockElement.clientWidth = 11;
+    expect(experimentNameController.isNameOverflowing()).toBe(false);
+  });
 });

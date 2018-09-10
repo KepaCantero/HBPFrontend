@@ -88,7 +88,7 @@
       this.experimentViewService.resetSimulation();
     }
 
-    onButtonExit() {
+    onButtonExitSimulation() {
       let isDemoMode = this.bbpConfig.get('demomode.demoCarousel', false);
       if (isDemoMode) {
         this.experimentViewService.exitSimulation();

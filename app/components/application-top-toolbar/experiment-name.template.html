@@ -3,13 +3,15 @@
 <!-- endbuild -->
 
 <div class="experiment-name-wrapper">
-  <div class="experiment-name" ng-show="!vm.editing" help-tooltip="EXPERIMENT_NAME">{{vm.experimentName}}</div>
-  <form ng-show="vm.editing">
+  <div id="app-top-toolbar-experiment-name" class="experiment-name" ng-show="!vm.editing"
+       help-tooltip="EXPERIMENT_NAME">{{vm.experimentName}}</div>
+  <div ng-show="!vm.editing && vm.isNameOverflowing()">...</div>
+  <form ng-show="vm.editing" show-on-top>
     <input type="text" value="{{vm.experimentName}}" size="{{vm.experimentName.length}}" ng-model="vm.experimentName"
            ng-blur="vm.stopEditExperimentName();" ng-keydown="vm.onKeyDown($event)" ng-required/>
   </form>
   <md-button class="md-icon-button" aria-label="Edit Name" ng-click="vm.onEditExperimentName();" ng-show="!vm.editing"
              help-tooltip="EDIT_EXPERIMENT_NAME">
-    <md-icon ng-bind="'edit'"></md-icon>
+    <md-icon class="experiment-name-edit-button" ng-bind="'edit'"></md-icon>
   </md-button>
 </div>

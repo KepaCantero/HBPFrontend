@@ -6,21 +6,26 @@
   <md-toolbar class="md-hue-1 md-background app-top-toolbar">
     <div class="md-toolbar-tools">
 
-      <div class="app-top-toolbar-section" ng-show="vm.experimentViewService.isInSimulationView()">
-        <md-button class="md-icon-button" aria-label="Menu" ng-click="vm.toggleSimulationToolsSidebar()"
-                   help-tooltip="SIMTOOLS_SIDEBAR">
-          <md-icon ng-bind="'menu'"></md-icon>
-        </md-button>
+      <div class="app-top-toolbar-section">
+        <div ng-show="vm.experimentViewService.isInSimulationView()">
+          <md-button class="md-icon-button" aria-label="Menu" ng-click="vm.toggleSimulationToolsSidebar()"
+                     help-tooltip="SIMTOOLS_SIDEBAR">
+            <md-icon ng-bind="'menu'"></md-icon>
+          </md-button>
+        </div>
 
-        <md-divider class="vertical-divider"></md-divider>
+        <div>
+          <div class="app-top-toolbar-title">
+            <h2 ng-show="!vm.experimentViewService.isInSimulationView()">Experiment Overview</h2>
+            <experiment-name ng-show="vm.experimentViewService.isInSimulationView()"></experiment-name>
+          </div>
+        </div>
+      </div>
 
-        <md-button class="md-icon-button" aria-label="Exit" help-tooltip="EXIT_BUTTON"
-                   ng-click="vm.onButtonExit()">
-          <md-icon ng-bind="'exit_to_app'" class="att-md-icon-size"></md-icon>
-        </md-button>
+      <div class="app-top-toolbar-section section-middle" ng-show="vm.experimentViewService.isInSimulationView()">
         <md-button class="md-icon-button" aria-label="Reset" help-tooltip="RESET_BUTTON"
                    ng-click="vm.onButtonReset()">
-          <md-icon ng-bind="'replay'"></md-icon>
+          <md-icon ng-bind="'stop'"></md-icon>
         </md-button>
         <md-button class="md-icon-button" aria-label="Play" help-tooltip="PLAY_BUTTON"
                    ng-show="vm.stateService.currentState === vm.STATE.PAUSED"
@@ -32,12 +37,11 @@
         <md-button class="md-icon-button" aria-label="Pause" help-tooltip="PAUSE_BUTTON"
                    ng-show="vm.stateService.currentState === vm.STATE.STARTED"
                    ng-if="vm.allowPlayPause()"
-                   ng-disabled="vm.stateService.statePending" ng-click="vm.onButtonSetSimulationState(vm.STATE.PAUSED)">
+                   ng-disabled="vm.stateService.statePending"
+                   ng-click="vm.onButtonSetSimulationState(vm.STATE.PAUSED)">
           <md-icon ng-bind="'pause'"></md-icon>
         </md-button>
-      </div>
 
-      <div class="app-top-toolbar-section" ng-show="vm.experimentViewService.isInSimulationView()">
         <div class="hbp-toolbar-large-tool hbp-time-display default-cursor app-top-toolbar-time-display"
              ng-class="{ 'disabled': (vm.stateService.currentState === vm.STATE.HALTED)
              || (vm.stateService.currentState === vm.STATE.STOPPED) || (vm.stateService.currentState === vm.STATE.FAILED)}"
@@ -59,7 +63,9 @@
               <span id="realTime">{{vm.simulationInfo.realTimeText | timeDDHHMMSS}}</span>
               <br/>
               <span
-                ng-style="{ color: vm.simulationInfo.simTimeoutText !== undefined && vm.simulationInfo.simTimeoutText < vm.simulationInfo.simMaxTimeOutText ? 'red' : '' }">{{vm.simulationInfo.simTimeoutText | timeDDHHMMSS}}</span>
+                ng-style="{ color: vm.simulationInfo.simTimeoutText !== undefined && vm.simulationInfo.simTimeoutText < vm.simulationInfo.simMaxTimeOutText ? 'red' : '' }">
+                {{vm.simulationInfo.simTimeoutText | timeDDHHMMSS}}
+              </span>
             </div>
           </div>
           <div ng-show="vm.stateService.currentState === vm.STATE.HALTED">
@@ -72,36 +78,37 @@
         </div>
       </div>
 
-      <div flex md-truncate class="app-top-toolbar-section-middle">
-        <div class="app-top-toolbar-title">
-          <h2 ng-show="!vm.experimentViewService.isInSimulationView()">Experiment Overview</h2>
-          <experiment-name ng-show="vm.experimentViewService.isInSimulationView()"></experiment-name>
-        </div>
-      </div>
-
-      <div class="app-top-toolbar-section-right">
+      <div class="app-top-toolbar-section section-right">
         <md-button class="md-icon-button" aria-label="Settings" help-tooltip="ENVIRONMENT_SETTINGS"
                    ng-show="vm.experimentViewService.isInSimulationView()" ng-click="vm.onButtonEnvironmentSettings()">
           <md-icon ng-bind="'settings'"></md-icon>
         </md-button>
 
         <md-menu>
-          <md-button class="md-icon-button" aria-label="Profile"  help-tooltip="PROFILE"
+          <md-button class="md-icon-button" aria-label="Profile" help-tooltip="PROFILE"
                      ng-click="vm.openMenu($mdMenu, $event)">
             <md-icon ng-bind="'account_circle'"></md-icon>
           </md-button>
           <md-menu-content width="3">
+            <md-menu-item ng-show="vm.experimentViewService.isInSimulationView()">
+              <md-button aria-label="Exit" help-tooltip="EXIT_BUTTON"
+                         ng-click="vm.onButtonExitSimulation()">
+                <div layout="row" flex>
+                  <p flex>Leave Experiment</p>
+                </div>
+              </md-button>
+            </md-menu-item>
             <md-menu-item>
-              <md-button ng-click="vm.onButtonLogout()">
+              <md-button class="app-top-toolbar-button-logout" ng-click="vm.onButtonLogout()">
                 <div layout="row" flex>
                   <p flex>Logout</p>
-                  <i class="fa fa-2x fa-sign-out"></i>
                 </div>
               </md-button>
             </md-menu-item>
           </md-menu-content>
         </md-menu>
       </div>
+
     </div>
   </md-toolbar>
 </div>
