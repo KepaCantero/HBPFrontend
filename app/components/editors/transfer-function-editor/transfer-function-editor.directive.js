@@ -133,6 +133,7 @@ def {0}(t):
       'rawTransferFunctionToStructured',
       'storageServer',
       'baseEventHandler',
+      'bbpConfig',
       function(
         $log,
         backendInterfaceService,
@@ -161,14 +162,15 @@ def {0}(t):
         structuredTransferFunctionToRaw,
         rawTransferFunctionToStructured,
         storageServer,
-        baseEventHandler
+        baseEventHandler,
+        bbpConfig
       ) {
         return {
           templateUrl:
             'components/editors/transfer-function-editor/transfer-function-editor.template.html',
           restrict: 'E',
           scope: {},
-          link: function(scope, element, attrs) {
+          link: function(scope, element) {
             /**************************************/
             // Initialize
 
@@ -216,6 +218,8 @@ def {0}(t):
             let docs = documentationURLs.getDocumentationURLs();
             scope.cleDocumentationURL = docs.cleDocumentationURL;
             scope.platformDocumentationURL = docs.platformDocumentationURL;
+
+            const cleError = bbpConfig.get('ros-topics').cleError;
 
             // only start watching for changes after a little timeout
             // the flood of changes during compilation will cause angular to throw digest errors when watched
@@ -339,7 +343,7 @@ def {0}(t):
             );
             scope.errorTopicSubscriber = roslib.createTopic(
               rosConnection,
-              attrs.topic,
+              cleError,
               'cle_ros_msgs/CLEError'
             );
             scope.errorTopicSubscriber.subscribe(
