@@ -101,9 +101,9 @@ describe('Controller: ApplicationTopToolbarController', function() {
     expect(experimentViewService.resetSimulation).toHaveBeenCalled();
   });
 
-  it(' - onButtonExitSimulation()', function() {
+  it(' - onButtonExit()', function() {
     // demo mode = false
-    applicationTopToolbarController.onButtonExitSimulation();
+    applicationTopToolbarController.onButtonExit();
     expect(experimentViewService.openExitDialog).toHaveBeenCalled();
     expect(experimentViewService.exitSimulation).not.toHaveBeenCalled();
 
@@ -115,7 +115,7 @@ describe('Controller: ApplicationTopToolbarController', function() {
         return defaultValue;
       }
     });
-    applicationTopToolbarController.onButtonExitSimulation();
+    applicationTopToolbarController.onButtonExit();
     expect(experimentViewService.exitSimulation).toHaveBeenCalled();
   });
 
