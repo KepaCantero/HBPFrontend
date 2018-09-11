@@ -55,7 +55,8 @@ describe('Services: userNavigationService', function() {
           removeEventListener: jasmine.createSpy('removeEventListener')
         },
         attachEventListeners: jasmine.createSpy('attachEventListeners'),
-        detachEventListeners: jasmine.createSpy('detachEventListeners')
+        detachEventListeners: jasmine.createSpy('detachEventListeners'),
+        setLookatTarget: jasmine.createSpy('setLookatTarget')
       };
       $provide.value('lookatControls', lookatControlsMock);
 
@@ -593,17 +594,37 @@ describe('Services: userNavigationService', function() {
     expect(gz3d.scene.controls).toBe(firstPersonControls);
   });
 
-  it(' - setLookatCamera()', function() {
-    // test for already in LOOKAT mode
+  it(' - setLookatCamera(), no selection', function() {
+    userNavigationService.init();
     userNavigationService.navigationMode = NAVIGATION_MODES.FREE_CAMERA;
     userNavigationService.lookatControls = lookatControls;
     userNavigationService.freeCameraControls = firstPersonControls;
 
+    gz3d.scene.selectedEntity = undefined;
+    let mockRobotModel = {};
+    spyOn(gz3d.scene.scene, 'getObjectByName').and.returnValue(mockRobotModel);
+
+    userNavigationService.setLookatCamera();
+    expect(userNavigationService.navigationMode).toBe(NAVIGATION_MODES.LOOKAT);
+    expect(gz3d.scene.controls).toBe(lookatControls);
+    expect(lookatControls.setLookatTarget).toHaveBeenCalledWith(mockRobotModel);
+  });
+
+  it(' - setLookatCamera(), success with robot selection', function() {
+    userNavigationService.init();
+    userNavigationService.navigationMode = NAVIGATION_MODES.FREE_CAMERA;
+    userNavigationService.lookatControls = lookatControls;
+    userNavigationService.freeCameraControls = firstPersonControls;
+    simulationInfo.isRobot.and.returnValue(true);
+
+    gz3d.scene.selectedEntity = {};
     userNavigationService.setLookatCamera();
 
     expect(userNavigationService.navigationMode).toBe(NAVIGATION_MODES.LOOKAT);
-
     expect(gz3d.scene.controls).toBe(lookatControls);
+    expect(lookatControls.setLookatTarget).toHaveBeenCalledWith(
+      gz3d.scene.selectedEntity
+    );
   });
 
   it(' - requestCameraTransform()', function() {

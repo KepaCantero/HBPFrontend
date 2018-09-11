@@ -32,6 +32,7 @@
         cameraPose: { x: 1.0, y: 2.0, z: 3.0 }
       };
       this.experimentID = 'experimentID';
+      this.isRobot = jasmine.createSpy('isRobot');
 
       $httpBackend.whenGET(/.*\/version/).respond({});
       $httpBackend.whenGET('package.json').respond({});
