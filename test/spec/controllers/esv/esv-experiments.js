@@ -293,7 +293,7 @@
       $window.location.reload.calls.reset();
       var page = renderEsvWebPage();
       page
-        .find('.app-top-toolbar-button-logout')
+        .find('.fa-sign-out')
         .first()
         .click();
       expect($window.location.reload).toHaveBeenCalled();

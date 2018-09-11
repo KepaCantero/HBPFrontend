@@ -3,15 +3,4 @@
   flex-direction: row;
   align-items: center;
   justify-content: center;
-
-  padding-left: 20px;
-
-  .experiment-name {
-    white-space: nowrap;
-    overflow: hidden;
-  }
-}
-
-.experiment-name-edit-button {
-  opacity: 0.4;
 }
