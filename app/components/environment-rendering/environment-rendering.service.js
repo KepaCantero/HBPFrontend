@@ -38,6 +38,7 @@
     .constant('VENDORS', ['ms', 'moz', 'webkit', 'o'])
     .service('environmentRenderingService', [
       '$q',
+      '$rootScope',
       'STATE',
       'FPS_LIMIT',
       'VENDORS',
@@ -57,6 +58,7 @@
       '$http',
       function(
         $q,
+        $rootScope,
         STATE,
         FPS_LIMIT,
         VENDORS,
@@ -87,6 +89,13 @@
           this.tipTooltipService = tipTooltipService;
           this.storageServer = storageServer;
           this.$http = $http;
+
+          $rootScope.$on('ENTER_SIMULATION', () => {
+            this.init();
+          });
+          $rootScope.$on('EXIT_SIMULATION', () => {
+            this.deinit();
+          });
 
           this.sceneInitialized = function() {
             return this.deferredSceneInitialized.promise;
@@ -196,6 +205,8 @@
             stateService.removeStateCallback(this.onStateChanged);
             userNavigationService.deinit();
             gz3d.deInitialize();
+
+            this.deferredSceneInitialized = $q.defer();
           };
 
           this.animate = function() {
@@ -365,7 +376,7 @@
           };
 
           this.showCameraHintWhenNeeded = function() {
-            if (!this.sceneLoading) {
+            if (!this.sceneLoading && angular.isDefined(gz3d.scene)) {
               var camera = gz3d.scene.viewManager.mainUserView.camera;
 
               if (this.lastCameraTransform) {
