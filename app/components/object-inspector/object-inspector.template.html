@@ -246,7 +246,7 @@
 
         <uib-tab heading="Robot" index="1" disable="!objectInspectorService.isRobot()" select="objectInspectorService.setRobotMode(true);">
           <div style="max-height: calc(100% - 130px); margin-top: 30px; overflow-y: auto;">
-            <robot-tree-view on-selection-change="objectInspectorService.selectedRobotComponent = $selectedObject"></robot-tree-view>
+            <robot-tree-view ng-if="objectInspectorService.isRobot()" on-selection-change="objectInspectorService.selectedRobotComponent = $selectedObject"></robot-tree-view>
           </div>
           <hr>
 
