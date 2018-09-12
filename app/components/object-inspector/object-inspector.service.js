@@ -538,7 +538,7 @@
                 this.previousCameraRotation = userNavigationService.userCamera.rotation.clone();
                 this.previousLookAtObject =
                   userNavigationService.lookatControls.lookAtTarget;
-
+                userNavigationService.setLookatCamera();
                 userNavigationService.lookatControls.setLookatTarget(
                   this.robotObject
                 );
