@@ -52,8 +52,9 @@
             <div class="experiment-title" ng-click="vm.selectExperiment(exp)" disable-animate ng-class="{'exp-selected':vm.selectedExperiment.uuid == exp.uuid}">
               <i class="fa" ng-class="vm.selectedExperiment.uuid == exp.uuid?'fa-folder-open-o':'fa-folder-o'"></i>
               <span class="experiment-label">{{exp.name}}</span>
+              {{vm.experimentList.deleting}}
               <span class="delete-exp-button" ng-click="!vm.isPrivateExperimentRunning(exp) && !vm.experimentList.deleting && vm.deleteExperiment(exp)">
-                <i ng-if="!vm.experimentList.deleting" disable-animate class="fa fa-remove" style="color:#e84539" title="Delete"></i>
+                <i ng-if="!vm.experimentList.deleting" disable-animate class="fa fa-times" style="color:#e84539" title="Delete"></i>
                 <i ng-if="vm.experimentList.deleting" disable-animate class="fa fa-spinner fa-spin fa-1x fa-fw" title="Deleting..."></i>
               </span>
             </div>
@@ -77,7 +78,7 @@
             <span class="action-button" ng-if="vm.selectedParent.parentFolder && vm.selectedParent.name != 'resources'" ng-click="!vm.selectedParent.deleting && vm.deleteFolder(vm.selectedParent)">
               <span class="delete-folder-button"  ng-if="!vm.selectedParent.deleting && !vm.selectedParent.loadingFiles" disable-animate title="Delete folder">
                 <i class="fa fa-folder"></i>
-                <i class="fa fa-remove"></i>
+                <i class="fa fa-times"></i>
               </span>
             <i ng-if="vm.selectedParent.deleting" disable-animate class="fa fa-spinner fa-pulse fa-1x fa-fw" title="Deleting..."></i>
             </span>
@@ -105,7 +106,7 @@
             <div class="exp-file-date">{{file.modifiedDate}}</div>
             <div class="exp-file-actions" ng-if="file.type != 'folder'">
               <span class="action-button" ng-click="!file.deleting && vm.deleteFile(file)">
-                <i ng-if="!file.deleting" disable-animate class="fa fa-remove" style="color:#e84539" title="Delete file"></i>
+                <i ng-if="!file.deleting" disable-animate class="fa fa-times" style="color:#e84539" title="Delete file"></i>
                 <i ng-if="file.deleting" disable-animate class="fa fa-spinner fa-pulse fa-1x fa-fw" title="Deleting..."></i>
               </span>
               <span class="action-button" ng-click="!file.downloading && vm.downloadFile(file)">

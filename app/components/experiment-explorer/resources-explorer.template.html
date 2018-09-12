@@ -48,7 +48,7 @@
             <span class="action-button" ng-if="vm.selectedParent.parentFolder" ng-click="!vm.selectedParent.deleting && vm.deleteFolder(vm.selectedParent)">
               <span class="delete-folder-button" ng-if="!vm.selectedParent.deleting && !vm.selectedParent.loadingFiles" disable-animate title="Delete folder">
                 <i class="fa fa-folder"></i>
-                <i class="fa fa-remove"></i>
+                <i class="fa fa-times"></i>
               </span>
             <i ng-if="vm.selectedParent.deleting" disable-animate class="fa fa-spinner fa-pulse fa-1x fa-fw" title="Deleting..."></i>
             </span>
@@ -69,7 +69,7 @@
             <div class="res-file-date truncate">{{file.modifiedDate}}</div>
             <div class="res-file-actions" ng-if="file.type != 'folder'">
               <span class="action-button" ng-click="!file.deleting && vm.deleteFile(file)">
-                <i ng-if="!file.deleting" disable-animate class="fa fa-remove" style="color:#e84539" title="Delete file"></i>
+                <i ng-if="!file.deleting" disable-animate class="fa fa-times" style="color:#e84539" title="Delete file"></i>
                 <i ng-if="file.deleting" disable-animate class="fa fa-spinner fa-pulse fa-1x fa-fw" title="Deleting..."></i>
               </span>
               <span class="action-button" ng-click="!file.downloading && vm.downloadFile(file)">
