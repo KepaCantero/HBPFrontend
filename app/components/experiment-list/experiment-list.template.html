@@ -23,7 +23,7 @@
       No experiments...
       <hr class="list-separator">
     </div>
-  
+
   <div ng-show="experiments && (!running || (config.canLaunchExperiments && exp.joinableServers.length > 0))" ng-repeat="exp in filteredExperiments | orderBy:'configuration.name':false"
     class="experiment-box" ng-mouseenter="isHovered = true" ng-mouseleave="isHovered = false" ng-mouseup="isHovered = false"
     ng-click="selectExperiment(exp);" editable-experiment experiment-details="exp">
@@ -110,8 +110,8 @@
         <div ng-show="!running" class="list-entry-buttons list-entry-container center" ng-if="exp.id == pageState.selected">
           <div class="btn-group" role="group" ng-hide="editing[nameID] || editing[descID] || loadingEdit">
             <!-- Servers are available and the user has edit rights: launch button enabled -->
-            <button analytics-on analytics-event="Launch" analytics-category="Experiment" 
-             ng-if="config.canLaunchExperiments && exp.availableServers.length > 0 && 
+            <button analytics-on analytics-event="Launch" analytics-category="Experiment"
+             ng-if="config.canLaunchExperiments && exp.availableServers.length > 0 &&
               exp.configuration.experimentFile && exp.configuration.bibiConfSrc"
               class="btn btn-default" ng-click="pageState.startingExperiment == exp.id || startNewExperiment(exp, false);"
               ng-disabled="pageState.startingExperiment == exp.id || pageState.deletingExperiment">
@@ -125,17 +125,17 @@
             </button>
 
             <!-- Option to Launch in Single Process Mode -->
-            <button ng-if="config.canLaunchExperiments && exp.configuration.brainProcesses > 1 && exp.availableServers.length > 0 && 
+            <button ng-if="config.canLaunchExperiments && exp.configuration.brainProcesses > 1 && exp.availableServers.length > 0 &&
               exp.configuration.experimentFile && exp.configuration.bibiConfSrc"
-                  class="btn btn-default" 
-                  ng-click="pageState.startingExperiment == exp.id || startNewExperiment(exp, true);" 
+                  class="btn btn-default"
+                  ng-click="pageState.startingExperiment == exp.id || startNewExperiment(exp, true);"
                   ng-disabled="pageState.startingExperiment == exp.id">
               <i class="fa fa-plus"></i> Launch in Single Process Mode
             </button>
 
             <!-- Delete button -->
             <button analytics-on analytics-event="Delete" analytics-category="Experiment" ng-if="isPrivateExperiment && config.canLaunchExperiments"
-              class="btn btn-default" ng-click="deleteExperiment(exp.id)" ng-disabled = "pageState.deletingExperiment || pageState.startingExperiment == exp.id  || 
+              class="btn btn-default" ng-click="deleteExperiment(exp.id)" ng-disabled = "pageState.deletingExperiment || pageState.startingExperiment == exp.id  ||
               (config.canLaunchExperiments && exp.joinableServers.length > 0)">
             <i class="fa fa-times"></i> Delete
             </button>
@@ -150,7 +150,7 @@
             <button ng-if="config.canCloneExperiments && (!exp.configuration.privateStorage || (exp.configuration.experimentFile && exp.configuration.bibiConfSrc))" analytics-on analytics-event="Clone" class="btn btn-default"
                   analytics-label="Collab" analytics-value="exp.id" class="btn btn-default" ng-click="clone(exp)"
                   ng-disabled="isCloneRequested || pageState.deletingExperiment">
-              <i class="fa fa-pencil"></i> Clone
+              <i class="fa fa-pencil-alt"></i> Clone
             </button>
 
             <!-- Files button -->
