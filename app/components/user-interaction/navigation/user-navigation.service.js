@@ -77,12 +77,34 @@
           userDisplayName: undefined,
           userReferenceROSCompliant: undefined,
           showHumanNavInfoDiv: false,
+          showLookAtCameraInfoDiv: false,
 
           rosbridgeWebsocketUrl: undefined,
           roslib: undefined,
 
           init: function() {
             const that = this;
+
+            this.displayHumanNavInfo = function() {
+              if (
+                stateService.currentState === STATE.PAUSED &&
+                that.showHumanNavInfoDiv === false
+              ) {
+                that.showHumanNavInfoDiv = true;
+                $timeout(function() {
+                  that.showHumanNavInfoDiv = false;
+                }, 5000);
+              }
+            };
+
+            this.displayLookAtCameraInfo = function() {
+              if (that.showLookAtCameraInfoDiv === false) {
+                that.showLookAtCameraInfoDiv = true;
+                $timeout(function() {
+                  that.showLookAtCameraInfoDiv = false;
+                }, 5000);
+              }
+            };
 
             stateService.getCurrentState().then(function() {
               if (stateService.currentState !== STATE.STOPPED) {
@@ -131,18 +153,6 @@
                 });
               }
             });
-
-            this.displayHumanNavInfo = function() {
-              if (
-                stateService.currentState === STATE.PAUSED &&
-                that.showHumanNavInfoDiv === false
-              ) {
-                that.showHumanNavInfoDiv = true;
-                $timeout(function() {
-                  that.showHumanNavInfoDiv = false;
-                }, 5000);
-              }
-            };
           },
 
           deinit: function() {
@@ -409,6 +419,14 @@
           },
 
           setLookatCamera: function() {
+            let selection = gz3d.scene.selectedEntity;
+            if (!selection || !simulationInfo.isRobot(selection)) {
+              selection = gz3d.scene.scene.getObjectByName(
+                simulationInfo.brain.robots[0]
+              );
+            }
+            this.lookatControls.setLookatTarget(selection);
+
             document.removeEventListener('keydown', this.displayHumanNavInfo);
 
             if (this.navigationMode === NAVIGATION_MODES.LOOKAT) {

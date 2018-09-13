@@ -213,7 +213,7 @@
           <md-tooltip md-direction="right" ng-show="!vm.isSubmenuSceneNavigationOpen">Scene Navigation</md-tooltip>
           <!--<i class="fa fa-compass"></i>-->
           <i class="fa fa-video" ng-if="vm.userNavigationService.navigationMode === vm.NAVIGATION_MODES.FREE_CAMERA"></i>
-          <img src="img/esv/lookatrobot_icon.png" ng-if="vm.userNavigationService.navigationMode === vm.NAVIGATION_MODES.LOOKAT_ROBOT">
+          <img src="img/esv/lookatrobot_icon.png" ng-if="vm.userNavigationService.navigationMode === vm.NAVIGATION_MODES.LOOKAT">
           <i class="fa fa-male" ng-if="vm.userNavigationService.navigationMode === vm.NAVIGATION_MODES.HUMAN_BODY"></i>
         </md-button>
 
@@ -224,7 +224,7 @@
             <i class="fa fa-video"></i>
           </md-button>
           <md-button aria-label="Robot Camera" class="md-fab md-raised md-mini subtool-button"
-                     ng-click="vm.userNavigationService.setLookatRobotCamera()">
+                     ng-click="vm.userNavigationService.setLookatCamera()">
             <md-tooltip md-direction="top">Robot Camera</md-tooltip>
             <img src="img/esv/lookatrobot_icon.png">
           </md-button>

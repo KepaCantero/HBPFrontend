@@ -63,9 +63,9 @@
 
   .lookat-camera-message {
     width: 220px;
-    position: relative;
+    position: absolute;
     padding-left: 16px;
-    left: 16px;
+    right: 16px;
     top: 16px;
     z-index: 95;
     background-color: rgba(0, 0, 0, 0.6);
