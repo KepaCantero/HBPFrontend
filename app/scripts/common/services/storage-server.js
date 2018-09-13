@@ -382,17 +382,14 @@
             return this.getCustomModels('robots')
               .then(robots =>
                 robots.find(robot =>
-                  robot.path.endsWith(
-                    window.encodeURIComponent(
-                      `/robots/${bodyModel.attributes.assetPath.value}`
-                    )
+                  robot.fileName.endsWith(
+                    `robots/${bodyModel.attributes.assetPath.value}`
                   )
                 )
               )
-              .then(robot =>
-                window.encodeURIComponent(
-                  `${this.STORAGE_BASE_URL}/custommodelconfig/${robot.path}`
-                )
+              .then(
+                robot =>
+                  `${this.STORAGE_BASE_URL}/custommodelconfig/${robot.fileName}`
               );
           } else {
             //robot comes from the templates
