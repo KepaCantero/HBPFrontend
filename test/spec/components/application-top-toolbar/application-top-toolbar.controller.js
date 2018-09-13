@@ -4,7 +4,8 @@ describe('Controller: ApplicationTopToolbarController', function() {
   let applicationTopToolbarController;
 
   let $controller, $rootScope, $scope, $window;
-  let bbpConfig,
+  let applicationTopToolbarService,
+    bbpConfig,
     editorToolbarService,
     environmentRenderingService,
     experimentViewService,
@@ -17,6 +18,7 @@ describe('Controller: ApplicationTopToolbarController', function() {
   beforeEach(module('exdFrontendApp'));
 
   // used outside simulation
+  beforeEach(module('applicationTopToolbarServiceMock'));
   beforeEach(module('experimentViewServiceMock'));
   beforeEach(module('nrpAnalyticsMock'));
   beforeEach(module('storageServerMock'));
@@ -33,6 +35,7 @@ describe('Controller: ApplicationTopToolbarController', function() {
       _$controller_,
       _$rootScope_,
       _$window_,
+      _applicationTopToolbarService_,
       _bbpConfig_,
       _editorToolbarService_,
       _environmentRenderingService_,
@@ -46,6 +49,7 @@ describe('Controller: ApplicationTopToolbarController', function() {
       $controller = _$controller_;
       $rootScope = _$rootScope_;
       $window = _$window_;
+      applicationTopToolbarService = _applicationTopToolbarService_;
       bbpConfig = _bbpConfig_;
       editorToolbarService = _editorToolbarService_;
       environmentRenderingService = _environmentRenderingService_;
@@ -59,6 +63,8 @@ describe('Controller: ApplicationTopToolbarController', function() {
   );
 
   beforeEach(function() {
+    applicationTopToolbarService.isInSimulationView.and.returnValue(true);
+
     $scope = $rootScope.$new();
     applicationTopToolbarController = $controller(
       'ApplicationTopToolbarController',

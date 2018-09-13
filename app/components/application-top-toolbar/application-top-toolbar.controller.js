@@ -32,9 +32,9 @@
       $scope,
       $window,
       STATE,
+      applicationTopToolbarService,
       bbpConfig,
       nrpAnalytics,
-      experimentViewService,
       storageServerTokenManager,
       userContextService
     ) {
@@ -47,16 +47,18 @@
       this.bbpConfig = bbpConfig;
       this.nrpAnalytics = nrpAnalytics;
       this.storageServerTokenManager = storageServerTokenManager;
-      this.experimentViewService = experimentViewService;
       this.userContextService = userContextService;
 
       this.show = true;
 
-      if (this.experimentViewService.isInSimulationView()) {
+      if (applicationTopToolbarService.isInSimulationView()) {
         // dynamically get the services that only apply during running experiment
         this.editorToolbarService = this.$injector.get('editorToolbarService');
         this.environmentRenderingService = this.$injector.get(
           'environmentRenderingService'
+        );
+        this.experimentViewService = this.$injector.get(
+          'experimentViewService'
         );
         this.simToolsSidebarService = this.$injector.get(
           'simToolsSidebarService'
@@ -127,9 +129,9 @@
       '$scope',
       '$window',
       'STATE',
+      'applicationTopToolbarService',
       'bbpConfig',
       'nrpAnalytics',
-      'experimentViewService',
       'storageServerTokenManager',
       'userContextService',
       function(...args) {

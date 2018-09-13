@@ -48,7 +48,6 @@
       STATE,
       userContextService,
       nrpAnalytics,
-      environmentRenderingService,
       gz3d,
       log,
       colorableObjectService,
@@ -83,8 +82,6 @@
             category: 'Experiment'
           });
           nrpAnalytics.tickDurationEvent('Browser-initialization');
-
-          environmentRenderingService.init(); //TODO: (@SandroWeber) should be moved / handled inside service
         }
 
         // We restrict material changes to simple objects and screen glasses found in screen models of the 3D scene,
@@ -192,7 +189,6 @@
     'STATE',
     'userContextService',
     'nrpAnalytics',
-    'environmentRenderingService',
     'gz3d',
     '$log',
     'colorableObjectService',
