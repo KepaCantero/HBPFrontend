@@ -149,9 +149,9 @@
           //TODO (Sandro): i think splashscreen stuff should be handled with a message callback inside the splashscreen service itself, not here
           //TODO: but first onSimulationDone() has to be moved to experiment service or replaced
           /* splashScreen == null means it has been already closed and should not be reopened */
+
           if (
             !loadingModel &&
-            this.splash.splashScreen !== null &&
             !this.environmentRenderingService.sceneLoading &&
             (angular.isDefined(message.state) ||
               (stateStopFailed ||
@@ -251,17 +251,16 @@
     //TODO: (@SandroWeber) taken from editor-toolbar.controller ... move this, let service react to close down themselves
     closeSimulationConnections() {
       // Stop listening for status messages
-      if (this.gz3d.iface && this.gz3d.iface.webSocket) {
-        this.gz3d.iface.webSocket.close();
-      }
-      // Stop listening for status messages
       this.stateService.stopListeningForStatusInformation();
     }
 
     setSimulationState(newState) {
       this.stateService.setCurrentState(newState);
 
-      if (this.gz3d.scene.manipulationMode !== this.EDIT_MODE.VIEW) {
+      if (
+        this.gz3d.scene &&
+        this.gz3d.scene.manipulationMode !== this.EDIT_MODE.VIEW
+      ) {
         this.gz3d.scene.setManipulationMode(this.EDIT_MODE.VIEW);
       }
 
@@ -423,8 +422,6 @@
     //TODO: (@SandroWeber) taken from editor-toolbar.controller ... move this, services should clean up after themselves
     cleanUp() {
       this.broadcastExitSimulation();
-
-      this.environmentRenderingService.deinit();
 
       // unbind resetListener callback
       this.resetListenerUnbindHandler();

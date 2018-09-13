@@ -62,8 +62,10 @@
       this.element = element;
       this.userContextService = userContextService;
       this.simulationInfo = simulationInfo;
+      this.stateService = stateService;
       this.userNavigationService = userNavigationService;
       this.NAVIGATION_MODES = NAVIGATION_MODES;
+      this.STATE = STATE;
 
       stateService.Initialize(); //TODO: (@SandroWeber) should be moved / handled inside service
 

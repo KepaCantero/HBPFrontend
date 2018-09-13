@@ -83,7 +83,7 @@
           this.tLastFrame = 0;
           this.maxDropCycles = 10;
           this.skippedFramesForDropCycles = 5;
-          this.sceneLoading = true;
+          this.sceneLoading = false;
           this.deferredSceneInitialized = $q.defer();
           this.scene3DSettingsReady = false;
           this.tipTooltipService = tipTooltipService;
@@ -95,6 +95,9 @@
           });
           $rootScope.$on('EXIT_SIMULATION', () => {
             this.deinit();
+          });
+          $rootScope.$on('ASSETS_LOADED', () => {
+            this.onSceneLoaded();
           });
 
           this.sceneInitialized = function() {
@@ -131,6 +134,7 @@
                 /* Listen for status informations */
                 stateService.addStateCallback(that.onStateChanged);
 
+                that.sceneLoading = true;
                 // Show the splash screen for the progress of the asset loading
                 that.assetLoadingSplashScreen =
                   that.assetLoadingSplashScreen || assetLoadingSplash.open();
@@ -148,7 +152,7 @@
               }
             });
 
-            this.deferredSceneInitialized.promise.then(function() {
+            this.sceneInitialized().then(function() {
               that.initComposerSettings();
             });
           };
@@ -194,6 +198,7 @@
               this.cancelAnimationFrame(this.requestID);
             }
 
+            this.sceneLoading = false;
             // Close the splash screens
             if (angular.isDefined(this.assetLoadingSplashScreen)) {
               if (angular.isDefined(assetLoadingSplash)) {
@@ -399,6 +404,8 @@
 
           this.onSceneLoaded = function() {
             if (this.sceneLoading) {
+              this.sceneLoading = false;
+
               nrpAnalytics.durationEventTrack('Browser-initialization', {
                 category: 'Simulation'
               });
@@ -407,14 +414,13 @@
               gz3d.scene.showLightHelpers = false;
               this.deferredSceneInitialized.resolve();
               gz3d.setLightHelperVisibility();
-              userNavigationService.init();
             }
           };
 
           this.onSceneReady = function() {
             delete this.assetLoadingSplashScreen;
-            this.sceneLoading = false;
             this.tipTooltipService.startShowingTipIfRequired();
+            userNavigationService.init();
 
             $timeout(() => this.showCameraHintWhenNeeded(), 200);
           };

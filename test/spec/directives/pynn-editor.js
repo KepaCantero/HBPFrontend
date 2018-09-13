@@ -511,6 +511,24 @@ describe('Directive: pynnEditor', function() {
         expect(typeof population.list).toBe('string');
       });
     });
+
+    it(' - onPopulationDefineModeChange()', function() {
+      // display mode 'range'
+      isolateScope.populations[0].displayMode = 'range';
+      isolateScope.onPopulationDefineModeChange(isolateScope.populations[0]);
+      expect(isolateScope.populations[0].list).not.toBeDefined();
+      expect(isolateScope.populations[0].from).toBe(0);
+      expect(isolateScope.populations[0].to).toBe(1);
+      expect(isolateScope.populations[0].step).toBe(1);
+
+      // display mode 'list'
+      isolateScope.populations[0].displayMode = 'list';
+      isolateScope.onPopulationDefineModeChange(isolateScope.populations[0]);
+      expect(isolateScope.populations[0].from).not.toBeDefined();
+      expect(isolateScope.populations[0].to).not.toBeDefined();
+      expect(isolateScope.populations[0].step).not.toBeDefined();
+      expect(isolateScope.populations[0].list).toBe('');
+    });
   });
 
   describe('Pynn-editor Upload & download', function() {

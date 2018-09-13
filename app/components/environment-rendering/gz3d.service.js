@@ -85,6 +85,7 @@
           that.scene.refresh3DViews();
         };
         this.MODEL_LIBRARY = 'libraries/model_library.json';
+
         this.Initialize = function() {
           if (isInitialized) {
             return;
@@ -129,6 +130,10 @@
         };
 
         this.deInitialize = function() {
+          if (this.iface && this.iface.webSocket) {
+            this.iface.webSocket.close();
+          }
+
           delete that.sdfParser;
           delete that.iface;
           delete that.gui;

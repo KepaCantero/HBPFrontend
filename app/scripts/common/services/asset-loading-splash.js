@@ -128,7 +128,6 @@
           $scope.preparing3DScene = true;
 
           $rootScope.$broadcast('ASSETS_LOADED');
-          environmentRenderingService.onSceneLoaded();
 
           $scope.$watch(
             'environmentRenderingService.scene3DSettingsReady',

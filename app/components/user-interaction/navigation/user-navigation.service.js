@@ -157,6 +157,7 @@
 
           deinit: function() {
             this.removeAvatar();
+            this.navigationMode = undefined;
           },
 
           update: function(tElapsed) {

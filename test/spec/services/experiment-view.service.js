@@ -166,7 +166,7 @@ describe('Service: ExperimentViewService', function() {
     $rootScope.$broadcast('ENTER_SIMULATION');
 
     stateService.currentState = STATE.STOPPED;
-    experimentViewService.sceneLoading = false;
+    environmentRenderingService.sceneLoading = false;
     experimentViewService.resetRequest = {};
     //Test the messageCallback
     splash.splashScreen = undefined;
@@ -318,9 +318,7 @@ describe('Service: ExperimentViewService', function() {
 
     experimentViewService.cleanUp();
 
-    expect(environmentRenderingService.deinit).toHaveBeenCalled();
     expect(experimentViewService.resetListenerUnbindHandler).toHaveBeenCalled();
-    expect(gz3d.iface.webSocket.close).toHaveBeenCalled();
   });
 
   it('should call the create modal upon exit click', function() {
