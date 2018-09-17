@@ -415,20 +415,19 @@
     function($http) {
       var boot = function() {
         // Google Analytics
-        if (angular.isDefined(window.bbpConfig.environment)) {
-          var stage = window.bbpConfig.environment;
-          if (stage === 'development') {
-            /* global ga: false */
-            ga('create', 'UA-62512653-1', 'auto');
-          } else if (stage === 'staging') {
-            /* global ga: false */
-            ga('create', 'UA-62512653-2', 'auto');
-          } else if (stage === 'production') {
-            /* global ga: false */
-            ga('create', 'UA-62512653-3', 'auto');
-          } else if (stage === 'demo') {
-            /* global ga: false */
-            ga('create', 'UA-62512653-5', 'auto');
+        const googleAnalytics = window.bbpConfig['google-analytics'];
+        const trackingId = googleAnalytics
+          ? googleAnalytics['tracking-id']
+          : undefined;
+        if (angular.isDefined(trackingId) && trackingId !== 'notracking') {
+          // 'notracking' is fit for local usage and development servers.
+          // The Google Analytics tracking ID is set in config.json via ansible (admin-scripts)
+          /* global ga: false */
+          ga('create', trackingId, 'auto');
+          const anonymizeIp = googleAnalytics['anonymize-ip'];
+          if (anonymizeIp === true) {
+            // eslint-disable-next-line camelcase
+            ga('set', 'anonymizeIp', true); // IP anonymization of all events
           }
         }
 
