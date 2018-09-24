@@ -27,11 +27,11 @@
 
   class UpdateChecker {
     get CHECK_UPDATE_URL() {
-      return this.bbpConfig.get('api.onlinePlatform.checkUpdate');
+      return this.bbpConfig.get('api.versionCheck.checkUpdate');
     }
 
     get RELEASE_NOTES_URL() {
-      return this.bbpConfig.get('api.onlinePlatform.releaseNotes');
+      return this.bbpConfig.get('api.versionCheck.releaseNotes');
     }
 
     static get LOCAL_STORAGE_KEYS() {

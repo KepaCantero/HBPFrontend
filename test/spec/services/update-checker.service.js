@@ -76,7 +76,7 @@ describe('Services: update-checker', () => {
         });
 
         $httpBackend
-          .expectPOST(bbpConfig.get('api.onlinePlatform.checkUpdate'))
+          .expectPOST(bbpConfig.get('api.versionCheck.checkUpdate'))
           .respond({ version: '1.2.4' });
 
         localStorage.getItem = jasmine.createSpy().and.returnValue(null);
