@@ -27,6 +27,7 @@
 
   class ExperimentViewService {
     constructor(
+      $window,
       $location,
       $rootScope,
       $timeout,
@@ -53,6 +54,7 @@
       userContextService,
       storageServer
     ) {
+      this.$window = $window;
       this.$location = $location;
       this.$rootScope = $rootScope;
       this.$timeout = $timeout;
@@ -406,6 +408,7 @@
           this.cleanUp();
           this.splash.splashScreen = null; // do not reopen splashscreen if further messages happen
           this.$location.path('esv-private');
+          this.$window.location.reload();
         });
       }
     }
@@ -467,6 +470,7 @@
 
   ExperimentViewService.$$ngIsClass = true;
   ExperimentViewService.$inject = [
+    '$window',
     '$location',
     '$rootScope',
     '$timeout',

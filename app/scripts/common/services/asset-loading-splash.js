@@ -92,6 +92,7 @@
     'environmentRenderingService',
     'gz3d',
     '$location',
+    '$window',
     function(
       $rootScope,
       $scope,
@@ -99,7 +100,8 @@
       assetLoadingSplash,
       environmentRenderingService,
       gz3d,
-      $location
+      $location,
+      $window
     ) {
       $scope.progressData = {};
       $scope.isError = false;
@@ -112,6 +114,7 @@
       $scope.close = function() {
         assetLoadingSplash.close();
         $location.path('esv-private');
+        $window.location.reload();
       };
 
       assetLoadingSplash.setProgressObserver(function(data) {

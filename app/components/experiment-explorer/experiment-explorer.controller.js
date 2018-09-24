@@ -406,6 +406,7 @@
     directToClonePage() {
       let clonePagePath = 'esv-private';
       this.$location.path(clonePagePath);
+      this.$window.location.reload();
     }
   }
 

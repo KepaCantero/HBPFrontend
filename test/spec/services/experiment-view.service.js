@@ -73,6 +73,12 @@ describe('Service: ExperimentViewService', function() {
       simulationInfo = _simulationInfo_;
       splash = _splash_;
       stateService = _stateService_;
+
+      environmentService.$window = {
+        location: {
+          reload: jasmine.createSpy()
+        }
+      };
     })
   );
 
