@@ -210,7 +210,7 @@
 
       environmentService.setPrivateExperiment(pageOptions.collab);
       $httpBackend
-        .whenPOST(bbpConfig.get('api.onlinePlatform.checkUpdate'))
+        .whenPOST(bbpConfig.get('api.versionCheck.checkUpdate'))
         .respond(200, { version: '1.0' });
 
       $httpBackend
