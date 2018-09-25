@@ -114,6 +114,7 @@
         $provide.value('assetLoadingSplash', assetLoadingSplashMock);
         $provide.value('$scope', scopeMock);
         $provide.value('$timeout', timeoutMock);
+        $provide.value('$window', { reload: jasmine.createSpy() });
         $provide.value(
           'environmentRenderingService',
           environmentRenderingServiceMock
