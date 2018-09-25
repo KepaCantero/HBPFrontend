@@ -521,15 +521,6 @@ def {0}(t):
                     'gm'
                   )
                 ) || [''])[0];
-
-                if (scope.lastAutoApplyAfterUIStructuredChange) {
-                  $timeout.cancel(scope.lastAutoApplyAfterUIStructuredChange);
-                }
-
-                scope.lastAutoApplyAfterUIStructuredChange = $timeout(() => {
-                  scope.lastAutoApplyAfterUIStructuredChange = null;
-                  scope.applyScript(tf);
-                }, 1000);
               });
             };
 
