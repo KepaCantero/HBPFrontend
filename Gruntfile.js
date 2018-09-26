@@ -303,7 +303,7 @@ module.exports = function(grunt) {
         httpFontsPath: '/styles/fonts',
         relativeAssets: false,
         assetCacheBuster: false,
-        raw: 'Sass::Script::Number.precision = 10\n'
+        raw: "Encoding.default_external = 'utf-8'\n"
       },
       dist: {
         options: {

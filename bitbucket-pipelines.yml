@@ -1,0 +1,35 @@
+# This is a sample build configuration for Docker.
+# Check our guides at https://confluence.atlassian.com/x/O1toN for more examples.
+# Only use spaces to indent your .yml configuration.
+# -----
+# You can specify a custom docker image from Docker Hub as your build environment.
+image: hbpneurorobotics/nrp_frontend:dev
+
+pipelines:
+  default:
+    - step:
+        name: Build
+        script: # Modify the commands below to build your repository.
+
+          # Install Ruby dependencies with Bundler
+          - sudo apt-get update && sudo apt-get install -y ruby-all-dev gem ruby-bundler ruby-ffi
+          - if [ -f Gemfile ]; then ruby -v && gem -v && gem install --user-install --no-ri --no-rdoc bundler && bundle install; fi
+
+          # Install npm packages
+          - npm install
+
+          # Install Ruby dependencies with Bundler
+          - if [ -f Gemfile ]; then ruby -v && gem -v && gem install --user-install --no-ri --no-rdoc bundler && bundle install; fi
+
+          # Install google chrome
+          - sudo apt-get install -y wget --no-install-recommends     && wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -     && sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list'     && sudo apt-get update     && sudo apt-get install -y google-chrome-unstable fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst ttf-freefont       --no-install-recommends     && sudo rm -rf /var/lib/apt/lists/*     && sudo apt-get purge --auto-remove -y curl     && sudo rm -rf /src/*.deb
+
+          # Checking for un-prettified files
+          - node_modules/prettier/bin/prettier.js --list-different '**/*.{js,scss}'
+
+          # Grunt execution
+          - grunt --stack ci
+
+          # Coverage check
+          - git archive --remote=ssh://git@bitbucket.org/hbpneurorobotics/admin-scripts.git refs/heads/master nrp_cobertura_check | tar xf -
+          - ./nrp_cobertura_check reports/coverage/*/cobertura-coverage.xml
