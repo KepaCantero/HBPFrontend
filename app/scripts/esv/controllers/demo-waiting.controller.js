@@ -60,7 +60,7 @@
                 simul.runningSimulation.state === STATE.PAUSED
               ) {
                 let path =
-                  '#/esv-private/experiment-view/' +
+                  'esv-private/experiment-view/' +
                   simul.server +
                   '/' +
                   exp.id +
@@ -72,8 +72,10 @@
                   scope.experimentsService.destroy();
                   scope.experimentsService = undefined;
                 }
-                $window.location.href = path;
-                $window.location.reload();
+                $location.path(path);
+                $timeout(() => {
+                  $window.location.reload();
+                }, 1000);
                 return;
               }
             }

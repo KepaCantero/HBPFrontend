@@ -47,7 +47,7 @@ describe('Controller: demo-waiting', function() {
       scope = $rootScope.$new();
 
       var proxyUrl = bbpConfig.get('api.proxy.url');
-
+      spyOn(location, 'path');
       $httpBackend
         .whenGET(new RegExp(proxyUrl + '/experiments'))
         .respond(200, experiments);
@@ -81,9 +81,13 @@ describe('Controller: demo-waiting', function() {
     experiments.developementExperiment.joinableServers = [
       { server: 'server', runningSimulation: { state: STATE.PAUSED } }
     ];
+    scope.process();
+    $httpBackend.flush();
     $timeout.flush(10000);
 
-    expect(windowMock.location.href).toContain('experiment-view');
+    expect(location.path.calls.mostRecent().args[0]).toContain(
+      'experiment-view'
+    );
     expect(windowMock.location.reload).toHaveBeenCalled();
   });
 });

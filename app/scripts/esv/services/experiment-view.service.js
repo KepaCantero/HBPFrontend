@@ -144,7 +144,9 @@
         var stateStopFailed =
           this.stateService.currentState === this.STATE.STOPPED ||
           this.stateService.currentState === this.STATE.FAILED;
-        if (this.demoMode && stateStopFailed) {
+
+        let demoMode = this.bbpConfig.get('demomode.demoCarousel', false);
+        if (demoMode && stateStopFailed) {
           this.exitSimulation();
         } else {
           // In demo mode, we don't show the end splash screen,
@@ -402,7 +404,7 @@
       if (isDemoMode) {
         this.cleanUp();
         this.splash.splashScreen = null; // do not reopen splashscreen if further messages happen
-        this.$location.path('esv-demo');
+        this.$location.path('esv-demo-wait');
       } else {
         this.autosaveOnExitService.onExit().then(() => {
           this.cleanUp();
