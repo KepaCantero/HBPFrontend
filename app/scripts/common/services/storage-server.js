@@ -331,8 +331,16 @@
         .$promise;
     }
 
+    demoMode() {
+      return (
+        window.bbpConfig.demomode && window.bbpConfig.demomode.demoCarousel
+      );
+    }
     getBrain(experimentId) {
-      return this.proxyRsc.getBrain({ experimentId }).$promise;
+      return this.proxyRsc.getBrain({
+        experimentId,
+        template: this.demoMode()
+      }).$promise;
     }
 
     saveBrain(experimentId, brain, populations) {
@@ -343,7 +351,10 @@
     }
 
     getStateMachines(experimentId) {
-      return this.proxyRsc.getStateMachines({ experimentId }).$promise;
+      return this.proxyRsc.getStateMachines({
+        experimentId,
+        template: this.demoMode()
+      }).$promise;
     }
 
     saveStateMachines(experimentId, stateMachines) {
@@ -354,7 +365,10 @@
     }
 
     getTransferFunctions(experimentId) {
-      return this.proxyRsc.getTransferFunctions({ experimentId }).$promise;
+      return this.proxyRsc.getTransferFunctions({
+        experimentId,
+        template: this.demoMode()
+      }).$promise;
     }
 
     saveTransferFunctions(experimentId, transferFunctions) {
