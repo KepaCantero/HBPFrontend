@@ -1,0 +1,19 @@
+<div class="modal-header">
+    <h4 class="modal-title">Data privacy and non dual use</h4>
+</div>
+<div class="modal-body">
+    <div>
+        <input type="checkbox" name="gdpr" ng-model="data.gdpr" />
+                I have read and I agree to the
+        <a href="http://neurorobotics.net/nrpPrivacy.html" target="_blank">Terms of Service</a>
+    </div>
+    <div>
+        <input type="checkbox" name="gdpr" ng-model="data.nonDual" />
+        I state that I will use the Neurorobotics
+        Platform solely for civilian purposes
+    </div>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-danger" ng-click="$close(false)">Cancel</button>
+    <button class="btn btn-default" ng-click="$close(true)" ng-disabled="!data.gdpr || !data.nonDual">Accept</button>
+</div>

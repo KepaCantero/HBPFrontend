@@ -86,6 +86,14 @@
             method: 'GET',
             url: `${this.IDENTITY_BASE_URL}/:userid`
           }),
+          getGdprStatus: buildAction({
+            method: 'GET',
+            url: `${this.IDENTITY_BASE_URL}/gdpr`
+          }),
+          setGdprStatus: buildAction({
+            method: 'POST',
+            url: `${this.IDENTITY_BASE_URL}/gdpr`
+          }),
           getCurrentUserGroups: buildAction({
             method: 'GET',
             isArray: true,
@@ -287,6 +295,14 @@
 
     getUser(userid) {
       return this.proxyRsc.getUserInfo({ userid }).$promise;
+    }
+
+    getGdprStatus() {
+      return this.proxyRsc.getGdprStatus().$promise;
+    }
+
+    acceptGdpr() {
+      return this.proxyRsc.setGdprStatus().$promise;
     }
 
     getCurrentUserGroups() {

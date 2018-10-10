@@ -254,15 +254,12 @@
           resolve: {
             currentUser: [
               'storageServer',
-              function(storageServer) {
-                return storageServer.getCurrentUser();
-              }
+              storageServer => storageServer.getCurrentUser()
             ],
             setCollabState: [
               'environmentService',
-              function(environmentService) {
-                return environmentService.setPrivateExperiment(true);
-              }
+              environmentService =>
+                environmentService.setPrivateExperiment(true)
             ]
           }
         };

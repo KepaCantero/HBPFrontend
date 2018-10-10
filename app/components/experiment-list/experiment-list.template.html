@@ -1,211 +1,223 @@
 <div>
 
-  <div  ng-show="!tipTooltipService.someTipsAreHidden()">
+    <gdpr-prompt></gdpr-prompt>
 
-  <div class="tip-tooltip-place">
-  <tip-tooltip  style="display:block;margin-right:16px"></tip-tooltip>
-  </div>
+    <div ng-show="!tipTooltipService.someTipsAreHidden()">
 
-  <div style="padding-bottom: 80px;"></div>
-</div>
-<new-experiment-wizard ng-show="isPrivateExperiment && !running && private"></new-experiment-wizard>
+        <div class="tip-tooltip-place">
+            <tip-tooltip style="display:block;margin-right:16px"></tip-tooltip>
+        </div>
 
-<div ng-if="!experiments">
-  <i class="fa fa-2x fa-spinner fa-spin"></i>&nbsp; <i>{{config.loadingMessage}}</i>
-</div>
+        <div style="padding-bottom: 80px;"></div>
+    </div>
+    <new-experiment-wizard ng-show="isPrivateExperiment && !running && private"></new-experiment-wizard>
 
-  <div class="no-experiment-msg" ng-show="experiments && running && !atLeastOneExperimentRunning()">
-    There is no simulation running now...
-    <hr class="list-separator">
-  </div>
-
-  <div class="no-experiment-msg" ng-show="experiments && !running && filteredExperiments.length==0">
-      No experiments...
-      <hr class="list-separator">
+    <div ng-if="!experiments">
+        <i class="fa fa-2x fa-spinner fa-spin"></i>&nbsp; <i>{{config.loadingMessage}}</i>
     </div>
 
-  <div ng-show="experiments && (!running || (config.canLaunchExperiments && exp.joinableServers.length > 0))" ng-repeat="exp in filteredExperiments | orderBy:'configuration.name':false"
-    class="experiment-box" ng-mouseenter="isHovered = true" ng-mouseleave="isHovered = false" ng-mouseup="isHovered = false"
-    ng-click="selectExperiment(exp);" editable-experiment experiment-details="exp">
-    <div class="list-entry-container left-right" ng-class="{selected: (exp.id == pageState.selected),hover:isHovered && (exp.id != pageState.selected)}">
-      <div class="list-entry-left" ng-class="{selected: exp.id == pageState.selected}">
-        <img class="entity-thumbnail" ng-src="{{exp.imageUrl || ''}}" />
-      </div>
-      <div class="list-entry-middle list-entry-container up-down">
-        <div ng-show="exp.configuration.privateStorage && (!exp.configuration.experimentFile || !exp.configuration.bibiConfSrc)" class="alert alert-danger" role="alert">
-            <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
-            Missing configuration file: <b>{{exp.configuration.experimentFile?'.bibi':'.exc'}}</b> file not found.
-        </div>
-        <div class="list-entry-container left-right title-line">
-          <div class="h4" ng-hide="!loadingEdit && editing[nameID] && isPrivateExperiment">{{exp.configuration.name}}
-            <a ng-if="exp.id == pageState.selected && exp.configuration.experimentFile" style="font-size:15px;" name="edit-button" class="glyphicon glyphicon-pencil" href="javascript:void(0);"
-              ng-show="!running && isPrivateExperiment && (!editing[nameID] && !editing[descID]) && (config.canCloneExperiments && config.canLaunchExperiments) && !pageState.deletingExperiment" id="edit-button"
-              v-busy="loadingEdit" ng-click="editExperiment(nameID);"></a>
-          </div>
-          <form ng-show="editing[nameID] && isPrivateExperiment && !loadingEdit">
-            <input type="text" id="{{nameID}}" value="{{exp.configuration.name}}" size="{{exp.configuration.name.length}}" ng-model="exp.configuration.name"
-              ng-blur="saveExperimentDetails(exp.configuration.name, nameID);" ng-required/>
-            <a style="font-size:15px;" href="javascript:void(0);" ng-show="isSavingToCollab" v-busy="isSavingToCollab"></a>
-            </br/>
-          </form>
-          <div ng-show="!running || exp.joinableServers.length > 1" ng-if="config.canLaunchExperiments && exp.joinableServers.length > 0" class="list-entry-running">({{exp.joinableServers.length}} simulation{{exp.joinableServers.length>1?'s':''}} running)</div>
-        </div>
-        <div ng-if="exp.id == pageState.selected" ng-show="!isPrivateExperiment || (config.canCloneExperiments && !config.canLaunchExperiments)">{{exp.configuration.description}}</div>
-        <div ng-if="exp.id == pageState.selected" ng-hide="!private || (editing[descID] && !loadingEdit)">{{exp.configuration.description}}
-          <a style="font-size:15px;" name="edit-button" class="glyphicon glyphicon-pencil" href="javascript:void(0);" ng-show="exp.configuration.experimentFile && !running && isPrivateExperiment && (!editing[nameID] && !editing[descID]) && !pageState.deletingExperiment"
-            v-busy="loadingEdit" ng-click="editExperiment(descID);"></a>
-        </div>
-        <form ng-show="editing[descID] && isPrivateExperiment && !loadingEdit">
-          <textarea rows="4" cols="50" id="{{descID}}" ng-model="exp.configuration.description" ng-blur="saveExperimentDetails(exp.configuration.description, descID);"></textarea>
-          <a style="font-size:15px;" href="javascript:void(0);" ng-show="isSavingToCollab" v-busy="isSavingToCollab"></a>
-        </form>
-        <div ng-if="exp.id != pageState.selected">{{exp.configuration.description | limitTo: 200}}...</div>
-        <div ng-if="exp.id == pageState.selected && config.canLaunchExperiments" style="position:relative">
-          <br/>
-          <i ng-if="exp.configuration.timeout != undefined">Timeout: {{exp.configuration.timeout | timeDDHHMMSS}}</i><br/>
-          <!-- temporary placeholder to notify the user an experiment requires multiple processes -->
-          <i>Brain processes: {{exp.configuration.brainProcesses}}</i><br/>
-          <span ng-if="devMode && config.canLaunchExperiments">
-        <i>Available backends:</i>
-        <i  class="label-availability"
-            title="A backend VM is required to control the simulation">
-           {{exp.availableServers.length}}
-        </i>
-        <br/>
-        <i>Use server:</i>
-        <select ng-model="exp.devServer" ng-change="getSoftwareVersions(exp.devServer)" style="background-color: white; margin: 5px;">
-          <option value="">All servers</option>
-          <option ng-repeat="server in exp.availableServers" value="{{server.id}}">{{server.id}}</option>
-        </select>
-        <a name="versionLink" href="" ng-click="setCollapsed(!isCollapsed); getSoftwareVersions(exp.devServer)">{{isCollapsed  ? 'Show versions' : 'Hide versions'}}</a>
-        <div uib-collapse="isCollapsed" name="versionDiv">
-          <div class="well well-lg pre" >{{softwareVersions}}</div>
-        </div>
-      <br>
-      <i>Cluster availability: </i>
-      <i class="label-availability" title="A cluster node is required to run the robot simulation" ng-class="clusterAvailability.free < CLUSTER_THRESHOLDS.AVAILABLE ? (clusterAvailability.free < CLUSTER_THRESHOLDS.UNAVAILABLE ? 'label-danger' : 'label-warning') : 'label-success' ">
-        {{clusterAvailability.free}} / {{clusterAvailability.total}}
-      </i>
-      <br/>
-      </span>
-          <div style="display:flex">
-            <i style="margin-top: 4px;">Server status: </i>
-            <i class="server-icon {{exp | experimentStatusClass : clusterAvailability}}" title="{{exp | experimentStatus: clusterAvailability}}"></i>
-          </div>
-        </div>
-        <div uib-collapse="!config.canCloneExperiments || (exp.id != pageState.selected) || !isCloneRequested">
-          <div class="list-entry-container center">
-            <i class="fa fa-spinner fa-spin"></i>&nbsp;
-            <i>Copying files to the storage...</i>
-          </div>
-        </div>
+    <div class="no-experiment-msg" ng-show="experiments && running && !atLeastOneExperimentRunning()">
+        There is no simulation running now...
+        <hr class="list-separator">
+    </div>
 
-        <div uib-collapse="!pageState.deletingExperiment ||  (exp.id != pageState.selected) ">
-          <div class="list-entry-container center">
-            <i class="fa fa-spinner fa-spin"></i>&nbsp;
-            <i>Deleting experiment from storage...</i>
-          </div>
-        </div>
+    <div class="no-experiment-msg" ng-show="experiments && !running && filteredExperiments.length==0">
+        No experiments...
+        <hr class="list-separator">
+    </div>
 
-        <div ng-show="!running" class="list-entry-buttons list-entry-container center" ng-if="exp.id == pageState.selected">
-          <div class="btn-group" role="group" ng-hide="editing[nameID] || editing[descID] || loadingEdit">
-            <!-- Servers are available and the user has edit rights: launch button enabled -->
-            <button analytics-on analytics-event="Launch" analytics-category="Experiment"
-             ng-if="config.canLaunchExperiments && exp.availableServers.length > 0 &&
+    <div ng-show="experiments && (!running || (config.canLaunchExperiments && exp.joinableServers.length > 0))"
+        ng-repeat="exp in filteredExperiments | orderBy:'configuration.name':false" class="experiment-box"
+        ng-mouseenter="isHovered = true" ng-mouseleave="isHovered = false" ng-mouseup="isHovered = false" ng-click="selectExperiment(exp);"
+        editable-experiment experiment-details="exp">
+        <div class="list-entry-container left-right" ng-class="{selected: (exp.id == pageState.selected),hover:isHovered && (exp.id != pageState.selected)}">
+            <div class="list-entry-left" ng-class="{selected: exp.id == pageState.selected}">
+                <img class="entity-thumbnail" ng-src="{{exp.imageUrl || ''}}" />
+            </div>
+            <div class="list-entry-middle list-entry-container up-down">
+                <div ng-show="exp.configuration.privateStorage && (!exp.configuration.experimentFile || !exp.configuration.bibiConfSrc)"
+                    class="alert alert-danger" role="alert">
+                    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                    Missing configuration file: <b>{{exp.configuration.experimentFile?'.bibi':'.exc'}}</b> file not
+                    found.
+                </div>
+                <div class="list-entry-container left-right title-line">
+                    <div class="h4" ng-hide="!loadingEdit && editing[nameID] && isPrivateExperiment">{{exp.configuration.name}}
+                        <a ng-if="exp.id == pageState.selected && exp.configuration.experimentFile" style="font-size:15px;"
+                            name="edit-button" class="glyphicon glyphicon-pencil" href="javascript:void(0);" ng-show="!running && isPrivateExperiment && (!editing[nameID] && !editing[descID]) && (config.canCloneExperiments && config.canLaunchExperiments) && !pageState.deletingExperiment"
+                            id="edit-button" v-busy="loadingEdit" ng-click="editExperiment(nameID);"></a>
+                    </div>
+                    <form ng-show="editing[nameID] && isPrivateExperiment && !loadingEdit">
+                        <input type="text" id="{{nameID}}" value="{{exp.configuration.name}}" size="{{exp.configuration.name.length}}"
+                            ng-model="exp.configuration.name" ng-blur="saveExperimentDetails(exp.configuration.name, nameID);"
+                            ng-required />
+                        <a style="font-size:15px;" href="javascript:void(0);" ng-show="isSavingToCollab" v-busy="isSavingToCollab"></a>
+                        </br />
+                    </form>
+                    <div ng-show="!running || exp.joinableServers.length > 1" ng-if="config.canLaunchExperiments && exp.joinableServers.length > 0"
+                        class="list-entry-running">({{exp.joinableServers.length}}
+                        simulation{{exp.joinableServers.length>1?'s':''}} running)</div>
+                </div>
+                <div ng-if="exp.id == pageState.selected" ng-show="!isPrivateExperiment || (config.canCloneExperiments && !config.canLaunchExperiments)">{{exp.configuration.description}}</div>
+                <div ng-if="exp.id == pageState.selected" ng-hide="!private || (editing[descID] && !loadingEdit)">{{exp.configuration.description}}
+                    <a style="font-size:15px;" name="edit-button" class="glyphicon glyphicon-pencil" href="javascript:void(0);"
+                        ng-show="exp.configuration.experimentFile && !running && isPrivateExperiment && (!editing[nameID] && !editing[descID]) && !pageState.deletingExperiment"
+                        v-busy="loadingEdit" ng-click="editExperiment(descID);"></a>
+                </div>
+                <form ng-show="editing[descID] && isPrivateExperiment && !loadingEdit">
+                    <textarea rows="4" cols="50" id="{{descID}}" ng-model="exp.configuration.description" ng-blur="saveExperimentDetails(exp.configuration.description, descID);"></textarea>
+                    <a style="font-size:15px;" href="javascript:void(0);" ng-show="isSavingToCollab" v-busy="isSavingToCollab"></a>
+                </form>
+                <div ng-if="exp.id != pageState.selected">{{exp.configuration.description | limitTo: 200}}...</div>
+                <div ng-if="exp.id == pageState.selected && config.canLaunchExperiments" style="position:relative">
+                    <br />
+                    <i ng-if="exp.configuration.timeout != undefined">Timeout: {{exp.configuration.timeout |
+                        timeDDHHMMSS}}</i><br />
+                    <!-- temporary placeholder to notify the user an experiment requires multiple processes -->
+                    <i>Brain processes: {{exp.configuration.brainProcesses}}</i><br />
+                    <span ng-if="devMode && config.canLaunchExperiments">
+                        <i>Available backends:</i>
+                        <i class="label-availability" title="A backend VM is required to control the simulation">
+                            {{exp.availableServers.length}}
+                        </i>
+                        <br />
+                        <i>Use server:</i>
+                        <select ng-model="exp.devServer" ng-change="getSoftwareVersions(exp.devServer)" style="background-color: white; margin: 5px;">
+                            <option value="">All servers</option>
+                            <option ng-repeat="server in exp.availableServers" value="{{server.id}}">{{server.id}}</option>
+                        </select>
+                        <a name="versionLink" href="" ng-click="setCollapsed(!isCollapsed); getSoftwareVersions(exp.devServer)">{{isCollapsed
+                            ? 'Show versions' : 'Hide versions'}}</a>
+                        <div uib-collapse="isCollapsed" name="versionDiv">
+                            <div class="well well-lg pre">{{softwareVersions}}</div>
+                        </div>
+                        <br>
+                        <i>Cluster availability: </i>
+                        <i class="label-availability" title="A cluster node is required to run the robot simulation"
+                            ng-class="clusterAvailability.free < CLUSTER_THRESHOLDS.AVAILABLE ? (clusterAvailability.free < CLUSTER_THRESHOLDS.UNAVAILABLE ? 'label-danger' : 'label-warning') : 'label-success' ">
+                            {{clusterAvailability.free}} / {{clusterAvailability.total}}
+                        </i>
+                        <br />
+                    </span>
+                    <div style="display:flex">
+                        <i style="margin-top: 4px;">Server status: </i>
+                        <i class="server-icon {{exp | experimentStatusClass : clusterAvailability}}" title="{{exp | experimentStatus: clusterAvailability}}"></i>
+                    </div>
+                </div>
+                <div uib-collapse="!config.canCloneExperiments || (exp.id != pageState.selected) || !isCloneRequested">
+                    <div class="list-entry-container center">
+                        <i class="fa fa-spinner fa-spin"></i>&nbsp;
+                        <i>Copying files to the storage...</i>
+                    </div>
+                </div>
+
+                <div uib-collapse="!pageState.deletingExperiment ||  (exp.id != pageState.selected) ">
+                    <div class="list-entry-container center">
+                        <i class="fa fa-spinner fa-spin"></i>&nbsp;
+                        <i>Deleting experiment from storage...</i>
+                    </div>
+                </div>
+
+                <div ng-show="!running" class="list-entry-buttons list-entry-container center" ng-if="exp.id == pageState.selected">
+                    <div class="btn-group" role="group" ng-hide="editing[nameID] || editing[descID] || loadingEdit">
+                        <!-- Servers are available and the user has edit rights: launch button enabled -->
+                        <button analytics-on analytics-event="Launch" analytics-category="Experiment" ng-if="config.canLaunchExperiments && exp.availableServers.length > 0 &&
               exp.configuration.experimentFile && exp.configuration.bibiConfSrc"
-              class="btn btn-default" ng-click="pageState.startingExperiment == exp.id || startNewExperiment(exp, false);"
-              ng-disabled="pageState.startingExperiment == exp.id || pageState.deletingExperiment">
-              <i class="fa fa-plus"></i> Launch
-            </button>
+                            class="btn btn-default" ng-click="pageState.startingExperiment == exp.id || startNewExperiment(exp, false);"
+                            ng-disabled="pageState.startingExperiment == exp.id || pageState.deletingExperiment">
+                            <i class="fa fa-plus"></i> Launch
+                        </button>
 
-            <!-- No server available but the user has edit rights: launch button disabled -->
-            <button ng-if="config.canLaunchExperiments && exp.availableServers.length == 0" class="btn btn-default disabled enable-tooltip"
-                  title="Sorry, no available servers.">
-              <i class="fa fa-plus"></i> Launch
-            </button>
+                        <!-- No server available but the user has edit rights: launch button disabled -->
+                        <button ng-if="config.canLaunchExperiments && exp.availableServers.length == 0" class="btn btn-default disabled enable-tooltip"
+                            title="Sorry, no available servers.">
+                            <i class="fa fa-plus"></i> Launch
+                        </button>
 
-            <!-- Option to Launch in Single Process Mode -->
-            <button ng-if="config.canLaunchExperiments && exp.configuration.brainProcesses > 1 && exp.availableServers.length > 0 &&
+                        <!-- Option to Launch in Single Process Mode -->
+                        <button ng-if="config.canLaunchExperiments && exp.configuration.brainProcesses > 1 && exp.availableServers.length > 0 &&
               exp.configuration.experimentFile && exp.configuration.bibiConfSrc"
-                  class="btn btn-default"
-                  ng-click="pageState.startingExperiment == exp.id || startNewExperiment(exp, true);"
-                  ng-disabled="pageState.startingExperiment == exp.id">
-              <i class="fa fa-plus"></i> Launch in Single Process Mode
-            </button>
+                            class="btn btn-default" ng-click="pageState.startingExperiment == exp.id || startNewExperiment(exp, true);"
+                            ng-disabled="pageState.startingExperiment == exp.id">
+                            <i class="fa fa-plus"></i> Launch in Single Process Mode
+                        </button>
 
-            <!-- Delete button -->
-            <button analytics-on analytics-event="Delete" analytics-category="Experiment" ng-if="isPrivateExperiment && config.canLaunchExperiments"
-              class="btn btn-default" ng-click="deleteExperiment(exp.id)" ng-disabled = "pageState.deletingExperiment || pageState.startingExperiment == exp.id  ||
+                        <!-- Delete button -->
+                        <button analytics-on analytics-event="Delete" analytics-category="Experiment" ng-if="isPrivateExperiment && config.canLaunchExperiments"
+                            class="btn btn-default" ng-click="deleteExperiment(exp.id)" ng-disabled="pageState.deletingExperiment || pageState.startingExperiment == exp.id  ||
               (config.canLaunchExperiments && exp.joinableServers.length > 0)">
-            <i class="fa fa-times"></i> Delete
-            </button>
+                            <i class="fa fa-times"></i> Delete
+                        </button>
 
-            <!-- Join button -->
-            <button analytics-on analytics-event="Join" analytics-category="Experiment" ng-if="config.canLaunchExperiments && exp.joinableServers.length > 0"
-                  class="btn btn-default" ng-disabled="pageState.startingExperiment" ng-click="pageState.showJoin = !pageState.showJoin">
-              <i class="fa fa-sign-in"></i> Simulations »
-            </button>
+                        <!-- Join button -->
+                        <button analytics-on analytics-event="Join" analytics-category="Experiment" ng-if="config.canLaunchExperiments && exp.joinableServers.length > 0"
+                            class="btn btn-default" ng-disabled="pageState.startingExperiment" ng-click="pageState.showJoin = !pageState.showJoin">
+                            <i class="fa fa-sign-in"></i> Simulations »
+                        </button>
 
-            <!-- Clone button -->
-            <button ng-if="config.canCloneExperiments && (!exp.configuration.privateStorage || (exp.configuration.experimentFile && exp.configuration.bibiConfSrc))" analytics-on analytics-event="Clone" class="btn btn-default"
-                  analytics-label="Collab" analytics-value="exp.id" class="btn btn-default" ng-click="clone(exp)"
-                  ng-disabled="isCloneRequested || pageState.deletingExperiment">
-              <i class="fa fa-pencil-alt"></i> Clone
-            </button>
+                        <!-- Clone button -->
+                        <button ng-if="config.canCloneExperiments && (!exp.configuration.privateStorage || (exp.configuration.experimentFile && exp.configuration.bibiConfSrc))"
+                            analytics-on analytics-event="Clone" class="btn btn-default" analytics-label="Collab"
+                            analytics-value="exp.id" class="btn btn-default" ng-click="clone(exp)" ng-disabled="isCloneRequested || pageState.deletingExperiment">
+                            <i class="fa fa-pencil-alt"></i> Clone
+                        </button>
 
-            <!-- Files button -->
-            <button ng-if="config.canLaunchExperiments" analytics-on analytics-event="Explorer" class="btn btn-default"
-              analytics-label="Collab" analytics-value="exp.id" class="btn btn-default" ng-click="exploreExpFiles(exp)">
+                        <!-- Files button -->
+                        <button ng-if="config.canLaunchExperiments" analytics-on analytics-event="Explorer" class="btn btn-default"
+                            analytics-label="Collab" analytics-value="exp.id" class="btn btn-default" ng-click="exploreExpFiles(exp)">
 
-              <i class="fa fa-list-alt"></i> Files
-            </button>
+                            <i class="fa fa-list-alt"></i> Files
+                        </button>
 
-          </div>
+                    </div>
+                </div>
+                <div uib-collapse="pageState.startingExperiment != exp.id">
+                    <uib-progressbar value="100" class="progress-striped active top-buffer"><i><b>{{progressMessage.main}}</b>
+                            {{progressMessage.sub}}</i></uib-progressbar>
+                </div>
+                <div class="table-wrapper" uib-collapse="!config.canLaunchExperiments || (pageState.selected != exp.id)||(!pageState.showJoin && !running) || !exp.joinableServers.length">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Server</th>
+                                <th>Creator</th>
+                                <th>Uptime</th>
+                                <th>Status</th>
+                                <th>&nbsp;</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="simul in exp.joinableServers">
+                                <td>{{simul.server}}</td>
+                                <td>{{simul.owner}}</td>
+                                <td class="monospace-text">{{simul.uptime | timeDDHHMMSS}}</td>
+                                <td>{{simul.runningSimulation.state}}</td>
+                                <td>
+                                    <!-- Join button enabled provided simulation state is consistent-->
+                                    <a analytics-on analytics-event="Join" analytics-category="Experiment" ng-click="(simul.runningSimulation.state === STATE.CREATED) || simul.stopping || joinExperiment(simul, exp);"
+                                        type="button" class="btn btn-default" ng-disabled="(simul.runningSimulation.state === STATE.CREATED) || simul.stopping">
+                                        Join »</a>
+                                    <!-- Stop button enabled provided simulation state is consistent-->
+                                    <a analytics-on analytics-event="Stop" analytics-category="Experiment" ng-click="stopSimulation(simul, exp);"
+                                        type="button" class="btn btn-default" ng-if="canStopSimulation(simul)"
+                                        ng-disabled="simul.stopping">
+                                        <i class="fa fa-spinner fa-spin" ng-if="simul.stopping"></i> Stop
+                                    </a>
+                                    <!-- No edit rights: stop button disabled -->
+                                    <a type="button" class="btn btn-default disabled enable-tooltip" title="Sorry, you don't have sufficient rights to stop the simulation."
+                                        ng-if="!canStopSimulation(simul)"> Stop
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
-        <div uib-collapse="pageState.startingExperiment != exp.id">
-          <uib-progressbar value="100" class="progress-striped active top-buffer"><i><b>{{progressMessage.main}}</b> {{progressMessage.sub}}</i></uib-progressbar>
-        </div>
-        <div class="table-wrapper" uib-collapse="!config.canLaunchExperiments || (pageState.selected != exp.id)||(!pageState.showJoin && !running) || !exp.joinableServers.length">
-          <table class="table table-striped">
-            <thead>
-              <tr>
-                <th>Server</th>
-                <th>Creator</th>
-                <th>Uptime</th>
-                <th>Status</th>
-                <th>&nbsp;</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr ng-repeat="simul in exp.joinableServers">
-                <td>{{simul.server}}</td>
-                <td>{{simul.owner}}</td>
-                <td class="monospace-text">{{simul.uptime | timeDDHHMMSS}}</td>
-                <td>{{simul.runningSimulation.state}}</td>
-                <td>
-                  <!-- Join button enabled provided simulation state is consistent-->
-                  <a analytics-on analytics-event="Join" analytics-category="Experiment" ng-click="(simul.runningSimulation.state === STATE.CREATED) || simul.stopping || joinExperiment(simul, exp);"
-                    type="button" class="btn btn-default" ng-disabled="(simul.runningSimulation.state === STATE.CREATED) || simul.stopping"> Join »</a>
-                  <!-- Stop button enabled provided simulation state is consistent-->
-                  <a analytics-on analytics-event="Stop" analytics-category="Experiment" ng-click="stopSimulation(simul, exp);" type="button"
-                    class="btn btn-default" ng-if="canStopSimulation(simul)" ng-disabled="simul.stopping">
-                <i class="fa fa-spinner fa-spin" ng-if="simul.stopping"></i> Stop
-              </a>
-                  <!-- No edit rights: stop button disabled -->
-                  <a type="button" class="btn btn-default disabled enable-tooltip" title="Sorry, you don't have sufficient rights to stop the simulation."
-                    ng-if="!canStopSimulation(simul)"> Stop
-            </a>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
+
+        <hr class="list-separator">
+
     </div>
-
-    <hr class="list-separator">
-
-  </div>
 
 
 </div>

@@ -13,6 +13,7 @@ describe('Services: update-checker', () => {
 
   it('should handle valid cache, same version', done => {
     inject((updateChecker, $http, nrpFrontendVersion, $rootScope, $q) => {
+      spyOn($http, 'post');
       nrpFrontendVersion.get.and.returnValue({
         $promise: $q.resolve({ version: '1.2.3' })
       });
@@ -38,6 +39,7 @@ describe('Services: update-checker', () => {
 
   it('should handle valid cache, different version', done => {
     inject((updateChecker, $http, nrpFrontendVersion, $rootScope, $q) => {
+      spyOn($http, 'post');
       nrpFrontendVersion.get.and.returnValue({
         $promise: $q.resolve({ version: '1.2.3' })
       });
