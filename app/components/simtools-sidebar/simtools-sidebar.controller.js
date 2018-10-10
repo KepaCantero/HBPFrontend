@@ -71,7 +71,9 @@
       simToolsSidebarService,
       userContextService,
       userNavigationService,
-      videoStreamService
+      videoStreamService,
+      tipTooltipService,
+      TIP_CODES
     ) {
       this.$scope = $scope;
 
@@ -97,6 +99,9 @@
       this.show = false;
       this.overflowing = [];
       this.expandedCategory = null;
+
+      this.tipTooltipService = tipTooltipService;
+      this.tipTooltipService.setCurrentTip(TIP_CODES.SIMULATIONS_TIPS);
 
       $rootScope.$on('ASSETS_LOADED', () => {
         this.show = true;
@@ -209,6 +214,8 @@
       'userContextService',
       'userNavigationService',
       'videoStreamService',
+      'tipTooltipService',
+      'TIP_CODES',
       function(...args) {
         return new SimToolsSidebarController(...args);
       }

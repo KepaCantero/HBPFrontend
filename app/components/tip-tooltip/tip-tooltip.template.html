@@ -12,8 +12,9 @@
 
           <i class="fa fa-info-circle tip-help-icon" style="min-width: 25px;"></i>
 
-          <img ng-show="tip.tipList? tip.tipList[tip.tipListPos].image:tip.image"
-            class="tip-image" ng-src="{{tip.tipList? tip.tipList[tip.tipListPos].image:tip.image}}"
+          <img ng-repeat="image in tip.tipList[tip.tipListPos].image"
+          ng-show="image"
+            class="tip-image" ng-src="{{image}}"
             draggable="false" />
 
           <div style="max-width:920px; margin-right:5px" ng-bind-html="vm.tipTooltipService.$sce.trustAsHtml(tip.tipList? tip.tipList[tip.tipListPos].text : tip.text)">

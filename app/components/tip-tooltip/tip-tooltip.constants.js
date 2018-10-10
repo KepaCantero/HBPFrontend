@@ -27,11 +27,11 @@
   angular.module('tipTooltipModule').constant('TIP_CODES', {
     WELCOME: {
       text:
-        'Welcome to the Neurorobotics Platorm! To begin using the platform you should clone an experiment from the template list. Simply select an experiment and press the clone button.'
+        'Welcome to the Neurorobotics Platform! To begin using the platform you should clone an experiment from the template list. Simply select an experiment and press the clone button.'
     },
     TEMPLATES: {
       text:
-        'The templates can be used as a starting point for a new experiment. Simply select a template and clone it. It will be added to your personnal experiment list.'
+        'The templates can be used as a starting point for a new experiment. Simply select a template and clone it. It will be added to your personal experiment list.'
     },
     MY_EXPERIMENTS: {
       text:
@@ -42,7 +42,7 @@
         'This is your personal experiment list. You don\'t have an experiment yet, got to "Templates" to clone your first experiment.'
     },
     EXPERIMENT_FILES: {
-      text: 'You can browse and modify all the files of your experiences here.'
+      text: 'You can browse and modify all the files of your experiments here.'
     },
     RUNNING_SIMULATIONS: {
       text: 'The running simulations are listed here.'
@@ -53,13 +53,13 @@
     },
     NAVIGATION: {
       text:
-        'Use the <b>w, s, a, d</b> keys to translate the camera. Move your <b>mouse</b> whilst pressing the <b>left button</b> to rotate the camera. The translation/rotation sensibility can be changed in the settings under the <b>User camera</b> section.',
+        'Use the <b>w, s, a, d</b> keys to translate the camera. Move your <b>mouse</b> whilst pressing the <b>left button</b> to rotate the camera. The translation/rotation sensitively can be changed in the <b>User camera</b> section after clicking on the gear icon on the top right.',
       stackMode: true
     },
     OBJECT_INSPECTOR: {
       text:
         'The object inspector can be used to move/rotate/scale and inspect 3D objects in the scene.<br>' +
-        'For more informations about these functionnalities use the <b>mouse over tooltips</b> in the Object Inspector.',
+        'For more information about these functionalities use the <b>mouse over tooltips</b> in the Object Inspector.',
       stackMode: true
     },
     SIMULATIONS_TIPS: {
@@ -67,30 +67,36 @@
         {
           text:
             'Welcome to the simulation! Press the "Play" button to run the simulation.',
-          image: 'img/tips/play.jpg'
+          image: ['img/tips/play.jpg']
         },
         {
           text:
             'Press the "Joint Plot" button to see the joint plot of your robot.',
-          image: 'img/tips/joint.jpg'
+          image: ['img/tips/joint.png']
         },
         {
           text: 'Press the "Spike Train" button to see the spike train',
-          image: 'img/tips/spiketrain.jpg'
+          image: ['img/tips/spiketrain.png']
         },
         {
           text:
             'Press the "Brain Visualizer" button to see a 3D representation of your neurons.',
-          image: 'img/tips/brainvis.jpg'
+          image: ['img/tips/brainvis.png']
         },
         {
           text:
-            'Open the editors to see the various scripts used by this experience.',
-          image: 'img/tips/editors.jpg'
+            'Open the editors to see the various scripts used by this experiment.',
+          image: [
+            'img/tips/env.png',
+            'img/tips/tf.png',
+            'img/tips/brain_edi.png',
+            'img/tips/sm.png',
+            'img/tips/resource.png'
+          ]
         },
         {
           text: 'Press the "Pause" button to pause your simulation.',
-          image: 'img/tips/pause.jpg'
+          image: ['img/tips/pause.jpg']
         }
       ]
     }

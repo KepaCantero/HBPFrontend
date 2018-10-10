@@ -17,6 +17,7 @@ describe('Controller: SimToolsSidebarController', function() {
 
   beforeEach(module('simToolsSidebarModule'));
   beforeEach(module('dynamicViewModule'));
+  beforeEach(module('tipTooltipModule'));
 
   beforeEach(module('dynamicViewOverlayServiceMock'));
   beforeEach(module('editorsPanelServiceMock'));
@@ -29,6 +30,7 @@ describe('Controller: SimToolsSidebarController', function() {
   beforeEach(module('userContextServiceMock'));
   beforeEach(module('userNavigationServiceMock'));
   beforeEach(module('videoStreamServiceMock'));
+  beforeEach(module('tipTooltipServiceMock'));
 
   beforeEach(
     inject(function(
