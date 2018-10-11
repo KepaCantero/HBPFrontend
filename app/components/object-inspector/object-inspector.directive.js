@@ -24,8 +24,6 @@
 (function() {
   'use strict';
 
-  const TF_EDITOR_TAB = 3;
-
   angular.module('objectInspectorModule', []).directive('objectInspector', [
     'OBJECT_VIEW_MODE',
     '$timeout',
@@ -40,6 +38,8 @@
     'TIP_CODES',
     'storageServer',
     'robotComponentsService',
+    'dynamicViewOverlayService',
+    'DYNAMIC_VIEW_CHANNELS',
     function(
       OBJECT_VIEW_MODE,
       $timeout,
@@ -53,7 +53,9 @@
       tipTooltipService,
       TIP_CODES,
       storageServer,
-      robotComponentsService
+      robotComponentsService,
+      dynamicViewOverlayService,
+      DYNAMIC_VIEW_CHANNELS
     ) {
       return {
         templateUrl:
@@ -147,9 +149,9 @@ def ${tfname}(${['t', ...parameters].join(', ')}):
                     newTF
                   ])
                   .then(() =>
-                    editorsPanelService.showEditor(TF_EDITOR_TAB, {
-                      selectTF: tfname
-                    })
+                    dynamicViewOverlayService.createDynamicOverlay(
+                      DYNAMIC_VIEW_CHANNELS.TRANSFER_FUNCTION_EDITOR
+                    )
                   )
                   .catch(err => serverError.displayHTTPError(err));
               });

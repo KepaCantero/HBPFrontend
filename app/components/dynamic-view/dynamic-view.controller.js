@@ -28,10 +28,9 @@
   /* global console: false */
 
   class DynamicViewController {
-    constructor($compile, $element, $rootScope, $scope) {
+    constructor($compile, $element, $scope) {
       this.$compile = $compile;
       this.$element = $element;
-      this.$rootScope = $rootScope;
       this.$scope = $scope;
 
       $scope.$on('$destroy', () => this.onDestroy());
@@ -64,7 +63,7 @@
       // set and compile new content
       this.viewContent = content;
       this.viewContainer.innerHTML = this.viewContent;
-      this.contentScope = this.$rootScope.$new();
+      this.contentScope = this.$scope.$new();
       this.$compile(this.viewContainer)(this.contentScope);
     }
 
@@ -81,12 +80,7 @@
   }
 
   DynamicViewController.$$ngIsClass = true;
-  DynamicViewController.$inject = [
-    '$compile',
-    '$element',
-    '$rootScope',
-    '$scope'
-  ];
+  DynamicViewController.$inject = ['$compile', '$element', '$scope'];
 
   angular
     .module('dynamicViewModule', [])

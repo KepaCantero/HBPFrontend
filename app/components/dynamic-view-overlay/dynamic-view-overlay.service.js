@@ -130,6 +130,13 @@
       return overlay;
     }
 
+    refreshOverlay(channel) {
+      this.isOverlayOpen(channel).then(controller => {
+        if (!controller || !controller.$scope) return;
+        controller.$scope.$broadcast('UPDATE_PANEL_UI');
+      });
+    }
+
     // TODO: Shall we merge the two create functions, or just make it clear when to use which?
     createDynamicOverlay(channel) {
       let deferedContinue = this.$q.defer();
@@ -143,6 +150,8 @@
           !overlayOpen
         ) {
           this.createOverlay(channel);
+        } else {
+          this.refreshOverlay(channel);
         }
         this.isOverlayOpen(channel).then(function(open) {
           if (open) {
@@ -218,7 +227,7 @@
               controller.channelType &&
               controller.channelType === channelType
             ) {
-              deferredIsOpen.resolve(true);
+              deferredIsOpen.resolve(controller);
             } else if (arrayIndex === array.length - 1) {
               deferredIsOpen.resolve(false);
             }
