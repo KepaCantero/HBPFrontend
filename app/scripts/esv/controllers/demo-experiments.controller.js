@@ -92,10 +92,8 @@
               this.environmentService.isPrivateExperiment() +
               '/' +
               simul.runningSimulation.simulationID;
-            this.location.path(path);
-            this.timeout(() => {
-              this.$window.location.reload();
-            }, 1000);
+            this.$window.location.href = this.location.path(path).$$absUrl;
+            this.$window.location.reload();
             return;
           }
         }

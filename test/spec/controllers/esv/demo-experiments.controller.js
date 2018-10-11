@@ -212,9 +212,9 @@
     }
 
     it('should be able to join a running experiment', function() {
-      spyOn($location, 'path');
-
+      spyOn($location, 'path').and.returnValue({});
       renderDemoWebPage();
+      $rootScope.vm.$window = { location: { reload: angular.noop } };
       $rootScope.vm.launchExperiment();
 
       $httpBackend.flush();

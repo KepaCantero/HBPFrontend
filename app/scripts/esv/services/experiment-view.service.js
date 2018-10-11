@@ -409,7 +409,9 @@
         this.autosaveOnExitService.onExit().then(() => {
           this.cleanUp();
           this.splash.splashScreen = null; // do not reopen splashscreen if further messages happen
-          this.$location.path('esv-private');
+          this.$window.location.href = this.$location.path(
+            'esv-private'
+          ).$$absUrl;
           this.$window.location.reload();
         });
       }

@@ -55,6 +55,7 @@ describe('Service: ExperimentViewService', function() {
       _stateService_
     ) {
       experimentViewService = _experimentViewService_;
+      experimentViewService.$window = { location: { reload: angular.noop } };
 
       $location = _$location_;
       $rootScope = _$rootScope_;

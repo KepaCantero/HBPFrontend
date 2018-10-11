@@ -404,8 +404,7 @@
     }
 
     directToClonePage() {
-      let clonePagePath = 'esv-private';
-      this.$location.path(clonePagePath);
+      this.$window.location.href = this.$location.path('esv-private').$$absUrl;
       this.$window.location.reload();
     }
   }
