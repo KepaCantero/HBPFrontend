@@ -253,3 +253,8 @@
 body {
   webkit-tap-highlight-color: rgba(255, 255, 255, 0.2);
 }
+
+.owner-only-disabled * {
+  cursor: not-allowed !important;
+  pointer-events: none;
+}

@@ -379,6 +379,10 @@
     }
 
     getRobotConfigPath(experimentID) {
+      const demoMode =
+        window.bbpConfig.demomode && window.bbpConfig.demomode.demoCarousel;
+      if (demoMode) return Promise.reject();
+
       return this.getFileContent(
         experimentID,
         'experiment_configuration.exc',

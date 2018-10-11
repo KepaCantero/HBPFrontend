@@ -77,11 +77,11 @@
         </md-button>
 
         <div ng-show="vm.isSubmenuLightingOpen" class="simtools-sidebar-submenu-items">
-          <md-button aria-label="Increase Global Lighting" class="md-fab md-raised md-mini subtool-button"
+          <md-button owner-only aria-label="Increase Global Lighting" class="md-fab md-raised md-mini subtool-button"
                      ng-click="vm.onButtonLightIntensity(1)">
             <i class="fa fa-arrow-up" ng-class="{'tool-disabled': vm.gz3d.isGlobalLightMaxReached()}"></i>
           </md-button>
-          <md-button aria-label="Decrease Global Lighting" class="md-fab md-raised md-mini subtool-button"
+          <md-button owner-only aria-label="Decrease Global Lighting" class="md-fab md-raised md-mini subtool-button"
                      ng-click="vm.onButtonLightIntensity(-1)">
             <i class="fa fa-arrow-down" ng-class="{'tool-disabled': vm.gz3d.isGlobalLightMinReached()}"></i>
           </md-button>

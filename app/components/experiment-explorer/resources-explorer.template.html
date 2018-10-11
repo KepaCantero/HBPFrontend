@@ -52,7 +52,7 @@
               </span>
             <i ng-if="vm.selectedParent.deleting" disable-animate class="fa fa-spinner fa-pulse fa-1x fa-fw" title="Deleting..."></i>
             </span>
-            <span class="action-button" ng-click="!vm.selectedParent.uploading && vm.uploadFileClick()">
+            <span class="action-button" owner-only ng-click="!vm.selectedParent.uploading && vm.uploadFileClick()">
               <i ng-if="!vm.selectedParent.uploading && !vm.selectedParent.loadingFiles" disable-animate class="fa fa-upload" title="Upload file"></i>
               <i ng-if="vm.selectedParent.uploading" disable-animate class="fa fa-spinner fa-pulse fa-1x fa-fw" title="Uploading..."></i>
             </span>

@@ -83,7 +83,7 @@
           require: '^autosaveOnExitCheckboxList',
           template:
             '<div>\n' +
-            '<input id="{{checkbox.idAttribute}}" type="checkbox" ng-model="checkbox.model" ng-model-options="{ getterSetter: true }"/>\n' +
+            '<input owner-only id="{{checkbox.idAttribute}}" type="checkbox" ng-model="checkbox.model" ng-model-options="{ getterSetter: true }"/>\n' +
             '<label for="{{checkbox.idAttribute}}" style="font-weight: normal;">{{label}}</label>\n' +
             '<br>\n' +
             '</div>',

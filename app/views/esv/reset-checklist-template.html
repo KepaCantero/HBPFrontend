@@ -9,7 +9,7 @@
         <b>Simulation</b>
         <li>
           <label>
-            <input type="radio" ng-model="vm.resetRequest.resetType" ng-value="{{vm.RESET_TYPE.RESET_FULL}}"
+            <input owner-only type="radio" ng-model="vm.resetRequest.resetType" ng-value="{{vm.RESET_TYPE.RESET_FULL}}"
                    title="Reset also the simulation timeout.">
             </input>
             Reset Simulation
@@ -20,7 +20,7 @@
       <b>Camera</b>
       <li>
         <label>
-          <input type="radio" ng-model="vm.resetRequest.resetType" ng-value="{{vm.RESET_TYPE.RESET_CAMERA_VIEW}}">
+          <input owner-only type="radio" ng-model="vm.resetRequest.resetType" ng-value="{{vm.RESET_TYPE.RESET_CAMERA_VIEW}}">
           </input>
           Reset Camera View
         </label>
@@ -32,7 +32,7 @@
         <b>Brain</b>
         <li>
           <label>
-            <input ng-model="vm.resetRequest.resetType" ng-value="{{vm.RESET_TYPE.RESET_BRAIN}}" type="radio"
+            <input owner-only ng-model="vm.resetRequest.resetType" ng-value="{{vm.RESET_TYPE.RESET_BRAIN}}" type="radio"
                    title="{{vm.environmentService.isPrivateExperiment?'Reset the brain to the last saved state':'Reset the brain to the status it was at the beginning of the simulation'}}">
             </input>
             Reset the Neural Network
@@ -45,7 +45,7 @@
         <b>Environment</b>
         <li>
           <label>
-            <input ng-model="vm.resetRequest.resetType" ng-value="{{vm.RESET_TYPE.RESET_WORLD}}" type="radio"
+            <input owner-only ng-model="vm.resetRequest.resetType" ng-value="{{vm.RESET_TYPE.RESET_WORLD}}" type="radio"
                    title="{{vm.environmentService.isPrivateExperiment?'Reset Environment Poses to the last saved state':'Reset the poses of models to the original state'}}">
             </input>
             Reset Environment Poses
@@ -58,7 +58,7 @@
         <b>Robot</b>
         <li>
           <label>
-            <input ng-model="vm.resetRequest.resetType" ng-value="{{vm.RESET_TYPE.RESET_ROBOT_POSE}}" type="radio"
+            <input owner-only ng-model="vm.resetRequest.resetType" ng-value="{{vm.RESET_TYPE.RESET_ROBOT_POSE}}" type="radio"
                    title="Reset Robot to the original position and rotation.">
             </input>
             Reset Robot Frame

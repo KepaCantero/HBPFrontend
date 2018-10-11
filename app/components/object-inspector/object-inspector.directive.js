@@ -75,7 +75,8 @@
 
           storageServer
             .getRobotConfigPath(simulationInfo.experimentID)
-            .then(robotConfigPath => (scope.robotConfigPath = robotConfigPath));
+            .then(robotConfigPath => (scope.robotConfigPath = robotConfigPath))
+            .catch(angular.noop);
 
           scope.suppressKeyPress = function(event) {
             baseEventHandler.suppressAnyKeyPress(event);
