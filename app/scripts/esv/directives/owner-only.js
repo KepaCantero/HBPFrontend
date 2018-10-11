@@ -23,21 +23,48 @@
  * ---LICENSE-END**/
 (function() {
   'use strict';
+
   angular.module('exdFrontendApp').directive('ownerOnly', [
     'userContextService',
-    userContextService => {
-      const DISABLED_TOOTLTIP = 'Restricted to owner only';
+    '$timeout',
+    (userContextService, $timeout) => {
+      const demoMode =
+        window.bbpConfig.demomode && window.bbpConfig.demomode.demoCarousel;
+
+      if (demoMode || !userContextService.isOwner()) {
+        const disableEvent = e => {
+          if (
+            $(e.srcElement).is('[owner-only]') ||
+            $(e.srcElement).parents('[owner-only]').length
+          )
+            e.stopImmediatePropagation();
+        };
+        window.addEventListener('click', disableEvent, true);
+        window.addEventListener('mousedown', disableEvent, true);
+      }
+
+      const DISABLED_TOOTLTIP = demoMode
+        ? 'Not available in demo mode'
+        : 'Restricted to owner only';
+
+      const setElementOwnerDisabled = elem => {
+        elem.attr('ng-disabled', true);
+        elem.attr('disabled', true);
+        elem.attr('title', DISABLED_TOOTLTIP);
+        elem.css('cursor', 'not-allowed');
+        elem.addClass('owner-only-disabled');
+      };
 
       return {
         restrict: 'A',
         priority: 10000,
-        replace: true,
-        compile: (tElement, tAttrs) => {
+        replace: false,
+        compile: tElement => {
           if (userContextService.isOwner()) return;
-          tAttrs.title = DISABLED_TOOTLTIP;
-          tAttrs.ngDisabled = 'true';
-          tElement.attr('disabled', 'true');
-          tElement.attr('title', DISABLED_TOOTLTIP);
+          setElementOwnerDisabled(tElement);
+          return (scope, elem) => {
+            $timeout(() => setElementOwnerDisabled(elem));
+          };
         }
       };
     }

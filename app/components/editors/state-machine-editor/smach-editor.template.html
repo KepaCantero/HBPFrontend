@@ -30,12 +30,12 @@
 
         <div>
 
-          <button type="button" class="btn btn-default smach-small-icon-button" ng-click="delete(stateMachine)"
+          <button type="button" owner-only class="btn btn-default smach-small-icon-button" ng-click="delete(stateMachine)"
                   ng-disabled="(stateService.currentState === STATE.INITIALIZED) || stateService.statePending">
             <i class="glyphicon glyphicon-trash"></i>
           </button>
 
-          <button type="button" class="btn btn-default btn-md smach-small-icon-button"
+          <button type="button" owner-only class="btn btn-default btn-md smach-small-icon-button"
                   ng-disabled="(stateService.currentState === STATE.INITIALIZED) || stateService.statePending"
                   ng-click="create();">
             <i class="glyphicon glyphicon-plus"></i>

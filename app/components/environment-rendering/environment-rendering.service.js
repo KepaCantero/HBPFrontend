@@ -190,7 +190,8 @@
                     gz3d.scene.addSkinMesh(skinDefinition);
                   }
                 });
-              });
+              })
+              .catch(angular.noop);
           };
 
           this.deinit = function() {

@@ -58,13 +58,13 @@
 
                 <div style="display:flex">
 
-                  <button ng-disabled="pop.editing" type="button" class="btn btn-default btn-md pynn-small-icon-button-param" ng-click="addSlice()">
+                  <button owner-only ng-disabled="pop.editing" type="button" class="btn btn-default btn-md pynn-small-icon-button-param" ng-click="addSlice()">
                     <i class="glyphicon glyphicon-plus"></i>
                   </button>
 
                   <div ng-show="!localHelpVisible.populations" style="display:flex;">
 
-                    <button type="button" class="btn btn-default btn-md pynn-small-icon-button-param" ng-click="showLocalHelp(true,'populations')"
+                    <button owner-only type="button" class="btn btn-default btn-md pynn-small-icon-button-param" ng-click="showLocalHelp(true,'populations')"
                       style="margin-left: 2px; min-width: 21px;">
                       <i class="fa fa-question" style="font-size: 12px;"></i>
                     </button>
@@ -82,7 +82,7 @@
                     Populations (set of neurons indices) can be defined here and referred to in transfer functions
                   </div>
                   <div>
-                    <button type="button" class="btn btn-default btn-md pynn-small-icon-button-param" ng-click="showLocalHelp(false,'populations')"
+                    <button owner-only type="button" class="btn btn-default btn-md pynn-small-icon-button-param" ng-click="showLocalHelp(false,'populations')"
                       style="margin-left: 2px;     height: 16px;
                         width: 16px; position:relative; border: none;
                         background: none;">
@@ -136,7 +136,7 @@
                       <div class="pynn-population-param">
                         <div style="font-weight:600">Define</div>
 
-                        <select ng-disabled="true"
+                        <select owner-only ng-disabled="true"
                               ng-model="pop.displayMode" data-value="{{pop.displayMode}}" ng-change="onPopulationDefineModeChange(pop)"
                               class="normal" style="max-height: 18px;
                         margin-bottom: 5px;
@@ -210,7 +210,7 @@
 
                       <div class="pynn-var-block-bottom-area">
 
-                        <button type="button" class="btn btn-default tf-small-icon-button" ng-click="deletePopulation($index);">
+                        <button owner-only type="button" class="btn btn-default tf-small-icon-button" ng-click="deletePopulation($index);">
                           <i class="glyphicon glyphicon-trash"></i>
                         </button>
 

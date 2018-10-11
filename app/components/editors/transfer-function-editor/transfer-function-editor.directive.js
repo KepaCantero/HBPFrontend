@@ -724,7 +724,7 @@ def {0}(t):
                 .then(() => {
                   refreshEditor();
                 })
-                .catch(err => alert('Failed to load TFS:\n' + err));
+                .catch(err => console.error('Failed to load TFS:\n' + err));
             };
 
             let reloadPopulations = () => {

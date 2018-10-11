@@ -4,102 +4,90 @@
 
 <div class="environment-designer-container">
 
-  <div class="ed-header">
+    <div class="ed-header">
 
-    <h3>Environment Editor</h3>
-      <div class="alert alert-info">
-      <p> Environments created for <a target="_blank" href="http://gazebosim.org/"><b>Gazebo</b></a> <img
-        src="img/common/gazebo-logo.png"/> and using
-        <a target="_blank" href="http://sdformat.org/"><b>SDF format</b></a>
-        are compatible with the Neurorobotics platform.
-      </p>
-    </div>
+        <h3>Environment Editor</h3>
+        <div class="alert alert-info">
+            <p> Environments created for <a target="_blank" href="http://gazebosim.org/"><b>Gazebo</b></a> <img src="img/common/gazebo-logo.png" />
+                and using
+                <a target="_blank" href="http://sdformat.org/"><b>SDF format</b></a>
+                are compatible with the Neurorobotics platform.
+            </p>
+        </div>
 
-    <div ng-show="(stateService.currentState === STATE.INITIALIZED)" class="alert alert-warning" role="alert">The simulation is in initialized state. It has to be started (or started and paused) to enable environment edition.</div>
-    <hr>
+        <div ng-show="(stateService.currentState === STATE.INITIALIZED)" class="alert alert-warning" role="alert">The
+            simulation is in initialized state. It has to be started (or started and paused) to enable environment
+            edition.</div>
+        <hr>
 
-    <div class="ed-section-toolbar">
+        <div class="ed-section-toolbar">
 
-      <div ng-mousedown="category.colorMode='mousedown'"
-          ng-mouseup="category.colorMode='mouseover'"
-          ng-mouseover="category.colorMode='mouseover'"
-          ng-mouseleave="category.colorMode='default'"
-          ng-click="toggleVisibleCategory(category)"
-          ng-repeat="category in categories"
-          ng-class="{'ed-section-button':true,'ed-section-button-first':$first,'ed-section-button-last':$last}"
-      style="background-color: {{category.visible?category.color[category.colorMode]: (category.colorMode=='mouseover'? '#ffffff' : '#eeeeee')}};">
+            <div ng-mousedown="category.colorMode='mousedown'" ng-mouseup="category.colorMode='mouseover'" ng-mouseover="category.colorMode='mouseover'"
+                ng-mouseleave="category.colorMode='default'" ng-click="toggleVisibleCategory(category)" ng-repeat="category in categories"
+                ng-class="{'ed-section-button':true,'ed-section-button-first':$first,'ed-section-button-last':$last}"
+                style="background-color: {{category.visible?category.color[category.colorMode]: (category.colorMode=='mouseover'? '#ffffff' : '#eeeeee')}};">
 
-        <img class="ed-section-image" ng-src="{{'img/esv/envsections/'+category.thumbnail}}" draggable="false"/>
+                <img class="ed-section-image" ng-src="{{'img/esv/envsections/'+category.thumbnail}}" draggable="false" />
 
-        <div class="ed-section-caption">{{category.title}}</div>
-
-      </div>
-
-    </div>
-
-  </div>
-
-
-  <div class="ed-object-list-border">
-
-    <div ng-controller="insertControl" class="ed-object-list">
-        <li ng-repeat="model in visibleModels" id="insert-entity-{{model.modelPath}}"
-            ng-mousedown="addModel(model.modelPath);"
-            data-role="button" class="ed-objectlist-item">
-          <div class="ed-objectlist-content" style="border: 2px solid {{model.color}};">
-
-            <div class="ed-objectlist-content-img-box">
-            <img ng-src="{{model.thumbnail?model.thumbnail:assetsPath+'/'+model.modelPath+'/thumbnail.png'}}"
-                  draggable="false"
-                  class="ed-img-thumbnail ed-environment-thumbnail"
-                  ng-class="stateService.currentState === STATE.INITIALIZED ? 'disabled-image' : 'clickable'"
-                  alt="{{model.modelPath}}">
+                <div class="ed-section-caption">{{category.title}}</div>
 
             </div>
 
-            <div class = "env-object-caption-box" >
-              <div class="env-object-caption" style="background: {{model.color}};">
-            {{model.modelTitle}}
-            </div>
-          </div>
-
-          </div>
-        </li>
-    </div>
-  </div>
-
-  <div class="ed-bottom-box">
-
-      <div class="ed-bottom-box_options">
-        <input id="lightsVisibilityCheckbox" type="checkbox" ng-model="gz3d.scene.showLightHelpers" ng-change="gz3d.setLightHelperVisibility()" />
-        <label for="lightsVisibilityCheckbox" style="font-weight: normal;">Show Visualization of lights</label>
-      </div>
-
-
-    <div class="ed-bottom-box_buttons">
-
-      <button ng-show="isPrivateExperiment" type="button" class="btn btn-default"
-              ng-click="saveSDFIntoCollabStorage()"
-              ng-disabled="(stateService.currentState === STATE.INITIALIZED)"
-              v-busy="isSavingToCollab"
-              v-busy-label="Saving to Storage"
-              v-pressable>
-        <i class="glyphicon glyphicon-book"></i>
-        <span> Save</span>
-      </button>
-
-      <button type="button" class="btn btn-default"
-              ng-click="exportSDFWorld()"
-              ng-disabled="(stateService.currentState === STATE.INITIALIZED)">
-        <i class="glyphicon glyphicon-download"></i>
-        <span> Download World</span>
-      </button>
+        </div>
 
     </div>
 
-  </div>
+
+    <div class="ed-object-list-border">
+
+        <div ng-controller="insertControl" class="ed-object-list">
+            <li ng-repeat="model in visibleModels" class="ed-objectlist-item" >
+                <div owner-only id="insert-entity-{{model.modelPath}}" ng-mousedown="addModel(model.modelPath);"
+                    data-role="button" class="ed-objectlist-content" style="border: 2px solid {{model.color}};">
+
+                    <div class="ed-objectlist-content-img-box">
+                        <img ng-src="{{model.thumbnail?model.thumbnail:assetsPath+'/'+model.modelPath+'/thumbnail.png'}}"
+                            draggable="false" class="ed-img-thumbnail ed-environment-thumbnail" ng-class="stateService.currentState === STATE.INITIALIZED || ownerOnlyDisabled? 'disabled-image' : 'clickable'"
+                            alt="{{model.modelPath}}">
+
+                    </div>
+
+                    <div class="env-object-caption-box">
+                        <div class="env-object-caption" style="background: {{model.color}};">
+                            {{model.modelTitle}}
+                        </div>
+                    </div>
+
+                </div>
+            </li>
+        </div>
+    </div>
+
+    <div class="ed-bottom-box">
+
+        <div class="ed-bottom-box_options">
+            <input id="lightsVisibilityCheckbox" type="checkbox" ng-model="gz3d.scene.showLightHelpers" ng-change="gz3d.setLightHelperVisibility()" />
+            <label for="lightsVisibilityCheckbox" style="font-weight: normal;">Show Visualization of lights</label>
+        </div>
+
+
+        <div class="ed-bottom-box_buttons">
+
+            <button ng-show="isPrivateExperiment" type="button" class="btn btn-default" ng-click="saveSDFIntoCollabStorage()"
+                ng-disabled="(stateService.currentState === STATE.INITIALIZED)" v-busy="isSavingToCollab" v-busy-label="Saving to Storage"
+                v-pressable>
+                <i class="glyphicon glyphicon-book"></i>
+                <span> Save</span>
+            </button>
+
+            <button type="button" class="btn btn-default" ng-click="exportSDFWorld()" ng-disabled="(stateService.currentState === STATE.INITIALIZED)">
+                <i class="glyphicon glyphicon-download"></i>
+                <span> Download World</span>
+            </button>
+
+        </div>
+
+    </div>
 
 
 </div>
-
-
