@@ -31,17 +31,24 @@
       const demoMode =
         window.bbpConfig.demomode && window.bbpConfig.demomode.demoCarousel;
 
-      if (demoMode || !userContextService.isOwner()) {
-        const disableEvent = e => {
-          if (
-            $(e.srcElement).is('[owner-only]') ||
-            $(e.srcElement).parents('[owner-only]').length
-          )
-            e.stopImmediatePropagation();
-        };
-        window.addEventListener('click', disableEvent, true);
-        window.addEventListener('mousedown', disableEvent, true);
-      }
+      let registerWindowEventsChecked = false;
+
+      const registerWindowEvents = () => {
+        if (registerWindowEventsChecked) return;
+        registerWindowEventsChecked = true;
+
+        if (demoMode || !userContextService.isOwner()) {
+          const disableEvent = e => {
+            if (
+              $(e.srcElement).is('[owner-only]') ||
+              $(e.srcElement).parents('[owner-only]').length
+            )
+              e.stopImmediatePropagation();
+          };
+          window.addEventListener('click', disableEvent, true);
+          window.addEventListener('mousedown', disableEvent, true);
+        }
+      };
 
       const DISABLED_TOOTLTIP = demoMode
         ? 'Not available in demo mode'
@@ -60,6 +67,7 @@
         priority: 10000,
         replace: false,
         compile: tElement => {
+          registerWindowEvents();
           if (userContextService.isOwner()) return;
           setElementOwnerDisabled(tElement);
           return (scope, elem) => {

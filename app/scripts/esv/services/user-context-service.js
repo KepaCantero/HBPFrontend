@@ -108,11 +108,7 @@
           };
 
           this.isOwner = function() {
-            return (
-              this.userID !== undefined &&
-              this.userID === this.ownerID &&
-              !this.demoMode
-            );
+            return this.userID === this.ownerID && !this.demoMode;
           };
 
           this.hasEditRights = function(entity) {

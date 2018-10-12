@@ -33,7 +33,8 @@ describe('Controller: editorPanelCtrl', function() {
       _bbpConfig_,
       _editorsPanelService_,
       _gz3d_,
-      simulationInfo
+      simulationInfo,
+      userContextService
     ) {
       $httpBackend = _$httpBackend_;
       rootScope = $rootScope;
@@ -41,6 +42,8 @@ describe('Controller: editorPanelCtrl', function() {
       bbpConfig = _bbpConfig_;
       gz3d = _gz3d_;
       editorsPanelService = _editorsPanelService_;
+
+      spyOn(userContextService, 'isOwner').and.returnValue(false);
 
       // Mock the scene controls object
       gz3d.scene = {};

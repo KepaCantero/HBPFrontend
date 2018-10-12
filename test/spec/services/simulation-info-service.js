@@ -109,6 +109,18 @@ describe('Services: server-info-service', function() {
     );
   });
 
+  it('should not be robot by default', function() {
+    simulationInfo.initialize(
+      'fake_serverID',
+      'fake_experimentID',
+      'fake_simulationID'
+    );
+    simulationInfo.brain = {
+      robots: [{}]
+    };
+    expect(simulationInfo.isRobot({})).toBe(false);
+  });
+
   it('should throw an error when simulationInfo.initialize() is called with no prior knowledge of serverID or simulationID', function() {
     expect(simulationInfo.initialize).toThrow();
     expect(_.partial(simulationInfo.initialize, 'fake_id')).toThrow();

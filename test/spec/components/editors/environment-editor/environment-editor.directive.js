@@ -133,6 +133,14 @@ describe('Directive: environment-designer', function() {
     })
   );
 
+  it('should emit "duplicate_entity" on duplicate', function() {
+    spyOn($scope.gz3d.gui.guiEvents, 'emit');
+    $scope.duplicateModel();
+    expect($scope.gz3d.gui.guiEvents.emit).toHaveBeenCalledWith(
+      'duplicate_entity'
+    );
+  });
+
   it('should initialize scope variables correctly', function() {
     expect($scope.assetsPath).toBeDefined();
   });
