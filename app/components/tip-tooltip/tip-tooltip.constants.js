@@ -99,6 +99,12 @@
           image: ['img/tips/pause.jpg']
         }
       ]
+    },
+    TEXTURES: {
+      text:
+        'Advanced tip: You can upload your own texture in the resources/textures folder and display it on an object from a state machine',
+      image: 'img/tips/chess-board-solid.svg',
+      stackMode: true
     }
   });
 })();

@@ -57,7 +57,9 @@
       window,
       experimentViewService,
       userNavigationService,
-      NAVIGATION_MODES
+      NAVIGATION_MODES,
+      tipTooltipService,
+      TIP_CODES
     ) {
       this.element = element;
       this.userContextService = userContextService;
@@ -135,6 +137,7 @@
 
         //main context menu handler
         scope.onContainerMouseDown = function(event) {
+          tipTooltipService.setCurrentTip(TIP_CODES.TEXTURES);
           if (userContextService.isOwner()) {
             switch (event.button) {
               case 2:
@@ -200,7 +203,9 @@
     '$window',
     'experimentViewService',
     'userNavigationService',
-    'NAVIGATION_MODES'
+    'NAVIGATION_MODES',
+    'tipTooltipService',
+    'TIP_CODES'
   ];
 
   angular
