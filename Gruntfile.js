@@ -364,7 +364,7 @@ module.exports = function(grunt) {
       css: ['<%= yeoman.dist %>/**/*.css'],
       htmlCustomImageDirectives: ['<%= yeoman.dist %>/**/*.html'],
       options: {
-        assetsDirs: ['<%= yeoman.dist %>'],
+        assetsDirs: ['<%= yeoman.dist %>', '<%= yeoman.dist %>/releasenotes'],
         patterns: {
           htmlCustomImageDirectives: [
             [
@@ -472,6 +472,17 @@ module.exports = function(grunt) {
 
     // Copies remaining files to places other tasks can use
     copy: {
+      releasenotes: {
+        files: [
+          {
+            // copy release notes app
+            expand: true,
+            cwd: '<%= yeoman.app %>',
+            src: 'releasenotes/*.*',
+            dest: '<%= yeoman.dist %>'
+          }
+        ]
+      },
       dist: {
         files: [
           {
@@ -529,6 +540,13 @@ module.exports = function(grunt) {
             expand: true,
             cwd: '.',
             src: 'bower_components/hbp-collaboratory-theme/dist/fonts/**/*.*',
+            dest: '<%= yeoman.dist %>'
+          },
+          {
+            // copy jquery to dist
+            expand: true,
+            cwd: '.',
+            src: 'bower_components/jquery/dist/jquery.js',
             dest: '<%= yeoman.dist %>'
           },
           {
@@ -854,6 +872,7 @@ module.exports = function(grunt) {
       'concat',
       'ngAnnotate',
       'copy:dist',
+      'copy:releasenotes',
       'cdnify',
       'cssmin',
       'uglify',
