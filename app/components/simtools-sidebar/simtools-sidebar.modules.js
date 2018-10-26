@@ -25,10 +25,12 @@
 (function() {
   'use strict';
 
-  angular.module('simToolsSidebarModule', ['ngMaterial']).config([
-    '$mdThemingProvider',
-    function($mdThemingProvider) {
-      $mdThemingProvider.theme('default').primaryPalette('grey');
-    }
-  ]);
+  angular
+    .module('simToolsSidebarModule', ['ngMaterial', 'clientLoggerModule'])
+    .config([
+      '$mdThemingProvider',
+      function($mdThemingProvider) {
+        $mdThemingProvider.theme('default').primaryPalette('grey');
+      }
+    ]);
 })();

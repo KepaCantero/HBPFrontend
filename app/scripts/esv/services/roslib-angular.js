@@ -31,7 +31,7 @@
   // We don't want to have ROSLIB on the global scope (ie. window), but we want to rely on dependency injection.
   // This allows our components to be intuitive, predictable, and testable. Hence we "wrap" this library here.
   // http://www.bennadel.com/blog/2720-creating-and-extending-a-lodash-underscore-service-in-angularjs.htm
-  var app = angular.module('roslibModule', []);
+  var app = angular.module('roslibModule', ['bbpConfig']);
   app.factory('roslib', [
     '$window',
     'bbpConfig',

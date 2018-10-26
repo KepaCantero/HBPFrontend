@@ -130,6 +130,12 @@
                  ng-class="{'tool-help-highlight': vm.helpTooltipService.helpCode === 'LOG_CONSOLE'}">
         <md-tooltip md-direction="right">Log Console</md-tooltip>
         <i class="fa fa-terminal"></i>
+        <div    ng-if="vm.clientLoggerService.missedConsoleLogs"
+                class="missed-console-badge missed-console-number-{{vm.clientLoggerService.missedConsoleLogs<=9}}"
+                ng-class="'missed-console-badge-count-'+(vm.clientLoggerService.missedConsoleLogs%2)">
+            <div ng-if="vm.clientLoggerService.missedConsoleLogs<=9">{{vm.clientLoggerService.missedConsoleLogs}}</div>
+            <div ng-if="vm.clientLoggerService.missedConsoleLogs>9">...</div>
+        </div>
       </md-button>
 
       <md-button class="md-raised tool-button tool-monitor" aria-label="Video Streams"

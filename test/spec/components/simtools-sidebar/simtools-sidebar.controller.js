@@ -15,6 +15,8 @@ describe('Controller: SimToolsSidebarController', function() {
     userNavigationService,
     videoStreamService;
 
+  const clientLoggerServiceMock = {};
+
   beforeEach(module('simToolsSidebarModule'));
   beforeEach(module('dynamicViewModule'));
   beforeEach(module('tipTooltipModule'));
@@ -31,6 +33,12 @@ describe('Controller: SimToolsSidebarController', function() {
   beforeEach(module('userNavigationServiceMock'));
   beforeEach(module('videoStreamServiceMock'));
   beforeEach(module('tipTooltipServiceMock'));
+
+  beforeEach(
+    module(function($provide) {
+      $provide.value('clientLoggerService', clientLoggerServiceMock);
+    })
+  );
 
   beforeEach(
     inject(function(

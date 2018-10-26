@@ -168,7 +168,7 @@
   ];
 
   angular
-    .module('clientLoggerModule', [])
+    .module('clientLoggerModule', ['roslibModule', 'simulationInfoService'])
     .service('clientLoggerService', ClientLoggerService)
     .constant('LOG_TYPE', {
       INFO: 1,

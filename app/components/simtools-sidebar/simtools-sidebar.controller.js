@@ -73,7 +73,8 @@
       userNavigationService,
       videoStreamService,
       tipTooltipService,
-      TIP_CODES
+      TIP_CODES,
+      clientLoggerService
     ) {
       this.$scope = $scope;
 
@@ -102,6 +103,8 @@
 
       this.tipTooltipService = tipTooltipService;
       this.tipTooltipService.setCurrentTip(TIP_CODES.SIMULATIONS_TIPS);
+
+      this.clientLoggerService = clientLoggerService;
 
       $rootScope.$on('ASSETS_LOADED', () => {
         this.show = true;
@@ -216,6 +219,7 @@
       'videoStreamService',
       'tipTooltipService',
       'TIP_CODES',
+      'clientLoggerService',
       function(...args) {
         return new SimToolsSidebarController(...args);
       }
