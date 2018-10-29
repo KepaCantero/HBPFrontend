@@ -3,68 +3,74 @@
 <!-- endbuild -->
 
 <div show-on-top class="description-window panels ng-hide" ng-show="helpTooltipService.visible == helpTooltipService.INFO && (stateService.currentState != STATE.STOPPED)">
-  <div>
+    <div>
 
-      <div ng-click="tipTooltipService.toggleTip()" ng-show="tipTooltipService.someTipsAreHidden()" style="display:flex;justify-content: flex-end;">
-          <div class="show-tips-button">
-            <i class="fa fa-info-circle tip-help-small-icon" style="margin-top:3px"></i>
-            Tips
-          </div>
+        <button class="help-info-close-btn" ng-click="helpTooltipService.toggleInfo()">×</button>
+
+        <div ng-click="tipTooltipService.toggleTip()" ng-show="tipTooltipService.someTipsAreHidden()" style="position: absolute;top: 6px;right: 30px;">
+            <div class="show-tips-button">
+                <i class="fa fa-info-circle tip-help-small-icon" style="margin-top:3px"></i>
+                Tips
+            </div>
         </div>
 
 
 
-    <div class="help-title">{{experimentService.experimentName}}:</div>
-    <div class="help-text pre">{{experimentService.experimentDescription}}</div>
-    <div class="help-title">Version Information:</div>
-    <div class="help-text prewrap">{{experimentService.versionString}}</div>
-    <a style="cursor: pointer;margin-left: 20px;font-weight: 600;font-style: italic;" ng-click="showLatestChangeLog()">See current change log</a>
-    <div class="help-title">Simulation Information:</div>
-    <div class="help-text">
-      <table class="table table-condensed table-compact borderless">
-        <col class="col-md-1">
-        <col>
-        <tbody>
-          <tr>
-            <td>ServerID:</td>
-            <td>{{simulationInfo.serverID}}</td>
-          </tr>
-          <tr>
-            <td>SimulationID:</td>
-            <td>{{simulationInfo.simulationID}}</td>
-          </tr>
-          <tr>
-            <td>ServerBaseURL:</td>
-            <td>{{simulationInfo.serverBaseUrl}}</td>
-          </tr>
-          <tr>
-            <td>ExperimentID:</td>
-            <td>{{simulationInfo.experimentID}}</td>
-          </tr>
-          <tr>
-            <td>ExperimentConfig:</td>
-            <td>{{experimentService.experimentConfiguration}}</td>
-          </tr>
-          <tr>
-            <td>EnvironmentConfig:</td>
-            <td>{{experimentService.environmentConfiguration}}</td>
-          </tr>
-          <tr>
-            <td>Owner:</td>
-            <td>{{experimentService.owner}}</td>
-          </tr>
-          <tr>
-            <td>Creation Date:</td>
-            <td>{{experimentService.creationDate}}</td>
-          </tr>
-        </tbody>
-      </table>
+        <div class="help-title">{{experimentService.experimentName}}:</div>
+        <div class="help-text pre">{{experimentService.experimentDescription}}</div>
+        <div class="help-title">Version Information:</div>
+        <div class="help-text prewrap">{{experimentService.versionString}}</div>
+        <a style="cursor: pointer;margin-left: 20px;font-weight: 600;font-style: italic;" ng-click="showLatestChangeLog()">See
+            current change log</a>
+        <div class="help-title">Simulation Information:</div>
+        <div class="help-text">
+            <table class="table table-condensed table-compact borderless">
+                <col class="col-md-1">
+                <col>
+                <tbody>
+                    <tr>
+                        <td>ServerID:</td>
+                        <td>{{simulationInfo.serverID}}</td>
+                    </tr>
+                    <tr>
+                        <td>SimulationID:</td>
+                        <td>{{simulationInfo.simulationID}}</td>
+                    </tr>
+                    <tr>
+                        <td>ServerBaseURL:</td>
+                        <td>{{simulationInfo.serverBaseUrl}}</td>
+                    </tr>
+                    <tr>
+                        <td>ExperimentID:</td>
+                        <td>{{simulationInfo.experimentID}}</td>
+                    </tr>
+                    <tr>
+                        <td>ExperimentConfig:</td>
+                        <td>{{experimentService.experimentConfiguration}}</td>
+                    </tr>
+                    <tr>
+                        <td>EnvironmentConfig:</td>
+                        <td>{{experimentService.environmentConfiguration}}</td>
+                    </tr>
+                    <tr>
+                        <td>Owner:</td>
+                        <td>{{experimentService.owner}}</td>
+                    </tr>
+                    <tr>
+                        <td>Creation Date:</td>
+                        <td>{{experimentService.creationDate}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
-  </div>
 </div>
 
+
 <div show-on-top class="toolbar-help-window panels ng-hide" ng-show="helpTooltipService.visible == helpTooltipService.HELP && (stateService.currentState != STATE.STOPPED)">
-  <div class="help-title">UI-Element Description:</div>
-  <div class="help-text" ng-hide="helpTooltipService.helpCode">(A description will be displayed here when you click on the corresponding user interface element)</div>
-  <div class="help-text pre" ng-show="helpTooltipService.helpCode">{{helpTooltipService.helpDescription}}</div>
+    <button class="help-info-close-btn" ng-click="helpTooltipService.toggleHelp()">×</button>
+    <div class="help-title">UI-Element Description:</div>
+    <div class="help-text" ng-hide="helpTooltipService.helpCode">(A description will be displayed here when you click
+        on the corresponding user interface element)</div>
+    <div class="help-text pre" ng-show="helpTooltipService.helpCode">{{helpTooltipService.helpDescription}}</div>
 </div>
