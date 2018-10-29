@@ -34,12 +34,10 @@
   });
 
   angular.module('exdFrontendApp').directive('environmentDesigner', [
-    '$document',
     'STATE',
     'EDIT_MODE',
     'panels',
     'simulationSDFWorld',
-    'bbpConfig',
     'gz3d',
     'stateService',
     'simulationInfo',
@@ -54,12 +52,10 @@
     '$http',
     'userNavigationService',
     function(
-      $document,
       STATE,
       EDIT_MODE,
       panels,
       simulationSDFWorld,
-      bbpConfig,
       gz3d,
       stateService,
       simulationInfo,
@@ -292,11 +288,36 @@
                   event.stopPropagation();
                 },
                 visible: false
+              },
+              {
+                text: 'Set as Initial Pose',
+                callback: event => {
+                  let {
+                    name,
+                    position: { x, y, z },
+                    rotation: { _x: roll, _y: pitch, _z: yaw }
+                  } = gz3d.scene.selectedEntity;
+
+                  backendInterfaceService.setRobotInitialPose(name, {
+                    x,
+                    y,
+                    z,
+                    roll,
+                    pitch,
+                    yaw
+                  });
+                  contextMenuState.toggleContextMenu(false);
+                  event.stopPropagation();
+                },
+                visible: false
               }
             ],
 
             hide: function() {
-              this.visible = this.items[0].visible = this.items[1].visible = this.items[2].visible = this.items[3].visible = this.items[4].visible = false;
+              for (let item of this.items) {
+                item.visible = false;
+              }
+              this.visible = false;
             },
 
             show: function(model) {
@@ -313,6 +334,7 @@
                 : 'Show Skin';
 
               this.items[4].visible = canDelete;
+              this.items[5].visible = !canDelete;
               return true;
             }
           });

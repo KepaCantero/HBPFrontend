@@ -41,11 +41,10 @@
 
   angular.module('exdFrontendApp').factory('backendInterfaceService', [
     '$resource',
-    '$stateParams',
-    'bbpConfig',
     'serverError',
     'simulationInfo',
-    function($resource, $stateParams, bbpConfig, serverError, simulationInfo) {
+    '$http',
+    function($resource, serverError, simulationInfo, $http) {
       var resourceStateMachineSimulation = function(backendBaseUrl) {
         return $resource(
           backendBaseUrl + '/simulation/:sim_id/state-machines',
@@ -401,6 +400,17 @@
           return resourcesCloneFiles(simulationInfo.serverBaseUrl).clone({
             exp_id: simulationInfo.experimentID
           });
+        },
+        /**
+         *  Set's the robot initial pose in the experiment
+         * @param robotId The id of the robot to set the position for
+         * @param robotPose The initial position (eg. {"x":2.0, "y":3.0, "z":1.0, "roll":1.0, "pitch":1.0, "yaw":1.0})
+         * @return A promise with the operation result
+         */
+        setRobotInitialPose: (robotId, robotPose) => {
+          const ROBOTS_API = `${simulationInfo.serverBaseUrl}/simulation/${simulationInfo.simulationID}/robots`;
+
+          return $http.put(ROBOTS_API, { robotId, robotPose });
         }
       };
     }
