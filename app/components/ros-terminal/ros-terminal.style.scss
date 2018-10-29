@@ -32,9 +32,12 @@
   height: 100%;
   white-space: pre;
   font-size: 11pt;
-  font-family: Inconsolata, monospace;
   color: white;
   background-color: black;
+
+  * {
+    font-family: Inconsolata, monospace;
+  }
 
   .ros-command-list {
     padding: 15px 10px 10px 10px;
