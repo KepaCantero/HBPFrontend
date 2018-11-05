@@ -54,19 +54,18 @@
 
       this.callbacks = [];
 
-      this.ros = new this.roslib.Ros({ url: this.server });
       this.jointsType = {};
 
       this.modelProp = bbpConfig.get('ros-services').modelProperties;
       this.jointProp = bbpConfig.get('ros-services').jointProperties;
 
       this.getModelPropertiesService = this.roslib.createService(
-        this.ros,
+        this.rosConnection,
         this.modelProp.name,
         this.modelProp.type
       );
       this.getJointPropertiesService = this.roslib.createService(
-        this.ros,
+        this.rosConnection,
         this.jointProp.name,
         this.jointProp.type
       );
