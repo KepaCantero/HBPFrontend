@@ -24,7 +24,7 @@
         <div class="release-notes">
 
             <header id="version-top">
-                <h1 id="release-notes">HBP Neuro­robotics Plat­form release notes</h1>
+                <h1 id="release-notes">HBP Neurorobotics Platform release notes</h1>
                 <p class="release-notes-head">
                     Here you’ll find our release notes: new features, bug fixes, migration steps and other updates introduced in each release.
                 </p>
@@ -37,34 +37,49 @@
 
             <hr>
 
-            <version version="2.1">
+            <version version="2.1.0">
                 <!-- New version -->
-                <h2>Version 2.1 (In progress)</h2>
-                <p class="date">[MONTH] 2018</p>
+                <h2>Version 2.1</h2>
+                <p class="date">November 2018</p>
                 <p>
-                    [INSERT SUMMARY]
+                    Easy installation, better user interface
                 </p>
                 <h3>Features</h3>
                 <ul>
-                    <li>The first feature </li>
-                    <li>The second feature</li>
+                    <li>Easy local installation using docker installer</li>
+                    <li>Support Nengo brains (in progress)</li>
+                    <li>Changelog informs user of new features and compatibility breaks</li>
+                    <li>New frontend design with layouts and new toolbars</li>
+                    <li>Support multiple robots (in progress)</li>
+                    <li>Code editors auto-persistance (no save button anymore)</li>
                 </ul>
-                <h3>Fixes</h3>
+                <h3>Fixes of user reported issues</h3>
                 <ul>
+                    <li><a target="_blank" href="https://hbpneurorobotics.atlassian.net/browse/NUIT-36">NUIT-36</a> Uploading to online platform a locally working experiment fails</li>
+                    <li><a target="_blank" href="https://hbpneurorobotics.atlassian.net/browse/NUIT-42">NUIT-42</a> NRP crash caused by TF trigger</li>
+                    <li><a target="_blank" href="https://hbpneurorobotics.atlassian.net/browse/NUIT-44">NUIT-44</a> class SimTK::ContactGeometry has no member named setUserData</li>
+                    <li><a target="_blank" href="https://hbpneurorobotics.atlassian.net/browse/NUIT-17">NUIT-17</a> #63 Initialize Brain and Gazebo in parallel</li>
+                    <li><a target="_blank" href="https://hbpneurorobotics.atlassian.net/browse/NUIT-35">NUIT-35</a> ROSCLEClient breaks due to Projection in the brain</li>
+                    <li><a target="_blank" href="https://hbpneurorobotics.atlassian.net/browse/NUIT-31">NUIT-31</a> #75 Possible Bug in Transfer Function Framework</li>
+                    <li><a target="_blank" href="https://hbpneurorobotics.atlassian.net/browse/NUIT-38">NUIT-38</a> Frontend breaks when ".exc" file is deleted</li>
+                    <li><a target="_blank" href="https://hbpneurorobotics.atlassian.net/browse/NUIT-4">NUIT-4</a> Error starting simulator</li>
+                    <li><a target="_blank" href="https://hbpneurorobotics.atlassian.net/browse/NUIT-9">NUIT-9</a> #66 Pingpongtrainer crashes the NRP</li>
+                    <li><a target="_blank" href="https://hbpneurorobotics.atlassian.net/browse/NUIT-6">NUIT-6</a> #65 Compilation error in Opensim</li>
+                    <li><a target="_blank" href="https://hbpneurorobotics.atlassian.net/browse/NUIT-32">NUIT-32</a> #76 uninformative error</li>
+                    <li><a target="_blank" href="https://hbpneurorobotics.atlassian.net/browse/NUIT-7">NUIT-7</a> #50 Using spike_recorder alters the spike train</li>
+                    <li><a target="_blank" href="https://hbpneurorobotics.atlassian.net/browse/NUIT-5">NUIT-5</a> #49 spike_recorder does not work with multiple populations</li>
+                    <li><a target="_blank" href="https://hbpneurorobotics.atlassian.net/browse/NUIT-3">NUIT-3</a> Live USB</li>
+                    <li><a target="_blank" href="https://hbpneurorobotics.atlassian.net/browse/NUIT-8">NUIT-8</a> #67 Editing world and setting it</li>
+                    <!-- EXAMPLE COMPATIBILITY BREAK
                     <li>
-                        The first fix (
-                        <i>#NRRPLT-6655</i>)
-                    </li>
-                    <li>
-                        The second fix (
-                        <i>#NRRPLT-6656</i>)
-                        <span style="color:red">[REGRESSION]</span>
+                        <span style="color:red">[COMPATIBILITY BREAK]</span>
                         <ul>
                             <li>XML strutured TFs are no longer supported. Please follow the
                                 <a target="_blank" href="https://bitbucket.org/hbpneurorobotics/neurorobotics-platform/src/40290e64bff41b1d1bbdd7a685f36c56d68ad1c6/test.md?at=master&fileviewer=file-view-default">migration steps</a>.
                             </li>
                         </ul>
                     </li>
+                    -->
                 </ul>
             </version>
 
@@ -80,8 +95,7 @@
                 <h3>Features</h3>
                 <ul>
                     <li>Yet bigger resources (120+ servers)</li>
-                    <li>Models graphical libraries</li>
-                    <li>Sensor noise graphical library</li>
+                    <li>Models and noise graphical libraries</li>
                     <li>Structured transfer functions editor</li>
                     <li>Interact with the robot</li>
                     <li>Robot inspector, ROS terminal, help tips</li>
@@ -102,10 +116,13 @@
                 <h3>Features</h3>
                 <ul>
                     <li>New virtual lab (Holodeck)</li>
+                    <li>Support for muscle system (OpenSim integrated)</li>
                     <li>Improved Environment Designer</li>
                     <li>Frontend Performance Monitor</li>
-                    <li>Demo simulations on Amazon cloud servers for basic users</li>
-                    <li>User installable platform</li>
+                    <li>Public demo server accessible 24/7</li>
+                    <li>Clone, save, customize experiments also on local installations</li>
+                    <li>Extended debugging tools</li>
+                    <li>User installable platform over live USB stick or source install</li>
                     <li>Pilot experiments</li>
                 </ul>
                 <hr>
