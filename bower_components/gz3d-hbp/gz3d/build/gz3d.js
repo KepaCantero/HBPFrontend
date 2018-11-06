@@ -6376,6 +6376,7 @@ GZ3D.GZIface.prototype.createModelFromMsg = function(model)
 // merging the two methods and extracting the different things to parameters (or any other means
 // of configuration).
 GZ3D.GZIface.prototype.updateModelFromMsg = function (modelObj, modelMsg) {
+
   if(modelMsg.scale)  {
     this.scene.setScale(modelObj, modelMsg.scale);
   }
@@ -11127,7 +11128,7 @@ GZ3D.Scene.prototype.getByName = function(name)
  */
 GZ3D.Scene.prototype.getGazeboObject = function(gazeboSpec)
 {
-  let object = undefined;
+  let object;
   this.scene.traverse((node) => {
     if (node.userData.id === gazeboSpec.id && node.name === gazeboSpec.name) {
       object = node;
