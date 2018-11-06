@@ -5573,7 +5573,7 @@ GZ3D.GZIface.prototype.onConnected = function()
   {
     var poseApplyUpdate = function(scope, message)
     {
-      var entity = scope.scene.getByName(message.name);
+      var entity = scope.scene.getGazeboObject(message);
       if (entity && entity !== scope.scene.modelManipulator.object
           && entity.parent !== scope.scene.modelManipulator.object)
       {
@@ -5584,7 +5584,7 @@ GZ3D.GZIface.prototype.onConnected = function()
 
     if (message.name)
     {
-      poseApplyUpdate(this,message);
+      poseApplyUpdate(this, message);
     }
     else
     {
@@ -5592,7 +5592,7 @@ GZ3D.GZIface.prototype.onConnected = function()
 
       for (var i=0;i<keys.length; i++)
       {
-        poseApplyUpdate(this,message[keys[i]]);
+        poseApplyUpdate(this, message[keys[i]]);
       }
     }
   };
@@ -5682,7 +5682,7 @@ GZ3D.GZIface.prototype.onConnected = function()
 
   var modelUpdate = function(message)
   {
-    if (!this.scene.getByName(message.name))
+    if (!this.scene.getGazeboObject(message))
     {
       var modelObj = createModelHierarchy(this, this.scene, message);
       if (modelObj)
@@ -5712,7 +5712,7 @@ GZ3D.GZIface.prototype.onConnected = function()
         i++;
       }
     } else {
-      this.updateModelFromMsg(this.scene.getByName(message.name), message);
+      this.updateModelFromMsg(this.scene.getGazeboObject(message), message);
     }
     this.gui.setModelStats(message, 'update');
   };
@@ -6248,9 +6248,15 @@ GZ3D.GZIface.prototype.loadCollisionVisuals = function(object)
 
 GZ3D.GZIface.prototype.createModelFromMsg = function(model)
 {
+  if(this.scene.getGazeboObject(model)) {
+    console.error('GZIface.createModelFromMsg() - model ' + model.name + ' already exists');
+    return;
+  }
+
   var modelObj = new THREE.Object3D();
   modelObj.name = model.name;
   modelObj.userData.id = model.id;
+  modelObj.userData.gazeboType = 'model';
   modelObj.userData.is_static = model.is_static;
   if (model.pose)
   {
@@ -6370,7 +6376,6 @@ GZ3D.GZIface.prototype.createModelFromMsg = function(model)
 // merging the two methods and extracting the different things to parameters (or any other means
 // of configuration).
 GZ3D.GZIface.prototype.updateModelFromMsg = function (modelObj, modelMsg) {
-
   if(modelMsg.scale)  {
     this.scene.setScale(modelObj, modelMsg.scale);
   }
@@ -6401,6 +6406,9 @@ GZ3D.GZIface.prototype.createVisualFromMsg = function(visual, modelScale)
       this.scene.setPose(visualObj, visual.pose.position,
           visual.pose.orientation);
     }
+
+    visualObj.userData.id = visual.id;
+    visualObj.userData.gazeboType = 'visual';
 
     visualObj.castShadow = visual.cast_shadows;
     visualObj.receiveShadow = visual.receive_shadows;
@@ -6492,6 +6500,7 @@ GZ3D.GZIface.prototype.createSensorFromMsg = function(sensor,modelName)
   sensorObj.userData.gazeboType = 'sensor';
   sensorObj.userData.sensorType = sensor.type;
   sensorObj._sensorSource = sensor;
+  sensorObj.userData.id = sensor.id;
 
   if (sensor.pose) {
     this.scene.setPose(sensorObj, sensor.pose.position, sensor.pose.orientation);
@@ -11109,6 +11118,23 @@ GZ3D.Scene.prototype.remove = function(model)
 GZ3D.Scene.prototype.getByName = function(name)
 {
   return this.scene.getObjectByName(name, true);
+};
+
+/**
+ * Returns the object which has the specified ID and name.
+ * @param {object} gazeboSpec Object specifying ID and name from gazebo.
+ * @returns {THREE.Object3D} model
+ */
+GZ3D.Scene.prototype.getGazeboObject = function(gazeboSpec)
+{
+  let object = undefined;
+  this.scene.traverse((node) => {
+    if (node.userData.id === gazeboSpec.id && node.name === gazeboSpec.name) {
+      object = node;
+    }
+  });
+
+  return object;
 };
 
 /**
