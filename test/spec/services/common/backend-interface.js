@@ -222,4 +222,25 @@ describe('Services: backendInterfaceService', function() {
     $httpBackend.flush();
     expect(callback).toHaveBeenCalled();
   });
+
+  it('should call serverError.displayHTTPError when the getRobots GET request fails', function() {
+    $httpBackend.expectGET(urlRegex).respond(404);
+    backendInterfaceService.getRobots();
+    $httpBackend.flush();
+    expect(serverError.displayHTTPError).toHaveBeenCalled();
+  });
+
+  it('should call serverError.displayHTTPError when the deletetRobot DELETE request fails', function() {
+    $httpBackend.whenDELETE(urlRegex).respond(500);
+    backendInterfaceService.deleteRobot();
+    $httpBackend.flush();
+    expect(serverError.displayHTTPError).toHaveBeenCalled();
+  });
+
+  it('should call serverError.displayHTTPError when the setInitialPose PUT request fails', function() {
+    $httpBackend.whenPUT(urlRegex).respond(500);
+    backendInterfaceService.setRobotInitialPose();
+    $httpBackend.flush();
+    expect(serverError.displayHTTPError).toHaveBeenCalled();
+  });
 });

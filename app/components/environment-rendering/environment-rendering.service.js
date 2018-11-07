@@ -46,7 +46,6 @@
       'userNavigationService',
       'simulationInfo',
       'stateService',
-      'isNotARobotPredicate',
       'userContextService',
       'assetLoadingSplash',
       'nrpAnalytics',
@@ -66,7 +65,6 @@
         userNavigationService,
         simulationInfo,
         stateService,
-        isNotARobotPredicate,
         userContextService,
         assetLoadingSplash,
         nrpAnalytics,
@@ -123,7 +121,6 @@
             stateService.getCurrentState().then(function() {
               if (stateService.currentState !== STATE.STOPPED) {
                 gz3d.Initialize();
-                gz3d.iface.addCanDeletePredicate(isNotARobotPredicate);
                 gz3d.iface.addCanDeletePredicate(
                   userContextService.hasEditRights
                 );

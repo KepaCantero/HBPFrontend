@@ -43,8 +43,7 @@
     '$resource',
     'serverError',
     'simulationInfo',
-    '$http',
-    function($resource, serverError, simulationInfo, $http) {
+    function($resource, serverError, simulationInfo) {
       var resourceStateMachineSimulation = function(backendBaseUrl) {
         return $resource(
           backendBaseUrl + '/simulation/:sim_id/state-machines',
@@ -218,6 +217,30 @@
       };
 
       /* eslint-disable camelcase*/
+
+      var resourceRobots = function(backendBaseUrl) {
+        return $resource(
+          backendBaseUrl + '/simulation/:sim_id/robots',
+          { sim_id: simulationInfo.simulationID },
+          {
+            getRobots: {
+              method: 'GET',
+              url: backendBaseUrl + '/simulation/:sim_id/robots',
+              interceptor: { responseError: serverError.displayHTTPError }
+            },
+            setInitialPose: {
+              method: 'PUT',
+              url: backendBaseUrl + '/simulation/:sim_id/robots/:robot_id',
+              interceptor: { responseError: serverError.displayHTTPError }
+            },
+            delete: {
+              method: 'DELETE',
+              url: backendBaseUrl + '/simulation/:sim_id/robots/:robot_id',
+              interceptor: { responseError: serverError.displayHTTPError }
+            }
+          }
+        );
+      };
 
       return {
         getBrain: function(callback) {
@@ -402,15 +425,37 @@
           });
         },
         /**
+        *  Get the list of the robots currently loaded in the simulation
+        * @return A promise with the operation result
+        */
+        getRobots: function() {
+          return resourceRobots(simulationInfo.serverBaseUrl).getRobots()
+            .$promise;
+        },
+        /**
          *  Set's the robot initial pose in the experiment
          * @param robotId The id of the robot to set the position for
          * @param robotPose The initial position (eg. {"x":2.0, "y":3.0, "z":1.0, "roll":1.0, "pitch":1.0, "yaw":1.0})
          * @return A promise with the operation result
          */
-        setRobotInitialPose: (robotId, robotPose) => {
-          const ROBOTS_API = `${simulationInfo.serverBaseUrl}/simulation/${simulationInfo.simulationID}/robots`;
-
-          return $http.put(ROBOTS_API, { robotId, robotPose });
+        setRobotInitialPose: function(robotId, robotPose) {
+          return resourceRobots(simulationInfo.serverBaseUrl).setInitialPose(
+            { robot_id: robotId },
+            {
+              robotId,
+              robotPose
+            }
+          ).$promise;
+        },
+        /**
+         *  Delete a robot specified by its robot ID string
+         * @param robotId The id of the robot to be deleted
+         * @return A promise with the operation result
+         */
+        deleteRobot: function(robotId) {
+          return resourceRobots(simulationInfo.serverBaseUrl).delete({
+            robot_id: robotId
+          }).$promise;
         }
       };
     }

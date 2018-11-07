@@ -37,7 +37,7 @@
       return 2;
     }
 
-    constructor(roslib, simulationInfo, bbpConfig) {
+    constructor(roslib, simulationInfo, sceneInfo, bbpConfig) {
       this.roslib = roslib;
       this.server = simulationInfo.serverConfig.rosbridge.websocket;
       this.jointTopic = bbpConfig.get('ros-topics').joint;
@@ -73,7 +73,7 @@
       let modelreq = {};
       let jointreq = {};
       // TODO: add multirobots support
-      modelreq[this.modelProp.param] = simulationInfo.brain.robots[0];
+      modelreq[this.modelProp.param] = sceneInfo.robots[0].robotId;
 
       this.getModelPropertiesService.callService(
         new this.roslib.ServiceRequest(modelreq),
@@ -180,7 +180,12 @@
   }
 
   JointPlotService.$$ngIsClass = true;
-  JointPlotService.$inject = ['roslib', 'simulationInfo', 'bbpConfig'];
+  JointPlotService.$inject = [
+    'roslib',
+    'simulationInfo',
+    'sceneInfo',
+    'bbpConfig'
+  ];
 
   angular.module('jointPlotModule').service('jointService', JointPlotService);
 })();

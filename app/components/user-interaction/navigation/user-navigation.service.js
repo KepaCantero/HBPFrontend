@@ -47,6 +47,8 @@
       'gz3d',
       'nrpUser',
       'simulationInfo',
+      'sceneInfo',
+      'isARobotPredicate',
       'roslib',
       'stateService',
       'userInteractionSettingsService',
@@ -57,6 +59,8 @@
         gz3d,
         nrpUser,
         simulationInfo,
+        sceneInfo,
+        isARobotPredicate,
         roslib,
         stateService,
         userInteractionSettingsService
@@ -421,9 +425,9 @@
 
           setLookatCamera: function() {
             let selection = gz3d.scene.selectedEntity;
-            if (!selection || !simulationInfo.isRobot(selection)) {
+            if (!selection || !isARobotPredicate(selection)) {
               selection = gz3d.scene.scene.getObjectByName(
-                simulationInfo.brain.robots[0]
+                sceneInfo.robots[0].robotId
               );
             }
             this.lookatControls.setLookatTarget(selection);

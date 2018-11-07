@@ -24,6 +24,7 @@ describe('Service: joint-service', function() {
   };
 
   beforeEach(module('simulationInfoMock'));
+  beforeEach(module('sceneInfoMock'));
 
   beforeEach(
     module(function($provide) {

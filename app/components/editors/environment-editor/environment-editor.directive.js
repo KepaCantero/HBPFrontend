@@ -41,10 +41,11 @@
     'gz3d',
     'stateService',
     'simulationInfo',
+    'sceneInfo',
     'contextMenuState',
     'backendInterfaceService',
     'clbErrorDialog',
-    'isNotARobotPredicate',
+    'isARobotPredicate',
     'downloadFileService',
     'environmentService',
     'dynamicViewOverlayService',
@@ -59,10 +60,11 @@
       gz3d,
       stateService,
       simulationInfo,
+      sceneInfo,
       contextMenuState,
       backendInterfaceService,
       clbErrorDialog,
-      isNotARobotPredicate,
+      isARobotPredicate,
       downloadFileService,
       environmentService,
       dynamicViewOverlayService,
@@ -87,6 +89,19 @@
           scope.assetsPath = serverConfig.gzweb.assets;
           scope.EDIT_MODE = EDIT_MODE;
           scope.gz3d = gz3d;
+
+          // Register a callback which deletes the robot in the back-end on the corresponding "deleteEntity" event
+          // and refresh the robots list managed by the SceneInfo service
+          var deleteBackendRobotCallback = function(entity) {
+            if (isARobotPredicate(entity)) {
+              backendInterfaceService.deleteRobot(entity.name);
+              sceneInfo.refreshRobotsList();
+            }
+          };
+          gz3d.Initialize();
+          gz3d.iface.addOnDeleteEntityCallbacks(deleteBackendRobotCallback);
+          gz3d.iface.addOnCreateEntityCallbacks(sceneInfo.refreshRobotsList);
+
           scope.isPrivateExperiment = environmentService.isPrivateExperiment();
           scope.isSavingToCollab = false;
           scope.categories = [];
@@ -282,14 +297,6 @@
                 visible: false
               },
               {
-                text: 'Delete',
-                callback: function(event) {
-                  scope.deleteModel();
-                  event.stopPropagation();
-                },
-                visible: false
-              },
-              {
                 text: 'Set as Initial Pose',
                 callback: event => {
                   let {
@@ -310,6 +317,14 @@
                   event.stopPropagation();
                 },
                 visible: false
+              },
+              {
+                text: 'Delete',
+                callback: function(event) {
+                  scope.deleteModel();
+                  event.stopPropagation();
+                },
+                visible: false
               }
             ],
 
@@ -321,20 +336,17 @@
             },
 
             show: function(model) {
-              //don't delete the robot
-              var canDelete = isNotARobotPredicate(model);
-
               this.visible = this.items[0].visible = true;
               this.items[1].visible = true;
-              this.items[2].visible =
-                canDelete && gz3d.gui.canModelBeDuplicated(model.name);
+              this.items[2].visible = gz3d.gui.canModelBeDuplicated(model.name);
               this.items[3].visible = gz3d.scene.hasSkin(model);
               this.items[3].text = gz3d.scene.skinVisible(model)
                 ? 'Hide Skin'
                 : 'Show Skin';
 
-              this.items[4].visible = canDelete;
-              this.items[5].visible = !canDelete;
+              this.items[4].visible = isARobotPredicate(model);
+              this.items[5].visible = true;
+
               return true;
             }
           });

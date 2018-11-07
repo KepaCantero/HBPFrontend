@@ -22,6 +22,7 @@ describe('Directive: environment-designer', function() {
   beforeEach(module('dynamicViewOverlayServiceMock'));
   beforeEach(module('contextMenuStateServiceMock'));
   beforeEach(module('gz3dMock'));
+  beforeEach(module('sceneInfoMock'));
   beforeEach(
     module(function($provide) {
       $provide.value(
@@ -97,7 +98,8 @@ describe('Directive: environment-designer', function() {
             {
               modelPath: 'cylinder',
               modelTitle: 'Cylinder',
-              thumbnail: 'img/esv/objects/cylinder.png'
+              thumbnail: 'img/esv/objects/cylinder.png',
+              physicsIgnore: 'opensim'
             }
           ]
         },
@@ -118,7 +120,8 @@ describe('Directive: environment-designer', function() {
             {
               modelPath: 'directionallight',
               modelTitle: 'Directional Light',
-              thumbnail: 'img/esv/objects/directionallight.png'
+              thumbnail: 'img/esv/objects/directionallight.png',
+              physicsIgnore: 'bullet'
             }
           ]
         }
@@ -132,6 +135,12 @@ describe('Directive: environment-designer', function() {
       httpBackend.flush();
     })
   );
+
+  it('should register callbacks for createEntity and modelUpdate events', function() {
+    expect($scope.gz3d.Initialize).toHaveBeenCalled();
+    expect($scope.gz3d.iface.addOnDeleteEntityCallbacks).toHaveBeenCalled();
+    expect($scope.gz3d.iface.addOnCreateEntityCallbacks).toHaveBeenCalled();
+  });
 
   it('should emit "duplicate_entity" on duplicate', function() {
     spyOn($scope.gz3d.gui.guiEvents, 'emit');
@@ -167,32 +176,26 @@ describe('Directive: environment-designer', function() {
 
     // initial structure
     expect(itemGroup.visible).toBe(false);
+    itemGroup.items.forEach(item => {
+      expect(item.visible).toBe(false);
+    });
     expect(itemGroup.items[0].text).toEqual('Inspect');
-    expect(itemGroup.items[0].visible).toBe(false);
     expect(itemGroup.items[1].text).toEqual('Look At');
-    expect(itemGroup.items[1].visible).toBe(false);
     expect(itemGroup.items[2].text).toEqual('Duplicate');
-    expect(itemGroup.items[2].visible).toBe(false);
     expect(itemGroup.items[3].text).toEqual('Show Skin');
-    expect(itemGroup.items[3].visible).toBe(false);
-    expect(itemGroup.items[4].text).toEqual('Delete');
-    expect(itemGroup.items[4].visible).toBe(false);
+    expect(itemGroup.items[4].text).toEqual('Set as Initial Pose');
+    expect(itemGroup.items[5].text).toEqual('Delete');
 
     // check hide()
     itemGroup.visible = true;
-    itemGroup.items[0].visible = true;
-    itemGroup.items[1].visible = true;
-    itemGroup.items[2].visible = true;
-    itemGroup.items[3].visible = true;
-    itemGroup.items[4].visible = true;
+    itemGroup.items.forEach(item => {
+      item.visible = true;
+    });
     itemGroup.hide();
     expect(itemGroup.visible).toBe(false);
-    expect(itemGroup.items[0].visible).toBe(false);
-    expect(itemGroup.items[1].visible).toBe(false);
-    expect(itemGroup.items[2].visible).toBe(false);
-    expect(itemGroup.items[3].visible).toBe(false);
-    expect(itemGroup.items[4].visible).toBe(false);
-
+    itemGroup.items.forEach(item => {
+      expect(item.visible).toBe(false);
+    });
     var eventMock = { stopPropagation: jasmine.createSpy('stopPropagation') };
     // check call to edit item
     itemGroup.items[0].callback(eventMock);
@@ -229,27 +232,29 @@ describe('Directive: environment-designer', function() {
 
     // check call to delete item
     spyOn($scope, 'deleteModel');
-    itemGroup.items[4].callback(eventMock);
+    itemGroup.items[5].callback(eventMock);
     expect($scope.deleteModel).toHaveBeenCalled();
     expect(eventMock.stopPropagation).toHaveBeenCalled();
 
-    // see that anyhting containing 'robot' can't be deleted
+    // see that anyhting can be deleted, robots included
     var modelMock = { name: 'robot' };
     itemGroup.show(modelMock);
     expect(itemGroup.visible).toBe(true);
     expect(itemGroup.items[0].visible).toBe(true);
     expect(itemGroup.items[1].visible).toBe(true);
-    expect(itemGroup.items[2].visible).toBe(false);
-    expect(itemGroup.items[3].visible).toBe(false);
-    expect(itemGroup.items[4].visible).toBe(false);
+    expect(itemGroup.items[2].visible).toBe(true);
+    expect(itemGroup.items[3].visible).toBe(false); // No skin on the robot
+    expect(itemGroup.items[4].visible).toBe(true); // 'Set as Initial Pose' is Visible only for robots
+    expect(itemGroup.items[5].visible).toBe(true);
     modelMock.name = 'iAmNotARobot';
     itemGroup.show(modelMock);
     expect(itemGroup.visible).toBe(true);
     expect(itemGroup.items[0].visible).toBe(true);
     expect(itemGroup.items[1].visible).toBe(true);
     expect(itemGroup.items[2].visible).toBe(true);
-    expect(itemGroup.items[3].visible).toBe(false);
-    expect(itemGroup.items[4].visible).toBe(true);
+    expect(itemGroup.items[5].visible).toBe(true);
+    expect(itemGroup.items[3].visible).toBe(false); // No skin on the object
+    expect(itemGroup.items[4].visible).toBe(false); // Can't set initial pose for non-robot object
   });
 
   it('should pause the simulation when needed', function() {

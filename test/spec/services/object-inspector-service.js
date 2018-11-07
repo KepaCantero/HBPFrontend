@@ -36,6 +36,7 @@ describe('Services: objectInspectorService', function() {
 
   var prepareDummyObject = function(collisionVisualMock) {
     var dummyObject = new THREE.Object3D();
+    dummyObject.name = 'dummy object';
     dummyObject.position.set(1, 2, 3);
     dummyObject.rotation.set(4, 5, 6);
     dummyObject.scale.set(2, 2, 2);
@@ -72,6 +73,7 @@ describe('Services: objectInspectorService', function() {
     module('dynamicViewOverlayServiceMock');
     module('editorToolbarServiceMock');
     module('userNavigationServiceMock');
+    module('sceneInfoMock');
     module('gz3dMock');
 
     // inject service for testing.

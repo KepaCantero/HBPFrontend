@@ -21,6 +21,7 @@ describe('Services: userNavigationService', function() {
     nrpUser;
 
   beforeEach(module('simulationInfoMock'));
+  beforeEach(module('sceneInfoMock'));
   beforeEach(module('userNavigationModule'));
   beforeEach(module('userInteractionSettingsServiceMock'));
   beforeEach(module('nrpUserMock'));
@@ -87,6 +88,10 @@ describe('Services: userNavigationService', function() {
         })
       };
       $provide.value('stateService', stateServiceMock);
+      $provide.value(
+        'isARobotPredicate',
+        jasmine.createSpy('isARobotPredicate').and.returnValue(true)
+      );
     })
   );
 
@@ -615,7 +620,6 @@ describe('Services: userNavigationService', function() {
     userNavigationService.navigationMode = NAVIGATION_MODES.FREE_CAMERA;
     userNavigationService.lookatControls = lookatControls;
     userNavigationService.freeCameraControls = firstPersonControls;
-    simulationInfo.isRobot.and.returnValue(true);
 
     gz3d.scene.selectedEntity = {};
     userNavigationService.setLookatCamera();

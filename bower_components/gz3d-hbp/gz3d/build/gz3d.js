@@ -5291,10 +5291,20 @@ GZ3D.GZIface = function(scene, gui)
   GZ3D.assetProgressCallback = undefined;
 
   this.webSocketConnectionCallbacks = [];
+  this.onDeleteEntityCallbacks = [scene.viewManager.deleteRobotViews.bind(scene.viewManager)];
+  this.onCreateEntityCallbacks = [];
 };
 
 GZ3D.GZIface.prototype.addCanDeletePredicate = function(canDeletePredicate){
   this.canDeletePredicates.push(canDeletePredicate);
+};
+
+GZ3D.GZIface.prototype.addOnDeleteEntityCallbacks = function (...args) {
+  args.forEach(callback => this.onDeleteEntityCallbacks.push(callback));
+};
+
+GZ3D.GZIface.prototype.addOnCreateEntityCallbacks = function (...args) {
+  args.forEach(callback => this.onCreateEntityCallbacks.push(callback));
 };
 
 GZ3D.GZIface.prototype.init = function()
@@ -5711,6 +5721,7 @@ GZ3D.GZIface.prototype.onConnected = function()
         }
         i++;
       }
+      this.onCreateEntityCallbacks.forEach(function (callback) { callback(); });
     } else {
       this.updateModelFromMsg(this.scene.getGazeboObject(message), message);
     }
@@ -6058,6 +6069,7 @@ GZ3D.GZIface.prototype.onConnected = function()
           return deletePredicate(entity) !== false;
         });
     if (canDelete) {
+      that.onDeleteEntityCallbacks.forEach(function(callback) { callback(entity); });
       that.deleteTopic.publish({ name: entity.name });
     }
   };
@@ -9513,6 +9525,18 @@ GZ3D.MultiView.prototype.createView = function (name, cameraParams) {
 
   return view;
 };
+
+// This function is used as a callback attached to the "deleteEntity" event
+GZ3D.MultiView.prototype.deleteRobotViews = function (entity) {
+  const name = entity.name;
+  if (!GZ3D.isRobot(entity)) {
+    console.error('GZ3D.MultiView.deleteRobotViews() - trying to delete views of a non-robot entity (' + name + ')');
+    return;
+  }
+
+  this.views = this.views.filter(function(view) { return !view.name.startsWith(name + '::'); } );
+};
+
 
 GZ3D.MultiView.prototype.getViewByName = function (name) {
   for (var i = 0; i < this.views.length; i = i + 1) {

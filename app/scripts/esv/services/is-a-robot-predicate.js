@@ -24,17 +24,14 @@
 (function() {
   'use strict';
 
-  angular.module('exdFrontendApp').service('isNotARobotPredicate', [
-    'simulationInfo',
-    function(simulationInfo) {
+  angular.module('exdFrontendApp').service('isARobotPredicate', [
+    'sceneInfo',
+    function(sceneInfo) {
       return function(entity) {
-        var ret = true;
-        if (entity) {
-          angular.forEach(simulationInfo.brain.robots, function(robot) {
-            if (entity.name === robot) ret = false;
-          });
-        }
-        return ret;
+        return (
+          entity &&
+          sceneInfo.robots.some(robot => entity.name === robot.robotId)
+        );
       };
     }
   ]);

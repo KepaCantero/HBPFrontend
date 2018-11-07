@@ -38,8 +38,17 @@
     '$compile',
     '$http',
     'simulationInfo',
+    'isARobotPredicate',
     'bbpConfig',
-    function($rootScope, $window, $compile, $http, simulationInfo, bbpConfig) {
+    function(
+      $rootScope,
+      $window,
+      $compile,
+      $http,
+      simulationInfo,
+      isARobotPredicate,
+      bbpConfig
+    ) {
       /* moved from the gz3d-view.html*/
       if (!Detector.webgl) {
         Detector.addGetWebGLMessage();
@@ -93,7 +102,7 @@
           GZ3D.assetsPath = simulationInfo.serverConfig.gzweb.assets;
           GZ3D.webSocketUrl = simulationInfo.serverConfig.gzweb.websocket;
           GZ3D.animatedModel = simulationInfo.animatedModel;
-          GZ3D.isRobot = simulationInfo.isRobot;
+          GZ3D.isRobot = isARobotPredicate;
 
           const modelLibraryPath = GZ3D.assetsPath + '/' + this.MODEL_LIBRARY;
           $http.get(modelLibraryPath).then(function(res) {

@@ -36,7 +36,11 @@ describe('testing the gz3d service', function() {
     refresh3DViews: jasmine.createSpy('refresh3DViews')
   };
   var GuiObject = {};
-  var GZIfaceObject = { addCanDeletePredicate: angular.noop };
+  var GZIfaceObject = {
+    addCanDeletePredicate: angular.noop,
+    addOnDeleteEntityCallback: angular.noop,
+    addOnCreateEntityCallback: angular.noop
+  };
   var SdfParserObject = {};
   GZ3D = {};
   GZ3D.Scene = jasmine.createSpy('Scene').and.returnValue(SceneObject);
@@ -62,6 +66,7 @@ describe('testing the gz3d service', function() {
   beforeEach(
     module(function($provide) {
       $provide.value('simulationInfo', simulationInfo);
+      $provide.value('isARobotPredicate', {});
       $provide.value('bbpConfig', bbpConfig);
     })
   );

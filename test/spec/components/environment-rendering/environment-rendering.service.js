@@ -2,7 +2,6 @@
 
 describe('Services: environmentRenderingService', function() {
   beforeEach(module('tipTooltipModule'));
-  beforeEach(module('tipTooltipModule'));
 
   var STATE, VENDORS;
 
@@ -14,7 +13,6 @@ describe('Services: environmentRenderingService', function() {
     userContextService,
     assetLoadingSplash,
     simulationInfo,
-    isNotARobotPredicate,
     userNavigationService,
     collab3DSettingsService,
     tipTooltipService,
@@ -58,9 +56,6 @@ describe('Services: environmentRenderingService', function() {
       };
       $provide.value('assetLoadingSplash', assetLoadingSplashMock);
 
-      var isNotARobotPredicateMock = {};
-      $provide.value('isNotARobotPredicate', isNotARobotPredicateMock);
-
       var nrpAnalyticsMock = {
         durationEventTrack: jasmine.createSpy('durationEventTrack'),
         tickDurationEvent: jasmine.createSpy('tickDurationEvent')
@@ -96,7 +91,6 @@ describe('Services: environmentRenderingService', function() {
       _environmentRenderingService_,
       _stateService_,
       _gz3d_,
-      _isNotARobotPredicate_,
       _userContextService_,
       _assetLoadingSplash_,
       _simulationInfo_,
@@ -112,7 +106,6 @@ describe('Services: environmentRenderingService', function() {
       environmentRenderingService = _environmentRenderingService_;
       stateService = _stateService_;
       gz3d = _gz3d_;
-      isNotARobotPredicate = _isNotARobotPredicate_;
       userContextService = _userContextService_;
       assetLoadingSplash = _assetLoadingSplash_;
       simulationInfo = _simulationInfo_;
@@ -179,9 +172,6 @@ describe('Services: environmentRenderingService', function() {
     expect(environmentRenderingService.sceneInitialized).toBeDefined();
     expect(gz3d.Initialize).toHaveBeenCalled();
     expect(gz3d.iface.addCanDeletePredicate).toHaveBeenCalledWith(
-      isNotARobotPredicate
-    );
-    expect(gz3d.iface.addCanDeletePredicate).toHaveBeenCalledWith(
       userContextService.hasEditRights
     );
     expect(stateService.addStateCallback).toHaveBeenCalledWith(
@@ -208,7 +198,6 @@ describe('Services: environmentRenderingService', function() {
     environmentRenderingService.init();
 
     expect(gz3d.Initialize).not.toHaveBeenCalled();
-    expect(gz3d.iface.addCanDeletePredicate).not.toHaveBeenCalled();
     expect(gz3d.iface.addCanDeletePredicate).not.toHaveBeenCalled();
     expect(stateService.addStateCallback).not.toHaveBeenCalled();
     expect(

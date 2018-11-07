@@ -52,6 +52,7 @@
       log,
       colorableObjectService,
       simulationInfo,
+      sceneInfo,
       contextMenuState,
       timeout,
       window,
@@ -69,6 +70,7 @@
       this.NAVIGATION_MODES = NAVIGATION_MODES;
       this.STATE = STATE;
 
+      sceneInfo.initialize();
       stateService.Initialize(); //TODO: (@SandroWeber) should be moved / handled inside service
 
       experimentViewService.broadcastEnterSimulation();
@@ -198,6 +200,7 @@
     '$log',
     'colorableObjectService',
     'simulationInfo',
+    'sceneInfo',
     'contextMenuState',
     '$timeout',
     '$window',
