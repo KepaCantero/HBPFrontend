@@ -51,7 +51,20 @@ describe('Controller: ExperimentExplorerController', function() {
       {
         uuid: '758096b6-e500-452b-93e1-ba2bba203844',
         name: 'New experiment',
-        parent: '89857775-6215-4d53-94ee-fb6c18b9e2f8'
+        parent: '89857775-6215-4d53-94ee-fb6c18b9e2f8',
+        joinableServers: [],
+        configuration: {
+          maturity: 'development',
+          timeout: '840',
+          name: 'test3',
+          thumbnail: 'TemplateNew.jpg',
+          description:
+            'This new experiment is based on the models that you have selected. You are free to edit the description.',
+          cameraPose: [4.5, 0, 1.8, 0, 0, 0.6],
+          bibiConfSrc: 'bibi_configuration.bibi'
+        },
+        id: 'benchmark_p3dx_0',
+        private: true
       }
     ],
     experimentFiles: [
@@ -129,9 +142,6 @@ describe('Controller: ExperimentExplorerController', function() {
       .respond({});
     */
     spyOn(experimentProxyService, 'getAvailableServers').and.returnValue(
-      $q.when([])
-    );
-    spyOn(experimentProxyService, 'getJoinableServers').and.returnValue(
       $q.when([])
     );
 

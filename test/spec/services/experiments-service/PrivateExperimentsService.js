@@ -66,47 +66,25 @@ describe('Services: PrivateExperimentsService', function() {
     $rootScope.$digest();
   });
 
-  it('should return an undefined experimentFile value if the .exc file is not found', function(
-    done
-  ) {
-    spyOn(storageServer, 'getExperimentConfig').and.returnValue(
-      window.$q.when({})
-    );
-    privateExperimentsService.loadExperimentDetails({}).then(function(res) {
-      expect(res.experimentFile).toBeUndefined();
-      done();
-    });
-    $rootScope.$digest();
-  });
-
-  it('should log error if no thumbnail found', function(done) {
-    spyOn(storageServer, 'getExperimentConfig').and.returnValue(
-      window.$q.when({})
-    );
+  it('should log error if no thumbnail found', function() {
     spyOn(console, 'error');
 
-    privateExperimentsService.loadExperimentDetails({}).then(function() {
-      expect(console.error).toHaveBeenCalled();
-      done();
-    });
-    $rootScope.$digest();
+    privateExperimentsService.checkConfiguration({ configuration: {} });
+    expect(console.error).toHaveBeenCalled();
   });
 
-  it('should fill in experiment configuration details', function(done) {
-    spyOn(storageServer, 'getExperimentConfig').and.returnValue(
-      window.$q.when({
+  it('should fill in experiment configuration details', function() {
+    let exp = {
+      configuration: {
         thumbnail: 'thumb.jpg',
         description: 'Some description',
         name: 'Experiment test',
         timeout: 840
-      })
-    );
+      }
+    };
 
-    privateExperimentsService.loadExperimentDetails({}).then(function(details) {
-      expect(details.timeout).toBe(840);
-      expect(details.name).toBe('Experiment test');
-      done();
-    });
-    $rootScope.$digest();
+    exp = privateExperimentsService.checkConfiguration(exp);
+    expect(exp.configuration.timeout).toBe(840);
+    expect(exp.configuration.name).toBe('Experiment test');
   });
 });

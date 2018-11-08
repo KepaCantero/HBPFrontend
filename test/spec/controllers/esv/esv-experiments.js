@@ -78,6 +78,7 @@
   };
 
   var expConfigMock = {
+    maturity: 'production',
     thumbnail: 'nail.jpg',
     description: 'None',
     name: 'Anonymous',
@@ -277,9 +278,6 @@
         .whenGET(new RegExp(proxyUrl + '/storage/experiments'))
         .respond(200, []);
       $httpBackend.whenGET(new RegExp(proxyUrl + '/storage')).respond(200, []);
-      $httpBackend
-        .whenGET(new RegExp(proxyUrl + '/joinableServers/undefined'))
-        .respond(200, []);
       var page = renderEsvWebPage({
         experiments: {}
       });
@@ -481,12 +479,14 @@
     }
 
     it('should allow launching when available servers', function() {
-      $httpBackend
-        .whenGET(new RegExp(proxyUrl + '/joinableServers/'))
-        .respond(200, []);
-
       spyOn(storageServer, 'getExperiments').and.returnValue(
-        $q.when([{ uuid: 'fakeUUID' }])
+        $q.when([
+          {
+            uuid: 'fakeUUID',
+            configuration: expConfigMock,
+            joinableServers: []
+          }
+        ])
       );
       spyOn(storageServer, 'getBase64Content').and.returnValue($q.when({}));
       var page = renderEsvWebPage({ dev: true, tab: 'MyExperiments' });
@@ -507,11 +507,15 @@
     });
 
     it('should trigger the right requests when launching an experiment', function() {
-      $httpBackend
-        .whenGET(new RegExp(proxyUrl + '/joinableServers/'))
-        .respond(200, []);
       spyOn(storageServer, 'getExperiments').and.returnValue(
-        $q.when([{ uuid: 'matureExperiment' }])
+        $q.when([
+          {
+            uuid: 'matureExperiment',
+            id: 'matureExperiment',
+            configuration: expConfigMock,
+            joinableServers: []
+          }
+        ])
       );
       spyOn(storageServer, 'getBase64Content').and.returnValue($q.when());
       var page = renderEsvWebPage({ tab: 'MyExperiments' });
@@ -671,11 +675,14 @@
 
     describe('esvExperimentsCtrl without a context id', function() {
       it('should show the right buttons', function() {
-        $httpBackend
-          .whenGET(new RegExp(proxyUrl + '/joinableServers/'))
-          .respond(200, []);
         spyOn(storageServer, 'getExperiments').and.returnValue(
-          $q.when([{ uuid: 'fakeUUID' }])
+          $q.when([
+            {
+              uuid: 'fakeUUID',
+              configuration: expConfigMock,
+              joinableServers: []
+            }
+          ])
         );
         spyOn(storageServer, 'getBase64Content').and.returnValue($q.when());
 
@@ -887,12 +894,19 @@
 
       describe('with cloned experiment', function() {
         beforeEach(function() {
-          $httpBackend
-            .whenGET(new RegExp(proxyUrl + '/joinableServers/'))
-            .respond(200, []);
-
           spyOn(storageServer, 'getExperiments').and.returnValue(
-            $q.when([{ uuid: 'fakeUUID' }, { uuid: 'dummyUUID' }])
+            $q.when([
+              {
+                uuid: 'fakeUUID',
+                configuration: expConfigMock,
+                joinableServers: []
+              },
+              {
+                uuid: 'dummyUUID',
+                configuration: expConfigMock,
+                joinableServers: []
+              }
+            ])
           );
           spyOn(storageServer, 'getBase64Content').and.returnValue(
             window.$q.when()

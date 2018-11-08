@@ -12,6 +12,16 @@ describe('Services: experimentsFactory', function() {
     FAIL_ON_ALL_SERVERS_ERROR,
     environmentService;
 
+  const expConfigMock = {
+    maturity: 'production',
+    thumbnail: 'nail.jpg',
+    description: 'None',
+    name: 'Anonymous',
+    experimentFile: '<ExD>My Experiment </ExD>',
+    bibiConfSrc: 'conf.bibi',
+    timeout: 600
+  };
+
   beforeEach(module('experimentServices'));
   beforeEach(module('exdFrontendApp'));
   beforeEach(
@@ -63,7 +73,7 @@ describe('Services: experimentsFactory', function() {
 
   it('image should come from collab storage', function() {
     spyOn(storageServer, 'getExperiments').and.returnValue(
-      $q.when([{ uuid: 'uuid' }])
+      $q.when([{ uuid: 'uuid', configuration: expConfigMock }])
     );
     spyOn(storageServer, 'getFileContent').and.returnValue(
       $q.when({
@@ -95,9 +105,6 @@ describe('Services: experimentsFactory', function() {
 
   it('image should come from proxy if collab storage fails', function() {
     var image = { experimentid: 'fakeImage' };
-    spyOn(experimentProxyService, 'getJoinableServers').and.returnValue(
-      $q.when([])
-    );
     spyOn(experimentProxyService, 'getAvailableServers').and.returnValue(
       $q.when([])
     );
@@ -118,9 +125,6 @@ describe('Services: experimentsFactory', function() {
 
   it('image should come from proxy if downloading image from collab storage failed', function() {
     var image = { experimentid: 'fakeImage' };
-    spyOn(experimentProxyService, 'getJoinableServers').and.returnValue(
-      $q.when([])
-    );
     spyOn(experimentProxyService, 'getAvailableServers').and.returnValue(
       $q.when([])
     );
@@ -139,14 +143,13 @@ describe('Services: experimentsFactory', function() {
   });
 
   it('experiment name and description should come from collab storage', function() {
-    spyOn(experimentProxyService, 'getJoinableServers').and.returnValue(
-      $q.when([])
-    );
     spyOn(experimentProxyService, 'getAvailableServers').and.returnValue(
       $q.when([])
     );
     spyOn(storageServer, 'getExperiments').and.returnValue(
-      $q.when([{ uuid: 'folder_id' }])
+      $q.when([
+        { uuid: 'folder_id', configuration: expConfigMock, joinableServers: [] }
+      ])
     );
     spyOn(experimentProxyService, 'getImage');
     var xml =
@@ -172,14 +175,13 @@ describe('Services: experimentsFactory', function() {
   });
 
   it('experiment xml should be stored', function() {
-    spyOn(experimentProxyService, 'getJoinableServers').and.returnValue(
-      $q.when([])
-    );
     spyOn(experimentProxyService, 'getAvailableServers').and.returnValue(
       $q.when([])
     );
     spyOn(storageServer, 'getExperiments').and.returnValue(
-      $q.when([{ uuid: 'fakeUUID' }])
+      $q.when([
+        { uuid: 'fakeUUID', configuration: expConfigMock, joinableServers: [] }
+      ])
     );
     spyOn(experimentProxyService, 'getImage');
     var xml =
@@ -209,24 +211,14 @@ describe('Services: experimentsFactory', function() {
     var joinableServer = [
       { server: 'testHost', runningSimulation: { owner: '1', simulationID: 5 } }
     ];
-    var callCount = 0;
-    spyOn(
-      experimentProxyService,
-      'getJoinableServers'
-    ).and.callFake(function() {
-      if (callCount === 0) {
-        callCount++;
-        return $q.when([]);
-      } else if (callCount === 1) {
-        callCount++;
-        return $q.when(joinableServer);
-      }
-    });
+
     spyOn(experimentProxyService, 'getAvailableServers').and.returnValue(
       $q.when([])
     );
     spyOn(storageServer, 'getExperiments').and.returnValue(
-      $q.when([{ uuid: 'fakeUUID' }])
+      $q.when([
+        { uuid: 'fakeUUID', configuration: expConfigMock, joinableServers: [] }
+      ])
     );
     var xml =
       '<?xml version="1.0" ?><ns1:ExD xmlns:ns1="http://schemas.humanbrainproject.eu/SP10/2014/ExDConfig">\

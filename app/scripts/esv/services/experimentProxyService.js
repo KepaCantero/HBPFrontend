@@ -43,7 +43,6 @@
           getExperiments: getExperiments,
           getImage: getImage,
           getServerConfig: _.memoize(getServerConfig),
-          getJoinableServers: getJoinableServers,
           getAvailableServers: getAvailableServers
         };
 
@@ -65,15 +64,6 @@
           return $http.get(url).then(function(response) {
             return response.data;
           });
-        }
-
-        function getJoinableServers(contextId) {
-          return $http
-            .get(getProxyUrl() + '/joinableServers/' + contextId)
-            .then(function(response) {
-              return response.data;
-            })
-            .catch(serverError.displayHTTPError);
         }
 
         function getAvailableServers() {
