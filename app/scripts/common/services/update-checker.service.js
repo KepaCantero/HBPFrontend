@@ -30,6 +30,10 @@
       return this.bbpConfig.get('api.versionCheck.checkUpdate');
     }
 
+    get CHECK_UPDATE_ENABLED() {
+      return !!this.bbpConfig.get('api.versionCheck.checkEnabled', true);
+    }
+
     get RELEASE_NOTES_URL() {
       return this.bbpConfig.get('api.versionCheck.releaseNotes');
     }

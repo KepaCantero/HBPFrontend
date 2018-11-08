@@ -74,9 +74,10 @@
         });
       }
 
-      updateChecker
-        .checkForNewVersion()
-        .then(newVersion => (this.newVersion = newVersion));
+      if (updateChecker.CHECK_UPDATE_ENABLED)
+        updateChecker
+          .checkForNewVersion()
+          .then(newVersion => (this.newVersion = newVersion));
     }
 
     openMenu($mdMenu, event) {
