@@ -83,39 +83,7 @@ describe('Directive: object-inspector', function() {
     expect(gz3d.gui.guiEvents.removeListener).toHaveBeenCalledTimes(2);
   });
 
-  it('should resolve old robot path format', function() {
-    getFileContentDefer.resolve({
-      uuid: 'uuid',
-      data: '<ExD><bibiConf src="bibifile" /></ExD>'
-    });
-
-    storageServer.getFileContent.and.returnValue({
-      uuid: 'uuid',
-      data: '<ExD><bodyModel></bodyModel></ExD>'
-    });
-    $rootScope.$digest();
-    expect(elementScope.robotConfigPath).toBe(
-      'http://proxy/storage/experimentID/robot.config?byname=true'
-    );
-  });
-
-  it('should resolve cloned experiment robot path', function() {
-    getFileContentDefer.resolve({
-      uuid: 'uuid',
-      data: '<ExD><bibiConf src="bibifile" /></ExD>'
-    });
-    storageServer.getFileContent.and.returnValue({
-      uuid: 'uuid',
-      data:
-        '<ExD><bodyModel customAsset="false" assetPath="robots/myrobot"/></ExD>'
-    });
-    $rootScope.$digest();
-    expect(elementScope.robotConfigPath).toBe(
-      'http://proxy/models/robots/myrobot/config'
-    );
-  });
-
-  it('should resolve experiment created from custom model robot fileName', function() {
+  it('should resolve manually created (legacy) experiment robot path for custom robot', function() {
     getFileContentDefer.resolve({
       uuid: 'uuid',
       data: '<ExD><bibiConf src="bibifile" /></ExD>'
@@ -125,11 +93,79 @@ describe('Directive: object-inspector', function() {
     );
     storageServer.getFileContent.and.returnValue({
       uuid: 'uuid',
-      data: '<ExD><bodyModel customAsset="true" assetPath="robot.zip"/></ExD>'
+      data:
+        '<ExD><bodyModel customAsset="true" assetPath="robot.zip">myrobot/model.sdf</bodyModel></ExD>'
     });
     $rootScope.$digest();
     expect(elementScope.robotConfigPath).toBe(
       'http://proxy/storage/custommodelconfig/robots/robot.zip'
+    );
+  });
+
+  it('should resolve manually created (legacy) experiment robot path for template robot', function() {
+    getFileContentDefer.resolve({
+      uuid: 'uuid',
+      data: '<ExD><bibiConf src="bibifile" /></ExD>'
+    });
+    storageServer.getFileContent.and.returnValue({
+      uuid: 'uuid',
+      data:
+        '<ExD><bodyModel customAsset="false" assetPath="robots/myrobot">myrobot/model.sdf</bodyModel></ExD>'
+    });
+    $rootScope.$digest();
+    expect(elementScope.robotConfigPath).toBe(
+      'http://proxy/models/robots/myrobot/config'
+    );
+  });
+
+  it('should resolve old template bodyModel (without robotId) path format', function() {
+    getFileContentDefer.resolve({
+      uuid: 'uuid',
+      data: '<ExD><bibiConf src="bibifile" /></ExD>'
+    });
+
+    storageServer.getFileContent.and.returnValue({
+      uuid: 'uuid',
+      data: '<ExD><bodyModel>myrobot/robot.sdf</bodyModel></ExD>'
+    });
+    $rootScope.$digest();
+    expect(elementScope.robotConfigPath).toBe(
+      'http://proxy/models/robots/myrobot/config'
+    );
+  });
+
+  it('should resolve path for the custom robot added from the frontend', function() {
+    getFileContentDefer.resolve({
+      uuid: 'uuid',
+      data: '<ExD><bibiConf src="bibifile" /></ExD>'
+    });
+    spyOn(storageServer, 'getCustomModels').and.returnValue(
+      window.$q.resolve([{ fileName: 'robots/robot.zip' }])
+    );
+    storageServer.getFileContent.and.returnValue({
+      uuid: 'uuid',
+      data:
+        '<ExD><bodyModel customAsset="true" assetPath="robot.zip">myrobot/model.sdf</bodyModel></ExD>'
+    });
+    $rootScope.$digest();
+    expect(elementScope.robotConfigPath).toBe(
+      'http://proxy/storage/custommodelconfig/robots/robot.zip'
+    );
+  });
+
+  it('should resolve path for the template robot added from the frontend', function() {
+    getFileContentDefer.resolve({
+      uuid: 'uuid',
+      data: '<ExD><bibiConf src="bibifile" /></ExD>'
+    });
+    storageServer.getFileContent.and.returnValue({
+      uuid: 'uuid',
+      data:
+        '<ExD><bodyModel customAsset="false">myrobot/model.sdf</bodyModel></ExD>'
+    });
+    $rootScope.$digest();
+    expect(elementScope.robotConfigPath).toBe(
+      'http://proxy/models/robots/myrobot/config'
     );
   });
 

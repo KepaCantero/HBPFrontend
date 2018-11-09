@@ -403,15 +403,10 @@
           const bodyModel = xml.getElementsByTagNameNS('*', 'bodyModel')[0];
 
           if (!bodyModel) return null;
-          if (!bodyModel.attributes.customAsset) {
-            //no custom asset attribute => backwards compatbility mode
-            return (
-              this.bbpConfig.get('api.proxy.url') +
-              `/storage/${experimentID}/robot.config?byname=true`
-            );
-          }
-
-          if (bodyModel.attributes.customAsset.value == 'true') {
+          if (
+            bodyModel.attributes.customAsset &&
+            bodyModel.attributes.customAsset.value == 'true'
+          ) {
             //robot is a custom model
             return this.getCustomModels('robots')
               .then(robots =>
@@ -426,11 +421,8 @@
                   `${this.STORAGE_BASE_URL}/custommodelconfig/${robot.fileName}`
               );
           } else {
-            //robot comes from the templates
-            let robotId = bodyModel.attributes.assetPath.value
-              .split('/')
-              .slice(-1)
-              .pop();
+            //robot comes from the templates, assume it has "someFolder/file.sdf" format!
+            let robotId = bodyModel.innerHTML.split('/')[0];
 
             return `${this.newExperimentProxyService.getModelUrl(
               'robots'
