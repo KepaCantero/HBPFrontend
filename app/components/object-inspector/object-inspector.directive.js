@@ -33,13 +33,13 @@
     'EDIT_MODE',
     'simulationInfo',
     'serverError',
-    'editorsPanelService',
     'tipTooltipService',
     'TIP_CODES',
     'storageServer',
     'robotComponentsService',
     'dynamicViewOverlayService',
     'DYNAMIC_VIEW_CHANNELS',
+    'backendInterfaceService',
     function(
       OBJECT_VIEW_MODE,
       $timeout,
@@ -49,13 +49,13 @@
       EDIT_MODE,
       simulationInfo,
       serverError,
-      editorsPanelService,
       tipTooltipService,
       TIP_CODES,
       storageServer,
       robotComponentsService,
       dynamicViewOverlayService,
-      DYNAMIC_VIEW_CHANNELS
+      DYNAMIC_VIEW_CHANNELS,
+      backendInterfaceService
     ) {
       return {
         templateUrl:
@@ -148,6 +148,9 @@ def ${tfname}(${['t', ...parameters].join(', ')}):
                     ..._.values(tfs),
                     newTF
                   ])
+                  .then(() =>
+                    backendInterfaceService.editTransferFunction(tfname, newTF)
+                  )
                   .then(() =>
                     dynamicViewOverlayService.createDynamicOverlay(
                       DYNAMIC_VIEW_CHANNELS.TRANSFER_FUNCTION_EDITOR

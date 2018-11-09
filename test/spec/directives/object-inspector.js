@@ -1,8 +1,13 @@
 'use strict';
 
 describe('Directive: object-inspector', function() {
-  var $rootScope, $compile, $scope, getFileContentDefer, storageServer;
-  var gz3d;
+  var $rootScope,
+    $compile,
+    $scope,
+    getFileContentDefer,
+    storageServer,
+    backendInterfaceService;
+  var gz3d, serverError;
   var elementScope;
   var dynamicViewOverlayService;
   var overlayWrapperMock, objectInspectorService;
@@ -31,8 +36,9 @@ describe('Directive: object-inspector', function() {
       _gz3d_,
       _dynamicViewOverlayService_,
       _objectInspectorService_,
+      _storageServer_,
       _backendInterfaceService_,
-      _storageServer_
+      _serverError_
     ) {
       $rootScope = _$rootScope_;
       $compile = _$compile_;
@@ -40,6 +46,8 @@ describe('Directive: object-inspector', function() {
       dynamicViewOverlayService = _dynamicViewOverlayService_;
       objectInspectorService = _objectInspectorService_;
       storageServer = _storageServer_;
+      backendInterfaceService = _backendInterfaceService_;
+      serverError = _serverError_;
 
       spyOn(gz3d.gui.guiEvents, 'on').and.callThrough();
       spyOn(gz3d.gui.guiEvents, 'removeListener').and.callThrough();
@@ -134,7 +142,7 @@ describe('Directive: object-inspector', function() {
     );
   });
 
-  it('should resolve path for the custom robot added from the frontend', function() {
+  it('should resolve experiment created from custom model robot fileName', function() {
     getFileContentDefer.resolve({
       uuid: 'uuid',
       data: '<ExD><bibiConf src="bibifile" /></ExD>'
@@ -176,6 +184,11 @@ describe('Directive: object-inspector', function() {
     spyOn(storageServer, 'getTransferFunctions').and.returnValue(
       window.$q.resolve({ data: {} })
     );
+
+    spyOn(backendInterfaceService, 'editTransferFunction').and.returnValue(
+      window.$q.resolve()
+    );
+
     objectInspectorService.selectedRobotComponent = {
       userData: {
         rosType: 'sometype',
@@ -186,5 +199,34 @@ describe('Directive: object-inspector', function() {
     elementScope.createTopicTF();
     elementScope.$digest();
     expect(storageServer.saveTransferFunctions).toHaveBeenCalled();
+    expect(backendInterfaceService.editTransferFunction).toHaveBeenCalled();
+  });
+
+  it('should throw when createTopicTF and backend service fails', function() {
+    spyOn(storageServer, 'saveTransferFunctions').and.returnValue(
+      window.$q.resolve()
+    );
+    spyOn(storageServer, 'getTransferFunctions').and.returnValue(
+      window.$q.resolve({ data: {} })
+    );
+
+    spyOn(backendInterfaceService, 'editTransferFunction').and.returnValue(
+      window.$q.reject('error')
+    );
+
+    spyOn(serverError, 'displayHTTPError');
+
+    objectInspectorService.selectedRobotComponent = {
+      userData: {
+        rosType: 'sometype',
+        type: 'sensor',
+        rosTopic: 'topic'
+      }
+    };
+    elementScope.createTopicTF();
+    elementScope.$digest();
+    expect(storageServer.saveTransferFunctions).toHaveBeenCalled();
+    expect(backendInterfaceService.editTransferFunction).toHaveBeenCalled();
+    expect(serverError.displayHTTPError).toHaveBeenCalledWith('error');
   });
 });
