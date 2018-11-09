@@ -111,6 +111,22 @@
       document.body.removeChild(input[0]);
     }
 
+    checkModelExists(customModels, filename) {
+      return customModels.filter(customModel =>
+        customModel.fileName.includes(filename)
+      ).length
+        ? this.clbConfirm
+            .open({
+              title: `A file with the name ${filename} exists`,
+              confirmLabel: 'Yes',
+              cancelLabel: 'No',
+              template: 'Are you sure you would like to upload the file again?',
+              closable: true
+            })
+            .catch(() => this.$q.resolve())
+        : this.$q.resolve();
+    }
+
     uploadModelZip(zip) {
       return this.$timeout(() => {
         if (zip.type !== 'application/zip') {
@@ -124,43 +140,26 @@
           textReader.onload = e => resolve([zip.name, e.target.result]);
           textReader.readAsArrayBuffer(zip);
         })
-          .then(([filename, filecontent]) => {
+          .then(([filename, filecontent]) =>
             this.storageServer
               .getCustomModels('environments')
-              .then(customModels => {
-                return (customModels.filter(customModel =>
-                  customModel.fileName.includes(filename)
-                ).length
-                  ? this.clbConfirm
-                      .open({
-                        title: `A file with the name ${filename} exists`,
-                        confirmLabel: 'Yes',
-                        cancelLabel: 'No',
-                        template:
-                          'Are you sure you would like to upload the file again?',
-                        closable: true
-                      })
-                      .catch(() => this.$q.resolve())
-                  : this.$q.resolve()
-                ).then(() => {
-                  return this.storageServer
-                    .setCustomModel(filename, 'environments', filecontent)
-                    .catch(err => {
-                      this.createErrorPopup(err.data);
-                      return this.$q.reject(err);
-                    })
-                    .then(() => {
-                      this.loadEnvironments();
-                    })
-                    .finally(() => {
-                      this.uploadingModel = false;
-                    });
-                });
-              });
-          })
-          .catch(() => {
-            this.uploadingModel = false;
-          })
+              .then(customModels =>
+                this.checkModelExists(customModels, filename)
+              )
+              .then(() =>
+                this.storageServer.setCustomModel(
+                  filename,
+                  'environments',
+                  filecontent
+                )
+              )
+              .catch(
+                err => this.createErrorPopup(err.data) && this.$q.reject(err)
+              )
+              .then(() => this.loadEnvironments())
+              .finally(() => (this.uploadingModel = false))
+          )
+          .catch(() => (this.uploadingModel = false))
           .finally(() => (this.uploadingModel = false));
       });
     }

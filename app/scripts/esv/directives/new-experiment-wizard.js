@@ -285,7 +285,7 @@
             if (customModelFound[0].userId == $scope.owner) {
               return clbConfirm
                 .open({
-                  title: `One of your CustomModels has already the name: ${filename}`,
+                  title: `One of your custom models already has the name: ${filename}`,
                   confirmLabel: 'Yes',
                   cancelLabel: 'No',
                   template:

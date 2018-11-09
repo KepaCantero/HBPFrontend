@@ -30,6 +30,12 @@ describe('Controller: NewExperimentController', function() {
     }
   ];
 
+  function blobToFile(theBlob, fileName) {
+    theBlob.lastModifiedDate = new Date();
+    theBlob.name = fileName;
+    return theBlob;
+  }
+
   var experimentsService = {
     rejectStartExperiment: false,
     initialize: function() {
@@ -170,11 +176,6 @@ describe('Controller: NewExperimentController', function() {
   });
 
   it('should check that upload environment zip function works ok', function() {
-    function blobToFile(theBlob, fileName) {
-      theBlob.lastModifiedDate = new Date();
-      theBlob.name = fileName;
-      return theBlob;
-    }
     var fakeZip = new Blob([3, 7426, 78921], { type: 'application/zip' });
     spyOn(window, 'FileReader').and.returnValue({
       readAsArrayBuffer: function() {
@@ -198,6 +199,19 @@ describe('Controller: NewExperimentController', function() {
         }
       ])
     );
+    newExperimentController.uploadEnvironment();
+    var res = newExperimentController.uploadModelZip(
+      blobToFile(fakeZip, 'test.zip')
+    );
+    $timeout.flush();
+    $timeout.verifyNoPendingTasks();
+    res.then(function() {
+      expect(newExperimentController.uploadingModel).toBe(false);
+    });
+  });
+
+  it('should uploading a non zip environment fails', function() {
+    var fakeZip = new Blob([3, 7426, 78921], { type: 'application/text' });
     newExperimentController.uploadEnvironment();
     var res = newExperimentController.uploadModelZip(
       blobToFile(fakeZip, 'test.zip')

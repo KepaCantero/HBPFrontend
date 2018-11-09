@@ -519,4 +519,12 @@ describe('Factory: simulationCreationInterceptor', function() {
       scope.$apply();
     });
   });
+
+  it('should return true when error lacks data', function() {
+    spyOn(serverError, 'displayHTTPError').and.returnValue();
+    simulationCreationInterceptor({}).catch(function(err) {
+      expect(err.isFatal).toBe(true);
+    });
+    scope.$apply();
+  });
 });
