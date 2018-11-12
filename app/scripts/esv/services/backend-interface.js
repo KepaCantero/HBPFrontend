@@ -256,11 +256,9 @@
           brainPopulations,
           brainType,
           dataType,
-          changePopulation,
-          successCallback,
-          failureCallback
+          changePopulation
         ) {
-          resourceBrainSimulation(simulationInfo.serverBaseUrl).put(
+          return resourceBrainSimulation(simulationInfo.serverBaseUrl).put(
             {
               sim_id: simulationInfo.simulationID
             },
@@ -270,10 +268,8 @@
               data_type: dataType,
               additional_populations: brainPopulations,
               change_population: changePopulation
-            },
-            successCallback,
-            failureCallback
-          );
+            }
+          ).$promise;
         },
 
         getPopulations: function(callback) {

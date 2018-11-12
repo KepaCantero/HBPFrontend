@@ -163,12 +163,12 @@
             // * env poses reset
             scope.refresh = function(forceRefresh = false) {
               refreshEditor();
-              if (!forceRefresh && autoSaveService.isDirty()) return;
               scope.loading = true;
               storageServer
                 .getBrain(simulationInfo.experimentID)
                 .then(response => {
                   scope.loading = false;
+                  if (!forceRefresh && autoSaveService.isDirty()) return; // Don't overwrite populations, they have been changed!
                   if (response.brainType === 'py') {
                     scope.pynnScript.code = response.brain;
                     let previousPopulations = scope.populations
@@ -327,9 +327,18 @@
               return populations;
             };
 
-            scope.applyBackend = function() {
+            scope.applyBackend = function(options) {
               var restart = stateService.currentState === STATE.STARTED;
               var populations = objectifyPopulations(scope.populations);
+              let populationToDelete;
+              if (
+                options &&
+                options.hasOwnProperty('populationToDeleteIndex')
+              ) {
+                populationToDelete =
+                  scope.populations[options.populationToDeleteIndex];
+                delete populations[populationToDelete.name];
+              }
 
               for (let popk in populations) {
                 let pop = populations[popk];
@@ -337,14 +346,15 @@
                 delete pop.displayMode;
               }
 
-              backendInterfaceService.setBrain(
-                scope.pynnScript.code,
-                scope.stringsToLists(populations),
-                'py',
-                'text',
-                true,
-                function() {
-                  // Success callback
+              backendInterfaceService
+                .setBrain(
+                  scope.pynnScript.code,
+                  scope.stringsToLists(populations),
+                  'py',
+                  'text',
+                  true
+                )
+                .then(function() {
                   scope.loading = false;
                   codeEditorsServices.getEditor('pynnEditor').markClean();
                   scope.clearError();
@@ -352,14 +362,18 @@
                   if (restart) {
                     stateService.setCurrentState(STATE.STARTED);
                   }
-
+                  if (populationToDelete) {
+                    scope.populations.splice(
+                      options.populationToDeleteIndex,
+                      1
+                    );
+                    autoSaveService.setDirty();
+                  }
                   $rootScope.$broadcast('pynn.populationsChanged');
-                },
-                function(result) {
-                  // Failure callback
+                })
+                .catch(function(result) {
                   scope.loading = false;
                   scope.clearError();
-
                   if (
                     result.data.error_line === -1 &&
                     result.data.error_column === -1
@@ -387,13 +401,11 @@
                       result.data.error_column
                     );
                   }
-                }
-              );
+                });
             };
 
-            scope.apply = function() {
+            scope.apply = function(options) {
               // If editing populations are valid first
-
               scope.loading = true;
 
               for (let pop of scope.populations) pop.editing = false;
@@ -402,20 +414,24 @@
                 .getTransferFunctions(simulationInfo.experimentID)
                 .then(result => {
                   let tfs = result.data;
-
                   // Check if we need to do some find and replace first
 
                   let mightNeedReplace = false;
-
+                  const hasAPopulationToDelete =
+                    options &&
+                    options.hasOwnProperty('populationToDeleteIndex');
                   for (let tf in tfs)
                     for (let pop of scope.populations) {
-                      if (pop.previousName !== pop.name) {
+                      if (
+                        pop.previousName !== pop.name ||
+                        hasAPopulationToDelete
+                      ) {
+                        const name = hasAPopulationToDelete
+                          ? scope.populations[options.populationToDeleteIndex]
+                          : pop.previousName;
                         if (
                           tfs[tf].match(
-                            new RegExp(
-                              '(?<=\\W)' + pop.previousName + '(?=\\W)',
-                              'igm'
-                            )
+                            new RegExp('(?<=\\W)' + name + '(?=\\W)', 'igm')
                           )
                         )
                           mightNeedReplace = true;
@@ -456,7 +472,7 @@
                             simulationInfo.experimentID,
                             tflist
                           )
-                          .then(() => scope.applyBackend())
+                          .then(() => scope.applyBackend(options))
                           .catch(() =>
                             clbErrorDialog.open({
                               type: 'BackendError.',
@@ -466,10 +482,11 @@
                           );
                       }, () => (scope.loading = false))
                       .finally(() => {
-                        for (let p of scope.populations)
+                        for (let p of scope.populations) {
                           p.previousName = p.name;
+                        }
                       });
-                  } else scope.applyBackend();
+                  } else scope.applyBackend(options);
                 })
                 .catch(err => console.error('Failed to load TFS:\n' + err));
             };
@@ -550,9 +567,8 @@
             };
 
             scope.deletePopulation = function(index) {
-              scope.populations.splice(index, 1);
+              scope.apply({ populationToDeleteIndex: index });
               scope.updateRegexPatterns();
-              scope.apply(0);
             };
 
             scope.onPopulationDefineModeChange = function(pop) {

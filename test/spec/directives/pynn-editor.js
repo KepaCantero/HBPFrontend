@@ -21,10 +21,6 @@ describe('Directive: pynnEditor', function() {
     simulationInfo,
     clbConfirm;
 
-  var backendInterfaceServiceMock = {
-    setBrain: jasmine.createSpy('setBrain')
-  };
-
   var getBrainresponse = {};
   var storageServerMock = {
     getBrain: jasmine
@@ -106,6 +102,11 @@ describe('Directive: pynnEditor', function() {
 
   beforeEach(
     module(function($provide) {
+      var backendInterfaceServiceMock = {
+        setBrain: jasmine
+          .createSpy('setBrain')
+          .and.callFake(() => window.$q.resolve())
+      };
       $provide.value('backendInterfaceService', backendInterfaceServiceMock);
       $provide.value('storageServer', storageServerMock);
       $provide.value('documentationURLs', documentationURLsMock);
@@ -204,7 +205,6 @@ describe('Directive: pynnEditor', function() {
         .and.returnValue(cmMock);
       storageServer.getBrain.calls.reset();
       storageServer.saveBrain.calls.reset();
-      backendInterfaceService.setBrain.calls.reset();
     });
 
     it('should apply editor options', function() {
@@ -263,6 +263,7 @@ describe('Directive: pynnEditor', function() {
       isolateScope.populations = [
         { name: 'index2', list: '1', previousName: 'index' }
       ];
+      isolateScope.loading = true;
       isolateScope.apply();
       isolateScope.$apply();
       expect(backendInterfaceService.setBrain).toHaveBeenCalledWith(
@@ -270,13 +271,8 @@ describe('Directive: pynnEditor', function() {
         { index2: { list: [1], previousName: 'index' } },
         'py',
         'text',
-        true,
-        jasmine.any(Function),
-        jasmine.any(Function)
+        true
       );
-
-      expect(isolateScope.loading).toBe(true);
-      backendInterfaceService.setBrain.calls.argsFor(0)[5](); // success callback
       expect(isolateScope.loading).toBe(false);
     });
 
@@ -294,30 +290,33 @@ describe('Directive: pynnEditor', function() {
     });
 
     it('should be able to repeat the same test twice', function() {
+      isolateScope.loading = true;
       isolateScope.apply();
       isolateScope.$apply();
       expect(backendInterfaceService.setBrain).toHaveBeenCalled();
-      expect(isolateScope.loading).toBe(true);
-      backendInterfaceService.setBrain.calls.argsFor(0)[5](); // success callback
       expect(isolateScope.loading).toBe(false);
     });
 
     it('should handle an error when sending a pynn script properly (1)', function() {
+      backendInterfaceService.setBrain = jasmine
+        .createSpy('setBrain')
+        .and.callFake(() => window.$q.reject(errorMock1)); // will trigger the error callback
+      isolateScope.loading = true;
       isolateScope.apply();
       isolateScope.$apply();
       expect(backendInterfaceService.setBrain).toHaveBeenCalled();
-      expect(isolateScope.loading).toBe(true);
-      backendInterfaceService.setBrain.calls.argsFor(0)[6](errorMock1); // error callback
       expect(isolateScope.loading).toBe(false);
     });
 
     it('should handle an error when sending a pynn script properly (2)', function() {
+      backendInterfaceService.setBrain = jasmine
+        .createSpy('setBrain')
+        .and.callFake(() => window.$q.reject(errorMock2)); // will trigger the error callback
+      isolateScope.loading = true;
       isolateScope.apply();
       isolateScope.$apply();
       expect(backendInterfaceService.setBrain).toHaveBeenCalled();
-      expect(isolateScope.loading).toBe(true);
       isolateScope.pynnScript.code = 'some pynn script';
-      backendInterfaceService.setBrain.calls.argsFor(0)[6](errorMock2); // error callback
       expect(isolateScope.loading).toBe(false);
     });
 
@@ -428,11 +427,21 @@ describe('Directive: pynnEditor', function() {
         { name: 'population_7', from: 1, to: 10 },
         { name: 'population_8', from: 2, to: 10 }
       ];
+      codeEditorsServices.getEditor = jasmine
+        .createSpy('getEditor')
+        .and.returnValue(cmMock);
     });
 
     it('should delete a population in the scope.populations object', function() {
+      spyOn(isolateScope, 'applyBackend').and.callThrough();
+      isolateScope.applyBackend.calls.reset();
+      backendInterfaceService.setBrain.calls.reset();
       isolateScope.deletePopulation(0);
+      isolateScope.$apply();
       isolateScope.deletePopulation(1);
+      isolateScope.$apply();
+      expect(isolateScope.applyBackend).toHaveBeenCalled();
+      expect(backendInterfaceService.setBrain).toHaveBeenCalled();
       expect(Object.keys(isolateScope.populations).length).toBe(6);
       expect(isolateScope.populations[0].name).toEqual('population_2');
       expect(isolateScope.populations[1].name).toEqual('population_4');

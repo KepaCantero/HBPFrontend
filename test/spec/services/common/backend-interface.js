@@ -207,22 +207,6 @@ describe('Services: backendInterfaceService', function() {
     expect(callback).toHaveBeenCalled();
   });
 
-  it('should call the failure callback when the setBrain PUT request fails', function() {
-    $httpBackend.whenPUT(urlRegex).respond(500);
-    var callback = jasmine.createSpy('callback');
-    backendInterfaceService.setBrain(
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      function() {},
-      callback
-    );
-    $httpBackend.flush();
-    expect(callback).toHaveBeenCalled();
-  });
-
   it('should call serverError.displayHTTPError when the getRobots GET request fails', function() {
     $httpBackend.expectGET(urlRegex).respond(404);
     backendInterfaceService.getRobots();
