@@ -48,8 +48,7 @@
     '$timeout',
     '$document',
     'rosCommanderService',
-    'editorToolbarService',
-    ($timeout, $document, rosCommanderService, editorToolbarService) => {
+    ($timeout, $document, rosCommanderService) => {
       return {
         templateUrl: 'components/ros-terminal/ros-terminal.template.html',
         restrict: 'E',
@@ -301,8 +300,6 @@
             rosResponses$.unsubscribe();
             upDownPress$.unsubscribe();
             tabKey$.unsubscribe();
-
-            editorToolbarService.showRosTerminal = false;
           });
         }
       };

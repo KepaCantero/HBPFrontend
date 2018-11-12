@@ -1,43 +1,46 @@
 'use strict';
 
-describe('Service: gz3dViews', function() {
+describe('Service: gz3dViewsService', function() {
   let gz3dViewsService;
 
   let $q, $rootScope;
-  let DYNAMIC_VIEW_CHANNELS;
-  let dynamicViewOverlayService, gz3d, environmentRenderingService;
+  let TOOL_CONFIGS;
+  let environmentRenderingService, goldenLayoutService, gz3d;
 
   let deferredSceneInitialized;
 
-  beforeEach(module('gz3dModule'));
-  beforeEach(module('dynamicViewModule'));
+  beforeEach(function() {
+    // load real modules
+    module('gz3dModule');
+    module('goldenLayoutModule');
 
-  // mock modules
-  beforeEach(module('dynamicViewOverlayServiceMock'));
-  beforeEach(module('environmentRenderingServiceMock'));
-  beforeEach(module('gz3dMock'));
-  beforeEach(module('nrpAnalyticsMock'));
+    // load mocks
+    module('environmentRenderingServiceMock');
+    module('goldenLayoutServiceMock');
+    module('gz3dMock');
+    module('nrpAnalyticsMock');
 
-  beforeEach(
     inject(function(
       _gz3dViewsService_,
       _$q_,
       _$rootScope_,
-      _DYNAMIC_VIEW_CHANNELS_,
-      _dynamicViewOverlayService_,
-      _gz3d_,
-      _environmentRenderingService_
+      _TOOL_CONFIGS_,
+      _environmentRenderingService_,
+      _goldenLayoutService_,
+      _gz3d_
     ) {
       gz3dViewsService = _gz3dViewsService_;
 
       $q = _$q_;
       $rootScope = _$rootScope_;
-      DYNAMIC_VIEW_CHANNELS = _DYNAMIC_VIEW_CHANNELS_;
-      dynamicViewOverlayService = _dynamicViewOverlayService_;
-      gz3d = _gz3d_;
+
+      TOOL_CONFIGS = _TOOL_CONFIGS_;
+
       environmentRenderingService = _environmentRenderingService_;
-    })
-  );
+      goldenLayoutService = _goldenLayoutService_;
+      gz3d = _gz3d_;
+    });
+  });
 
   beforeEach(function() {
     deferredSceneInitialized = $q.defer();
@@ -101,28 +104,6 @@ describe('Service: gz3dViews', function() {
       }
     );
     deferredSceneInitialized.reject();
-    $rootScope.$digest();
-  });
-
-  it(' - assignView(), success (no undefined containers, last view assigned)', function(
-    done
-  ) {
-    var mockContainer = {};
-    var viewToBeAssigned =
-      gz3d.scene.viewManager.views[gz3d.scene.viewManager.views.length - 1];
-
-    var viewPromise = gz3dViewsService.assignView(mockContainer);
-    viewPromise.then(
-      function(result) {
-        expect(
-          gz3d.scene.viewManager.setViewContainerElement
-        ).toHaveBeenCalledWith(viewToBeAssigned, mockContainer);
-        expect(result).toBe(viewToBeAssigned);
-        done();
-      },
-      function() {}
-    );
-    deferredSceneInitialized.resolve();
     $rootScope.$digest();
   });
 
@@ -191,28 +172,23 @@ describe('Service: gz3dViews', function() {
     ).toBe(true);
   });
 
-  it(' - onOpenRobotViews()', function() {
+  it(' - onToggleRobotViews()', function() {
     spyOn(gz3dViewsService, 'hasCameraView').and.returnValue(false);
-    gz3dViewsService.onOpenRobotViews();
-    expect(
-      dynamicViewOverlayService.createDynamicOverlay
-    ).not.toHaveBeenCalled();
-    expect(
-      dynamicViewOverlayService.closeAllOverlaysOfType
-    ).not.toHaveBeenCalled();
+    gz3dViewsService.onToggleRobotViews();
+    expect(goldenLayoutService.openTool).not.toHaveBeenCalled();
 
-    // open views
+    // open views, close them
+    let layoutItems = [{ remove: jasmine.createSpy('remove') }];
+    goldenLayoutService.layout.root.getItemsById.and.returnValue(layoutItems);
     gz3dViewsService.hasCameraView.and.callThrough();
-    gz3dViewsService.onOpenRobotViews();
-    expect(
-      dynamicViewOverlayService.closeAllOverlaysOfType
-    ).toHaveBeenCalledWith(DYNAMIC_VIEW_CHANNELS.ENVIRONMENT_RENDERING);
+    gz3dViewsService.onToggleRobotViews();
+    expect(layoutItems[0].remove).toHaveBeenCalled();
 
-    // closed views
+    // all views closed, open them
     gz3dViewsService.views[1].container = undefined;
-    gz3dViewsService.onOpenRobotViews();
-    expect(dynamicViewOverlayService.createDynamicOverlay).toHaveBeenCalledWith(
-      DYNAMIC_VIEW_CHANNELS.ENVIRONMENT_RENDERING
+    gz3dViewsService.onToggleRobotViews();
+    expect(goldenLayoutService.openTool).toHaveBeenCalledWith(
+      TOOL_CONFIGS.ROBOT_CAMERA_RENDERING
     );
   });
 });

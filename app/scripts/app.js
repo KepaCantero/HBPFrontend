@@ -54,7 +54,6 @@
       'simulationControlServices',
       'colorableObjectModule',
       'simulationStateServices',
-      'contextMenuStateService',
       'objectInspectorModule',
       'performanceMonitorModule',
       'userNavigationModule',
@@ -74,8 +73,6 @@
       'browserSupport',
       'vButton',
       'nrpUser',
-      'editorToolbarModule',
-      'editorsPanelModule',
       'experimentModule',
       'jointPlotModule',
       'simulationConfigModule',
@@ -106,7 +103,9 @@
       'robotComponentsModule',
       'applicationTopToolbarModule',
       'changelog',
-      'simToolsSidebarModule'
+      'simToolsSidebarModule',
+      'goldenLayoutModule',
+      'ui.bootstrap.contextMenu'
     ])
     // Routes
     .config([
@@ -129,7 +128,7 @@
           url:
             '/esv-private/experiment-view/:serverID/:experimentID/:privateExperiment/:simulationID?ctx',
           templateUrl: 'views/esv/experiment-view.html',
-          controller: 'experimentViewController as vm',
+          controller: 'experimentViewController',
           controllerAs: 'vm',
           onEnter: [
             '$document',

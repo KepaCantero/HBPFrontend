@@ -30,9 +30,9 @@
 (function() {
   'use strict';
 
-  var gz3dModule = angular.module('gz3dModule');
+  //var gz3dModule = angular.module('gz3dModule', ['simulationInfoService']);
 
-  gz3dModule.factory('gz3d', [
+  angular.module('gz3dModule').factory('gz3d', [
     '$rootScope',
     '$window',
     '$compile',
@@ -151,6 +151,103 @@
           delete that.stats;
 
           isInitialized = false;
+        };
+
+        this.getRayCastModel = (
+          clickPos,
+          view = this.scene.viewManager.mainUserView
+        ) => {
+          let intersections = this.getRayCastIntersections(clickPos, view);
+
+          let model = null;
+          let found = false;
+          let getClosestModel = node => {
+            if (node.parent === this.scene.scene && !found) {
+              model = node;
+              found = true;
+            }
+          };
+          for (let i = 0; i < intersections.length; i = i + 1) {
+            let object = intersections[i].object;
+            object.traverseAncestors(getClosestModel);
+          }
+
+          return model;
+        };
+
+        this.getRayCastLink = (
+          parentModel,
+          clickPos,
+          view = this.scene.viewManager.mainUserView
+        ) => {
+          let intersections = this.getRayCastIntersections(clickPos, view);
+          for (let i = 0; i < intersections.length; i = i + 1) {
+            let object = intersections[i].object;
+
+            if (object.type !== 'LineSegments') {
+              while (object.parent && object.parent !== this.scene.scene) {
+                if (
+                  object.userData &&
+                  object.userData.gazeboType === 'link' &&
+                  object.parent === parentModel
+                ) {
+                  // we have a link and it's a child of the target model
+                  return object;
+                } else {
+                  object = object.parent;
+                }
+              }
+            }
+          }
+
+          return null;
+        };
+
+        this.getRayCastIntersections = (
+          clickPos,
+          view = this.scene.viewManager.mainUserView
+        ) => {
+          let containerRect = view.container.getBoundingClientRect();
+
+          let normalizedScreenCoords = new THREE.Vector2(
+            (clickPos.x - containerRect.x) / containerRect.width * 2 - 1,
+            -((clickPos.y - containerRect.y) / containerRect.height) * 2 + 1
+          );
+
+          let raycaster = new THREE.Raycaster();
+          raycaster.setFromCamera(normalizedScreenCoords, view.camera);
+
+          this.scene.prepareModelsForRaycast(true);
+          let intersections = raycaster.intersectObjects(
+            this.scene.scene.children,
+            true
+          );
+          this.scene.prepareModelsForRaycast(false);
+
+          return intersections;
+        };
+
+        this.getLinkFromIntersections = (intersections, parentModel) => {
+          for (let i = 0; i < intersections.length; i = i + 1) {
+            let object = intersections[i].object;
+
+            if (object.type !== 'LineSegments') {
+              while (object.parent && object.parent !== this.scene.scene) {
+                if (
+                  object.userData &&
+                  object.userData.gazeboType === 'link' &&
+                  object.parent === parentModel
+                ) {
+                  // we have a link and it's a child of the target model
+                  return { link: object, intersection: intersections[i] };
+                } else {
+                  object = object.parent;
+                }
+              }
+            }
+          }
+
+          return undefined;
         };
       }
 

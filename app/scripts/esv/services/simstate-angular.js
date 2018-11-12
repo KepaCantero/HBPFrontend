@@ -44,6 +44,7 @@
     'roslibModule'
   ]);
   module.factory('stateService', [
+    '$rootScope',
     'simulationState',
     'STATE',
     '$log',
@@ -53,6 +54,7 @@
     'roslib',
     'simulationInfo',
     function(
+      $rootScope,
       simulationState,
       STATE,
       $log,
@@ -148,6 +150,13 @@
           rosConnection = undefined;
         }
       };
+
+      $rootScope.$on('ENTER_SIMULATION', () => {
+        thisStateService.startListeningForStatusInformation();
+      });
+      $rootScope.$on('EXIT_SIMULATION', () => {
+        thisStateService.stopListeningForStatusInformation();
+      });
 
       thisStateService.addStateCallback = function(callback) {
         stateCallbacks.push(callback);

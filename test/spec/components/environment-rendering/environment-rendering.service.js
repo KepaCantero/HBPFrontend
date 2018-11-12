@@ -18,38 +18,11 @@ describe('Services: environmentRenderingService', function() {
     tipTooltipService,
     $httpBackend;
 
-  var frameInterval, lastFrameTime;
+  var frameInterval, lastFrameTime, document;
 
   // provide mock objects
   beforeEach(
     module(function($provide) {
-      var stateServiceMock = {
-        currentState: undefined,
-        getCurrentState: jasmine.createSpy('getCurrentState').and.returnValue({
-          then: jasmine.createSpy('then').and.callFake(function(fn) {
-            fn();
-          })
-        }),
-        addStateCallback: jasmine.createSpy('addStateCallback'),
-        removeStateCallback: jasmine.createSpy('removeStateCallback')
-      };
-      $provide.value('stateService', stateServiceMock);
-
-      var userNavigationServiceMock = {
-        init: jasmine.createSpy('init'),
-        deinit: jasmine.createSpy('deinit'),
-        setDefaultPose: {
-          apply: jasmine.createSpy('apply')
-        },
-        update: jasmine.createSpy('update')
-      };
-      $provide.value('userNavigationService', userNavigationServiceMock);
-
-      var userContextServiceMock = {
-        hasEditRights: jasmine.createSpy('hasEditRights')
-      };
-      $provide.value('userContextService', userContextServiceMock);
-
       var assetLoadingSplashMock = {
         open: jasmine.createSpy('open').and.returnValue({}),
         close: jasmine.createSpy('close')
@@ -70,6 +43,9 @@ describe('Services: environmentRenderingService', function() {
         })
       };
       $provide.value('collab3DSettingsService', collab3DSettingsServiceMock);
+
+      document = {};
+      $provide.value('$document', document);
     })
   );
 
@@ -81,6 +57,9 @@ describe('Services: environmentRenderingService', function() {
     module('gz3dMock');
     module('tipTooltipServiceMock');
     module('storageServerMock');
+    module('stateServiceMock');
+    module('userContextServiceMock');
+    module('userNavigationServiceMock');
 
     // inject service for testing.
     inject(function(
@@ -418,12 +397,32 @@ describe('Services: environmentRenderingService', function() {
       userNavigationService,
       pose
     );
+
+    // pose is null
+    environmentRenderingService.updateInitialCameraPose(null);
+    gz3d.scene.setDefaultCameraPose.apply.calls.reset();
+    userNavigationService.setDefaultPose.apply.calls.reset();
+    expect(gz3d.scene.setDefaultCameraPose.apply).not.toHaveBeenCalled();
+    expect(userNavigationService.setDefaultPose.apply).not.toHaveBeenCalled();
   });
 
   it(' - onStateChanged()', function() {
+    let disableRebirth = gz3d.iface.webSocket.disableRebirth;
     environmentRenderingService.onStateChanged(STATE.STOPPED);
 
-    expect(gz3d.iface.webSocket.disableRebirth).toHaveBeenCalled();
+    expect(disableRebirth).toHaveBeenCalled();
+
+    // no websocket
+    disableRebirth.calls.reset();
+    gz3d.iface.webSocket = null;
+    environmentRenderingService.onStateChanged(STATE.STOPPED);
+    expect(disableRebirth).not.toHaveBeenCalled();
+
+    // other state besides STOPPED
+    disableRebirth.calls.reset();
+    gz3d.iface.webSocket = {};
+    environmentRenderingService.onStateChanged(STATE.STARTED);
+    expect(disableRebirth).not.toHaveBeenCalled();
   });
 
   it(' - onSceneLoaded()', function() {
@@ -451,12 +450,28 @@ describe('Services: environmentRenderingService', function() {
     expect(gz3d.setLightHelperVisibility).toHaveBeenCalled();
     expect(userNavigationService.init).toHaveBeenCalled();
     expect(environmentRenderingService.sceneLoading).toBe(false);
+
+    spyOn(environmentRenderingService, 'showCameraHintWhenNeeded');
+    $timeout.flush();
+    expect(
+      environmentRenderingService.showCameraHintWhenNeeded
+    ).toHaveBeenCalled();
+
+    // not loading
+    environmentRenderingService.sceneLoading = false;
+    gz3d.setLightHelperVisibility.calls.reset();
+    environmentRenderingService.onSceneLoaded();
+    expect(gz3d.setLightHelperVisibility).not.toHaveBeenCalled();
   });
 
   it(' - initComposerSettings()', function() {
     environmentRenderingService.initComposerSettings();
 
     expect(collab3DSettingsService.loadSettings).toHaveBeenCalled();
+
+    environmentRenderingService.scene3DSettingsReady = false;
+    $timeout.flush();
+    expect(environmentRenderingService.scene3DSettingsReady).toBe(true);
   });
 
   it(' - update rendering callback', function() {
@@ -524,5 +539,68 @@ describe('Services: environmentRenderingService', function() {
     $httpBackend.flush();
 
     expect(gz3d.scene.addSkinMesh).toHaveBeenCalled();
+  });
+
+  it(' - event ENTER_SIMULATION', function() {
+    spyOn(environmentRenderingService, 'init');
+    $rootScope.$broadcast('ENTER_SIMULATION');
+    expect(environmentRenderingService.init).toHaveBeenCalled();
+  });
+
+  it(' - event EXIT_SIMULATION', function() {
+    spyOn(environmentRenderingService, 'deinit');
+    $rootScope.$broadcast('EXIT_SIMULATION');
+    expect(environmentRenderingService.deinit).toHaveBeenCalled();
+  });
+
+  it(' - event ASSETS_LOADED', function() {
+    spyOn(environmentRenderingService, 'onSceneLoaded');
+    $rootScope.$broadcast('ASSETS_LOADED');
+    expect(environmentRenderingService.onSceneLoaded).toHaveBeenCalled();
+  });
+
+  it(' - initAnimationFrameFunctions(), with undefined requestAnimationFrame() & cancelAnimationFrame()', function(
+    done
+  ) {
+    window.requestAnimationFrame = {
+      bind: jasmine.createSpy('bind').and.returnValue(undefined)
+    };
+    window.cancelAnimationFrame = {
+      bind: jasmine.createSpy('bind').and.returnValue(undefined)
+    };
+    for (let x = 0; x < VENDORS.length && !this.requestAnimationFrame; ++x) {
+      window[VENDORS[x] + 'RequestAnimationFrame'] = undefined;
+      window[VENDORS[x] + 'CancelAnimationFrame'] = undefined;
+      window[VENDORS[x] + 'CancelRequestAnimationFrame'] = undefined;
+    }
+    environmentRenderingService.initAnimationFrameFunctions();
+
+    let mockRequestCallback = jasmine.createSpy('mockCallback');
+    let id = environmentRenderingService.requestAnimationFrame(
+      mockRequestCallback
+    );
+    setTimeout(function() {
+      expect(mockRequestCallback).toHaveBeenCalled();
+      environmentRenderingService.cancelAnimationFrame(id);
+      done();
+    }, 500);
+  });
+
+  it(' - isElementVisible()', function(done) {
+    document.hidden = true;
+    expect(environmentRenderingService.isElementVisible()).toBe(false);
+
+    document.hidden = undefined;
+    document.msHidden = true;
+    expect(environmentRenderingService.isElementVisible()).toBe(false);
+
+    document.msHidden = undefined;
+    document.webkitHidden = true;
+    expect(environmentRenderingService.isElementVisible()).toBe(false);
+
+    document.webkitHidden = false;
+    expect(environmentRenderingService.isElementVisible()).toBe(true);
+
+    done();
   });
 });

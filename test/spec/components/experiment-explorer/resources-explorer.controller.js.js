@@ -4,6 +4,8 @@ describe('Controller: ResourcesExplorerController', function() {
   beforeEach(module('exdFrontendApp'));
   beforeEach(module('exd.templates'));
 
+  beforeEach(module('clbConfirmMock'));
+
   var $rootScope, element, storageServer, backendInterfaceService;
   var $q;
 

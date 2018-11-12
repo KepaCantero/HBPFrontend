@@ -40,34 +40,13 @@ $environmentSettingsPanelHeadingHeightTotal: $environmentSettingsPanelHeadingHei
     background: transparent;
   }
 
-  @extend .pop-over-viewer;
   display: flex;
   top: 3%;
   left: 3%;
-  width: $environmentSettingsPanelStartWidth;
-  height: $environmentSettingsPanelStartHeight;
+  height: 100%;
   min-width: $environmentSettingsPanelMinWidth;
   min-height: $environmentSettingsPanelMinHeight;
   background: rgba(255, 255, 255, 0.9);
-
-  .environment-settings-panel-close {
-    position: absolute;
-    top: 5px;
-    right: 5px;
-  }
-
-  .environment-settings-panel-header {
-    position: absolute;
-    width: 80%;
-    width: calc(100% - 50px);
-    height: $environmentSettingsPanelHeadingHeight;
-    margin: $environmentSettingsPanelHeadingMargin;
-    border-radius: 3px;
-    -moz-border-radius: 3px;
-    -webkit-border-radius: 3px;
-    border: 1px solid #e1e1e1;
-    background: #f8f8f8;
-  }
 
   .environment-settings-panel-bottom {
     position: absolute;
@@ -107,7 +86,7 @@ $environmentSettingsPanelHeadingHeightTotal: $environmentSettingsPanelHeadingHei
 
 @media (min-width: 1024px) {
   .environment-settings-panel-widget {
-    width: $environmentSettingsPanelStartWidthLargeScreen;
+    min-width: $environmentSettingsPanelStartWidthLargeScreen;
   }
 }
 /* http://stackoverflow.com/questions/826782/css-rule-to-disable-text-selection-highlighting */

@@ -30,14 +30,12 @@
     'collab3DSettingsService',
     'userInteractionSettingsService',
     'simulationInfo',
-    'editorToolbarService',
     function(
       CAMERA_SENSITIVITY_RANGE,
       gz3d,
       collab3DSettingsService,
       userInteractionSettingsService,
-      simulationInfo,
-      editorToolbarService
+      simulationInfo
     ) {
       return {
         templateUrl:
@@ -46,7 +44,6 @@
         scope: true, // create a child scope for the directive and inherits the parent scope properties
         link: function(scope) {
           scope.simulationInfo = simulationInfo;
-          scope.editorToolbarService = editorToolbarService;
           scope.gz3d = gz3d;
 
           scope.resetSettings = function() {
@@ -62,10 +59,6 @@
           scope.saveSettings = function() {
             collab3DSettingsService.saveSettings();
             userInteractionSettingsService.saveSettings();
-          };
-
-          scope.closePanel = function() {
-            editorToolbarService.showEnvironmentSettingsPanel = false;
           };
         }
       };

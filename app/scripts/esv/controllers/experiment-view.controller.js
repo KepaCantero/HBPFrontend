@@ -21,8 +21,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  * ---LICENSE-END**/
-/* global console: false */
-/* global THREE: false */
 
 (function() {
   'use strict';
@@ -42,173 +40,32 @@
 
   class ExperimentViewController {
     constructor(
-      scope,
-      element,
-      stateService,
-      STATE,
-      userContextService,
-      nrpAnalytics,
-      gz3d,
-      log,
-      colorableObjectService,
-      simulationInfo,
-      sceneInfo,
-      contextMenuState,
-      timeout,
-      window,
       experimentViewService,
-      userNavigationService,
-      NAVIGATION_MODES,
-      tipTooltipService,
-      TIP_CODES
+      sceneInfo,
+      simulationInfo,
+      userContextService,
+      goldenLayoutService
     ) {
-      this.element = element;
-      this.userContextService = userContextService;
       this.simulationInfo = simulationInfo;
-      this.stateService = stateService;
-      this.userNavigationService = userNavigationService;
-      this.NAVIGATION_MODES = NAVIGATION_MODES;
-      this.STATE = STATE;
+      this.userContextService = userContextService;
+      this.goldenLayoutService = goldenLayoutService;
 
-      sceneInfo.initialize();
-      stateService.Initialize(); //TODO: (@SandroWeber) should be moved / handled inside service
+      //sceneInfo.initialize(); //TODO: fix that, write self-contained services
 
       experimentViewService.broadcastEnterSimulation();
-
-      // Query the state of the simulation
-      stateService.getCurrentState().then(function() {
-        if (stateService.currentState === STATE.STOPPED) {
-          // The Simulation is already Stopped, so do nothing more but show the alert popup
-          userContextService.isJoiningStoppedSimulation = true;
-          nrpAnalytics.eventTrack('Join-stopped', {
-            category: 'Simulation'
-          });
-        } else {
-          nrpAnalytics.durationEventTrack('Server-initialization', {
-            category: 'Experiment'
-          });
-          nrpAnalytics.tickDurationEvent('Browser-initialization');
-        }
-
-        // We restrict material changes to simple objects and screen glasses found in screen models of the 3D scene,
-        // i.e., only visuals bearing the name screen_glass or COLORABLE_VISUAL can be modified by this function.
-        scope.setMaterialOnEntity = function(material) {
-          var selectedEntity = gz3d.scene.selectedEntity;
-          if (!selectedEntity) {
-            log.error(
-              'Could not change color since there was no object selected'
-            );
-            return;
-          }
-          colorableObjectService.setEntityMaterial(
-            simulationInfo,
-            selectedEntity,
-            material
-          );
-          // Hide context menu after a color was assigned
-          contextMenuState.toggleContextMenu(false);
-        };
-
-        // colorable object context Menu setup
-        var colorableMenuItemGroup = {
-          id: 'changeColor',
-          visible: false,
-          items: [
-            {
-              html:
-                '<materials-chooser on-select="setMaterialOnEntity(material)"/>',
-              callback: function(event) {
-                event.stopPropagation();
-              },
-              visible: false
-            }
-          ],
-          hide: function() {
-            this.visible = this.items[0].visible = false;
-          },
-          show: function(model) {
-            var isColorableEntity = colorableObjectService.isColorableEntity(
-              model
-            );
-            var show = isColorableEntity;
-            return (this.visible = this.items[0].visible = show);
-          }
-        };
-
-        contextMenuState.pushItemGroup(colorableMenuItemGroup);
-
-        //main context menu handler
-        scope.onContainerMouseDown = function(event) {
-          tipTooltipService.setCurrentTip(TIP_CODES.TEXTURES);
-          if (userContextService.isOwner()) {
-            switch (event.button) {
-              case 2:
-                //right click -> show menu
-                contextMenuState.toggleContextMenu(true, event);
-                break;
-
-              //other buttons -> hide menu
-              case 0:
-              case 1:
-                contextMenuState.toggleContextMenu(false);
-                break;
-            }
-          }
-        };
-
-        scope.focus = function(id) {
-          // timeout makes sure that it is invoked after any other event has been triggered.
-          // e.g. click events that need to run before the focus or
-          // inputs elements that are in a disabled state but are enabled when those events
-          // are triggered.
-          timeout(function() {
-            var element = window.document.getElementById(id);
-            if (element) {
-              element.focus();
-            }
-          });
-        };
-      });
     }
-
-    exitLookatCameraMode() {
-      this.userNavigationService.setModeFreeCamera();
-    }
-
-    exit() {
-      //calls the exit function that has been moved to the toolbar
-      const editorToolbar = 'editor-toolbar';
-      if (this.element) {
-        //not systematically mocked in the tests
-        const controller = angular
-          .element(this.element.find(editorToolbar))
-          .controller(editorToolbar);
-        controller.exit();
-      }
+    sidemenuToggled() {
+      this.goldenLayoutService.refreshSize();
     }
   }
 
   ExperimentViewController.$$ngIsClass = true;
   ExperimentViewController.$inject = [
-    '$scope',
-    '$element',
-    'stateService',
-    'STATE',
-    'userContextService',
-    'nrpAnalytics',
-    'gz3d',
-    '$log',
-    'colorableObjectService',
-    'simulationInfo',
-    'sceneInfo',
-    'contextMenuState',
-    '$timeout',
-    '$window',
     'experimentViewService',
-    'userNavigationService',
-    'NAVIGATION_MODES',
-    'tipTooltipService',
-    'TIP_CODES'
+    'sceneInfo',
+    'simulationInfo',
+    'userContextService',
+    'goldenLayoutService'
   ];
 
   angular

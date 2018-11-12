@@ -31,7 +31,13 @@
     }
 
     toggleSidebar() {
-      this.$mdSidenav('simtools-sidebar').toggle();
+      const sidenav = this.$mdSidenav('simtools-sidebar');
+      sidenav.toggle();
+
+      return new Promise(resolve => {
+        if (sidenav.isOpen()) resolve();
+        setTimeout(resolve, 450);
+      });
     }
 
     isOverflowingY(elementID) {

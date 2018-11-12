@@ -37,6 +37,7 @@
     })
     .constant('VENDORS', ['ms', 'moz', 'webkit', 'o'])
     .service('environmentRenderingService', [
+      '$document',
       '$q',
       '$rootScope',
       'STATE',
@@ -56,6 +57,7 @@
       'storageServer',
       '$http',
       function(
+        $document,
         $q,
         $rootScope,
         STATE,
@@ -349,12 +351,12 @@
           this.isElementVisible = function() {
             // Check page visibily
             var isPageVisible = true;
-            if (typeof document.hidden !== 'undefined') {
-              isPageVisible = !document.hidden;
-            } else if (typeof document.msHidden !== 'undefined') {
-              isPageVisible = !document.msHidden;
-            } else if (typeof document.webkitHidden !== 'undefined') {
-              isPageVisible = !document.webkitHidden;
+            if (typeof $document.hidden !== 'undefined') {
+              isPageVisible = !$document.hidden;
+            } else if (typeof $document.msHidden !== 'undefined') {
+              isPageVisible = !$document.msHidden;
+            } else if (typeof $document.webkitHidden !== 'undefined') {
+              isPageVisible = !$document.webkitHidden;
             }
 
             return isPageVisible;

@@ -967,6 +967,12 @@
             .click();
           checkButtonsVisibility(page, { launch: 1, clone: 1 });
         });
+
+        it('should reset experiment', function() {
+          selectedSharedExperiment.experiment = { data: 'data' };
+          selectedSharedExperiment.resetExperiment();
+          expect(selectedSharedExperiment.experiment).toEqual({});
+        });
       });
     });
   });

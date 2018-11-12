@@ -9,5 +9,8 @@
       this.resetSimulation = jasmine.createSpy('resetSimulation');
       this.openExitDialog = jasmine.createSpy('openExitDialog');
       this.exitSimulation = jasmine.createSpy('exitSimulation');
+      this.broadcastEnterSimulation = jasmine.createSpy(
+        'broadcastEnterSimulation'
+      );
     });
 })();

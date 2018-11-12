@@ -32,8 +32,10 @@
       $scope,
       $window,
       STATE,
+      TOOL_CONFIGS,
       applicationTopToolbarService,
       bbpConfig,
+      goldenLayoutService,
       nrpAnalytics,
       storageServerTokenManager,
       userContextService,
@@ -44,6 +46,7 @@
       this.$window = $window;
 
       this.STATE = STATE;
+      this.TOOL_CONFIGS = TOOL_CONFIGS;
 
       this.bbpConfig = bbpConfig;
       this.nrpAnalytics = nrpAnalytics;
@@ -55,13 +58,13 @@
 
       if (applicationTopToolbarService.isInSimulationView()) {
         // dynamically get the services that only apply during running experiment
-        this.editorToolbarService = this.$injector.get('editorToolbarService');
         this.environmentRenderingService = this.$injector.get(
           'environmentRenderingService'
         );
         this.experimentViewService = this.$injector.get(
           'experimentViewService'
         );
+        this.goldenLayoutService = this.$injector.get('goldenLayoutService');
         this.simToolsSidebarService = this.$injector.get(
           'simToolsSidebarService'
         );
@@ -110,11 +113,12 @@
       if (this.environmentRenderingService.loadingEnvironmentSettingsPanel) {
         return;
       } else {
-        this.editorToolbarService.showEnvironmentSettingsPanel = !this
-          .editorToolbarService.showEnvironmentSettingsPanel;
+        this.goldenLayoutService.openTool(
+          this.TOOL_CONFIGS.ENVIRONMENT_RENDERING_SETTINGS
+        );
         this.nrpAnalytics.eventTrack('Toggle-environment-settings-panel', {
           category: 'Simulation-GUI',
-          value: this.editorToolbarService.showEnvironmentSettingsPanel
+          value: true
         });
       }
     }
@@ -124,7 +128,9 @@
     }
 
     toggleSimulationToolsSidebar() {
-      this.simToolsSidebarService.toggleSidebar();
+      this.simToolsSidebarService
+        .toggleSidebar()
+        .then(() => this.onSidemenuToggled());
     }
   }
 
@@ -136,8 +142,10 @@
       '$scope',
       '$window',
       'STATE',
+      'TOOL_CONFIGS',
       'applicationTopToolbarService',
       'bbpConfig',
+      'goldenLayoutService',
       'nrpAnalytics',
       'storageServerTokenManager',
       'userContextService',

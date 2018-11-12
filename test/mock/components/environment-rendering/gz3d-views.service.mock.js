@@ -8,5 +8,6 @@
       this.hasCameraView = jasmine.createSpy('hasCameraView');
       this.toggleCameraHelper = jasmine.createSpy('toggleCameraHelper');
       this.assignView = jasmine.createSpy('assignView');
+      this.isUserView = jasmine.createSpy('isUserView');
     });
 })();

@@ -96,7 +96,6 @@ THREE.FirstPersonControls = function(gz3d) {
     $(document.activeElement).blur();
 
     event.preventDefault();
-    event.stopPropagation();
 
     switch (event.button) {
       case 0: {

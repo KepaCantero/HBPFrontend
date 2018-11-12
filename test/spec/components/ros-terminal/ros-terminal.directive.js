@@ -4,13 +4,11 @@ describe('Directive: ros-terminal', function() {
   beforeEach(module('exdFrontendApp'));
   beforeEach(module('exd.templates')); // import html template
   beforeEach(module('simulationInfoMock'));
-  beforeEach(module('editorToolbarServiceMock'));
 
   var $rootScope,
     element,
     childScope,
     rosCommanderService,
-    editorToolbarService,
     rosCommandLine,
     $timeout;
 
@@ -31,16 +29,9 @@ describe('Directive: ros-terminal', function() {
   );
 
   beforeEach(
-    inject(function(
-      _$rootScope_,
-      $compile,
-      _rosCommanderService_,
-      _editorToolbarService_,
-      _$timeout_
-    ) {
+    inject(function(_$rootScope_, $compile, _rosCommanderService_, _$timeout_) {
       $rootScope = _$rootScope_;
       rosCommanderService = _rosCommanderService_;
-      editorToolbarService = _editorToolbarService_;
       $timeout = _$timeout_;
 
       spyOn(localStorage, 'getItem');
@@ -142,12 +133,6 @@ describe('Directive: ros-terminal', function() {
     spyOn(rosCommanderService, 'stopCurrentExecution').and.callThrough();
     $(document).trigger($.Event('keydown', { which: 67, ctrlKey: true }));
     expect(rosCommanderService.stopCurrentExecution).toHaveBeenCalled();
-  });
-
-  it('should set flag on exit', function() {
-    editorToolbarService.showRosTerminal = true;
-    childScope.$destroy();
-    expect(editorToolbarService.showRosTerminal).toBe(false);
   });
 });
 

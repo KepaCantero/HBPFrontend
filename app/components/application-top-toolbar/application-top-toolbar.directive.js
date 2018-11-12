@@ -32,7 +32,10 @@
         templateUrl:
           'components/application-top-toolbar/application-top-toolbar.template.html',
         restrict: 'E',
-        scope: {},
+        scope: {
+          onSidemenuToggled: '&'
+        },
+        bindToController: true,
         controller: 'ApplicationTopToolbarController',
         controllerAs: 'vm'
       })

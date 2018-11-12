@@ -14,18 +14,20 @@ describe('Services: userNavigationService', function() {
     firstPersonControls,
     lookatControls;
   var simulationInfo,
+    sceneInfo,
     userProfile,
     roslib,
     stateService,
     userInteractionSettingsService,
     nrpUser;
 
-  beforeEach(module('simulationInfoMock'));
   beforeEach(module('sceneInfoMock'));
   beforeEach(module('userNavigationModule'));
   beforeEach(module('userInteractionSettingsServiceMock'));
   beforeEach(module('nrpUserMock'));
   beforeEach(module('gz3dMock'));
+  beforeEach(module('simulationInfoMock'));
+  beforeEach(module('stateServiceMock'));
 
   // provide mock objects
   beforeEach(
@@ -80,14 +82,6 @@ describe('Services: userNavigationService', function() {
       var roslibMock = {};
       $provide.value('roslib', roslibMock);
 
-      var stateServiceMock = {
-        getCurrentState: jasmine.createSpy('getCurrentState').and.returnValue({
-          then: jasmine.createSpy('then').and.callFake(function(fn) {
-            fn();
-          })
-        })
-      };
-      $provide.value('stateService', stateServiceMock);
       $provide.value(
         'isARobotPredicate',
         jasmine.createSpy('isARobotPredicate').and.returnValue(true)
@@ -105,11 +99,11 @@ describe('Services: userNavigationService', function() {
       _NAVIGATION_MODES_,
       _STATE_,
       _gz3d_,
-      //_camera_,
       _avatar_,
       _avatarControls_,
       _firstPersonControls_,
       _lookatControls_,
+      _sceneInfo_,
       _simulationInfo_,
       _roslib_,
       _stateService_,
@@ -122,11 +116,11 @@ describe('Services: userNavigationService', function() {
       gz3d = _gz3d_;
       $rootScope = _$rootScope_;
 
-      //camera = _camera_;
       avatar = _avatar_;
       avatarControls = _avatarControls_;
       firstPersonControls = _firstPersonControls_;
       lookatControls = _lookatControls_;
+      sceneInfo = _sceneInfo_;
       simulationInfo = _simulationInfo_;
       roslib = _roslib_;
       stateService = _stateService_;
@@ -622,6 +616,7 @@ describe('Services: userNavigationService', function() {
     userNavigationService.freeCameraControls = firstPersonControls;
 
     gz3d.scene.selectedEntity = {};
+    sceneInfo.isRobot.and.returnValue(true);
     userNavigationService.setLookatCamera();
 
     expect(userNavigationService.navigationMode).toBe(NAVIGATION_MODES.LOOKAT);
@@ -653,5 +648,23 @@ describe('Services: userNavigationService', function() {
     event.which = 1;
     userNavigationService.releaseCameraTransform(event, action);
     expect(gz3d.scene.controls.onMouseUpManipulator).toHaveBeenCalled();
+  });
+
+  it(' - displayLookAtCameraInfo()', function() {
+    userNavigationService.init();
+    userNavigationService.showLookAtCameraInfoDiv = false;
+    userNavigationService.displayLookAtCameraInfo();
+    expect(userNavigationService.showLookAtCameraInfoDiv).toBe(true);
+  });
+
+  it(' - lookAtRobot()', function() {
+    userNavigationService.navigationMode = NAVIGATION_MODES.LOOKAT;
+    sceneInfo.isRobot.and.returnValue(true);
+    gz3d.scene.selectedEntity = { name: 'robot' };
+    userNavigationService.setLookatCamera.and.callFake(() => {});
+
+    userNavigationService.lookAtRobot();
+
+    expect(userNavigationService.setLookatCamera).toHaveBeenCalled();
   });
 });

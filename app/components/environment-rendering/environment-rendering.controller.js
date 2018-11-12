@@ -27,34 +27,168 @@
 (function() {
   'use strict';
 
-  class EnvironmentRenderingController {
-    get containerElement() {
-      return this.gz3dContainerElement;
-    }
-    get INIT_WIDTH_PERCENTAGE() {
-      return 0.3;
-    }
-
+  class EnvironmentRenderingContextmenu {
     constructor(
+      environmentRenderingController,
+      $compile,
+      $scope,
+      TOOL_CONFIGS,
+      backendInterfaceService,
+      colorableObjectService,
+      goldenLayoutService,
+      gz3d,
+      sceneInfo,
+      userNavigationService
+    ) {
+      this.options = [
+        // selection name
+        {
+          html: () => {
+            let title;
+            if (gz3d.scene.selectedEntity) {
+              title = gz3d.scene.selectedEntity.name;
+            } else {
+              title = 'No Selection';
+            }
+            return '<div class="contextmenu-title">' + title + '</div>';
+          },
+          enabled: false
+        },
+        null, // divider
+        // inspect
+        {
+          text: 'Inspect',
+          click: () => {
+            goldenLayoutService.openTool(TOOL_CONFIGS.OBJECT_INSPECTOR);
+          }
+        },
+        // look at
+        {
+          text: 'Look At',
+          click: () => {
+            userNavigationService.setLookatCamera();
+          }
+        },
+        // duplicate
+        {
+          text: 'Duplicate',
+          displayed: () => {
+            return (
+              gz3d.scene.selectedEntity &&
+              gz3d.gui.canModelBeDuplicated(gz3d.scene.selectedEntity.name)
+            );
+          },
+          click: () => {
+            gz3d.gui.guiEvents.emit('duplicate_entity');
+          }
+        },
+        // show/hide skin
+        {
+          text: () => {
+            return gz3d.scene.skinVisible(gz3d.scene.selectedEntity)
+              ? 'Hide Skin'
+              : 'Show Skin';
+          },
+          displayed: () => {
+            return (
+              gz3d.scene.selectedEntity &&
+              gz3d.scene.hasSkin(gz3d.scene.selectedEntity)
+            );
+          },
+          click: () => {
+            if (gz3d.scene.selectedEntity) {
+              gz3d.scene.setSkinVisible(
+                gz3d.scene.selectedEntity,
+                !gz3d.scene.skinVisible(gz3d.scene.selectedEntity)
+              );
+            }
+          }
+        },
+        // delete
+        {
+          text: 'Delete',
+          displayed: () => {
+            return (
+              gz3d.scene.selectedEntity &&
+              !sceneInfo.isRobot(gz3d.scene.selectedEntity)
+            );
+          },
+          click: () => {
+            gz3d.gui.emitter.emit('deleteEntity', gz3d.scene.selectedEntity);
+            gz3d.scene.selectEntity(null);
+          }
+        },
+        {
+          text: 'Set as Initial Pose',
+          displayed: () => {
+            return (
+              gz3d.scene.selectedEntity &&
+              sceneInfo.isRobot(gz3d.scene.selectedEntity)
+            );
+          },
+          click: () => {
+            let {
+              name,
+              position: { x, y, z },
+              rotation: { _x: roll, _y: pitch, _z: yaw }
+            } = gz3d.scene.selectedEntity;
+
+            backendInterfaceService.setRobotInitialPose(name, {
+              x,
+              y,
+              z,
+              roll,
+              pitch,
+              yaw
+            });
+          }
+        },
+        // material color picker
+        {
+          html: () => {
+            return $compile('<materials-chooser />')($scope.$new());
+          },
+          displayed: () => {
+            return (
+              gz3d.scene.selectedEntity &&
+              colorableObjectService.isColorableEntity(
+                gz3d.scene.selectedEntity
+              )
+            );
+          }
+        }
+      ];
+    }
+  }
+
+  class EnvironmentRenderingController {
+    constructor(
+      $compile,
       $scope,
       $element,
+      TOOL_CONFIGS,
+      backendInterfaceService,
+      colorableObjectService,
       userContextService,
       experimentService,
       userNavigationService,
       environmentRenderingService,
+      goldenLayoutService,
+      gz3d,
       gz3dViewsService,
+      sceneInfo,
       stateService,
-      videoStreamService,
-      dynamicViewOverlayService
+      videoStreamService
     ) {
+      this.backendInterfaceService = backendInterfaceService;
       this.stateService = stateService;
       this.userContextService = userContextService;
       this.experimentService = experimentService;
       this.userNavigationService = userNavigationService;
       this.environmentRenderingService = environmentRenderingService;
+      this.gz3d = gz3d;
       this.gz3dViewsService = gz3dViewsService;
       this.videoStreamService = videoStreamService;
-      this.dynamicViewOverlayService = dynamicViewOverlayService;
 
       this.view = undefined;
       this.videoUrl = undefined;
@@ -67,59 +201,40 @@
         'gz3d-webgl'
       )[0];
 
+      this.contextmenu = new EnvironmentRenderingContextmenu(
+        this,
+        $compile,
+        $scope,
+        TOOL_CONFIGS,
+        backendInterfaceService,
+        colorableObjectService,
+        goldenLayoutService,
+        gz3d,
+        sceneInfo,
+        userNavigationService
+      );
+
       this.environmentRenderingService.sceneInitialized().then(() => {
         // assign a view which doesn't have a displaying container yet for now
         this.gz3dViewsService
           .assignView(this.gz3dContainerElement)
           .then(view => {
             this.view = view;
-            // if it's a camera view and we're inside an overlay, keep aspect ratio for that overlay
-            let overlayWrapper = this.dynamicViewOverlayService.getParentOverlayWrapper(
-              $element
-            );
-            if (
-              this.view.type === 'camera' &&
-              angular.isDefined(overlayWrapper)
-            ) {
-              overlayWrapper.setAttribute(
-                'keep-aspect-ratio',
-                this.view.initAspectRatio.toString()
-              );
-              // set initial size according to aspect ratio
-              let parentWidthPx = dynamicViewOverlayService.getOverlayParentElement()[0]
-                .clientWidth;
-              let parentHeightPx = dynamicViewOverlayService.getOverlayParentElement()[0]
-                .clientHeight;
-              let height =
-                this.INIT_WIDTH_PERCENTAGE *
-                parentWidthPx /
-                this.view.initAspectRatio /
-                parentHeightPx;
-              overlayWrapper.style.width =
-                (this.INIT_WIDTH_PERCENTAGE * 100).toString() + '%';
-              overlayWrapper.style.height = (height * 100).toString() + '%';
-
-              // place according to index of view
-              let pos = gz3dViewsService.views.indexOf(this.view) - 1;
-              let row = Math.floor(pos / 3) % 3;
-              let column = pos % 3;
-              overlayWrapper.style.top = (row * 33).toString() + '%';
-              overlayWrapper.style.left = (3 + column * 33).toString() + '%';
-
-              // remove context menus from views other than user view
-              if (this.view !== this.gz3dViewsService.views[0]) {
-                let contextMenu = $element[0].getElementsByTagName(
-                  'context-menu'
-                )[0];
-                contextMenu.remove();
-              }
-
+            if (this.view.type === 'camera') {
               // set up server video stream
               this.videoStreamService
                 .getStreamingUrlForTopic(this.view.topic)
                 .then(streamUrl => {
                   this.videoUrl = streamUrl;
                 });
+            }
+
+            if (
+              gz3dViewsService.isUserView(this.view) &&
+              userNavigationService.controls
+            ) {
+              userNavigationService.controls.detachEventListeners();
+              userNavigationService.controls.attachEventListeners();
             }
           });
       });
@@ -162,17 +277,37 @@
             this.reconnectTrials
         : '';
     }
+
+    onMouseUp(event) {
+      switch (event.button) {
+        case 2: {
+          let model = this.gz3d.scene.getRayCastModel(
+            new THREE.Vector2(event.offsetX, event.offsetY),
+            new THREE.Vector3()
+          );
+          this.gz3d.scene.selectEntity(model);
+          break;
+        }
+      }
+    }
   }
 
   EnvironmentRenderingController.$$ngIsClass = true;
   EnvironmentRenderingController.$inject = [
+    '$compile',
     '$scope',
     '$element',
+    'TOOL_CONFIGS',
+    'backendInterfaceService',
+    'colorableObjectService',
     'userContextService',
     'experimentService',
     'userNavigationService',
     'environmentRenderingService',
+    'goldenLayoutService',
+    'gz3d',
     'gz3dViewsService',
+    'sceneInfo',
     'stateService',
     'videoStreamService',
     'dynamicViewOverlayService'

@@ -6,67 +6,47 @@ describe('Controller: SimToolsSidebarController', function() {
   let simToolsSidebarController;
 
   let $controller, $rootScope, $scope, $timeout;
-  let DYNAMIC_VIEW_CHANNELS;
-  let dynamicViewOverlayService,
-    editorsPanelService,
-    gz3d,
-    simToolsSidebarService,
-    userContextService,
-    userNavigationService,
-    videoStreamService;
+  let gz3d, simToolsSidebarService, userNavigationService;
 
-  const clientLoggerServiceMock = {};
+  // real modules
+  beforeEach(() => {
+    module('simToolsSidebarModule');
+    module('goldenLayoutModule');
+    module('tipTooltipModule');
+  });
 
-  beforeEach(module('simToolsSidebarModule'));
-  beforeEach(module('dynamicViewModule'));
-  beforeEach(module('tipTooltipModule'));
-
-  beforeEach(module('dynamicViewOverlayServiceMock'));
-  beforeEach(module('editorsPanelServiceMock'));
-  beforeEach(module('editorToolbarServiceMock'));
-  beforeEach(module('environmentRenderingServiceMock'));
-  beforeEach(module('gz3dMock'));
-  beforeEach(module('gz3dViewsServiceMock'));
-  beforeEach(module('helpTooltipServiceMock'));
-  beforeEach(module('nrpAnalyticsMock'));
-  beforeEach(module('userContextServiceMock'));
-  beforeEach(module('userNavigationServiceMock'));
-  beforeEach(module('videoStreamServiceMock'));
-  beforeEach(module('tipTooltipServiceMock'));
-
-  beforeEach(
-    module(function($provide) {
-      $provide.value('clientLoggerService', clientLoggerServiceMock);
-    })
-  );
+  // mock modules
+  beforeEach(() => {
+    module('clientLoggerServiceMock');
+    module('editorToolbarServiceMock');
+    module('environmentRenderingServiceMock');
+    module('gz3dMock');
+    module('gz3dViewsServiceMock');
+    module('helpTooltipServiceMock');
+    module('nrpAnalyticsMock');
+    module('simulationInfoMock');
+    module('userNavigationServiceMock');
+    module('userContextServiceMock');
+    module('videoStreamServiceMock');
+    module('tipTooltipServiceMock');
+  });
 
   beforeEach(
     inject(function(
       _$controller_,
       _$rootScope_,
       _$timeout_,
-      _DYNAMIC_VIEW_CHANNELS_,
-      _dynamicViewOverlayService_,
-      _editorsPanelService_,
       _gz3d_,
       _simToolsSidebarService_,
-      _userContextService_,
-      _userNavigationService_,
-      _videoStreamService_
+      _userNavigationService_
     ) {
       $controller = _$controller_;
       $rootScope = _$rootScope_;
       $timeout = _$timeout_;
 
-      DYNAMIC_VIEW_CHANNELS = _DYNAMIC_VIEW_CHANNELS_;
-
-      dynamicViewOverlayService = _dynamicViewOverlayService_;
-      editorsPanelService = _editorsPanelService_;
       gz3d = _gz3d_;
       simToolsSidebarService = _simToolsSidebarService_;
-      userContextService = _userContextService_;
       userNavigationService = _userNavigationService_;
-      videoStreamService = _videoStreamService_;
     })
   );
 
@@ -120,49 +100,6 @@ describe('Controller: SimToolsSidebarController', function() {
     gz3d.isGlobalLightMinReached.and.returnValue(true);
     simToolsSidebarController.onButtonLightIntensity(-1);
     expect(gz3d.scene.emitter.emit).not.toHaveBeenCalled();
-  });
-
-  it(' - onButtonEditors()', function() {
-    userContextService.editIsDisabled = true;
-    simToolsSidebarController.onButtonEditors();
-    expect(editorsPanelService.toggleEditors).not.toHaveBeenCalled();
-
-    userContextService.editIsDisabled = false;
-    editorsPanelService.loadingEditPanel = true;
-    simToolsSidebarController.onButtonEditors();
-    expect(editorsPanelService.toggleEditors).not.toHaveBeenCalled();
-
-    editorsPanelService.loadingEditPanel = false;
-    simToolsSidebarController.onButtonEditors();
-    expect(editorsPanelService.toggleEditors).toHaveBeenCalled();
-  });
-
-  it(' - onButtonToggleEditor()', function() {
-    userContextService.editIsDisabled = true;
-    simToolsSidebarController.onButtonToggleEditor();
-    expect(
-      dynamicViewOverlayService.toggleDynamicViewOverlay
-    ).not.toHaveBeenCalled();
-
-    userContextService.editIsDisabled = false;
-    simToolsSidebarController.onButtonToggleEditor('my-editor-channel');
-    expect(
-      dynamicViewOverlayService.toggleDynamicViewOverlay
-    ).toHaveBeenCalledWith('my-editor-channel');
-  });
-
-  it(' - onButtonVideoStreams()', function() {
-    videoStreamService.videoStreamsAvailable = false;
-    simToolsSidebarController.onButtonVideoStreams();
-    expect(
-      dynamicViewOverlayService.createDynamicOverlay
-    ).not.toHaveBeenCalled();
-
-    videoStreamService.videoStreamsAvailable = true;
-    simToolsSidebarController.onButtonVideoStreams();
-    expect(dynamicViewOverlayService.createDynamicOverlay).toHaveBeenCalledWith(
-      DYNAMIC_VIEW_CHANNELS.STREAM_VIEWER
-    );
   });
 
   it(' - onButtonExpandCategory()', function() {

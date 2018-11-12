@@ -102,7 +102,7 @@ describe('Directive: pynnEditor', function() {
   beforeEach(module('exd.templates')); // import html template
   beforeEach(module('simulationInfoMock'));
   beforeEach(module('userContextServiceMock'));
-  beforeEach(module('applyForceServiceMock'));
+  beforeEach(module('pushForceServiceMock'));
 
   beforeEach(
     module(function($provide) {
@@ -536,7 +536,7 @@ describe('Directive: pynnEditor', function() {
       isolateScope.download();
       expect(
         downloadFileServiceMock.downloadFile.calls.mostRecent().args[0]
-      ).toMatch(/^blob:/);
+      ).toMatch('http://some/url');
       expect(
         downloadFileServiceMock.downloadFile.calls.mostRecent().args[1]
       ).toEqual('pynnBrain.py');

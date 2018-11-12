@@ -32,19 +32,19 @@
 
     constructor(
       $q,
-      DYNAMIC_VIEW_CHANNELS,
+      TOOL_CONFIGS,
       gz3d,
-      dynamicViewOverlayService,
       environmentRenderingService,
+      goldenLayoutService,
       nrpAnalytics
     ) {
       this.$q = $q;
 
-      this.DYNAMIC_VIEW_CHANNELS = DYNAMIC_VIEW_CHANNELS;
+      this.TOOL_CONFIGS = TOOL_CONFIGS;
 
       this.gz3d = gz3d;
-      this.dynamicViewOverlayService = dynamicViewOverlayService;
       this.environmentRenderingService = environmentRenderingService;
+      this.goldenLayoutService = goldenLayoutService;
       this.nrpAnalytics = nrpAnalytics;
     }
 
@@ -85,10 +85,7 @@
         () => {
           for (let i = 0; i < this.views.length; i = i + 1) {
             // find the first view without a container displaying it, assign to this one
-            if (
-              this.views[i].container === undefined ||
-              i === this.views.length - 1
-            ) {
+            if (this.views[i].container === undefined) {
               this.gz3d.scene.viewManager.setViewContainerElement(
                 this.views[i],
                 containerElement
@@ -125,7 +122,7 @@
     }
 
     // robot view
-    onOpenRobotViews() {
+    onToggleRobotViews() {
       if (!this.hasCameraView()) {
         return;
       }
@@ -142,15 +139,17 @@
         // open overlays for every view that doesn't have a container
         this.views.forEach(view => {
           if (view.container === undefined) {
-            this.dynamicViewOverlayService.createDynamicOverlay(
-              this.DYNAMIC_VIEW_CHANNELS.ENVIRONMENT_RENDERING
+            this.goldenLayoutService.openTool(
+              this.TOOL_CONFIGS.ROBOT_CAMERA_RENDERING
             );
           }
         });
       } else {
-        this.dynamicViewOverlayService.closeAllOverlaysOfType(
-          this.DYNAMIC_VIEW_CHANNELS.ENVIRONMENT_RENDERING
-        );
+        this.goldenLayoutService.layout.root
+          .getItemsById('robot-camera-rendering')
+          .forEach(item => {
+            item.remove();
+          });
       }
 
       this.nrpAnalytics.eventTrack('Toggle-robot-view', {
@@ -163,10 +162,10 @@
   GZ3DViewsService.$$ngIsClass = true;
   GZ3DViewsService.$inject = [
     '$q',
-    'DYNAMIC_VIEW_CHANNELS',
+    'TOOL_CONFIGS',
     'gz3d',
-    'dynamicViewOverlayService',
     'environmentRenderingService',
+    'goldenLayoutService',
     'nrpAnalytics'
   ];
 

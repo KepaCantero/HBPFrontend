@@ -62,7 +62,6 @@
       'environmentService',
       'downloadFileService',
       'baseEventHandler',
-      'editorToolbarService',
       'storageServer',
       function(
         $timeout,
@@ -82,7 +81,6 @@
         environmentService,
         downloadFileService,
         baseEventHandler,
-        editorToolbarService,
         storageServer
       ) {
         return {
@@ -138,7 +136,6 @@
               scope.unbindWatcherResize && scope.unbindWatcherResize();
               scope.unbindListenerUpdatePanelUI();
               stateService.removeMessageCallback(messageCallbackHandler);
-              editorToolbarService.showPynnEditor = false;
             });
 
             let refreshEditor = (reset = false) => {

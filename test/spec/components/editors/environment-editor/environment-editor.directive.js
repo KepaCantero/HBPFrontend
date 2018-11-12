@@ -5,14 +5,11 @@ describe('Directive: environment-designer', function() {
     element,
     stateService,
     panels,
-    contextMenuState,
     simulationSDFWorld,
     simulationInfo,
     clbErrorDialog,
-    dynamicViewOverlayService,
-    DYNAMIC_VIEW_CHANNELS,
-    httpBackend,
-    userNavigationService;
+    goldenLayoutService,
+    httpBackend;
 
   beforeEach(module('exdFrontendApp'));
   beforeEach(module('exd.templates'));
@@ -20,7 +17,7 @@ describe('Directive: environment-designer', function() {
   beforeEach(module('simulationInfoMock'));
   beforeEach(module('stateServiceMock'));
   beforeEach(module('dynamicViewOverlayServiceMock'));
-  beforeEach(module('contextMenuStateServiceMock'));
+  beforeEach(module('goldenLayoutServiceMock'));
   beforeEach(module('gz3dMock'));
   beforeEach(module('sceneInfoMock'));
   beforeEach(
@@ -52,33 +49,29 @@ describe('Directive: environment-designer', function() {
       $document,
       EDIT_MODE,
       STATE,
-      _DYNAMIC_VIEW_CHANNELS_,
+      TOOL_CONFIGS,
       _currentStateMockFactory_,
       _stateService_,
-      _contextMenuState_,
       _objectInspectorService_,
       _panels_,
       _simulationSDFWorld_,
       _simulationInfo_,
       _clbErrorDialog_,
       _environmentService_,
-      _dynamicViewOverlayService_,
-      _$httpBackend_,
-      _userNavigationService_
+      _goldenLayoutService_,
+      _$httpBackend_
     ) {
       $scope = $rootScope.$new();
       $scope.EDIT_MODE = EDIT_MODE;
       $scope.STATE = STATE;
-      DYNAMIC_VIEW_CHANNELS = _DYNAMIC_VIEW_CHANNELS_;
-      contextMenuState = _contextMenuState_;
+      $scope.TOOL_CONFIGS = TOOL_CONFIGS;
       stateService = _stateService_;
       simulationInfo = _simulationInfo_;
       panels = _panels_;
       simulationSDFWorld = _simulationSDFWorld_;
       clbErrorDialog = _clbErrorDialog_;
-      dynamicViewOverlayService = _dynamicViewOverlayService_;
+      goldenLayoutService = _goldenLayoutService_;
       httpBackend = _$httpBackend_;
-      userNavigationService = _userNavigationService_;
 
       var modelLibraryMock = [
         {
@@ -137,7 +130,6 @@ describe('Directive: environment-designer', function() {
   );
 
   it('should register callbacks for createEntity and modelUpdate events', function() {
-    expect($scope.gz3d.Initialize).toHaveBeenCalled();
     expect($scope.gz3d.iface.addOnDeleteEntityCallbacks).toHaveBeenCalled();
     expect($scope.gz3d.iface.addOnCreateEntityCallbacks).toHaveBeenCalled();
   });
@@ -168,93 +160,6 @@ describe('Directive: environment-designer', function() {
     expect($scope.gz3d.scene.setManipulationMode).toHaveBeenCalledWith(
       $scope.EDIT_MODE.TRANSLATE
     );
-  });
-
-  it('should call correctly contextMenuState.pushItemGroup', function() {
-    stateService.currentState = $scope.STATE.PAUSED;
-    var itemGroup = contextMenuState.pushItemGroup.calls.mostRecent().args[0];
-
-    // initial structure
-    expect(itemGroup.visible).toBe(false);
-    itemGroup.items.forEach(item => {
-      expect(item.visible).toBe(false);
-    });
-    expect(itemGroup.items[0].text).toEqual('Inspect');
-    expect(itemGroup.items[1].text).toEqual('Look At');
-    expect(itemGroup.items[2].text).toEqual('Duplicate');
-    expect(itemGroup.items[3].text).toEqual('Show Skin');
-    expect(itemGroup.items[4].text).toEqual('Set as Initial Pose');
-    expect(itemGroup.items[5].text).toEqual('Delete');
-
-    // check hide()
-    itemGroup.visible = true;
-    itemGroup.items.forEach(item => {
-      item.visible = true;
-    });
-    itemGroup.hide();
-    expect(itemGroup.visible).toBe(false);
-    itemGroup.items.forEach(item => {
-      expect(item.visible).toBe(false);
-    });
-    var eventMock = { stopPropagation: jasmine.createSpy('stopPropagation') };
-    // check call to edit item
-    itemGroup.items[0].callback(eventMock);
-    expect(dynamicViewOverlayService.createDynamicOverlay).toHaveBeenCalledWith(
-      DYNAMIC_VIEW_CHANNELS.OBJECT_INSPECTOR
-    );
-    expect(contextMenuState.toggleContextMenu).toHaveBeenCalledWith(false);
-    expect(eventMock.stopPropagation).toHaveBeenCalled();
-
-    // check call to duplicate item
-    spyOn($scope, 'duplicateModel');
-    itemGroup.items[2].callback(eventMock);
-    expect($scope.duplicateModel).toHaveBeenCalled();
-    expect(eventMock.stopPropagation).toHaveBeenCalled();
-
-    // check call to look at
-    spyOn(userNavigationService, 'setLookatCamera');
-    itemGroup.items[1].callback(eventMock);
-    expect(userNavigationService.setLookatCamera).toHaveBeenCalled();
-    expect(contextMenuState.toggleContextMenu).toHaveBeenCalledWith(false);
-    expect(eventMock.stopPropagation).toHaveBeenCalled();
-
-    // check show skin
-    $scope.gz3d.scene.selectedEntity = {};
-    $scope.gz3d.scene.setSkinVisible = function() {};
-    $scope.gz3d.scene.skinVisible = function() {
-      return false;
-    };
-    spyOn($scope.gz3d.scene, 'setSkinVisible');
-    itemGroup.items[3].callback(eventMock);
-    expect($scope.gz3d.scene.setSkinVisible).toHaveBeenCalled();
-    expect(contextMenuState.toggleContextMenu).toHaveBeenCalledWith(false);
-    expect(eventMock.stopPropagation).toHaveBeenCalled();
-
-    // check call to delete item
-    spyOn($scope, 'deleteModel');
-    itemGroup.items[5].callback(eventMock);
-    expect($scope.deleteModel).toHaveBeenCalled();
-    expect(eventMock.stopPropagation).toHaveBeenCalled();
-
-    // see that anyhting can be deleted, robots included
-    var modelMock = { name: 'robot' };
-    itemGroup.show(modelMock);
-    expect(itemGroup.visible).toBe(true);
-    expect(itemGroup.items[0].visible).toBe(true);
-    expect(itemGroup.items[1].visible).toBe(true);
-    expect(itemGroup.items[2].visible).toBe(true);
-    expect(itemGroup.items[3].visible).toBe(false); // No skin on the robot
-    expect(itemGroup.items[4].visible).toBe(true); // 'Set as Initial Pose' is Visible only for robots
-    expect(itemGroup.items[5].visible).toBe(true);
-    modelMock.name = 'iAmNotARobot';
-    itemGroup.show(modelMock);
-    expect(itemGroup.visible).toBe(true);
-    expect(itemGroup.items[0].visible).toBe(true);
-    expect(itemGroup.items[1].visible).toBe(true);
-    expect(itemGroup.items[2].visible).toBe(true);
-    expect(itemGroup.items[5].visible).toBe(true);
-    expect(itemGroup.items[3].visible).toBe(false); // No skin on the object
-    expect(itemGroup.items[4].visible).toBe(false); // Can't set initial pose for non-robot object
   });
 
   it('should pause the simulation when needed', function() {
@@ -355,8 +260,8 @@ describe('Directive: environment-designer', function() {
     $scope.selectCreatedEntity(objName + ' created');
 
     expect($scope.gz3d.scene.selectedEntity === obj);
-    expect(dynamicViewOverlayService.createDynamicOverlay).toHaveBeenCalledWith(
-      DYNAMIC_VIEW_CHANNELS.OBJECT_INSPECTOR
+    expect(goldenLayoutService.openTool).toHaveBeenCalledWith(
+      $scope.TOOL_CONFIGS.OBJECT_INSPECTOR
     );
   });
 
@@ -414,8 +319,6 @@ describe('Directive: environment-designer', function() {
     expect($scope.gz3d.gui.guiEvents.emit).toHaveBeenCalledWith(
       'delete_entity'
     );
-    //should toggle menu
-    expect(contextMenuState.toggleContextMenu).toHaveBeenCalledWith(false);
   });
 
   it('should correctly saveSDFIntoCollabStorage', function() {

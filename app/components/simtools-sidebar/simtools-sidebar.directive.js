@@ -41,6 +41,8 @@
       SIDEBAR: 'simtools-sidebar',
       GROUP_EDITORS: 'simtools-sidebar-group-editors',
       GROUP_MONITORS: 'simtools-sidebar-group-monitors',
-      GROUP_CLIENT_SETTINGS: 'simtools-sidebar-group-client-settings'
+      GROUP_CLIENT_SETTINGS: 'simtools-sidebar-group-client-settings',
+      TRANSFER_FUNCTION_EDITOR: 'sidebar-transfer-function-editor',
+      BRAIN_EDITOR: 'sidebar-brain-editor'
     });
 })();

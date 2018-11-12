@@ -9,6 +9,11 @@
     );
     this.isGlobalLightMinReached = jasmine.createSpy('isGlobalLightMinReached');
     this.isGlobalLightMaxReached = jasmine.createSpy('isGlobalLightMaxReached');
+    this.getRayCastIntersections = jasmine.createSpy('getRayCastIntersections');
+    this.getRayCastModel = jasmine.createSpy('getRayCastModel');
+    this.getLinkFromIntersections = jasmine.createSpy(
+      'getLinkFromIntersections'
+    );
 
     this.gui = {
       emitter: {
@@ -47,6 +52,10 @@
       composerSettings: {
         pbrMaterial: true
       },
+      composer: {
+        currentMasterSettings: {}
+      },
+      defaultComposerSettings: {},
       render: jasmine.createSpy('render'),
       resetView: jasmine.createSpy('resetView'),
       refresh3DViews: jasmine.createSpy('refresh3DViews'),
@@ -116,7 +125,8 @@
       getByName: jasmine.createSpy('getByName'),
       toggleScreenChangeMenu: jasmine.createSpy('toggleScreenChangeMenu'),
       attachEventListeners: jasmine.createSpy('attachEventListeners'),
-      getRayCastModel: jasmine.createSpy('getRayCastModel')
+      getRayCastModel: jasmine.createSpy('getRayCastModel'),
+      setSkinVisible: jasmine.createSpy('setSkinVisible')
     };
 
     this.iface = {

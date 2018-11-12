@@ -46,7 +46,6 @@
     'environmentService',
     'userContextService',
     'bbpConfig',
-    'editorToolbarService',
     'storageServer',
     'baseEventHandler',
     function(
@@ -71,7 +70,6 @@
       environmentService,
       userContextService,
       bbpConfig,
-      editorToolbarService,
       storageServer,
       baseEventHandler
     ) {
@@ -111,7 +109,6 @@
             scope.resetListenerUnbindHandler();
             scope.unbindWatcherResize && scope.unbindWatcherResize();
             scope.unbindListenerUpdatePanelUI();
-            editorToolbarService.showSmachEditor = false;
           });
 
           $timeout(() => {

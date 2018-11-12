@@ -26,15 +26,11 @@
   angular.module('exdFrontendApp').directive('environmentSettingsUsercamera', [
     'CAMERA_SENSITIVITY_RANGE',
     'gz3d',
-    'nrpAnalytics',
-    'editorToolbarService',
     'gz3dViewsService',
     'userInteractionSettingsService',
     function(
       CAMERA_SENSITIVITY_RANGE,
       gz3d,
-      nrpAnalytics,
-      editorToolbarService,
       gz3dViewsService,
       userInteractionSettingsService
     ) {
@@ -46,7 +42,6 @@
         link: function(scope) {
           scope.CAMERA_SENSITIVITY_RANGE = CAMERA_SENSITIVITY_RANGE;
 
-          scope.editorToolbarService = editorToolbarService;
           scope.gz3dViewsService = gz3dViewsService;
           scope.userInteractionSettingsService = userInteractionSettingsService;
 
@@ -60,42 +55,33 @@
           // Init the values
 
           scope.composerSettingsToUI = function() {
-            if (editorToolbarService.isEnvironmentSettingsPanelActive) {
-              scope.userCameraSettings = gz3d.scene.composerSettings;
-              if (!scope.userCameraSettings.verticalFOV) {
-                scope.userCameraSettings.verticalFOV = 60;
-              }
-              if (!scope.userCameraSettings.nearClippingDistance) {
-                scope.userCameraSettings.nearClippingDistance = 0.15;
-              }
-              if (!scope.userCameraSettings.farClippingDistance) {
-                scope.userCameraSettings.farClippingDistance = 100.0;
-              }
-              if (!scope.userCameraSettings.showCameraHelper) {
-                scope.userCameraSettings.showCameraHelper = false;
-              }
+            scope.userCameraSettings = gz3d.scene.composerSettings;
+            if (!scope.userCameraSettings.verticalFOV) {
+              scope.userCameraSettings.verticalFOV = 60;
+            }
+            if (!scope.userCameraSettings.nearClippingDistance) {
+              scope.userCameraSettings.nearClippingDistance = 0.15;
+            }
+            if (!scope.userCameraSettings.farClippingDistance) {
+              scope.userCameraSettings.farClippingDistance = 100.0;
+            }
+            if (!scope.userCameraSettings.showCameraHelper) {
+              scope.userCameraSettings.showCameraHelper = false;
             }
           };
-
-          scope.uisSettingsToUI = function() {
-            if (editorToolbarService.isEnvironmentSettingsPanelActive) {
-              scope.camSensitivityTranslation =
-                userInteractionSettingsService.settingsData.camera.sensitivity.translation;
-              scope.camSensitivityRotation =
-                userInteractionSettingsService.settingsData.camera.sensitivity.rotation;
-            }
-          };
-
-          scope.$watch(
-            'editorToolbarService.showEnvironmentSettingsPanel',
-            function() {
-              scope.composerSettingsToUI();
-            }
-          );
+          scope.composerSettingsToUI();
 
           scope.$watch('gz3d.scene.composerSettings', function() {
             scope.composerSettingsToUI();
           });
+
+          scope.uisSettingsToUI = function() {
+            scope.camSensitivityTranslation =
+              userInteractionSettingsService.settingsData.camera.sensitivity.translation;
+            scope.camSensitivityRotation =
+              userInteractionSettingsService.settingsData.camera.sensitivity.rotation;
+          };
+          scope.uisSettingsToUI();
 
           scope.$watch(
             'userInteractionSettingsService.settingsData',

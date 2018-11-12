@@ -68,6 +68,9 @@ def {0}(t):
     if t % 2 < 0.02:
         clientLogger.info('Time: ', t)`
     )
+    .constant('TF_CONFIG', {
+      selectTF: null
+    })
     .factory('structuredTransferFunctionToRaw', [
       '$resource',
       'serverError',
@@ -120,7 +123,6 @@ def {0}(t):
       'simulationInfo',
       'codeEditorsServices',
       'environmentService',
-      'editorsPanelService',
       'clbErrorDialog',
       'RESET_TYPE',
       'autoSaveFactory',
@@ -134,6 +136,7 @@ def {0}(t):
       'storageServer',
       'baseEventHandler',
       'bbpConfig',
+      'TF_CONFIG',
       function(
         $log,
         backendInterfaceService,
@@ -150,7 +153,6 @@ def {0}(t):
         simulationInfo,
         codeEditorsServices,
         environmentService,
-        editorsPanelService,
         clbErrorDialog,
         RESET_TYPE,
         autoSaveFactory,
@@ -163,7 +165,8 @@ def {0}(t):
         rawTransferFunctionToStructured,
         storageServer,
         baseEventHandler,
-        bbpConfig
+        bbpConfig,
+        TF_CONFIG
       ) {
         return {
           templateUrl:
@@ -728,9 +731,7 @@ def {0}(t):
             };
 
             let reloadPopulations = () => {
-              let tf2select =
-                editorsPanelService.openOptions &&
-                editorsPanelService.openOptions.selectTF;
+              let tf2select = TF_CONFIG.selectTF;
 
               backendInterfaceService
                 .getPopulations(scope.loadPopulations)

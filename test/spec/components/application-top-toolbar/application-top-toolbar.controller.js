@@ -6,9 +6,9 @@ describe('Controller: ApplicationTopToolbarController', function() {
   let $controller, $rootScope, $scope, $window;
   let applicationTopToolbarService,
     bbpConfig,
-    editorToolbarService,
     environmentRenderingService,
     experimentViewService,
+    goldenLayoutService,
     nrpAnalytics,
     simToolsSidebarService,
     simulationInfo,
@@ -19,13 +19,13 @@ describe('Controller: ApplicationTopToolbarController', function() {
 
   // used outside simulation
   beforeEach(module('applicationTopToolbarServiceMock'));
-  beforeEach(module('experimentViewServiceMock'));
   beforeEach(module('nrpAnalyticsMock'));
   beforeEach(module('storageServerMock'));
   beforeEach(module('userContextServiceMock'));
   // used inside simulation
-  beforeEach(module('editorToolbarServiceMock'));
   beforeEach(module('environmentRenderingServiceMock'));
+  beforeEach(module('experimentViewServiceMock'));
+  beforeEach(module('goldenLayoutServiceMock'));
   beforeEach(module('simToolsSidebarServiceMock'));
   beforeEach(module('simulationInfoMock'));
   beforeEach(module('stateServiceMock'));
@@ -37,9 +37,9 @@ describe('Controller: ApplicationTopToolbarController', function() {
       _$window_,
       _applicationTopToolbarService_,
       _bbpConfig_,
-      _editorToolbarService_,
       _environmentRenderingService_,
       _experimentViewService_,
+      _goldenLayoutService_,
       _nrpAnalytics_,
       _simToolsSidebarService_,
       _simulationInfo_,
@@ -51,9 +51,9 @@ describe('Controller: ApplicationTopToolbarController', function() {
       $window = _$window_;
       applicationTopToolbarService = _applicationTopToolbarService_;
       bbpConfig = _bbpConfig_;
-      editorToolbarService = _editorToolbarService_;
       environmentRenderingService = _environmentRenderingService_;
       experimentViewService = _experimentViewService_;
+      goldenLayoutService = _goldenLayoutService_;
       nrpAnalytics = _nrpAnalytics_;
       simToolsSidebarService = _simToolsSidebarService_;
       simulationInfo = _simulationInfo_;
@@ -169,9 +169,6 @@ describe('Controller: ApplicationTopToolbarController', function() {
 
     it(' - constructor()', function() {
       expect(
-        applicationTopToolbarController.editorToolbarService
-      ).toBeDefined();
-      expect(
         applicationTopToolbarController.environmentRenderingService
       ).toBeDefined();
       expect(
@@ -182,14 +179,13 @@ describe('Controller: ApplicationTopToolbarController', function() {
     });
 
     it(' - onButtonEnvironmentSettings()', function() {
-      editorToolbarService.showEnvironmentSettingsPanel = false;
       environmentRenderingService.loadingEnvironmentSettingsPanel = true;
       applicationTopToolbarController.onButtonEnvironmentSettings();
-      expect(editorToolbarService.showEnvironmentSettingsPanel).toBe(false);
+      expect(goldenLayoutService.openTool).not.toHaveBeenCalled();
 
       environmentRenderingService.loadingEnvironmentSettingsPanel = false;
       applicationTopToolbarController.onButtonEnvironmentSettings();
-      expect(editorToolbarService.showEnvironmentSettingsPanel).toBe(true);
+      expect(goldenLayoutService.openTool).toHaveBeenCalled();
       expect(nrpAnalytics.eventTrack).toHaveBeenCalled();
     });
 

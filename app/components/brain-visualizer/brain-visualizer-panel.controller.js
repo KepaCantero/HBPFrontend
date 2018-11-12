@@ -29,14 +29,7 @@
     '$scope',
     '$timeout',
     'simulationInfo',
-    'editorToolbarService',
-    function(
-      $rootScope,
-      $scope,
-      $timeout,
-      simulationInfo,
-      editorToolbarService
-    ) {
+    function($rootScope, $scope, $timeout, simulationInfo) {
       $scope.simulationID = simulationInfo.simulationID;
       $scope.serverBaseUrl = simulationInfo.serverBaseUrl;
 
@@ -46,11 +39,6 @@
         this.showBrainVisualiser = false;
         $timeout(() => (this.showBrainVisualiser = true));
       };
-
-      $scope.$on(
-        '$destroy',
-        () => (editorToolbarService.showBrainvisualizerPanel = false)
-      );
     }
   ]);
 })();

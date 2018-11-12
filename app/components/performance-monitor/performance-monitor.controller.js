@@ -20,14 +20,8 @@
   'use strict';
 
   class PerformanceMonitorController {
-    constructor(
-      $element,
-      $scope,
-      performanceMonitorService,
-      editorToolbarService
-    ) {
+    constructor($element, $scope, performanceMonitorService) {
       this.performanceMonitorService = performanceMonitorService;
-      this.editorToolbarService = editorToolbarService;
       var that = this;
       var ctx = $element.find('canvas')[0].getContext('2d');
       this.chart = new Chart(ctx, performanceMonitorService.getConfig());
@@ -35,8 +29,7 @@
 
       $scope.$on('$destroy', function() {
         // remove the callback
-        that.performanceMonitorService.unregisterClient(that.chart);
-        that.editorToolbarService.showPerformanceView = false;
+        performanceMonitorService.unregisterClient(that.chart);
       });
     }
   }
@@ -45,8 +38,7 @@
   PerformanceMonitorController.$inject = [
     '$element',
     '$scope',
-    'performanceMonitorService',
-    'editorToolbarService'
+    'performanceMonitorService'
   ];
 
   angular

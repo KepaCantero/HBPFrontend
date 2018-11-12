@@ -28,20 +28,24 @@
 
   angular.module('exdFrontendApp').service('sceneInfo', [
     '$q',
+    '$rootScope',
     'backendInterfaceService',
-    function($q, backendInterfaceService) {
+    function($q, $rootScope, backendInterfaceService) {
       let initialized = $q.defer();
       let refreshRobotsList = function() {
         return backendInterfaceService
           .getRobots()
           .then(res => (thisService.robots = res.robots));
       };
-      var thisService = {
-        initialize: initialize,
-        initialized: initialized.promise,
-        refreshRobotsList: refreshRobotsList
+
+      let isRobot = entity => {
+        thisService.initialized.then(() => {
+          return (
+            entity &&
+            thisService.robots.some(robot => entity.name === robot.robotId)
+          );
+        });
       };
-      return thisService;
 
       // This function loads the list of robots initially provided by the back-end
       function initialize() {
@@ -50,6 +54,18 @@
           .refreshRobotsList()
           .then(() => initialized.resolve());
       }
+
+      $rootScope.$on('ENTER_SIMULATION', () => {
+        thisService.initialize();
+      });
+
+      var thisService = {
+        initialize: initialize,
+        initialized: initialized.promise,
+        refreshRobotsList: refreshRobotsList,
+        isRobot: isRobot
+      };
+      return thisService;
     }
   ]);
 })();

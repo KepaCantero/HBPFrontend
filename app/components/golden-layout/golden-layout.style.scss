@@ -1,0 +1,10 @@
+@import '../application-top-toolbar/application-top-toolbar.style.scss';
+
+.lm_content {
+  background-color: #f8f8f8;
+}
+
+#golden-layout-container {
+  width: 100%;
+  height: calc(#{100%} - #{$app-top-toolbar-height});
+}

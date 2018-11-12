@@ -56,41 +56,26 @@
   class SimToolsSidebarController {
     constructor(
       $rootScope,
-      $scope,
       $timeout,
-      DYNAMIC_VIEW_CHANNELS,
       NAVIGATION_MODES,
       SIMTOOLS_SIDEBAR_ID,
-      dynamicViewOverlayService,
-      editorsPanelService,
-      editorToolbarService,
       gz3d,
       gz3dViewsService,
       helpTooltipService,
-      nrpAnalytics,
       simToolsSidebarService,
-      userContextService,
       userNavigationService,
       videoStreamService,
       tipTooltipService,
       TIP_CODES,
       clientLoggerService
     ) {
-      this.$scope = $scope;
-
-      this.DYNAMIC_VIEW_CHANNELS = DYNAMIC_VIEW_CHANNELS;
       this.NAVIGATION_MODES = NAVIGATION_MODES;
       this.SIMTOOLS_SIDEBAR_ID = SIMTOOLS_SIDEBAR_ID;
 
-      this.dynamicViewOverlayService = dynamicViewOverlayService;
-      this.editorsPanelService = editorsPanelService;
-      this.editorToolbarService = editorToolbarService;
       this.gz3d = gz3d;
       this.gz3dViewsService = gz3dViewsService;
       this.helpTooltipService = helpTooltipService;
-      this.nrpAnalytics = nrpAnalytics;
       this.simToolsSidebarService = simToolsSidebarService;
-      this.userContextService = userContextService;
       this.userNavigationService = userNavigationService;
       this.videoStreamService = videoStreamService;
 
@@ -127,35 +112,6 @@
       }
 
       this.gz3d.scene.emitter.emit('lightChanged', direction * 0.1);
-    }
-
-    onButtonEditors() {
-      if (
-        this.userContextService.editIsDisabled ||
-        this.editorsPanelService.loadingEditPanel
-      ) {
-        return;
-      } else {
-        return this.editorsPanelService.toggleEditors();
-      }
-    }
-
-    onButtonToggleEditor(editorChannel) {
-      if (this.userContextService.editIsDisabled) {
-        return;
-      }
-
-      this.dynamicViewOverlayService.toggleDynamicViewOverlay(editorChannel);
-    }
-
-    onButtonVideoStreams() {
-      if (!this.videoStreamService.videoStreamsAvailable) {
-        return;
-      }
-
-      this.dynamicViewOverlayService.createDynamicOverlay(
-        this.DYNAMIC_VIEW_CHANNELS.STREAM_VIEWER
-      );
     }
 
     onButtonCameraTranslate(event) {
@@ -201,20 +157,13 @@
     .module('simToolsSidebarModule')
     .controller('SimToolsSidebarController', [
       '$rootScope',
-      '$scope',
       '$timeout',
-      'DYNAMIC_VIEW_CHANNELS',
       'NAVIGATION_MODES',
       'SIMTOOLS_SIDEBAR_ID',
-      'dynamicViewOverlayService',
-      'editorsPanelService',
-      'editorToolbarService',
       'gz3d',
       'gz3dViewsService',
       'helpTooltipService',
-      'nrpAnalytics',
       'simToolsSidebarService',
-      'userContextService',
       'userNavigationService',
       'videoStreamService',
       'tipTooltipService',

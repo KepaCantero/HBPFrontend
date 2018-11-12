@@ -7,7 +7,7 @@ describe('Controller: environmentSettingsPanelCtrl', function() {
 
   beforeEach(module('simulationInfoMock'));
 
-  var scope, rootScope, gz3d, editorToolbarService;
+  var scope, rootScope, gz3d;
 
   var simulationInfo;
 
@@ -32,13 +32,11 @@ describe('Controller: environmentSettingsPanelCtrl', function() {
       $rootScope,
       _bbpConfig_,
       _gz3d_,
-      _editorToolbarService_,
       _simulationInfo_
     ) {
       rootScope = $rootScope;
       scope = $rootScope.$new();
       gz3d = _gz3d_;
-      editorToolbarService = _editorToolbarService_;
       simulationInfo = _simulationInfo_;
 
       // Mock the scene controls object
@@ -49,8 +47,7 @@ describe('Controller: environmentSettingsPanelCtrl', function() {
       $controller('environmentSettingsPanelCtrl', {
         $rootScope: rootScope,
         $scope: scope,
-        simulationInfo: simulationInfo,
-        editorToolbarService: editorToolbarService
+        simulationInfo: simulationInfo
       });
 
       // create mock for console
@@ -58,35 +55,6 @@ describe('Controller: environmentSettingsPanelCtrl', function() {
       spyOn(console, 'log');
     })
   );
-
-  it('should set the panelIsOpen on the open and close callbacks', function() {
-    expect(scope.panelIsOpen).toBeFalsy();
-    expect(scope.openCallback).toEqual(jasmine.any(Function));
-    expect(scope.closeCallback).toEqual(jasmine.any(Function));
-    scope.openCallback();
-    expect(scope.panelIsOpen).toBeTruthy();
-    scope.closeCallback();
-    expect(scope.panelIsOpen).toBeFalsy();
-  });
-
-  it('should set the variable showEnvironmentSettingsPanel to be false', function() {
-    editorToolbarService.showEnvironmentSettingsPanel = true;
-    scope.$destroy();
-    expect(editorToolbarService.showEnvironmentSettingsPanel).toBeFalsy();
-  });
-
-  it('should watch showEnvironmentSettingsPanel', function() {
-    spyOn(scope, 'openCallback');
-    spyOn(scope, 'closeCallback');
-
-    editorToolbarService.showEnvironmentSettingsPanel = false;
-    scope.$digest();
-    expect(scope.closeCallback).toHaveBeenCalled();
-
-    editorToolbarService.showEnvironmentSettingsPanel = true;
-    scope.$digest();
-    expect(scope.openCallback).toHaveBeenCalled();
-  });
 
   it('should call suppressAnyKeyPress from baseEventHandler service', function() {
     scope.suppressKeyPress();

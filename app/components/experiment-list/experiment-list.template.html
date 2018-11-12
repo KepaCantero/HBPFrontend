@@ -66,7 +66,7 @@
                         v-busy="loadingEdit" ng-click="editExperiment(descID);"></a>
                 </div>
                 <form ng-show="editing[descID] && isPrivateExperiment && !loadingEdit">
-                    <textarea rows="4" cols="50" id="{{descID}}" ng-model="exp.configuration.description" 
+                    <textarea rows="4" cols="50" id="{{descID}}" ng-model="exp.configuration.description"
                       ng-change="saveExperimentDetails(exp.configuration.description, descID);" ng-model-options="{ updateOn: 'blur'}"></textarea>
                     <a style="font-size:15px;" href="javascript:void(0);" ng-show="isSavingToCollab" v-busy="isSavingToCollab"></a>
                 </form>

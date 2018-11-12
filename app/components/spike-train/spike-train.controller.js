@@ -50,15 +50,13 @@
       $timeout,
       RESET_TYPE,
       SPIKE_TIMELABEL_SPACE,
-      spikeListenerService,
-      editorToolbarService
+      spikeListenerService
     ) {
       this.SEPARATOR_MSG = Symbol('sep');
 
       this.$filter = $filter;
       this.spikeListenerService = spikeListenerService;
       this.SPIKE_TIMELABEL_SPACE = SPIKE_TIMELABEL_SPACE;
-      this.editorToolbarService = editorToolbarService;
 
       this.firstRun = true;
       this.messages = [];
@@ -70,28 +68,24 @@
 
       this.startSpikeDisplay();
 
-      // only start watching for size changes after a little timeout
-      // the flood of size changes during compilation will cause angular to throw digest errors when watched
-      $timeout(() => {
-        $scope.$watch(
-          () => {
-            return [
-              this.canvas.parentNode.offsetWidth,
-              this.canvas.parentNode.offsetHeight
-            ].join('x');
-          },
-          () => {
-            this.calculateCanvas();
-          }
-        );
-      }, 200);
+      let pollCheckResize = () => {
+        let newDimensions = [
+          this.canvas.parentNode.offsetWidth,
+          this.canvas.parentNode.offsetHeight
+        ].join('x');
+        if (this.oldDimensions !== newDimensions) {
+          this.calculateCanvas();
+        }
+        this.oldDimensions = newDimensions;
+        $timeout(pollCheckResize, 500);
+      };
+      $timeout(pollCheckResize, 500);
 
       $scope.$on('RESET', (event, resetType) => {
         if (resetType !== RESET_TYPE.RESET_CAMERA_VIEW) this.clearPlot();
       });
 
       $scope.$on('$destroy', () => {
-        this.editorToolbarService.showSpikeTrain = false;
         this.stopSpikeDisplay();
         angular.element(window).off('resize.spiketrain');
       });
@@ -271,8 +265,7 @@
     '$timeout',
     'RESET_TYPE',
     'SPIKE_TIMELABEL_SPACE',
-    'spikeListenerService',
-    'editorToolbarService'
+    'spikeListenerService'
   ];
 
   angular

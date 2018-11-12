@@ -30,17 +30,7 @@
     'bbpConfig',
     'gz3d',
     'baseEventHandler',
-    'editorToolbarService',
-    function(
-      $rootScope,
-      $scope,
-      bbpConfig,
-      gz3d,
-      baseEventHandler,
-      editorToolbarService
-    ) {
-      $scope.editorToolbarService = editorToolbarService;
-      $scope.panelIsOpen = false;
+    function($rootScope, $scope, bbpConfig, gz3d, baseEventHandler) {
       $scope.tabindex = {
         master: 1,
         quality: 2,
@@ -50,33 +40,6 @@
       };
 
       $scope.activeTabIndex = $scope.tabindex.master;
-
-      $scope.openCallback = function() {
-        // The Panel is opened
-        $scope.panelIsOpen = true;
-      };
-
-      $scope.closeCallback = function() {
-        // The Panel is closed
-        $scope.panelIsOpen = false;
-      };
-
-      // clean up on leaving
-      $scope.$on('$destroy', function() {
-        // prevent calling the select functions of the tabs
-        editorToolbarService.showEnvironmentSettingsPanel = false;
-      });
-
-      $scope.$watch(
-        'editorToolbarService.showEnvironmentSettingsPanel',
-        function() {
-          if (editorToolbarService.isEnvironmentSettingsPanelActive) {
-            $scope.openCallback();
-          } else {
-            $scope.closeCallback();
-          }
-        }
-      );
 
       $scope.suppressKeyPress = function(event) {
         baseEventHandler.suppressAnyKeyPress(event);

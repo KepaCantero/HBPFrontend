@@ -4,11 +4,9 @@ describe('Service: ExperimentViewService', function() {
   let experimentViewService;
 
   let $location, $rootScope, $timeout;
-  let DYNAMIC_VIEW_CHANNELS, RESET_TYPE, STATE;
+  let RESET_TYPE, STATE;
   let backendInterfaceService,
     bbpConfig,
-    dynamicViewOverlayService,
-    editorsPanelService,
     environmentRenderingService,
     environmentService,
     gz3d,
@@ -21,8 +19,7 @@ describe('Service: ExperimentViewService', function() {
 
   beforeEach(module('autosaveOnExitServiceMock'));
   beforeEach(module('backendInterfaceServiceMock'));
-  beforeEach(module('dynamicViewOverlayServiceMock'));
-  beforeEach(module('editorsPanelServiceMock'));
+  beforeEach(module('clbConfirmMock'));
   beforeEach(module('environmentRenderingServiceMock'));
   beforeEach(module('gz3dMock'));
   beforeEach(module('nrpModalServiceMock'));
@@ -39,13 +36,10 @@ describe('Service: ExperimentViewService', function() {
       _$location_,
       _$rootScope_,
       _$timeout_,
-      _DYNAMIC_VIEW_CHANNELS_,
       _RESET_TYPE_,
       _STATE_,
       _backendInterfaceService_,
       _bbpConfig_,
-      _dynamicViewOverlayService_,
-      _editorsPanelService_,
       _environmentRenderingService_,
       _environmentService_,
       _gz3d_,
@@ -60,13 +54,10 @@ describe('Service: ExperimentViewService', function() {
       $location = _$location_;
       $rootScope = _$rootScope_;
       $timeout = _$timeout_;
-      DYNAMIC_VIEW_CHANNELS = _DYNAMIC_VIEW_CHANNELS_;
       RESET_TYPE = _RESET_TYPE_;
       STATE = _STATE_;
       backendInterfaceService = _backendInterfaceService_;
       bbpConfig = _bbpConfig_;
-      dynamicViewOverlayService = _dynamicViewOverlayService_;
-      editorsPanelService = _editorsPanelService_;
       environmentRenderingService = _environmentRenderingService_;
       environmentService = _environmentService_;
       gz3d = _gz3d_;
@@ -164,9 +155,6 @@ describe('Service: ExperimentViewService', function() {
     experimentViewService.resetGUI();
     expect(gz3d.scene.resetView).toHaveBeenCalled();
     expect(gz3d.scene.selectEntity).toHaveBeenCalledWith(null);
-    expect(
-      dynamicViewOverlayService.closeAllOverlaysOfType
-    ).toHaveBeenCalledWith(DYNAMIC_VIEW_CHANNELS.OBJECT_INSPECTOR);
   });
 
   it('should open splash screen with callbackOnClose', function() {
@@ -248,14 +236,12 @@ describe('Service: ExperimentViewService', function() {
     spyOn(experimentViewService, 'notifyResetToWidgets').and.callThrough();
     spyOn(experimentViewService, 'updatePanelUI').and.callThrough();
 
-    editorsPanelService.showEditorPanel = true;
     experimentViewService.resetRequest = {
       resetType: RESET_TYPE.RESET_FULL
     };
 
     experimentViewService.resetOccuredOnServer();
 
-    expect(editorsPanelService.toggleEditors).toHaveBeenCalled();
     expect(experimentViewService.notifyResetToWidgets).toHaveBeenCalled();
     expect(experimentViewService.updatePanelUI).toHaveBeenCalled();
     expect(gz3d.scene.resetView).toHaveBeenCalled();
@@ -354,7 +340,8 @@ describe('Service: ExperimentViewService', function() {
         resetType: RESET_TYPE.NO_RESET,
         contextId: 'mockContextID'
       };
-      spyOn(experimentViewService.clbConfirm, 'open').and.returnValue({
+
+      experimentViewService.clbConfirm.open.and.returnValue({
         then: fn => {
           experimentViewService.resetRequest = mockResetRequest;
           fn();
@@ -385,18 +372,7 @@ describe('Service: ExperimentViewService', function() {
 
     it('should close editor panels', function() {
       mockResetRequest.resetType = RESET_TYPE.RESET_FULL;
-      editorsPanelService.showEditorPanel = true;
       experimentViewService.resetSimulation();
-      expect(editorsPanelService.toggleEditors).toHaveBeenCalled();
-    });
-
-    it('should close object inspector panels', function() {
-      mockResetRequest.resetType = RESET_TYPE.RESET_FULL;
-      editorsPanelService.showEditorPanel = true;
-      experimentViewService.resetSimulation();
-      expect(
-        dynamicViewOverlayService.closeAllOverlaysOfType
-      ).toHaveBeenCalledWith(DYNAMIC_VIEW_CHANNELS.OBJECT_INSPECTOR);
     });
 
     it('should notify the widgets when resetting brain/camera/robot', function() {

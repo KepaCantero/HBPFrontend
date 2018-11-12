@@ -34,7 +34,15 @@
     ])
     .directive('materialsChooser', [
       'COLORING_MATERIALS',
-      function(COLORING_MATERIALS) {
+      'colorableObjectService',
+      'gz3d',
+      'simulationInfo',
+      function(
+        COLORING_MATERIALS,
+        colorableObjectService,
+        gz3d,
+        simulationInfo
+      ) {
         return {
           templateUrl: 'views/esv/materials-chooser.html',
           restrict: 'E',
@@ -43,6 +51,21 @@
           },
           link: function(scope) {
             scope.materials = COLORING_MATERIALS;
+
+            scope.setMaterialOnEntity = material => {
+              var selectedEntity = gz3d.scene.selectedEntity;
+              if (!selectedEntity) {
+                console.error(
+                  'Could not change color since there was no object selected'
+                );
+                return;
+              }
+              colorableObjectService.setEntityMaterial(
+                simulationInfo,
+                selectedEntity,
+                material
+              );
+            };
           }
         };
       }

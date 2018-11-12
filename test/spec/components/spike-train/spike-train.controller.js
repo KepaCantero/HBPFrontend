@@ -6,7 +6,6 @@ describe('Controller: spiketrain', function() {
   beforeEach(module('exdFrontendApp.Constants'));
 
   beforeEach(module('simulationInfoMock'));
-  beforeEach(module('editorToolbarServiceMock'));
   beforeEach(module('spikeListenerServiceMock'));
 
   var $rootScope, $scope, $timeout;
@@ -15,7 +14,7 @@ describe('Controller: spiketrain', function() {
     canvas,
     canvasParent,
     SPIKE_TIMELABEL_SPACE = 0;
-  var editorToolbarService, spikeListenerService;
+  var spikeListenerService;
 
   beforeEach(
     module(function($provide) {
@@ -48,13 +47,11 @@ describe('Controller: spiketrain', function() {
       $filter,
       _$timeout_,
       _RESET_TYPE_,
-      _editorToolbarService_,
       _spikeListenerService_
     ) {
       $rootScope = _$rootScope_;
       $scope = $rootScope.$new();
       $timeout = _$timeout_;
-      editorToolbarService = _editorToolbarService_;
       spikeListenerService = _spikeListenerService_;
 
       spikeController = $controller('SpikeTrainController', {
@@ -75,21 +72,19 @@ describe('Controller: spiketrain', function() {
     spyOn(spikeController, 'startSpikeDisplay').and.callThrough();
     spyOn(spikeController, 'stopSpikeDisplay').and.callThrough();
     spyOn(spikeController, 'redraw').and.callThrough();
+    spyOn(spikeController, 'calculateCanvas').and.callThrough();
   });
 
-  it('should call controller methods when created', function() {
-    expect(spikeController.canvas).toBeDefined();
+  it('should start polling for resized canvas and update canvas size if necessary', function() {
+    spikeController.calculateCanvas.calls.reset();
 
-    spyOn($scope, '$watch').and.callThrough();
     $timeout.flush();
-    expect($scope.$watch).toHaveBeenCalled();
+
+    expect(spikeController.calculateCanvas).toHaveBeenCalled();
   });
 
   it('should stop and hide on close', function() {
-    editorToolbarService.showSpikeTrain = true;
     $scope.$destroy();
-
-    expect(editorToolbarService.showSpikeTrain).toBe(false);
     expect(spikeController.stopSpikeDisplay).toHaveBeenCalled();
   });
 

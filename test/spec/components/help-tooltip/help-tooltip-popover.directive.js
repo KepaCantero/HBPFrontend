@@ -6,17 +6,22 @@
     beforeEach(module('helpTooltipPopoverModule'));
     beforeEach(module('exd.templates')); // import html template
 
+    beforeEach(module('tipTooltipServiceMock'));
+
+    let $rootScope;
     var scope, helpTooltipService, STATE, stateService;
 
     beforeEach(
       inject(function(
-        $rootScope,
+        _$rootScope_,
         $compile,
         $httpBackend,
         _helpTooltipService_,
         _STATE_,
         _stateService_
       ) {
+        $rootScope = _$rootScope_;
+
         helpTooltipService = _helpTooltipService_;
         STATE = _STATE_;
         stateService = _stateService_;
@@ -35,6 +40,12 @@
       expect(scope.helpTooltipService).toBe(helpTooltipService);
       expect(scope.STATE).toBe(STATE);
       expect(scope.stateService).toBe(stateService);
+    });
+
+    it(' - showLatestChangeLog()', function() {
+      spyOn($rootScope, '$emit').and.callThrough();
+      scope.showLatestChangeLog();
+      expect($rootScope.$emit).toHaveBeenCalledWith('SHOW_CHANGE_LOG');
     });
   });
 })();

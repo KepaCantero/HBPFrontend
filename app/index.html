@@ -18,6 +18,8 @@
     <link rel="stylesheet" href="bower_components/v-button/dist/v-button.css" />
     <link rel="stylesheet" href="bower_components/gz3d-hbp/gz3d/client/style/gz3d-hbp.css" />
     <link rel="stylesheet" href="bower_components/angular-material/angular-material.css">
+    <link rel="stylesheet" href="bower_components/golden-layout/src/css/goldenlayout-base.css">
+    <link rel="stylesheet" href="bower_components/golden-layout/src/css/goldenlayout-light-theme.css">
     <!-- endbuild -->
 
     <!-- build:css(.tmp) styles/main.css -->
@@ -68,6 +70,7 @@
     <script src="bower_components/angular-animate/angular-animate.js"></script>
     <script src="bower_components/angular-aria/angular-aria.js"></script>
     <script src="bower_components/angular-bbp-config/angular-bbp-config.js"></script>
+    <script src="bower_components/angular-bootstrap-contextmenu/contextMenu.js"></script>
     <script src="bower_components/angular-cookies/angular-cookies.js"></script>
     <script src="bower_components/angular-messages/angular-messages.js"></script>
     <script src="bower_components/angular-material/angular-material.js"></script>
@@ -83,6 +86,7 @@
     <script src="bower_components/angular.panels/dist/angular.panels.min.js"></script>
     <script src="bower_components/bootstrap-sass-official/assets/javascripts/bootstrap.js"></script>
     <script src="bower_components/es5-shim/es5-shim.js"></script>
+    <script src="bower_components/golden-layout/dist/goldenlayout.min.js"></script>
     <script src="bower_components/three.js/three.js"></script>
     <script src="bower_components/three.js/examples/js/controls/OrbitControls.js"></script>
     <script src="bower_components/three.js/examples/js/Detector.js"></script>
@@ -152,13 +156,11 @@
     <script src="scripts/common/services/download-file-service.js"></script>
     <script src="scripts/common/services/update-checker.service.js"></script>
     <script src="scripts/common/directives/bindHtmlAndCompile.js"></script>
-    <script src="components/editors/editor-panel.controller.js"></script>
     <script src="scripts/common/services/nrp-angulartics.js"></script>
     <script src="scripts/esv/controllers/experiment-view.controller.js"></script>
     <script src="scripts/esv/controllers/esv-experiments.js"></script>
     <script src="scripts/esv/controllers/demo-experiments.controller.js"></script>
     <script src="scripts/esv/controllers/demo-waiting.controller.js"></script>
-    <script src="scripts/esv/directives/context-menu.js"></script>
     <script src="scripts/esv/directives/materials-chooser.js"></script>
     <script src="scripts/esv/directives/owner-only.js"></script>
     <script src="scripts/esv/directives/editable-experiment.js"></script>
@@ -166,7 +168,6 @@
     <script src="scripts/esv/filters/experiment-status.js"></script>
     <script src="scripts/esv/services/documentation-urls.js"></script>
     <script src="scripts/esv/services/simulation-control.js"></script>
-    <script src="scripts/esv/services/context-menu-service.js"></script>
     <script src="scripts/esv/services/backend-interface.js"></script>
     <script src="scripts/esv/services/roslib-angular.js"></script>
     <script src="scripts/esv/services/simulation-info-service.js"></script>
@@ -190,7 +191,6 @@
     <script src="scripts/esv/services/is-a-robot-predicate.js"></script>
     <script src="scripts/esv/services/code-editors-services.js"></script>
     <script src="scripts/esv/services/user-context-service.js"></script>
-    <script src="components/editors/editor-panel.service.js"></script>
     <script src="scripts/esv/services/experiment.service.js"></script>
     <script src="scripts/esv/directives/camera-view.js"></script>
     <script src="scripts/esv/directives/ros-reconnecting.js"></script>
@@ -231,7 +231,6 @@
     <script src="components/dynamic-view-overlay/dynamic-view-overlay.controller.js"></script>
     <script src="components/dynamic-view-overlay/dynamic-view-overlay.directive.js"></script>
     <script src="components/dynamic-view-overlay/dynamic-view-overlay.service.js"></script>
-    <script src="components/editors/editor-panel.directive.js"></script>
     <script src="components/editors/brain-editor/pynn-editor.directive.js"></script>
     <script src="components/editors/environment-editor/environment-editor.directive.js"></script>
     <script src="components/editors/state-machine-editor/smach-editor.directive.js"></script>
@@ -265,6 +264,11 @@
     <script src="components/tip-tooltip/tip-tooltip.service.js"></script>
     <script src="components/experiment-list/experiment-list.controller.js"></script>
     <script src="components/experiment-list/experiment-list.directive.js"></script>
+    <script src="components/golden-layout/golden-layout.modules.js"></script>
+    <script src="components/golden-layout/golden-layout.service.js"></script>
+    <script src="components/golden-layout/golden-layout.controller.js"></script>
+    <script src="components/golden-layout/golden-layout.directive.js"></script>
+    <script src="components/golden-layout/golden-layout-tool-source.directive.js"></script>
     <script src="components/joint-plot/joint-plot.controller.js"></script>
     <script src="components/joint-plot/joint-plot.directive.js"></script>
     <script src="components/joint-plot/joint-plot.service.js"></script>
@@ -274,9 +278,6 @@
     <script src="components/help-tooltip/help-tooltip.directive.js"></script>
     <script src="components/help-tooltip/help-tooltip.service.js"></script>
     <script src="components/help-tooltip/popover/help-tooltip-popover.directive.js"></script>
-    <script src="components/editor-toolbar/editor-toolbar.controller.js"></script>
-    <script src="components/editor-toolbar/editor-toolbar.directive.js"></script>
-    <script src="components/editor-toolbar/editor-toolbar.service.js"></script>
     <script src="components/video-stream/video-stream.directive.js"></script>
     <script src="components/video-stream/video-stream.service.js"></script>
     <script src="components/noise-model/noise-model.directive.js"></script>
@@ -299,12 +300,10 @@
     <script src="components/user-interaction/user-interaction.modules.js"></script>
     <script src="components/user-interaction/navigation/first-person-controls.js"></script>
     <script src="components/user-interaction/navigation/user-navigation.service.js"></script>
-    <script src="components/user-interaction/apply-force.service.js"></script>
-    <script src="components/user-interaction/apply-force-view.controller.js"></script>
-    <script src="components/user-interaction/apply-force-view.directive.js"></script>
-    <script src="components/user-interaction/pull-force.controller.js"></script>
-    <script src="components/user-interaction/pull-force.service.js"></script>
-    <script src="components/user-interaction/pull-force.directive.js"></script>
+    <script src="components/user-interaction/apply-force/push-force.service.js"></script>
+    <script src="components/user-interaction/apply-force/pull-force.service.js"></script>
+    <script src="components/user-interaction/apply-force/apply-force.controller.js"></script>
+    <script src="components/user-interaction/apply-force/apply-force.directive.js"></script>
     <script src="components/user-interaction/user-interaction-settings.service.js"></script>
     <script src="components/robot-documentation/robot-documentation.directive.js"></script>
     <!-- endbuild -->

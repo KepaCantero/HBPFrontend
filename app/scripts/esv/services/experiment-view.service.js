@@ -40,7 +40,6 @@
       bbpConfig,
       clbConfirm,
       dynamicViewOverlayService,
-      editorsPanelService,
       environmentRenderingService,
       environmentService,
       gz3d,
@@ -69,7 +68,6 @@
       this.bbpConfig = bbpConfig;
       this.clbConfirm = clbConfirm;
       this.dynamicViewOverlayService = dynamicViewOverlayService;
-      this.editorsPanelService = editorsPanelService;
       this.environmentRenderingService = environmentRenderingService;
       this.environmentService = environmentService;
       this.gz3d = gz3d;
@@ -210,7 +208,6 @@
       if (angular.isDefined(message.realTime)) {
         this.simulationInfo.realTimeText = message.realTime;
       }
-      this.performanceMonitorService.processStateChange(message);
     }
 
     onStateChanged(newState) {
@@ -228,9 +225,6 @@
      * Hide the editor if visible, reset the UI
      */
     resetOccuredOnServer() {
-      if (this.editorsPanelService.showEditorPanel) {
-        this.editorsPanelService.toggleEditors();
-      }
       //Workaround for resetting correctly the PBR textures
       if (
         this.resetRequest.resetType == this.RESET_TYPE.RESET_WORLD ||
@@ -297,9 +291,6 @@
 
               this.stateService.setCurrentState(this.STATE.PAUSED);
 
-              if (this.editorsPanelService.showEditorPanel) {
-                this.editorsPanelService.toggleEditors();
-              }
               this.dynamicViewOverlayService.closeAllOverlaysOfType(
                 this.DYNAMIC_VIEW_CHANNELS.OBJECT_INSPECTOR
               );
@@ -437,7 +428,6 @@
       });
 
       if (this.environmentService.isPrivateExperiment()) {
-        this.editorsPanelService.deinit();
         this.userContextService.deinit();
       }
 
@@ -447,12 +437,7 @@
     //TODO: (@SandroWeber) move this to their respective services, they can react to RESET events themselves
     resetGUI() {
       this.gz3d.scene.resetView(); //update the default camera position, if defined
-      if (this.objectInspectorService !== null) {
-        this.gz3d.scene.selectEntity(null);
-        this.dynamicViewOverlayService.closeAllOverlaysOfType(
-          this.DYNAMIC_VIEW_CHANNELS.OBJECT_INSPECTOR
-        );
-      }
+      this.gz3d.scene.selectEntity(null);
     }
 
     notifyResetToWidgets(resetType) {
@@ -487,7 +472,6 @@
     'bbpConfig',
     'clbConfirm',
     'dynamicViewOverlayService',
-    'editorsPanelService',
     'environmentRenderingService',
     'environmentService',
     'gz3d',

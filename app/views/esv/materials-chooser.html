@@ -1,3 +1,4 @@
 <div class="esv-materials-chooser">
-    <div class="esv-materials-chooser-material" color="{{material.name}}" ng-style="{'background-color': material.color}" ng-click="select({material:material.name})" ng-repeat="material in materials" />
+    <div class="esv-materials-chooser-material" color="{{material.name}}" ng-style="{'background-color': material.color}"
+         ng-click="setMaterialOnEntity(material.name)" ng-repeat="material in materials" />
 </div>

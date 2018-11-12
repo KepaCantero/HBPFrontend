@@ -36,41 +36,39 @@
   angular.module('exdFrontendApp').directive('environmentDesigner', [
     'STATE',
     'EDIT_MODE',
+    'TOOL_CONFIGS',
     'panels',
     'simulationSDFWorld',
     'gz3d',
     'stateService',
     'simulationInfo',
     'sceneInfo',
-    'contextMenuState',
     'backendInterfaceService',
     'clbErrorDialog',
     'isARobotPredicate',
     'downloadFileService',
     'environmentService',
-    'dynamicViewOverlayService',
+    'goldenLayoutService',
     'DYNAMIC_VIEW_CHANNELS',
     '$http',
-    'userNavigationService',
     function(
       STATE,
       EDIT_MODE,
+      TOOL_CONFIGS,
       panels,
       simulationSDFWorld,
       gz3d,
       stateService,
       simulationInfo,
       sceneInfo,
-      contextMenuState,
       backendInterfaceService,
       clbErrorDialog,
       isARobotPredicate,
       downloadFileService,
       environmentService,
-      dynamicViewOverlayService,
+      goldenLayoutService,
       DYNAMIC_VIEW_CHANNELS,
-      $http,
-      userNavigationService
+      $http
     ) {
       return {
         templateUrl:
@@ -98,7 +96,6 @@
               sceneInfo.refreshRobotsList();
             }
           };
-          gz3d.Initialize();
           gz3d.iface.addOnDeleteEntityCallbacks(deleteBackendRobotCallback);
           gz3d.iface.addOnCreateEntityCallbacks(sceneInfo.refreshRobotsList);
 
@@ -193,9 +190,10 @@
 
             if (obj) {
               scope.gz3d.scene.selectEntity(obj);
-              dynamicViewOverlayService.createDynamicOverlay(
+              /*dynamicViewOverlayService.createDynamicOverlay(
                 DYNAMIC_VIEW_CHANNELS.OBJECT_INSPECTOR
-              );
+              );*/
+              goldenLayoutService.openTool(TOOL_CONFIGS.OBJECT_INSPECTOR);
             }
           };
 
@@ -241,115 +239,11 @@
 
           scope.deleteModel = function() {
             gz3d.gui.guiEvents.emit('delete_entity');
-            contextMenuState.toggleContextMenu(false);
           };
 
           scope.duplicateModel = function() {
             gz3d.gui.guiEvents.emit('duplicate_entity');
-            contextMenuState.toggleContextMenu(false);
           };
-
-          // Edit and Delete object context Menu item
-          contextMenuState.pushItemGroup({
-            id: 'Modify',
-            visible: false,
-            items: [
-              {
-                text: 'Inspect',
-                callback: function(event) {
-                  dynamicViewOverlayService.createDynamicOverlay(
-                    DYNAMIC_VIEW_CHANNELS.OBJECT_INSPECTOR
-                  );
-                  contextMenuState.toggleContextMenu(false);
-                  event.stopPropagation();
-                },
-                visible: false
-              },
-              {
-                text: 'Look At',
-                callback: function(event) {
-                  userNavigationService.setLookatCamera();
-                  gz3d.gui.guiEvents.emit('lookat_entity');
-                  contextMenuState.toggleContextMenu(false);
-                  event.stopPropagation();
-                },
-                visible: false
-              },
-              {
-                text: 'Duplicate',
-                callback: function(event) {
-                  scope.duplicateModel();
-                  event.stopPropagation();
-                },
-                visible: false
-              },
-              {
-                text: 'Show Skin',
-                callback: function(event) {
-                  if (gz3d.scene.selectedEntity)
-                    gz3d.scene.setSkinVisible(
-                      gz3d.scene.selectedEntity,
-                      !gz3d.scene.skinVisible(gz3d.scene.selectedEntity)
-                    );
-                  contextMenuState.toggleContextMenu(false);
-                  event.stopPropagation();
-                },
-                visible: false
-              },
-              {
-                text: 'Set as Initial Pose',
-                callback: event => {
-                  let {
-                    name,
-                    position: { x, y, z },
-                    rotation: { _x: roll, _y: pitch, _z: yaw }
-                  } = gz3d.scene.selectedEntity;
-
-                  backendInterfaceService.setRobotInitialPose(name, {
-                    x,
-                    y,
-                    z,
-                    roll,
-                    pitch,
-                    yaw
-                  });
-                  contextMenuState.toggleContextMenu(false);
-                  event.stopPropagation();
-                },
-                visible: false
-              },
-              {
-                text: 'Delete',
-                callback: function(event) {
-                  scope.deleteModel();
-                  event.stopPropagation();
-                },
-                visible: false
-              }
-            ],
-
-            hide: function() {
-              for (let item of this.items) {
-                item.visible = false;
-              }
-              this.visible = false;
-            },
-
-            show: function(model) {
-              this.visible = this.items[0].visible = true;
-              this.items[1].visible = true;
-              this.items[2].visible = gz3d.gui.canModelBeDuplicated(model.name);
-              this.items[3].visible = gz3d.scene.hasSkin(model);
-              this.items[3].text = gz3d.scene.skinVisible(model)
-                ? 'Hide Skin'
-                : 'Show Skin';
-
-              this.items[4].visible = isARobotPredicate(model);
-              this.items[5].visible = true;
-
-              return true;
-            }
-          });
 
           scope.exportSDFWorld = function() {
             simulationSDFWorld(simulationInfo.serverBaseUrl).export(

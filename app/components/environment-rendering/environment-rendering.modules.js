@@ -28,6 +28,7 @@
   angular.module('gz3dModule', []);
   angular.module('environmentRenderingModule', [
     'gz3dModule',
-    'tipTooltipModule'
+    'tipTooltipModule',
+    'userContextModule'
   ]);
 })();

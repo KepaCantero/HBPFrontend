@@ -31,26 +31,16 @@
   angular.module('exdFrontendApp').directive('environmentSettingsEnvironment', [
     'gz3d',
     'nrpAnalytics',
-    'editorToolbarService',
     'simulationInfo',
     '$http',
     'SKYBOX_LIBRARY',
-    function(
-      gz3d,
-      nrpAnalytics,
-      editorToolbarService,
-      simulationInfo,
-      $http,
-      SKYBOX_LIBRARY
-    ) {
+    function(gz3d, nrpAnalytics, simulationInfo, $http, SKYBOX_LIBRARY) {
       return {
         templateUrl:
           'components/environment-settings/environment-settings-environment.template.html',
         restrict: 'E',
         scope: true,
         link: function(scope) {
-          scope.editorToolbarService = editorToolbarService;
-
           //----------------------------------------------
           // Init the values
 
@@ -92,31 +82,24 @@
             $http.get(skyBoxLibrary).then(function(res) {
               scope.skyList = res.data.skyList;
               scope.skyLabelList = res.data.skyLabelList;
-              if (editorToolbarService.isEnvironmentSettingsPanelActive) {
-                var cs = gz3d.scene.composerSettings;
 
-                scope.envMap.selectedEnvMap = scope.skyList.indexOf(cs.skyBox);
-                scope.selectedSun = scope.sunList.indexOf(cs.sun);
-                scope.dynamicEnvMap = cs.dynamicEnvMap ? 1 : 0;
+              var cs = gz3d.scene.composerSettings;
 
-                scope.bloom = cs.bloom;
-                scope.bloomThreshold = cs.bloomThreshold;
-                scope.bloomStrength = cs.bloomStrength;
-                scope.bloomRadius = cs.bloomRadius;
+              scope.envMap.selectedEnvMap = scope.skyList.indexOf(cs.skyBox);
+              scope.selectedSun = scope.sunList.indexOf(cs.sun);
+              scope.dynamicEnvMap = cs.dynamicEnvMap ? 1 : 0;
 
-                scope.fog = cs.fog;
-                scope.fogDensity = cs.fogDensity;
-                scope.fogColor = cs.fogColor;
-              }
+              scope.bloom = cs.bloom;
+              scope.bloomThreshold = cs.bloomThreshold;
+              scope.bloomStrength = cs.bloomStrength;
+              scope.bloomRadius = cs.bloomRadius;
+
+              scope.fog = cs.fog;
+              scope.fogDensity = cs.fogDensity;
+              scope.fogColor = cs.fogColor;
             });
           };
-
-          scope.$watch(
-            'editorToolbarService.showEnvironmentSettingsPanel',
-            function() {
-              scope.composerSettingsToUI();
-            }
-          );
+          scope.composerSettingsToUI();
 
           scope.$watch('gz3d.scene.composerSettings', function() {
             scope.composerSettingsToUI();

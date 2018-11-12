@@ -33,7 +33,8 @@ describe('testing the gz3d service', function() {
     },
     getDomElement: jasmine.createSpy('getDomElement').and.returnValue({}),
     setWindowSize: jasmine.createSpy('setWindowSize'),
-    refresh3DViews: jasmine.createSpy('refresh3DViews')
+    refresh3DViews: jasmine.createSpy('refresh3DViews'),
+    prepareModelsForRaycast: jasmine.createSpy('prepareModelsForRaycast')
   };
   var GuiObject = {};
   var GZIfaceObject = {
@@ -82,6 +83,44 @@ describe('testing the gz3d service', function() {
       gz3d.Initialize();
     })
   );
+
+  let correctModel, correctChildLink, wrongModel, wrongChildLink, lineSegment;
+  let mockIntersections;
+  beforeEach(function() {
+    correctModel = new THREE.Object3D();
+    correctChildLink = new THREE.Object3D();
+    wrongModel = new THREE.Object3D();
+    wrongChildLink = new THREE.Object3D();
+    lineSegment = new THREE.Object3D();
+
+    correctChildLink.userData = {
+      gazeboType: 'link'
+    };
+    correctModel.add(correctChildLink);
+    gz3d.scene.scene.add(correctModel);
+
+    wrongChildLink.userData = {
+      gazeboType: 'link'
+    };
+    wrongModel.add(wrongChildLink);
+
+    lineSegment.type = 'LineSegments';
+
+    mockIntersections = [
+      {
+        object: wrongModel
+      },
+      {
+        object: lineSegment
+      },
+      {
+        object: correctChildLink
+      },
+      {
+        object: wrongChildLink
+      }
+    ];
+  });
 
   it('checks if all the GZ3D constructors have been called', function() {
     expect(GZ3D.Scene).toHaveBeenCalled();
@@ -156,5 +195,80 @@ describe('testing the gz3d service', function() {
     expect(gz3d.scene.scene.getObjectByName('test_lightHelper').visible).toBe(
       true
     );
+  });
+
+  it(' - getRayCastModel()', function() {
+    spyOn(gz3d, 'getRayCastIntersections').and.returnValue(mockIntersections);
+
+    expect(gz3d.getRayCastModel({ x: 1, y: 1 })).toBe(correctModel);
+  });
+
+  it(' - getRayCastLink()', function() {
+    spyOn(gz3d, 'getRayCastIntersections').and.returnValue([]);
+    expect(gz3d.getRayCastLink(correctModel, { x: 1, y: 1 })).toBe(null);
+
+    gz3d.getRayCastIntersections.and.returnValue(mockIntersections);
+
+    expect(gz3d.getRayCastLink(wrongModel, { x: 1, y: 1 })).toBe(
+      wrongChildLink
+    );
+    expect(gz3d.getRayCastLink(correctModel, { x: 1, y: 1 })).toBe(
+      correctChildLink
+    );
+  });
+
+  it(' - getRayCastIntersections()', function() {
+    let mockRaycaster = {
+      setFromCamera: jasmine.createSpy('setFromCamera'),
+      intersectObjects: jasmine.createSpy('intersectObjects')
+    };
+    spyOn(THREE, 'Raycaster').and.returnValue(mockRaycaster);
+
+    let clickPos = { x: 10, y: 10 };
+    let boundingClientRect = {
+      x: 0,
+      y: 0,
+      width: 40,
+      height: 20
+    };
+    let view = {
+      container: {
+        getBoundingClientRect: jasmine
+          .createSpy('getBoundingClientRect')
+          .and.returnValue(boundingClientRect)
+      },
+      camera: {}
+    };
+    gz3d.getRayCastIntersections(clickPos, view);
+
+    expect(mockRaycaster.setFromCamera).toHaveBeenCalledWith(
+      new THREE.Vector2(-0.5, 0),
+      view.camera
+    );
+    expect(mockRaycaster.intersectObjects).toHaveBeenCalledWith(
+      gz3d.scene.scene.children,
+      true
+    );
+  });
+
+  it(' - getLinkFromIntersections()', function() {
+    expect(gz3d.getLinkFromIntersections(mockIntersections, null)).toBe(
+      undefined
+    );
+
+    expect(
+      gz3d.getLinkFromIntersections(mockIntersections, wrongModel).link
+    ).toBe(wrongChildLink);
+    expect(
+      gz3d.getLinkFromIntersections(mockIntersections, wrongModel).intersection
+    ).toBe(mockIntersections[3]);
+
+    expect(
+      gz3d.getLinkFromIntersections(mockIntersections, correctModel).link
+    ).toBe(correctChildLink);
+    expect(
+      gz3d.getLinkFromIntersections(mockIntersections, correctModel)
+        .intersection
+    ).toBe(mockIntersections[2]);
   });
 });

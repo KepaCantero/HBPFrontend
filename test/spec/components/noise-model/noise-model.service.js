@@ -21,7 +21,6 @@ describe('Services: noise-model-service', function() {
   );
   var modelname, sensorname, sensortype;
   it('- test for setDataNoiseModel', function() {
-    spyOn(dynamicViewOverlayService, 'createDynamicOverlay');
     var mockModelName = 'robot';
     var mockSensorName = 'default::robot::some_link::my_camera';
     var mockSensorType = 'camera';

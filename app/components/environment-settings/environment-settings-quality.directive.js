@@ -25,40 +25,29 @@
   'use strict';
   angular.module('exdFrontendApp').directive('environmentSettingsQuality', [
     'gz3d',
-    'nrpAnalytics',
-    'editorToolbarService',
-    function(gz3d, nrpAnalytics, editorToolbarService) {
+    function(gz3d) {
       return {
         templateUrl:
           'components/environment-settings/environment-settings-quality.template.html',
         restrict: 'E',
         scope: true,
         link: function(scope) {
-          scope.editorToolbarService = editorToolbarService;
-
           //----------------------------------------------
           // Init the values
 
           scope.composerSettingsToUI = function() {
-            if (editorToolbarService.showEnvironmentSettingsPanel) {
-              var cs = gz3d.scene.composerSettings;
+            var cs = gz3d.scene.composerSettings;
 
-              scope.renderShadows = cs.shadows;
-              scope.renderAmbientOcclusion = cs.ssao;
-              scope.ambientOcclusionClamp = cs.ssaoClamp;
-              scope.ambientOcclusionLum = cs.ssaoLumInfluence;
-              scope.antiAliasingEnabled = cs.antiAliasing;
-              scope.renderPBR =
-                cs.pbrMaterial === undefined ? false : cs.pbrMaterial;
-            }
+            scope.renderShadows = cs.shadows;
+            scope.renderAmbientOcclusion = cs.ssao;
+            scope.ambientOcclusionClamp = cs.ssaoClamp;
+            scope.ambientOcclusionLum = cs.ssaoLumInfluence;
+            scope.antiAliasingEnabled = cs.antiAliasing;
+            scope.renderPBR =
+              cs.pbrMaterial === undefined ? false : cs.pbrMaterial;
           };
 
-          scope.$watch(
-            'editorToolbarService.showEnvironmentSettingsPanel',
-            function() {
-              scope.composerSettingsToUI();
-            }
-          );
+          scope.composerSettingsToUI();
 
           scope.$watch('gz3d.scene.composerSettings', function() {
             scope.composerSettingsToUI();

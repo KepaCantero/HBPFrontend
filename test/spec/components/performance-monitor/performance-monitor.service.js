@@ -5,6 +5,8 @@ describe('Services: performance-monitor service', function() {
 
   beforeEach(function() {
     module('performanceMonitorModule');
+
+    module('stateServiceMock');
   });
 
   beforeEach(

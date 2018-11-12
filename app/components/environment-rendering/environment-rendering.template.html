@@ -5,7 +5,7 @@
 
 <div class="gz3d-container">
   <!-- WEBGL-context -->
-  <div class="gz3d-webgl" ng-mousedown="onContainerMouseDown($event);" ng-hide="vm.showServerStream"></div>
+  <div class="gz3d-webgl" ng-mouseup="vm.onMouseUp($event)" context-menu="vm.contextmenu.options" ng-hide="vm.showServerStream"></div>
   <!-- WEBGL-context -->
 
   <!-- video stream -->
@@ -52,8 +52,6 @@
        ng-show="vm.gz3dViewsService.isUserView(vm.view) && vm.userNavigationService.showLookAtCameraInfoDiv">
     <span>Camera target needs to be selected first</span>
   </div>
-
-  <context-menu></context-menu>
 
   <auto-save-widget/>
 

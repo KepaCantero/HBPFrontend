@@ -533,7 +533,7 @@
     '$rootScope'
   ];
   angular
-    .module('experimentExplorer', ['storageServer'])
+    .module('experimentExplorer', ['storageServer', 'clb-ui-dialog'])
     .controller('ExperimentExplorerController', ExperimentExplorerController)
     .controller('ResourcesExplorerController', ResourcesExplorerController);
 })();

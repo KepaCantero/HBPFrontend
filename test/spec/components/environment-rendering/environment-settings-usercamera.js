@@ -8,6 +8,7 @@ describe('Directive: render settings user camera frustum', function() {
 
   beforeEach(module('userInteractionSettingsServiceMock'));
   beforeEach(module('editorToolbarServiceMock'));
+  beforeEach(module('gz3dViewsServiceMock'));
 
   beforeEach(
     module(function($provide) {

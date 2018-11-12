@@ -26,9 +26,11 @@
 
   /* global console: false */
 
-  angular.module('exdFrontendApp').service('baseEventHandler', function() {
-    this.suppressAnyKeyPress = function(event) {
-      event.stopPropagation();
-    };
-  });
+  angular
+    .module('baseEventHandlerModule', [])
+    .service('baseEventHandler', function() {
+      this.suppressAnyKeyPress = function(event) {
+        event.stopPropagation();
+      };
+    });
 })();

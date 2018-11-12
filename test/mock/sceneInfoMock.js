@@ -11,6 +11,7 @@
       ];
       this.refreshRobotsList = $q.when();
       this.initialized = $q.when();
+      this.isRobot = jasmine.createSpy('isRobot');
     }
   ]);
 })();

@@ -6,18 +6,13 @@ describe('Directive: 3d settings', function() {
 
   beforeEach(module('exdFrontendApp'));
   beforeEach(module('exd.templates'));
+
+  beforeEach(module('gz3dMock'));
   beforeEach(module('simulationInfoMock'));
   beforeEach(module('userInteractionSettingsServiceMock'));
 
   beforeEach(
     module(function($provide) {
-      gz3d = {
-        scene: {
-          defaultComposerSettings: {},
-          applyComposerSettings: jasmine.createSpy('applyComposerSettings')
-        }
-      };
-
       collab3DSettingsService = {
         saveSettings: jasmine.createSpy('saveSettings'),
         setDefaultNavigationSensitivity: jasmine.createSpy(
@@ -30,13 +25,20 @@ describe('Directive: 3d settings', function() {
       GZ3D.MASTER_QUALITY_LOW = 'Low';
       GZ3D.MASTER_QUALITY_MINIMAL = 'Minimal';
 
-      $provide.value('gz3d', gz3d);
       $provide.value('collab3DSettingsService', collab3DSettingsService);
     })
   );
 
   beforeEach(
-    inject(function($rootScope, $compile, $httpBackend, SKYBOX_LIBRARY) {
+    inject(function(
+      $rootScope,
+      $compile,
+      $httpBackend,
+      SKYBOX_LIBRARY,
+      _gz3d_
+    ) {
+      gz3d = _gz3d_;
+
       var element = $compile('<environment-settings-panel/>')($rootScope);
       var regex = new RegExp('.*' + SKYBOX_LIBRARY);
       $httpBackend.whenGET(regex).respond({ skyList: [], skyLabelList: [] });

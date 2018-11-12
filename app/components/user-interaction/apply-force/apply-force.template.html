@@ -1,0 +1,57 @@
+<!-- build:css(.tmp) styles/esv/pull-force.css -->
+<link rel="stylesheet" href="components/user-interaction/apply-force/apply-force.style.css"/>
+<!-- endbuild -->
+<div class="dynamic-view-overlay-content">
+  <button type="button" ng-click="vm.toggleMode()">
+    <div ng-show="!vm.advancedMode">Advanced mode</div>
+    <div ng-show="vm.advancedMode">Simple mode</div>
+  </button>
+
+  <div ng-show="vm.pullForceService.gz3d.scene.selectedEntity.userData.is_static" class="force-static-warning">
+    Can't apply forces to static models, please select another model.
+  </div>
+
+  <div ng-show="!vm.pullForceService.gz3d.scene.selectedEntity.userData.is_static">
+
+    <div ng-show="!vm.advancedMode" class="force-simple-mode-wrapper">
+      <div ng-show="vm.pullForceService.gz3d.scene.selectedEntity">
+        You can now apply forces on objects by dragging them around. </p>
+        <div class="slidecontainer">
+          Force amplifier:</p>
+          min <input type="range" min="0.1" max="10" value="1" step="0.1" class="slider" id="forceAmplifier" ng-model="vm.forceAmplifier" ng-change="vm.updateForceAmplifier()">max
+        </div>
+      </div>
+      <div ng-show="!vm.pullForceService.gz3d.scene.selectedEntity">
+        Please select a model.
+      </div>
+    </div>
+
+    <div ng-show="vm.advancedMode" class="force-advanced-mode-wrapper">
+      <div ng-show="!vm.pushForceService.targetModel">
+        Select a force application point in the scene.
+      </div>
+
+      <div ng-show="vm.pushForceService.targetModel">
+        <h6>Direction</h6>
+        x: <input interactive type="number" name="rotate-x" class="vec3-num-input"
+                  ng-model="vm.pushForceService.forceVector.x"
+                  ng-keydown="suppressKeyPress($event)" ng-change="vm.pushForceService.onUIChangeForceVector()">
+        y: <input interactive type="number" name="rotate-y" class="vec3-num-input"
+                  ng-model="vm.pushForceService.forceVector.y"
+                  ng-keydown="suppressKeyPress($event)" ng-change="vm.pushForceService.onUIChangeForceVector()">
+        z: <input interactive type="number" name="rotate-z" class="vec3-num-input"
+                  ng-model="vm.pushForceService.forceVector.z"
+                  ng-keydown="suppressKeyPress($event)" ng-change="vm.pushForceService.onUIChangeForceVector()">
+        <h6>Strength</h6>
+        in newton applied over a period of 0.1 seconds</br>
+        <input interactive type="number" ng-model="vm.pushForceService.forceStrength"
+               ng-keydown="suppressKeyPress($event)">
+        <button type="button" ng-click="vm.pushForceService.OnApplyForce()">
+          Apply
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+</div>

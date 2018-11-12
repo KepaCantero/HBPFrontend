@@ -54,8 +54,13 @@ describe('Services: userInteractionSettingsService', function() {
         cb(mockConfig);
         return mockConfigPromise;
       }),
-      catch: jasmine.createSpy('catch').and.callFake(() => mockConfigPromise),
-      finally: jasmine.createSpy('finally').and.returnValue(mockConfigPromise)
+      catch: jasmine.createSpy('catch').and.callFake(function() {
+        return mockConfigPromise;
+      }),
+      finally: jasmine.createSpy('finally').and.callFake(function(cb) {
+        cb();
+        return mockConfigPromise;
+      })
     };
     simulationConfigService.loadConfigFile = jasmine
       .createSpy('test')
@@ -142,6 +147,52 @@ describe('Services: userInteractionSettingsService', function() {
     $rootScope.$digest();
     expect(result).toBe(UIS_DEFAULTS);
     expect(userInteractionSettingsService.loadSettings).not.toHaveBeenCalled();
+    done();
+  });
+
+  it(' - persistToFile()', function(done) {
+    let mockData = {
+      a: true,
+      b: 'true',
+      c: 1
+    };
+    simulationConfigService.saveConfigFile.and.returnValue({
+      then: jasmine.createSpy('then').and.callFake(cb => {
+        cb();
+      })
+    });
+
+    userInteractionSettingsService._persistToFile(mockData);
+
+    expect(userInteractionSettingsService.lastSavedSettingsData.a).toBe(
+      mockData.a
+    );
+    expect(userInteractionSettingsService.lastSavedSettingsData.b).toBe(
+      mockData.b
+    );
+    expect(userInteractionSettingsService.lastSavedSettingsData.c).toBe(
+      mockData.c
+    );
+
+    done();
+  });
+
+  it(' - saveSetting(), with specific types', function(done) {
+    spyOn(userInteractionSettingsService, '_persistToFile');
+    userInteractionSettingsService.lastSavedSettingsData = {};
+    userInteractionSettingsService.settingsData = {
+      typeA: true,
+      typeB: 'true',
+      typeC: 1
+    };
+
+    userInteractionSettingsService.saveSetting('typeA', 'typeB');
+
+    expect(userInteractionSettingsService._persistToFile).toHaveBeenCalledWith({
+      typeA: true,
+      typeB: 'true'
+    });
+
     done();
   });
 });

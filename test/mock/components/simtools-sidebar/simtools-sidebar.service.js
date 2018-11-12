@@ -4,6 +4,8 @@
   angular
     .module('simToolsSidebarServiceMock', [])
     .service('simToolsSidebarService', function() {
-      this.toggleSidebar = jasmine.createSpy('toggleSidebar');
+      this.toggleSidebar = jasmine
+        .createSpy('toggleSidebar')
+        .and.returnValue(new Promise(() => {}));
     });
 })();

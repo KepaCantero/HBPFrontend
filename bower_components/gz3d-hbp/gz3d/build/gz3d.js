@@ -9707,8 +9707,13 @@ GZ3D.MultiView.prototype.renderViews = function () {
           {
             this.updateView(view);
             this.gz3dScene.composer.render(view);
-            view.canvas.getContext('2d').drawImage(this.renderer.domElement, 0, 0,view.canvas.width,view.canvas.height,
-                                                                            0, 0,view.canvas.width,view.canvas.height);
+
+            let context = view.canvas.getContext('2d');
+            if (context.canvas.width !== 0 && context.canvas.height !== 0) {
+              context.drawImage(this.renderer.domElement, 0, 0,view.canvas.width,view.canvas.height,
+                0, 0,view.canvas.width,view.canvas.height);
+            }
+
           }
           else
           {

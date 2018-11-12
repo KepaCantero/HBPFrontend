@@ -24,7 +24,6 @@
 @import '../../styles/esv/pop-over-viewer';
 
 $objectInspectorMinWidth: 280px;
-$objectInspectorMinHeight: 40px;
 
 object-inspector {
   display: flex;
@@ -36,7 +35,7 @@ object-inspector {
   flex-direction: column;
 
   margin: 0px 0px 5px 5px;
-  width: $objectInspectorMinWidth;
+  min-width: $objectInspectorMinWidth;
 }
 
 .robot-doc-link {

@@ -18,7 +18,6 @@ describe('Directive: smachEditor', function() {
     RESET_TYPE,
     codeEditorsServices,
     environmentService,
-    editorToolbarService,
     $q;
 
   var backendInterfaceServiceMock = {
@@ -79,7 +78,7 @@ describe('Directive: smachEditor', function() {
   beforeEach(module('exd.templates')); // import html template
   beforeEach(module('simulationInfoMock'));
   beforeEach(module('userContextServiceMock'));
-  beforeEach(module('applyForceServiceMock'));
+  beforeEach(module('pushForceServiceMock'));
 
   beforeEach(
     module(function($provide) {
@@ -106,7 +105,6 @@ describe('Directive: smachEditor', function() {
       _codeEditorsServices_,
       _$q_,
       _environmentService_,
-      _editorToolbarService_,
       _storageServer_
     ) {
       $rootScope = _$rootScope_;
@@ -120,7 +118,6 @@ describe('Directive: smachEditor', function() {
       codeEditorsServices = _codeEditorsServices_;
       $q = _$q_;
       environmentService = _environmentService_;
-      editorToolbarService = _editorToolbarService_;
       storageServer = _storageServer_;
 
       editorMock.addLineClass = jasmine.createSpy('addLineClass');
@@ -478,11 +475,9 @@ describe('Directive: smachEditor', function() {
     });
 
     it('should set toolbar flag on destroy', function() {
-      editorToolbarService.showSmachEditor = true;
       $timeout.flush();
       isolateScope.$destroy();
       $rootScope.$digest();
-      expect(editorToolbarService.showSmachEditor).toBe(false);
     });
   });
 });

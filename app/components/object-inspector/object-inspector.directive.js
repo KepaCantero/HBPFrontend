@@ -24,147 +24,166 @@
 (function() {
   'use strict';
 
-  angular.module('objectInspectorModule', []).directive('objectInspector', [
-    'OBJECT_VIEW_MODE',
-    '$timeout',
-    'objectInspectorService',
-    'baseEventHandler',
-    'gz3d',
-    'EDIT_MODE',
-    'simulationInfo',
-    'serverError',
-    'tipTooltipService',
-    'TIP_CODES',
-    'storageServer',
-    'robotComponentsService',
-    'dynamicViewOverlayService',
-    'DYNAMIC_VIEW_CHANNELS',
-    'backendInterfaceService',
-    function(
-      OBJECT_VIEW_MODE,
-      $timeout,
-      objectInspectorService,
-      baseEventHandler,
-      gz3d,
-      EDIT_MODE,
-      simulationInfo,
-      serverError,
-      tipTooltipService,
-      TIP_CODES,
-      storageServer,
-      robotComponentsService,
-      dynamicViewOverlayService,
-      DYNAMIC_VIEW_CHANNELS,
-      backendInterfaceService
-    ) {
-      return {
-        templateUrl:
-          'components/object-inspector/object-inspector.template.html',
-        restrict: 'E',
-        scope: true,
-        link: function(scope) {
-          tipTooltipService.setCurrentTip(TIP_CODES.OBJECT_INSPECTOR);
+  angular
+    .module('objectInspectorModule', [
+      'exdFrontendApp.Constants',
+      'dynamicViewModule',
+      'gz3dModule',
+      'simulationStateServices',
+      'colorableObjectModule',
+      'userNavigationModule',
+      'noiseModelModule',
+      'baseEventHandlerModule',
+      'robotComponentsModule'
+    ])
+    .directive('objectInspector', [
+      'OBJECT_VIEW_MODE',
+      '$timeout',
+      'objectInspectorService',
+      'baseEventHandler',
+      'gz3d',
+      'EDIT_MODE',
+      'simulationInfo',
+      'serverError',
+      'tipTooltipService',
+      'TIP_CODES',
+      'storageServer',
+      'robotComponentsService',
+      'TF_CONFIG',
+      'goldenLayoutService',
+      'TOOL_CONFIGS',
+      'backendInterfaceService',
+      function(
+        OBJECT_VIEW_MODE,
+        $timeout,
+        objectInspectorService,
+        baseEventHandler,
+        gz3d,
+        EDIT_MODE,
+        simulationInfo,
+        serverError,
+        tipTooltipService,
+        TIP_CODES,
+        storageServer,
+        robotComponentsService,
+        TF_CONFIG,
+        goldenLayoutService,
+        TOOL_CONFIGS,
+        backendInterfaceService
+      ) {
+        return {
+          templateUrl:
+            'components/object-inspector/object-inspector.template.html',
+          restrict: 'E',
+          scope: true,
+          link: function(scope) {
+            tipTooltipService.setCurrentTip(TIP_CODES.OBJECT_INSPECTOR);
 
-          scope.minimized = false;
-          scope.collapsedTransform = false;
-          scope.collapsedVisuals = false;
-          scope.objectInspectorService = objectInspectorService;
-          scope.gz3d = gz3d;
-          scope.robotComponentsService = robotComponentsService;
+            scope.minimized = false;
+            scope.collapsedTransform = false;
+            scope.collapsedVisuals = false;
+            scope.objectInspectorService = objectInspectorService;
+            scope.gz3d = gz3d;
+            scope.robotComponentsService = robotComponentsService;
 
-          scope.EDIT_MODE = EDIT_MODE;
-          scope.OBJECT_VIEW_MODE = OBJECT_VIEW_MODE;
+            scope.EDIT_MODE = EDIT_MODE;
+            scope.OBJECT_VIEW_MODE = OBJECT_VIEW_MODE;
 
-          storageServer
-            .getRobotConfigPath(simulationInfo.experimentID)
-            .then(robotConfigPath => (scope.robotConfigPath = robotConfigPath))
-            .catch(angular.noop);
+            storageServer
+              .getRobotConfigPath(simulationInfo.experimentID)
+              .then(
+                robotConfigPath => (scope.robotConfigPath = robotConfigPath)
+              )
+              .catch(angular.noop);
 
-          scope.suppressKeyPress = function(event) {
-            baseEventHandler.suppressAnyKeyPress(event);
-          };
-          $timeout(objectInspectorService.update, 0);
+            scope.suppressKeyPress = function(event) {
+              baseEventHandler.suppressAnyKeyPress(event);
+            };
+            $timeout(objectInspectorService.update, 0);
 
-          const setTreeSelected = function() {
-            $timeout(objectInspectorService.update, 0); //force scope.$apply
-          };
-          gz3d.gui.guiEvents.on('setTreeSelected', setTreeSelected);
+            const setTreeSelected = function() {
+              $timeout(objectInspectorService.update, 0); //force scope.$apply
+            };
+            gz3d.gui.guiEvents.on('setTreeSelected', setTreeSelected);
 
-          const deleteEntity = function() {
-            $timeout(objectInspectorService.update, 0); //force scope.$apply
-          };
-          gz3d.gui.guiEvents.on('delete_entity', deleteEntity);
+            const deleteEntity = function() {
+              $timeout(objectInspectorService.update, 0); //force scope.$apply
+            };
+            gz3d.gui.guiEvents.on('delete_entity', deleteEntity);
 
-          scope.cleanup = function() {
-            // remove the callback
-            objectInspectorService.setManipulationMode(EDIT_MODE.VIEW);
-            objectInspectorService.setRobotMode(false);
-            gz3d.gui.guiEvents.removeListener(
-              'setTreeSelected',
-              setTreeSelected
-            );
-            gz3d.gui.guiEvents.removeListener('delete_entity', deleteEntity);
-          };
+            scope.cleanup = function() {
+              // remove the callback
+              objectInspectorService.setManipulationMode(EDIT_MODE.VIEW);
+              objectInspectorService.setRobotMode(false);
+              gz3d.gui.guiEvents.removeListener(
+                'setTreeSelected',
+                setTreeSelected
+              );
+              gz3d.gui.guiEvents.removeListener('delete_entity', deleteEntity);
+            };
 
-          const DECORATOR_BY_TYPE = {
-            sensor: userData => {
-              let topicId = userData.rosTopic.split('/').pop();
-              return [
-                [topicId],
-                `@nrp.MapRobotSubscriber('${topicId}', Topic('${userData.rosTopic}', ${userData.rosType}))
+            const DECORATOR_BY_TYPE = {
+              sensor: userData => {
+                let topicId = userData.rosTopic.split('/').pop();
+                return [
+                  [topicId],
+                  `@nrp.MapRobotSubscriber('${topicId}', Topic('${userData.rosTopic}', ${userData.rosType}))
 @nrp.Robot2Neuron()`
-              ];
-            },
-            actuator: userData => [
-              [],
-              `@nrp.Neuron2Robot(Topic('${userData.rosTopic}', ${userData.rosType}))`
-            ]
-          };
+                ];
+              },
+              actuator: userData => [
+                [],
+                `@nrp.Neuron2Robot(Topic('${userData.rosTopic}', ${userData.rosType}))`
+              ]
+            };
 
-          scope.createTopicTF = () => {
-            return storageServer
-              .getTransferFunctions(simulationInfo.experimentID)
-              .then(({ data: tfs }) => {
-                let selectedData =
-                  objectInspectorService.selectedRobotComponent.userData;
-                let topicName = selectedData.rosTopic;
-                topicName = topicName.substr(1).replace(/\//g, '_');
-                let tfname = topicName;
-                let postfix = 2;
-                while (tfs[tfname]) tfname = topicName + '_' + postfix++;
+            scope.createTopicTF = () => {
+              return storageServer
+                .getTransferFunctions(simulationInfo.experimentID)
+                .then(({ data: tfs }) => {
+                  let selectedData =
+                    objectInspectorService.selectedRobotComponent.userData;
+                  let topicName = selectedData.rosTopic;
+                  topicName = topicName.substr(1).replace(/\//g, '_');
+                  let tfname = topicName;
+                  let postfix = 2;
+                  while (tfs[tfname]) tfname = topicName + '_' + postfix++;
 
-                let [parameters, decorator] = DECORATOR_BY_TYPE[
-                  selectedData.type
-                ](selectedData);
+                  let [parameters, decorator] = DECORATOR_BY_TYPE[
+                    selectedData.type
+                  ](selectedData);
 
-                let newTF = `${decorator}
+                  let newTF = `${decorator}
 def ${tfname}(${['t', ...parameters].join(', ')}):
     # Auto generated TF for ${topicName}
     if t % 2 < 0.02:
         clientLogger.info('TF ${topicName}:', t)`;
 
-                storageServer
-                  .saveTransferFunctions(simulationInfo.experimentID, [
-                    ..._.values(tfs),
-                    newTF
-                  ])
-                  .then(() =>
-                    backendInterfaceService.editTransferFunction(tfname, newTF)
-                  )
-                  .then(() =>
-                    dynamicViewOverlayService.createDynamicOverlay(
-                      DYNAMIC_VIEW_CHANNELS.TRANSFER_FUNCTION_EDITOR
+                  storageServer
+                    .saveTransferFunctions(simulationInfo.experimentID, [
+                      ..._.values(tfs),
+                      newTF
+                    ])
+                    .then(() =>
+                      backendInterfaceService.editTransferFunction(
+                        tfname,
+                        newTF
+                      )
                     )
-                  )
-                  .catch(err => serverError.displayHTTPError(err));
-              });
-          };
+                    .then(() => {
+                      goldenLayoutService.openTool(
+                        TOOL_CONFIGS.TRANSFER_FUNCTION_EDITOR
+                      );
+                    })
+                    .catch(err => serverError.displayHTTPError(err));
+                });
+            };
 
-          scope.$on('$destroy', function() {
-            scope.cleanup();
-          });
-        }
-      };
-    }
-  ]);
+            scope.$on('$destroy', function() {
+              scope.cleanup();
+            });
+          }
+        };
+      }
+    ]);
 })();

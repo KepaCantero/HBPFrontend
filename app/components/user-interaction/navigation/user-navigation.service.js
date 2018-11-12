@@ -27,7 +27,11 @@
   'use strict';
 
   angular
-    .module('userNavigationModule', ['nrpUser', 'gz3dModule'])
+    .module('userNavigationModule', [
+      'nrpUser',
+      'gz3dModule',
+      'userInteractionModule'
+    ])
     .constant('NAVIGATION_MODES', {
       FREE_CAMERA: 'FreeCamera',
       GHOST: 'Ghost',
@@ -48,7 +52,6 @@
       'nrpUser',
       'simulationInfo',
       'sceneInfo',
-      'isARobotPredicate',
       'roslib',
       'stateService',
       'userInteractionSettingsService',
@@ -60,7 +63,6 @@
         nrpUser,
         simulationInfo,
         sceneInfo,
-        isARobotPredicate,
         roslib,
         stateService,
         userInteractionSettingsService
@@ -425,7 +427,7 @@
 
           setLookatCamera: function() {
             let selection = gz3d.scene.selectedEntity;
-            if (!selection || !isARobotPredicate(selection)) {
+            if (!selection || !sceneInfo.isRobot(selection)) {
               selection = gz3d.scene.scene.getObjectByName(
                 sceneInfo.robots[0].robotId
               );
@@ -477,6 +479,26 @@
               // camera control uses left button only
               gz3d.scene.controls.onMouseUpManipulator(action);
             }
+          },
+
+          lookAtRobot() {
+            let robotIndex = 0;
+            // get next robot if already focused on a robot
+            if (
+              this.navigationMode === NAVIGATION_MODES.LOOKAT &&
+              sceneInfo.isRobot(gz3d.scene.selectedEntity)
+            ) {
+              for (let i = 0; i < sceneInfo.robots.length; i = i + 1) {
+                if (gz3d.scene.selectedEntity.name === sceneInfo.robots[i]) {
+                  robotIndex = i + 1 % sceneInfo.robots.length;
+                }
+              }
+            }
+
+            gz3d.scene.selectedEntity = gz3d.scene.scene.getObjectByName(
+              sceneInfo.robots[robotIndex]
+            );
+            this.setLookatCamera();
           }
         };
       }

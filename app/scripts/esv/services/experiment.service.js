@@ -99,6 +99,6 @@
   ];
 
   angular
-    .module('experimentModule', ['nrpBackendAbout', 'editorToolbarModule'])
+    .module('experimentModule', ['nrpBackendAbout'])
     .service('experimentService', ExperimentService);
 })();

@@ -26,8 +26,13 @@
 
 $app-top-toolbar-height: 50px;
 
+application-top-toolbar {
+  flex-shrink: 0;
+}
+
 .app-top-toolbar-wrapper {
   .app-top-toolbar {
+    flex-shrink: 0;
     box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.22);
     background: linear-gradient(to right bottom, #f1f1f1, #f3f3f3);
     min-height: 5%;

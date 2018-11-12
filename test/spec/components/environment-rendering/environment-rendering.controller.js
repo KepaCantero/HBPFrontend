@@ -7,6 +7,7 @@ describe('Controller: EnvironmentRenderingController', function() {
     controller,
     $scope,
     $rootScope,
+    TOOL_CONFIGS,
     log,
     stateService,
     gz3d,
@@ -23,7 +24,11 @@ describe('Controller: EnvironmentRenderingController', function() {
     gz3dViewsService,
     environmentRenderingService,
     dynamicViewOverlayService,
-    videoStreamService;
+    videoStreamService,
+    goldenLayoutService,
+    sceneInfo,
+    colorableObjectService,
+    backendInterfaceService;
 
   var mockAngularElement,
     deferredSceneInitialized,
@@ -33,6 +38,7 @@ describe('Controller: EnvironmentRenderingController', function() {
   // load the controller's module
   beforeEach(module('exdFrontendApp'));
   beforeEach(module('exd.templates')); // import html template
+  beforeEach(module('goldenLayoutModule'));
 
   beforeEach(module('stateServiceMock'));
   beforeEach(module('gz3dMock'));
@@ -40,14 +46,16 @@ describe('Controller: EnvironmentRenderingController', function() {
   beforeEach(module('userContextServiceMock'));
   beforeEach(module('editorsPanelServiceMock'));
   beforeEach(module('contextMenuStateServiceMock'));
-  beforeEach(module('simulationInfoMock'));
+  beforeEach(module('sceneInfoMock'));
   beforeEach(module('assetLoadingSplashMock'));
   beforeEach(module('colorableObjectServiceMock'));
   beforeEach(module('experimentServiceMock'));
   beforeEach(module('gz3dViewsServiceMock'));
-  beforeEach(module('environmentRenderingServiceMock'));
   beforeEach(module('dynamicViewOverlayServiceMock'));
   beforeEach(module('videoStreamServiceMock'));
+  beforeEach(module('goldenLayoutServiceMock'));
+  beforeEach(module('backendInterfaceServiceMock'));
+  beforeEach(module('environmentRenderingServiceMock'));
 
   beforeEach(
     module(function($provide) {
@@ -138,7 +146,8 @@ describe('Controller: EnvironmentRenderingController', function() {
       _$element_,
       _$log_,
       _$timeout_,
-      _simulationInfo_,
+      _TOOL_CONFIGS_,
+      _sceneInfo_,
       _stateService_,
       _contextMenuState_,
       _nrpBackendVersions_,
@@ -153,21 +162,30 @@ describe('Controller: EnvironmentRenderingController', function() {
       _gz3dViewsService_,
       _environmentRenderingService_,
       _dynamicViewOverlayService_,
-      _videoStreamService_
+      _videoStreamService_,
+      _goldenLayoutService_,
+      _backendInterfaceService_
     ) {
       controller = $controller;
       $rootScope = _$rootScope_;
       log = _$log_;
+      $q = _$q_;
+
+      TOOL_CONFIGS = _TOOL_CONFIGS_;
+
       $scope = $rootScope.$new();
       stateService = _stateService_;
       gz3d = _gz3d_;
       userNavigationService = _userNavigationService_;
-      $q = _$q_;
       userContextService = _userContextService_;
       gz3dViewsService = _gz3dViewsService_;
       environmentRenderingService = _environmentRenderingService_;
       dynamicViewOverlayService = _dynamicViewOverlayService_;
       videoStreamService = _videoStreamService_;
+      goldenLayoutService = _goldenLayoutService_;
+      sceneInfo = _sceneInfo_;
+      colorableObjectService = _colorableObjectService_;
+      backendInterfaceService = _backendInterfaceService_;
 
       callback = $q.defer();
       lockServiceCancelCallback = jasmine.createSpy('cancelCallback');
@@ -329,7 +347,9 @@ describe('Controller: EnvironmentRenderingController', function() {
       expect(environmentRenderingController.gz3dContainerElement).toBe(
         container
       );
-      expect(environmentRenderingController.containerElement).toBe(container);
+      expect(environmentRenderingController.gz3dContainerElement).toBe(
+        container
+      );
       expect(environmentRenderingService.sceneInitialized).toHaveBeenCalled();
 
       deferredSceneInitialized.resolve();
@@ -344,26 +364,6 @@ describe('Controller: EnvironmentRenderingController', function() {
       deferredView.resolve(mockView);
       $rootScope.$digest();
       expect(environmentRenderingController.view).toBe(mockView);
-      expect(
-        dynamicViewOverlayService.getParentOverlayWrapper
-      ).toHaveBeenCalled();
-      expect(mockOverlayWrapper.setAttribute).toHaveBeenCalledWith(
-        'keep-aspect-ratio',
-        mockView.initAspectRatio.toString()
-      );
-
-      var expectedWidth = environmentRenderingController.INIT_WIDTH_PERCENTAGE;
-      var expectedHeight =
-        environmentRenderingController.INIT_WIDTH_PERCENTAGE *
-        mockOverlayParent[0].clientWidth /
-        mockView.initAspectRatio /
-        mockOverlayParent[0].clientHeight;
-      expect(mockOverlayWrapper.style.width).toBe(
-        (expectedWidth * 100).toString() + '%'
-      );
-      expect(mockOverlayWrapper.style.height).toBe(
-        (expectedHeight * 100).toString() + '%'
-      );
 
       expect(videoStreamService.getStreamingUrlForTopic).toHaveBeenCalledWith(
         mockView.topic
@@ -445,6 +445,158 @@ describe('Controller: EnvironmentRenderingController', function() {
       environmentRenderingController.showServerStream = true;
       url = environmentRenderingController.getVideoUrlSource();
       expect(url).toBe(testUrl + '&t=' + testState + reconnectTrials);
+    });
+
+    it(' - onMouseUp()', function() {
+      let mockEvent = {
+        button: 0,
+        offsetX: 10,
+        offsetY: 10
+      };
+      let mockModel = {};
+
+      environmentRenderingController.onMouseUp(mockEvent);
+      expect(gz3d.scene.getRayCastModel).not.toHaveBeenCalled();
+
+      mockEvent.button = 2;
+      gz3d.scene.getRayCastModel.and.returnValue(mockModel);
+      environmentRenderingController.onMouseUp(mockEvent);
+      expect(gz3d.scene.getRayCastModel).toHaveBeenCalled();
+      expect(gz3d.scene.selectEntity).toHaveBeenCalledWith(mockModel);
+    });
+  });
+
+  describe('(ContextMenu)', function() {
+    let contextmenu;
+
+    beforeEach(function() {
+      environmentRenderingController = controller(
+        'EnvironmentRenderingController',
+        {
+          $rootScope: $rootScope,
+          $scope: $scope
+        }
+      );
+
+      contextmenu = environmentRenderingController.contextmenu;
+    });
+
+    it(' - constructed', function() {
+      expect(contextmenu).toBeDefined();
+    });
+
+    it(' - option[0] "selection name"', function() {
+      expect(contextmenu.options[0].html()).toContain('No Selection');
+
+      gz3d.scene.selectedEntity = { name: 'my-selection' };
+      expect(contextmenu.options[0].html()).toContain('my-selection');
+    });
+
+    it(' - option[2] "Inspect"', function() {
+      contextmenu.options[2].click();
+      expect(goldenLayoutService.openTool).toHaveBeenCalledWith(
+        TOOL_CONFIGS.OBJECT_INSPECTOR
+      );
+    });
+
+    it(' - option[3] "Look At"', function() {
+      contextmenu.options[3].click();
+      expect(userNavigationService.setLookatCamera).toHaveBeenCalled();
+    });
+
+    it(' - option[4] "Duplicate"', function() {
+      // displayed
+      expect(contextmenu.options[4].displayed()).toBe(undefined);
+
+      gz3d.scene.selectedEntity = {};
+      gz3d.gui.canModelBeDuplicated.and.returnValue(false);
+      expect(contextmenu.options[4].displayed()).toBe(false);
+
+      gz3d.gui.canModelBeDuplicated.and.returnValue(true);
+      expect(contextmenu.options[4].displayed()).toBe(true);
+
+      // click
+      spyOn(gz3d.gui.guiEvents, 'emit');
+      contextmenu.options[4].click();
+      expect(gz3d.gui.guiEvents.emit).toHaveBeenCalledWith('duplicate_entity');
+    });
+
+    it(' - option[5] "show/hide skin"', function() {
+      gz3d.scene.skinVisible.and.returnValue(false);
+      expect(contextmenu.options[5].text()).toBe('Show Skin');
+
+      gz3d.scene.skinVisible.and.returnValue(true);
+      expect(contextmenu.options[5].text()).toBe('Hide Skin');
+
+      // displayed
+      expect(contextmenu.options[5].displayed()).toBe(undefined);
+
+      gz3d.scene.selectedEntity = {};
+      gz3d.scene.hasSkin.and.returnValue(false);
+      expect(contextmenu.options[5].displayed()).toBe(false);
+
+      gz3d.scene.hasSkin.and.returnValue(true);
+      expect(contextmenu.options[5].displayed()).toBe(true);
+
+      // click
+      contextmenu.options[5].click();
+      expect(gz3d.scene.setSkinVisible).toHaveBeenCalled();
+    });
+
+    it(' - option[6] "delete"', function() {
+      // displayed
+      expect(contextmenu.options[6].displayed()).toBe(undefined);
+
+      gz3d.scene.selectedEntity = {};
+      sceneInfo.isRobot.and.returnValue(true);
+      expect(contextmenu.options[6].displayed()).toBe(false);
+
+      sceneInfo.isRobot.and.returnValue(false);
+      expect(contextmenu.options[6].displayed()).toBe(true);
+
+      // click
+      contextmenu.options[6].click();
+      expect(gz3d.gui.emitter.emit).toHaveBeenCalledWith(
+        'deleteEntity',
+        gz3d.scene.selectedEntity
+      );
+      expect(gz3d.scene.selectEntity).toHaveBeenCalledWith(null);
+    });
+
+    it(' - option[7] "Set as Initial Pose"', function() {
+      // displayed
+      expect(contextmenu.options[7].displayed()).toBe(undefined);
+
+      gz3d.scene.selectedEntity = {
+        name: 'mockEntity',
+        position: { x: 1, y: 2, z: 3 },
+        rotation: { _x: 4, _y: 5, _z: 6 }
+      };
+      sceneInfo.isRobot.and.returnValue(false);
+      expect(contextmenu.options[7].displayed()).toBe(false);
+
+      sceneInfo.isRobot.and.returnValue(true);
+      expect(contextmenu.options[7].displayed()).toBe(true);
+
+      // click
+      contextmenu.options[7].click();
+      expect(backendInterfaceService.setRobotInitialPose).toHaveBeenCalled();
+    });
+
+    it(' - option[8] "material color picker"', function() {
+      // html
+      let element = contextmenu.options[8].html();
+      expect(element[0].outerHTML).toContain('materials-chooser');
+
+      // displayed
+      expect(contextmenu.options[8].displayed()).toBe(undefined);
+
+      gz3d.scene.selectedEntity = {};
+      colorableObjectService.isColorableEntity.and.returnValue(false);
+      expect(contextmenu.options[8].displayed()).toBe(false);
+
+      colorableObjectService.isColorableEntity.and.returnValue(true);
+      expect(contextmenu.options[8].displayed()).toBe(true);
     });
   });
 });

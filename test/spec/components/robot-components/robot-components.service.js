@@ -163,4 +163,33 @@ describe('Services: robotComponentsService', function() {
       true
     );
   });
+
+  it(' - getRobot()', function() {
+    mockRobot = {};
+    gz3d.scene.selectedEntity = mockRobot;
+
+    let robot = robotComponentsService.getRobot();
+    expect(robot, mockRobot);
+  });
+
+  it(' - getCameraTopicURL()', function() {
+    let mockTopicURLs = [
+      'camera_1/my-topic',
+      'camera_2/my-other-topic',
+      'camera_3/my-other-other-topic'
+    ];
+
+    expect(
+      robotComponentsService.getCameraTopicURL(mockTopicURLs, 'camera_1')
+    ).toBe(mockTopicURLs[0]);
+    expect(
+      robotComponentsService.getCameraTopicURL(mockTopicURLs, 'camera_2')
+    ).toBe(mockTopicURLs[1]);
+    expect(
+      robotComponentsService.getCameraTopicURL(mockTopicURLs, 'camera_3')
+    ).toBe(mockTopicURLs[2]);
+    expect(
+      robotComponentsService.getCameraTopicURL(mockTopicURLs, 'camera_4')
+    ).toBe(undefined);
+  });
 });

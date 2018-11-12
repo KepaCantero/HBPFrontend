@@ -66,7 +66,10 @@
       tipList: [
         {
           text:
-            'Welcome to the simulation! Press the "Play" button to run the simulation.',
+            'Welcome to the simulation! Press the "Play" button to run the simulation.<br/>' +
+            '<b>New</b>: You can now move the tool windows by dragging their title. ' +
+            'You can split windows horizontally or vertically. Stacks with tabs are also possible. ' +
+            'A shadow will preview the position the window will move to.',
           image: ['img/tips/play.jpg']
         },
         {

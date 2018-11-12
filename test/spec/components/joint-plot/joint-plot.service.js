@@ -1,16 +1,16 @@
 'use strict';
 
 describe('Service: joint-service', function() {
-  var rosLibConnectionObject = {
+  let rosLibConnectionObject = {
     subscribe: jasmine.createSpy('subscribe'),
     unsubscribe: jasmine.createSpy('unsubscribe')
   };
 
-  var rosLibServiceObject = {
+  let rosLibServiceObject = {
     callService: jasmine.createSpy('callService')
   };
 
-  var roslibMock = {
+  let roslibMock = {
     getOrCreateConnectionTo: jasmine.createSpy('getOrCreateConnectionTo'),
     createTopic: jasmine
       .createSpy('createTopic')
@@ -34,7 +34,7 @@ describe('Service: joint-service', function() {
 
   beforeEach(module('jointPlotModule'));
 
-  var jointService;
+  let jointService;
   beforeEach(
     inject(function(_jointService_) {
       jointService = _jointService_;
@@ -69,7 +69,7 @@ describe('Service: joint-service', function() {
 
   it('should unsubscribe from joint topic once no more callbacks are registered', function() {
     expect(rosLibConnectionObject.subscribe).not.toHaveBeenCalled();
-    var testCallback = function() {};
+    let testCallback = function() {};
     jointService.subscribe(testCallback);
     expect(jointService.callbacks.length).toBe(1);
     expect(rosLibConnectionObject.subscribe).toHaveBeenCalled();
@@ -80,7 +80,7 @@ describe('Service: joint-service', function() {
 
   it('should add callbacks to a list', function() {
     expect(jointService.callbacks.length).toBe(0);
-    var jointMessageCallback = jasmine.createSpy('jointMessageCallback');
+    let jointMessageCallback = jasmine.createSpy('jointMessageCallback');
     jointService.subscribe(jointMessageCallback);
     expect(jointService.callbacks.length).toBe(1);
 
@@ -91,5 +91,24 @@ describe('Service: joint-service', function() {
       name: 'jointName'
     });
     expect(jointMessageCallback).toHaveBeenCalled();
+
+    // no jointsType
+    jointMessageCallback.calls.reset();
+    jointService.jointsType = {};
+    jointService.parseMessages({
+      header: { stamp: { secs: 5000, nsecs: 0 } },
+      name: 'jointName'
+    });
+    expect(jointMessageCallback).not.toHaveBeenCalled();
+
+    // no callbacks
+    jointMessageCallback.calls.reset();
+    jointService.jointsType['jointName'] = 0;
+    jointService.callbacks = [];
+    jointService.parseMessages({
+      header: { stamp: { secs: 5000, nsecs: 0 } },
+      name: 'jointName'
+    });
+    expect(jointMessageCallback).not.toHaveBeenCalled();
   });
 });

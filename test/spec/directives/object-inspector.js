@@ -9,8 +9,7 @@ describe('Directive: object-inspector', function() {
     backendInterfaceService;
   var gz3d, serverError;
   var elementScope;
-  var dynamicViewOverlayService;
-  var overlayWrapperMock, objectInspectorService;
+  var objectInspectorService;
 
   var baseEventHandlerMock = {
     suppressAnyKeyPress: jasmine.createSpy('suppressAnyKeyPress')
@@ -19,9 +18,9 @@ describe('Directive: object-inspector', function() {
   beforeEach(module('objectInspectorModule'));
   beforeEach(module('exdFrontendApp'));
   beforeEach(module('exd.templates'));
+  beforeEach(module('goldenLayoutServiceMock'));
   beforeEach(module('gz3dMock'));
   beforeEach(module('simulationInfoMock'));
-  beforeEach(module('dynamicViewOverlayServiceMock'));
   beforeEach(module('userNavigationServiceMock'));
   beforeEach(
     module(function($provide) {
@@ -34,7 +33,6 @@ describe('Directive: object-inspector', function() {
       _$rootScope_,
       _$compile_,
       _gz3d_,
-      _dynamicViewOverlayService_,
       _objectInspectorService_,
       _storageServer_,
       _backendInterfaceService_,
@@ -43,7 +41,6 @@ describe('Directive: object-inspector', function() {
       $rootScope = _$rootScope_;
       $compile = _$compile_;
       gz3d = _gz3d_;
-      dynamicViewOverlayService = _dynamicViewOverlayService_;
       objectInspectorService = _objectInspectorService_;
       storageServer = _storageServer_;
       backendInterfaceService = _backendInterfaceService_;
@@ -51,17 +48,6 @@ describe('Directive: object-inspector', function() {
 
       spyOn(gz3d.gui.guiEvents, 'on').and.callThrough();
       spyOn(gz3d.gui.guiEvents, 'removeListener').and.callThrough();
-      overlayWrapperMock = {
-        style: {
-          minWidth: '',
-          minHeight: '',
-          width: '',
-          height: ''
-        }
-      };
-      dynamicViewOverlayService.getParentOverlayWrapper.and.returnValue(
-        overlayWrapperMock
-      );
       spyOn(angular, 'isDefined').and.returnValue(true);
 
       getFileContentDefer = window.$q.defer();

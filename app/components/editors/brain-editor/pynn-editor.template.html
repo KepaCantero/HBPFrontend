@@ -31,7 +31,7 @@
         <div class="pynn-center-panel">
 
           <div id="pynnEditor" ui-codemirror ui-codemirror-opts="editorOptions" ng-model="pynnScript.code" ui-refresh="pynnScript.code"
-            style="height: 100%; font-size:13px">
+            style="height: 100%; font-size:13px; overflow: scroll">
           </div>
           <div ng-repeat="(type, error) in pynnScript.error">
             <div class="alert alert-danger" role="alert">

@@ -25,7 +25,8 @@
   angular
     .module('performanceMonitorModule')
     .factory('performanceMonitorService', [
-      function() {
+      'stateService',
+      function(stateService) {
         function PerformanceMonitorService() {
           var backgroundColors = [
             'rgb(255, 99, 132)',
@@ -124,12 +125,23 @@
 
           this.registerClient = function(chart) {
             this.clients.push(chart);
+
+            if (!this.messageCallbackHandler) {
+              this.messageCallbackHandler = message =>
+                this.processStateChange(message);
+              stateService.addMessageCallback(this.messageCallbackHandler);
+            }
           };
 
           this.unregisterClient = function(chart) {
             var index = this.clients.indexOf(chart);
             if (index > -1) {
               this.clients.splice(index, 1);
+            }
+
+            if (this.clients.length === 0) {
+              stateService.removeMessageCallback(this.messageCallbackHandler);
+              this.messageCallbackHandler = null;
             }
           };
         }

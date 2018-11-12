@@ -6,5 +6,6 @@
     .service('backendInterfaceService', function() {
       this.reset = jasmine.createSpy('reset');
       this.resetCollab = jasmine.createSpy('resetCollab');
+      this.setRobotInitialPose = jasmine.createSpy('setRobotInitialPose');
     });
 })();

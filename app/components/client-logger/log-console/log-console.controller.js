@@ -38,7 +38,6 @@
       $element,
       stateService,
       clientLoggerService,
-      editorToolbarService,
       STATE,
       LOG_TYPE
     ) {
@@ -94,7 +93,6 @@
 
       $scope.$on('$destroy', function() {
         logSubscription.unsubscribe();
-        editorToolbarService.showLogConsole = false;
       });
     }
   }
@@ -106,7 +104,6 @@
     '$element',
     'stateService',
     'clientLoggerService',
-    'editorToolbarService',
     'STATE',
     'LOG_TYPE'
   ];
