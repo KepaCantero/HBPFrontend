@@ -325,6 +325,7 @@ describe('Directive: smachEditor', function() {
         severity: 1,
         sourceType: SOURCE_TYPE.STATE_MACHINE
       };
+      isolateScope.stateMachine = stateMachines[0];
       spyOn(codeEditorsServices, 'getEditor').and.returnValue(editorMock);
       isolateScope.onNewErrorMessageReceived(msg);
       expect(stateMachines[0].error[errorType]).toEqual(msg);

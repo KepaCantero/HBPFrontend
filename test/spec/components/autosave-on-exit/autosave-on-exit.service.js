@@ -17,6 +17,14 @@ describe('Service: autosave-on-exit', function() {
     })
   );
 
+  it('should on exit save all settings', function() {
+    autosaveOnExitService.saveSettings = jasmine
+      .createSpy('saveSettings')
+      .and.returnValue($q.when());
+    autosaveOnExitService.onExit();
+    expect(autosaveOnExitService.saveSettings).toHaveBeenCalled();
+  });
+
   it('should return the settings of the editor', function() {
     autosaveOnExitService.settings = [];
     autosaveOnExitService.settings['faketype'] = 'fakeresult';
@@ -83,10 +91,24 @@ describe('Service: autosave-on-exit', function() {
     expect(autosaveOnExitService.saveSettings).toHaveBeenCalled();
   });
 
-  it('should on exit save all settings', function() {
-    autosaveOnExitService.saveSettings();
-    expect(userInteractionSettingsService.saveSetting).toHaveBeenCalledWith(
-      'autosaveOnExit'
-    );
-  });
+  it(
+    'should on exit save all settings',
+    inject($rootScope => {
+      autosaveOnExitService.saveSettings();
+      $rootScope.$digest();
+      expect(userInteractionSettingsService.saveSetting).toHaveBeenCalledWith(
+        'autosaveOnExit'
+      );
+    })
+  );
+
+  it(
+    'should on update seetings on ENTER_SIMULATION',
+    inject($rootScope => {
+      autosaveOnExitService.saveSettings();
+      $rootScope.$emit('ENTER_SIMULATION');
+      $rootScope.$digest();
+      expect(userInteractionSettingsService.saveSetting).toHaveBeenCalled();
+    })
+  );
 });

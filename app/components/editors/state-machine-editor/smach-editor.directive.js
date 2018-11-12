@@ -134,6 +134,7 @@
 
           scope.selectStateMachine = function(stateMachine) {
             scope.stateMachine = stateMachine;
+            setTimeout(refreshSelectedSMErrors);
           };
 
           scope.applyEditorOptions = function() {
@@ -499,6 +500,25 @@
               });
           };
 
+          function refreshSelectedSMErrors() {
+            if (!scope.stateMachine) return;
+            for (let errorType in scope.stateMachine.error) {
+              let msg = scope.stateMachine.error[errorType];
+              if (msg.lineNumber >= 0) {
+                // Python Syntax Error
+                // Error line highlighting
+                var editor = codeEditorsServices.getEditor('smachCodeEditor');
+                var codeMirrorLineNumber = msg.lineNumber - 1; // 0-based line numbering
+                msg.lineHandle = codeMirrorLineNumber;
+                editor.addLineClass(
+                  codeMirrorLineNumber,
+                  'background',
+                  'alert-danger'
+                );
+              }
+            }
+          }
+
           scope.onNewErrorMessageReceived = function(msg) {
             if (
               msg.severity < 2 &&
@@ -519,20 +539,7 @@
                 scope.cleanCompileError(flawedStateMachine);
               }
               flawedStateMachine.error[msg.errorType] = msg;
-              if (msg.lineNumber >= 0) {
-                // Python Syntax Error
-                // Error line highlighting
-                var editor = codeEditorsServices.getEditor(
-                  'state-machine-' + flawedStateMachine.id
-                );
-                var codeMirrorLineNumber = msg.lineNumber - 1; // 0-based line numbering
-                msg.lineHandle = codeMirrorLineNumber;
-                editor.addLineClass(
-                  codeMirrorLineNumber,
-                  'background',
-                  'alert-danger'
-                );
-              }
+              refreshSelectedSMErrors();
             }
           };
 
@@ -540,9 +547,7 @@
             var compileError = stateMachine.error[scope.ERROR.COMPILE];
             var lineHandle = compileError ? compileError.lineHandle : undefined;
             if (angular.isDefined(lineHandle)) {
-              var editor = codeEditorsServices.getEditor(
-                'state-machine-' + stateMachine.id
-              );
+              var editor = codeEditorsServices.getEditor('smachCodeEditor');
               editor.removeLineClass(lineHandle, 'background', 'alert-danger');
             }
             delete stateMachine.error[scope.ERROR.COMPILE];
