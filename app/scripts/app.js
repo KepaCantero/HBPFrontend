@@ -420,6 +420,12 @@
           // The Google Analytics tracking ID is set in config.json via ansible (admin-scripts)
           /* global ga: false */
           ga('create', trackingId, 'auto');
+          const virtualPageViews = window.bbpConfig['virtualPageViews'];
+          if (virtualPageViews) {
+            Object.getOwnPropertyNames(virtualPageViews).forEach(val =>
+              ga('set', 'page', '/' + virtualPageViews[val])
+            );
+          }
           const anonymizeIp = googleAnalytics['anonymize-ip'];
           if (anonymizeIp === true) {
             // eslint-disable-next-line camelcase

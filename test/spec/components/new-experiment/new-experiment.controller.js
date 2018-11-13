@@ -257,7 +257,11 @@ describe('Controller: NewExperimentController', function() {
     spyOn(newExperimentController, 'launchExperiment').and.returnValue(
       $q.when({})
     );
-    newExperimentController.environment = {};
+    newExperimentController.environment = { custom: true };
+    newExperimentController.cloneAndLaunch();
+    $scope.$digest();
+    expect(newExperimentController.isCloneRequested).toEqual(false);
+    newExperimentController.environment = { custom: false };
     newExperimentController.cloneAndLaunch();
     $scope.$digest();
     expect(newExperimentController.isCloneRequested).toEqual(false);
