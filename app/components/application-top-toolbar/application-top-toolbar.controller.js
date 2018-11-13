@@ -113,7 +113,7 @@
       if (this.environmentRenderingService.loadingEnvironmentSettingsPanel) {
         return;
       } else {
-        this.goldenLayoutService.openTool(
+        this.goldenLayoutService.toggleTool(
           this.TOOL_CONFIGS.ENVIRONMENT_RENDERING_SETTINGS
         );
         this.nrpAnalytics.eventTrack('Toggle-environment-settings-panel', {

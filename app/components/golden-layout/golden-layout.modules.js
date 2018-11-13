@@ -61,7 +61,8 @@
       componentName: 'angularModuleComponent',
       componentState: {
         module: 'exdFrontendApp',
-        angularDirective: '<environment-designer />'
+        angularDirective: '<environment-designer />',
+        singleton: true
       }
     },
     TRANSFER_FUNCTION_EDITOR: {
@@ -71,7 +72,8 @@
       componentName: 'angularModuleComponent',
       componentState: {
         module: 'exdFrontendApp',
-        angularDirective: '<transfer-function-editor />'
+        angularDirective: '<transfer-function-editor />',
+        singleton: true
       }
     },
     BRAIN_EDITOR: {
@@ -81,7 +83,8 @@
       componentName: 'angularModuleComponent',
       componentState: {
         module: 'exdFrontendApp',
-        angularDirective: '<pynn-editor />'
+        angularDirective: '<pynn-editor />',
+        singleton: true
       }
     },
     SMACH_EDITOR: {
@@ -91,7 +94,8 @@
       componentName: 'angularModuleComponent',
       componentState: {
         module: 'exdFrontendApp',
-        angularDirective: '<smach-editor />'
+        angularDirective: '<smach-editor />',
+        singleton: true
       }
     },
     RESOURCES_EDITOR: {
@@ -101,7 +105,8 @@
       componentName: 'angularModuleComponent',
       componentState: {
         module: 'exdFrontendApp',
-        angularDirective: '<resources-editor />'
+        angularDirective: '<resources-editor />',
+        singleton: true
       }
     },
     ROS_TERMINAL: {
@@ -111,7 +116,8 @@
       componentName: 'angularModuleComponent',
       componentState: {
         module: 'exdFrontendApp',
-        angularDirective: '<ros-terminal />'
+        angularDirective: '<ros-terminal />',
+        singleton: true
       }
     },
     PULL_FORCE: {
@@ -121,7 +127,8 @@
       componentName: 'angularModuleComponent',
       componentState: {
         module: 'exdFrontendApp',
-        angularDirective: '<apply-force />'
+        angularDirective: '<apply-force />',
+        singleton: true
       }
     },
     SPIKE_TRAIN: {
@@ -131,7 +138,8 @@
       componentName: 'angularModuleComponent',
       componentState: {
         module: 'exdFrontendApp',
-        angularDirective: '<spike-train />'
+        angularDirective: '<spike-train />',
+        singleton: true
       }
     },
     JOINT_PLOT: {
@@ -151,7 +159,8 @@
       componentName: 'angularModuleComponent',
       componentState: {
         module: 'exdFrontendApp',
-        angularDirective: '<brainvisualizer />'
+        angularDirective: '<brainvisualizer />',
+        singleton: true
       }
     },
     LOG_CONSOLE: {
@@ -161,7 +170,8 @@
       componentName: 'angularModuleComponent',
       componentState: {
         module: 'exdFrontendApp',
-        angularDirective: '<log-console />'
+        angularDirective: '<log-console />',
+        singleton: true
       }
     },
     SERVER_VIDEO_STREAM: {

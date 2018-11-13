@@ -185,7 +185,7 @@ describe('Controller: ApplicationTopToolbarController', function() {
 
       environmentRenderingService.loadingEnvironmentSettingsPanel = false;
       applicationTopToolbarController.onButtonEnvironmentSettings();
-      expect(goldenLayoutService.openTool).toHaveBeenCalled();
+      expect(goldenLayoutService.toggleTool).toHaveBeenCalled();
       expect(nrpAnalytics.eventTrack).toHaveBeenCalled();
     });
 
