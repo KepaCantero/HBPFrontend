@@ -32,7 +32,7 @@
 
         <div ng-repeat="envGroup in vm.environments">
 
-          <div ng-repeat="entity in envGroup.environments | filter: query | filter: maturity: 'maturity'" class="experiment-box" ng-mouseenter="isHovered = true"
+          <div ng-repeat="entity in envGroup.environments | filter: query" class="experiment-box" ng-mouseenter="isHovered = true"
             ng-mouseleave="isHovered = false" ng-mouseup="isHovered = false" ng-click="vm.selectEnvironment(entity)">
             <div class="list-entry-container left-right" ng-show="entity.thumbnail!==''" ng-class="{selected: (entity.path == vm.environment.path), hover:isHovered && (entity.path != vm.environment.path)}">
               <div class="list-entry-left" style="position:relative" ng-class="{selected: entity.path == vm.environment.path}">

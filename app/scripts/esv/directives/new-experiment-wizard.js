@@ -69,7 +69,7 @@
           nrpUser
             .getOwnerDisplayName('me')
             .then(owner => ($scope.owner = owner));
-          $scope.maturity = environmentService.isDevMode() ? '' : 'production';
+
           var RobotUploader = {
             name: 'Robot',
             uploadFromTemplates: function() {
@@ -429,7 +429,6 @@
                 name: entity.name,
                 custom: entity.custom ? entity.custom : false,
                 description: entity.description,
-                maturity: entity.maturity,
                 thumbnail: entity.thumbnail
               };
             });

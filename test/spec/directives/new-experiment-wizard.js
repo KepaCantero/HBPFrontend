@@ -64,14 +64,12 @@
           {
             name: 'fakeICub',
             description: 'fakeICub',
-            maturity: 'development',
             id: 'fakeICub',
             thumbnail: ''
           },
           {
             name: 'fakeHusky',
             description: 'fakeHuskyDescription',
-            maturity: 'development',
             id: 'fakeHusky',
             thumbnail: ''
           }
@@ -86,7 +84,6 @@
         id: 'fakeICub',
         name: 'fakeICub',
         description: 'fakeICub',
-        maturity: 'development',
         thumbnail: '',
         path: 'undefined',
         configpath:
@@ -104,14 +101,12 @@
             id: 'fake3DSpace',
             name: 'fake3DSpace',
             description: 'fake3DSpace',
-            maturity: 'development',
             thumbnail: ''
           },
           {
             id: 'fakeFZIGround',
             name: 'fakeFZIGround',
             description: 'fakeFZIGround',
-            maturity: 'development',
             thumbnail: ''
           }
         ]);
@@ -124,7 +119,6 @@
         id: 'fake3DSpace',
         name: 'fake3DSpace',
         description: 'fake3DSpace',
-        maturity: 'development',
         thumbnail: '',
         path: 'undefined',
         custom: true
@@ -140,14 +134,12 @@
             id: 'fakeBraitenberg',
             name: 'fakeBraitenberg',
             description: 'fakeBraitenberg',
-            maturity: 'development',
             thumbnail: ''
           },
           {
             id: 'fakeIdleBrain',
             name: 'fakeIdleBrain',
             description: 'fakeIdleBrain',
-            maturity: 'development',
             thumbnail: ''
           }
         ]);
@@ -161,7 +153,6 @@
         id: 'fakeBraitenberg',
         name: 'fakeBraitenberg',
         description: 'fakeBraitenberg',
-        maturity: 'development',
         thumbnail: '',
         custom: true,
         path: 'undefined'

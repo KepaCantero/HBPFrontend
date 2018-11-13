@@ -17,7 +17,7 @@
             No models available...
             <hr class="list-separator" style="margin-left: -18px">
           </div>
-        <div ng-repeat="entity in entities | filter: query | filter: maturity: 'maturity'" class="experiment-box" ng-mouseenter="isHovered = true" ng-mouseleave="isHovered = false" ng-mouseup="isHovered = false" ng-click="selectEntity(entity)">
+        <div ng-repeat="entity in entities | filter: query" class="experiment-box" ng-mouseenter="isHovered = true" ng-mouseleave="isHovered = false" ng-mouseup="isHovered = false" ng-click="selectEntity(entity)">
             <div class="list-entry-container left-right" ng-show="entity.thumbnail!==''" ng-class="{selected: (entity.path == entityPageState.selected.path) || isHovered}">
                 <div class="list-entry-left" ng-class="{selected: entity.path == entityPageState.selected.path}">
                     <img ng-if="!entity.thumbnail && (entityName == 'Robot' || entityName == 'Robots')" class="entity-thumbnail" src="img/esv/robotbody.png"/>
