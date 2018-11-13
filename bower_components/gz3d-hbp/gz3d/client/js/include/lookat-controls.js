@@ -60,7 +60,6 @@ THREE.LookatControls = function (userView)
     $(document.activeElement).blur();
 
     event.preventDefault();
-    event.stopPropagation();
 
     if (that.activeLook)
     {
