@@ -588,7 +588,7 @@ describe('Services: userNavigationService', function() {
     expect(gz3d.scene.controls).toBe(firstPersonControls);
   });
 
-  it(' - setLookatCamera(), no selection', function() {
+  it(' - lookAtRobot(), no selection', function() {
     userNavigationService.init();
     userNavigationService.navigationMode = NAVIGATION_MODES.FREE_CAMERA;
     userNavigationService.lookatControls = lookatControls;
@@ -598,7 +598,7 @@ describe('Services: userNavigationService', function() {
     let mockRobotModel = {};
     spyOn(gz3d.scene.scene, 'getObjectByName').and.returnValue(mockRobotModel);
 
-    userNavigationService.setLookatCamera();
+    userNavigationService.lookAtRobot();
     expect(userNavigationService.navigationMode).toBe(NAVIGATION_MODES.LOOKAT);
     expect(gz3d.scene.controls).toBe(lookatControls);
     expect(lookatControls.setLookatTarget).toHaveBeenCalledWith(mockRobotModel);

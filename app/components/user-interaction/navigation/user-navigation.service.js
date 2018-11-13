@@ -427,11 +427,6 @@
 
           setLookatCamera: function() {
             let selection = gz3d.scene.selectedEntity;
-            if (!selection || !sceneInfo.isRobot(selection)) {
-              selection = gz3d.scene.scene.getObjectByName(
-                sceneInfo.robots[0].robotId
-              );
-            }
             this.lookatControls.setLookatTarget(selection);
 
             document.removeEventListener('keydown', this.displayHumanNavInfo);
@@ -496,7 +491,7 @@
             }
 
             gz3d.scene.selectedEntity = gz3d.scene.scene.getObjectByName(
-              sceneInfo.robots[robotIndex]
+              sceneInfo.robots[robotIndex].robotId
             );
             this.setLookatCamera();
           }
