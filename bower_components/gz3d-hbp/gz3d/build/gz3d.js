@@ -5291,7 +5291,12 @@ GZ3D.GZIface = function(scene, gui)
   GZ3D.assetProgressCallback = undefined;
 
   this.webSocketConnectionCallbacks = [];
-  this.onDeleteEntityCallbacks = [scene.viewManager.deleteRobotViews.bind(scene.viewManager)];
+  let deleteRobotViewsCallback = function(entity) {
+    if (GZ3D.isRobot(entity)) {
+      scene.viewManager.deleteRobotViews.bind(scene.viewManager);
+    }
+  };
+  this.onDeleteEntityCallbacks = [deleteRobotViewsCallback];
   this.onCreateEntityCallbacks = [];
 };
 
