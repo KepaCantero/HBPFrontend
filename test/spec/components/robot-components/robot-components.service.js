@@ -108,6 +108,7 @@ describe('Services: robotComponentsService', function() {
     spyOn(robotComponentsService, 'parseRobotModelProperties');
 
     // success
+    gz3d.scene.selectedEntity = { name: 'mockedRobot' };
     robotComponentsService.getRobotModelProperties();
 
     expect(mockRosService.callService).toHaveBeenCalled();

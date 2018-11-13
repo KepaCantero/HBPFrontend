@@ -72,7 +72,7 @@
     getRobotModelProperties() {
       /* eslint-disable camelcase */
       var request = new this.roslib.ServiceRequest({
-        model_name: 'robot'
+        model_name: this.getRobot().name
       });
       /* eslint-enable camelcase */
 
