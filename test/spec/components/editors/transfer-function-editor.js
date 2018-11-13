@@ -1295,17 +1295,24 @@ def tf2(t):
       expect(isolateScope.isSavingCSVToCollab).toBe(false);
     });
 
-    it('should support toggleActive', function() {
+    it('should toggleActive only script is applyied sucessfully', function() {
       var tf = { active: false, code: 'some code', error: {} };
 
+      spyOn(isolateScope, 'applyScript').and.callFake((tf, cb) =>
+        cb([null, null])
+      );
+      spyOn(
+        backendInterfaceServiceMock,
+        'setActivateTransferFunction'
+      ).and.callFake((name, data, activate, successCallback) =>
+        successCallback()
+      );
       isolateScope.toggleActive(tf);
+      expect(isolateScope.applyScript).toHaveBeenCalled();
+      expect(
+        backendInterfaceService.setActivateTransferFunction
+      ).toHaveBeenCalled();
       expect(tf.active).toBe(true);
-
-      shouldUseErrorCallback = true;
-      isolateScope.toggleActive(tf);
-
-      expect(tf.active).toBe(true);
-      shouldUseErrorCallback = false;
     });
 
     it('should change the name of TF correctly', function() {

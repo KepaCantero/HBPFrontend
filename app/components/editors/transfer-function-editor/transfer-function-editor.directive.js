@@ -1150,12 +1150,13 @@ def {0}(t):
                 });
 
                 if (new Set(tfNames).size !== tfNames.length) {
-                  clbErrorDialog.open({
+                  const err = {
                     type: 'Duplicate definition names',
                     message: `There is already a transfer function with the same name. Please use another name.`
-                  });
+                  };
+                  clbErrorDialog.open(err);
 
-                  _doneCallback();
+                  _doneCallback(null, err);
                   return;
                 }
 
@@ -1213,9 +1214,9 @@ def {0}(t):
                       }
                     }, 1.0);
                   })
-                  .catch(function(data) {
-                    serverError.displayHTTPError(data);
-                    _doneCallback();
+                  .catch(function(error) {
+                    serverError.displayHTTPError(error);
+                    _doneCallback(null, error);
                   });
               }
             };
@@ -1356,18 +1357,18 @@ def {0}(t):
             };
 
             scope.toggleActive = function(tf) {
-              if (Object.keys(tf.error).length > 0) return;
-              tf.active = !tf.active;
-              backendInterfaceService.setActivateTransferFunction(
-                tf.name,
-                null,
-                tf.active,
-                function() {},
-                function(data) {
-                  tf.active = !tf.active;
-                  serverError.displayHTTPError(data);
-                }
-              );
+              scope.applyScript(tf, (res, err) => {
+                if (err) return;
+                backendInterfaceService.setActivateTransferFunction(
+                  tf.name,
+                  null,
+                  tf.active,
+                  () => {
+                    tf.active = !tf.active;
+                  },
+                  () => {}
+                );
+              });
             };
 
             scope.updateNTransferFunctionDirty = function() {
