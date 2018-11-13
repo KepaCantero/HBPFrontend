@@ -89,7 +89,7 @@
           // Register a callback which deletes the robot in the back-end on the corresponding "deleteEntity" event
           // and refresh the robots list managed by the SceneInfo service
           var deleteBackendRobotCallback = function(entity) {
-            if (sceneInfo.isARobot(entity)) {
+            if (sceneInfo.isRobot(entity)) {
               backendInterfaceService.deleteRobot(entity.name);
               sceneInfo.refreshRobotsList();
             }
