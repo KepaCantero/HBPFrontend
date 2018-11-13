@@ -8,7 +8,6 @@ describe('Directive: pullForceService', function() {
 
   // load modules that are can be used without mocking them
   beforeEach(module('clientLoggerServiceMock'));
-  beforeEach(module('contextMenuStateServiceMock'));
   beforeEach(module('eventDispatcherModule'));
   beforeEach(module('userInteractionModule'));
   beforeEach(module('pushForceServiceMock'));
@@ -35,11 +34,7 @@ describe('Services: pullForceService', function() {
 
   let container;
   let eventDispatcherService;
-  let gz3d,
-    environmentRenderingService,
-    pushForceService,
-    contextMenuState,
-    stateService;
+  let gz3d, environmentRenderingService, pushForceService, stateService;
   let STATE;
 
   let mockRaycaster;
@@ -51,7 +46,6 @@ describe('Services: pullForceService', function() {
 
   // load mocks for all services that are used
   beforeEach(module('gz3dMock'));
-  beforeEach(module('contextMenuStateServiceMock'));
   beforeEach(module('userNavigationServiceMock'));
   beforeEach(module('pushForceServiceMock'));
   beforeEach(module('environmentRenderingServiceMock'));
@@ -78,7 +72,6 @@ describe('Services: pullForceService', function() {
       _gz3d_,
       _environmentRenderingService_,
       _eventDispatcherService_,
-      _contextMenuState_,
       _pushForceService_,
       _stateService_,
       _STATE_
@@ -87,7 +80,6 @@ describe('Services: pullForceService', function() {
       gz3d = _gz3d_;
       environmentRenderingService = _environmentRenderingService_;
       eventDispatcherService = _eventDispatcherService_;
-      contextMenuState = _contextMenuState_;
       pushForceService = _pushForceService_;
       stateService = _stateService_;
       STATE = _STATE_;
@@ -191,7 +183,6 @@ describe('Services: pullForceService', function() {
       expect(myService.pullForceGizmos.length).toBe(0);
 
       gz3d.scene.getRayCastModel.and.returnValue(mockModelStatic);
-      contextMenuState.axisSelected.and.returnValue(false);
 
       eventDispatcherService.triggerMouseEvent(container, 'mousedown', 0, 0, 0);
 
@@ -203,7 +194,6 @@ describe('Services: pullForceService', function() {
       expect(myService.pullForceGizmos.length).toBe(0);
 
       gz3d.scene.getRayCastModel.and.returnValue(mockModel);
-      contextMenuState.axisSelected.and.returnValue(false);
       pushForceService.getLinkRayCastIntersection.and.returnValue(undefined);
 
       eventDispatcherService.triggerMouseEvent(container, 'mousedown', 0, 0, 0);
@@ -218,7 +208,6 @@ describe('Services: pullForceService', function() {
 
       mockModel.worldToLocal.and.returnValue(new THREE.Vector3(0, 0, 0));
       gz3d.getRayCastModel.and.returnValue(mockModel);
-      contextMenuState.axisSelected.and.returnValue(false);
       gz3d.getRayCastIntersections.and.returnValue(
         mockLinkIntersection.intersection
       );
@@ -249,7 +238,6 @@ describe('Services: pullForceService', function() {
 
       beforeEach(function() {
         gz3d.getRayCastModel.and.returnValue(mockModel);
-        contextMenuState.axisSelected.and.returnValue(false);
         gz3d.getRayCastIntersections.and.returnValue(
           mockLinkIntersection.intersection
         );
@@ -319,7 +307,6 @@ describe('Services: pullForceService', function() {
 
       beforeEach(function() {
         gz3d.getRayCastModel.and.returnValue(mockModel);
-        contextMenuState.axisSelected.and.returnValue(false);
         gz3d.getRayCastIntersections.and.returnValue(
           mockLinkIntersection.intersection
         );
@@ -414,7 +401,6 @@ describe('Services: pullForceService', function() {
 
       beforeEach(function() {
         gz3d.getRayCastModel.and.returnValue(mockModel);
-        contextMenuState.axisSelected.and.returnValue(false);
         gz3d.getRayCastIntersections.and.returnValue(
           mockLinkIntersection.intersection
         );

@@ -45,7 +45,6 @@ describe('Controller: EnvironmentRenderingController', function() {
   beforeEach(module('userNavigationServiceMock'));
   beforeEach(module('userContextServiceMock'));
   beforeEach(module('editorsPanelServiceMock'));
-  beforeEach(module('contextMenuStateServiceMock'));
   beforeEach(module('sceneInfoMock'));
   beforeEach(module('assetLoadingSplashMock'));
   beforeEach(module('colorableObjectServiceMock'));
@@ -149,7 +148,6 @@ describe('Controller: EnvironmentRenderingController', function() {
       _TOOL_CONFIGS_,
       _sceneInfo_,
       _stateService_,
-      _contextMenuState_,
       _nrpBackendVersions_,
       _nrpFrontendVersion_,
       _gz3d_,
