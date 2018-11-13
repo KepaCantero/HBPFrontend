@@ -10765,6 +10765,21 @@ GZ3D.Scene.prototype.onPointerDown = function(event)
     }
   }
 
+  let pos;
+  if (event.touches )    {
+      if (event.touches.length === 1)
+          pos = new THREE.Vector2(event.touches[0].offsetX, event.touches[0].offsetY);
+      else
+          return;
+  } else
+      pos = new THREE.Vector2(event.offsetX, event.offsetY);
+
+  const model = this.getRayCastModel(pos, new THREE.Vector3());
+
+  if (model && model.name !== '')
+      this.selectEntity(model);
+
+
   this.timeDown = new Date().getTime();
 };
 
