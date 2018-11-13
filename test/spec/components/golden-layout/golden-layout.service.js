@@ -152,7 +152,42 @@ describe('Service: GoldenLayoutService', function() {
     ]);
     goldenLayoutService.openTool(mockToolConfig);
     expect(mockLayout.root.contentItems[0].addChild).not.toHaveBeenCalled();
-    expect(mockLayout.root.getItemsById()[0].close).toHaveBeenCalled();
+
+    // not a singleton tool with same elements open, success
+    mockLayout.root.contentItems[0].addChild.calls.reset();
+    mockToolConfig.componentState.singleton = false;
+    goldenLayoutService.openTool(mockToolConfig);
+    expect(mockLayout.root.contentItems[0].addChild).toHaveBeenCalledWith(
+      mockToolConfig
+    );
+  });
+
+  it(' - toggleTool', function() {
+    goldenLayoutService.layout = mockLayout;
+
+    let mockToolConfig = {
+      id: 'mock-id',
+      componentState: {
+        singleton: true
+      }
+    };
+
+    mockLayout.root.getItemsById.and.returnValue([]);
+
+    // first call for a singleton tool, success
+    goldenLayoutService.toggleTool(mockToolConfig);
+    expect(mockLayout.root.contentItems[0].addChild).toHaveBeenCalledWith(
+      mockToolConfig
+    );
+
+    // second call for a singletion tool, failure
+    mockLayout.root.contentItems[0].addChild.calls.reset();
+    let mockItems = [{ close: jasmine.createSpy('close') }];
+    mockLayout.root.getItemsById.and.returnValue(mockItems);
+
+    goldenLayoutService.toggleTool(mockToolConfig);
+    expect(mockLayout.root.contentItems[0].addChild).not.toHaveBeenCalled();
+    expect(mockItems[0].close).toHaveBeenCalled();
 
     // not a singleton tool with same elements open, success
     mockLayout.root.contentItems[0].addChild.calls.reset();

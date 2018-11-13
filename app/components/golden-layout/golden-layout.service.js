@@ -81,6 +81,17 @@
         toolConfig.componentState.singleton &&
         this.layout.root.getItemsById(toolConfig.id).length > 0
       ) {
+        return;
+      }
+
+      this.layout.root.contentItems[0].addChild(toolConfig);
+    }
+
+    toggleTool(toolConfig) {
+      if (
+        toolConfig.componentState.singleton &&
+        this.layout.root.getItemsById(toolConfig.id).length > 0
+      ) {
         this.layout.root.getItemsById(toolConfig.id).forEach(item => {
           item.close();
         });

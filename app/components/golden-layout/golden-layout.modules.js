@@ -57,6 +57,7 @@
     ENVIRONMENT_EDITOR: {
       type: 'component',
       title: 'Environment Editor',
+      id: 'environment-designer',
       componentName: 'angularModuleComponent',
       componentState: {
         module: 'exdFrontendApp',
@@ -66,6 +67,7 @@
     TRANSFER_FUNCTION_EDITOR: {
       type: 'component',
       title: 'TF Editor',
+      id: 'transfer-function-editor',
       componentName: 'angularModuleComponent',
       componentState: {
         module: 'exdFrontendApp',
@@ -75,6 +77,7 @@
     BRAIN_EDITOR: {
       type: 'component',
       title: 'Brain Editor',
+      id: 'pynn-editor',
       componentName: 'angularModuleComponent',
       componentState: {
         module: 'exdFrontendApp',
@@ -84,6 +87,7 @@
     SMACH_EDITOR: {
       type: 'component',
       title: 'Smach Editor',
+      id: 'smach-editor',
       componentName: 'angularModuleComponent',
       componentState: {
         module: 'exdFrontendApp',
@@ -93,6 +97,7 @@
     RESOURCES_EDITOR: {
       type: 'component',
       title: 'Resources Editor',
+      id: 'resources-editor',
       componentName: 'angularModuleComponent',
       componentState: {
         module: 'exdFrontendApp',
@@ -102,6 +107,7 @@
     ROS_TERMINAL: {
       type: 'component',
       title: 'ROS Terminal',
+      id: 'ros-terminal',
       componentName: 'angularModuleComponent',
       componentState: {
         module: 'exdFrontendApp',
@@ -111,6 +117,7 @@
     PULL_FORCE: {
       type: 'component',
       title: 'Apply Force',
+      id: 'apply-force',
       componentName: 'angularModuleComponent',
       componentState: {
         module: 'exdFrontendApp',
@@ -120,6 +127,7 @@
     SPIKE_TRAIN: {
       type: 'component',
       title: 'Spike Train',
+      id: 'spike-train',
       componentName: 'angularModuleComponent',
       componentState: {
         module: 'exdFrontendApp',
@@ -129,6 +137,7 @@
     JOINT_PLOT: {
       type: 'component',
       title: 'Joint Plot',
+      id: 'joint-plot',
       componentName: 'angularModuleComponent',
       componentState: {
         module: 'exdFrontendApp',
@@ -138,6 +147,7 @@
     BRAIN_VISUALIZER: {
       type: 'component',
       title: 'Brain Visualizer',
+      id: 'brainvisualizer',
       componentName: 'angularModuleComponent',
       componentState: {
         module: 'exdFrontendApp',
@@ -147,6 +157,7 @@
     LOG_CONSOLE: {
       type: 'component',
       title: 'Log Console',
+      id: 'log-console',
       componentName: 'angularModuleComponent',
       componentState: {
         module: 'exdFrontendApp',
@@ -156,6 +167,7 @@
     SERVER_VIDEO_STREAM: {
       type: 'component',
       title: 'Video Stream',
+      id: 'video-stream',
       componentName: 'angularModuleComponent',
       componentState: {
         module: 'exdFrontendApp',

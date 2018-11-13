@@ -45,7 +45,11 @@
           element[0].addEventListener('mouseup', () => {
             if (helpTooltipService.visible === helpTooltipService.HELP) return;
 
-            goldenLayoutService.openTool(TOOL_CONFIGS[attr.glToolSource]);
+            if (TOOL_CONFIGS[attr.glToolSource].componentState.singleton) {
+              goldenLayoutService.toggleTool(TOOL_CONFIGS[attr.glToolSource]);
+            } else {
+              goldenLayoutService.openTool(TOOL_CONFIGS[attr.glToolSource]);
+            }
           });
         });
       }

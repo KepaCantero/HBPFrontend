@@ -12,6 +12,7 @@
 
       this.createLayout = jasmine.createSpy('createLayout');
       this.openTool = jasmine.createSpy('openTool');
+      this.toggleTool = jasmine.createSpy('toggleTool');
       this.createDragSource = jasmine.createSpy('createDragSource');
       this.refreshSize = jasmine.createSpy('refreshSize');
     });

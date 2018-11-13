@@ -72,8 +72,20 @@ describe('Directive: gl-tool-source', function() {
     $rootScope.$broadcast('ASSETS_LOADED');
 
     helpTooltipService.visible = false;
+    TOOL_CONFIGS[toolConfig].componentState.singleton = false;
     eventDispatcherService.triggerMouseEvent(element[0], 'mouseup', 0, 0, 0);
     expect(goldenLayoutService.openTool).toHaveBeenCalledWith(
+      TOOL_CONFIGS[toolConfig]
+    );
+  });
+
+  it(' - mouseup, singleton tool config', function() {
+    $rootScope.$broadcast('ASSETS_LOADED');
+
+    helpTooltipService.visible = false;
+    TOOL_CONFIGS[toolConfig].componentState.singleton = true;
+    eventDispatcherService.triggerMouseEvent(element[0], 'mouseup', 0, 0, 0);
+    expect(goldenLayoutService.toggleTool).toHaveBeenCalledWith(
       TOOL_CONFIGS[toolConfig]
     );
   });
