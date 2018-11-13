@@ -45,7 +45,6 @@
     'sceneInfo',
     'backendInterfaceService',
     'clbErrorDialog',
-    'isARobotPredicate',
     'downloadFileService',
     'environmentService',
     'goldenLayoutService',
@@ -63,7 +62,6 @@
       sceneInfo,
       backendInterfaceService,
       clbErrorDialog,
-      isARobotPredicate,
       downloadFileService,
       environmentService,
       goldenLayoutService,
@@ -91,7 +89,7 @@
           // Register a callback which deletes the robot in the back-end on the corresponding "deleteEntity" event
           // and refresh the robots list managed by the SceneInfo service
           var deleteBackendRobotCallback = function(entity) {
-            if (isARobotPredicate(entity)) {
+            if (sceneInfo.isARobot(entity)) {
               backendInterfaceService.deleteRobot(entity.name);
               sceneInfo.refreshRobotsList();
             }

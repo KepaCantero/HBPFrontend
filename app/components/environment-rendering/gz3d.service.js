@@ -38,7 +38,7 @@
     '$compile',
     '$http',
     'simulationInfo',
-    'isARobotPredicate',
+    'sceneInfo',
     'bbpConfig',
     function(
       $rootScope,
@@ -46,7 +46,7 @@
       $compile,
       $http,
       simulationInfo,
-      isARobotPredicate,
+      sceneInfo,
       bbpConfig
     ) {
       /* moved from the gz3d-view.html*/
@@ -102,7 +102,7 @@
           GZ3D.assetsPath = simulationInfo.serverConfig.gzweb.assets;
           GZ3D.webSocketUrl = simulationInfo.serverConfig.gzweb.websocket;
           GZ3D.animatedModel = simulationInfo.animatedModel;
-          GZ3D.isRobot = isARobotPredicate;
+          GZ3D.isRobot = sceneInfo.isRobot;
 
           const modelLibraryPath = GZ3D.assetsPath + '/' + this.MODEL_LIBRARY;
           $http.get(modelLibraryPath).then(function(res) {

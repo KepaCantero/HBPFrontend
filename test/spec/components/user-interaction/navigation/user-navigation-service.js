@@ -81,11 +81,6 @@ describe('Services: userNavigationService', function() {
       };
       var roslibMock = {};
       $provide.value('roslib', roslibMock);
-
-      $provide.value(
-        'isARobotPredicate',
-        jasmine.createSpy('isARobotPredicate').and.returnValue(true)
-      );
     })
   );
 

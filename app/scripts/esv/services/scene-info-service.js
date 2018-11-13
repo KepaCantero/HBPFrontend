@@ -38,14 +38,9 @@
           .then(res => (thisService.robots = res.robots));
       };
 
-      let isRobot = entity => {
-        thisService.initialized.then(() => {
-          return (
-            entity &&
-            thisService.robots.some(robot => entity.name === robot.robotId)
-          );
-        });
-      };
+      let isRobot = entity =>
+        entity &&
+        thisService.robots.some(robot => entity.name === robot.robotId);
 
       // This function loads the list of robots initially provided by the back-end
       function initialize() {

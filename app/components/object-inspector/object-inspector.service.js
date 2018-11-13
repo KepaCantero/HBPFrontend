@@ -43,7 +43,7 @@
       'gz3d',
       'stateService',
       'colorableObjectService',
-      'isARobotPredicate',
+      'sceneInfo',
       'simulationInfo',
       'userNavigationService',
       'NAVIGATION_MODES',
@@ -56,7 +56,7 @@
         gz3d,
         stateService,
         colorableObjectService,
-        isARobotPredicate,
+        sceneInfo,
         simulationInfo,
         userNavigationService,
         NAVIGATION_MODES,
@@ -137,7 +137,7 @@
 
           this.isRobot = function() {
             return (
-              this.selectedObject && isARobotPredicate(this.selectedObject)
+              this.selectedObject && sceneInfo.isRobot(this.selectedObject)
             );
           };
 
@@ -606,7 +606,7 @@
 
           this.update = function() {
             that.updateSelection();
-            that.isARobot = isARobotPredicate(that.selectedObject);
+            that.isARobot = sceneInfo.isRobot(that.selectedObject);
 
             if (
               angular.isUndefined(that.selectedObject) ||

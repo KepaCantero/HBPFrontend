@@ -108,10 +108,7 @@
         {
           text: 'Delete',
           displayed: () => {
-            return (
-              gz3d.scene.selectedEntity &&
-              !sceneInfo.isRobot(gz3d.scene.selectedEntity)
-            );
+            return Boolean(gz3d.scene.selectedEntity);
           },
           click: () => {
             gz3d.gui.emitter.emit('deleteEntity', gz3d.scene.selectedEntity);

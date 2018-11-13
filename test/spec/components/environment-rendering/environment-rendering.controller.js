@@ -545,11 +545,11 @@ describe('Controller: EnvironmentRenderingController', function() {
 
     it(' - option[6] "delete"', function() {
       // displayed
-      expect(contextmenu.options[6].displayed()).toBe(undefined);
+      expect(contextmenu.options[6].displayed()).toBe(false);
 
       gz3d.scene.selectedEntity = {};
       sceneInfo.isRobot.and.returnValue(true);
-      expect(contextmenu.options[6].displayed()).toBe(false);
+      expect(contextmenu.options[6].displayed()).toBe(true);
 
       sceneInfo.isRobot.and.returnValue(false);
       expect(contextmenu.options[6].displayed()).toBe(true);

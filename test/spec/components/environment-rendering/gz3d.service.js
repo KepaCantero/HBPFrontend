@@ -64,10 +64,10 @@ describe('testing the gz3d service', function() {
   bbpConfig.get = jasmine.createSpy('get').and.returnValue('toto');
 
   beforeEach(module('gz3dModule'));
+  beforeEach(module('sceneInfoMock'));
   beforeEach(
     module(function($provide) {
       $provide.value('simulationInfo', simulationInfo);
-      $provide.value('isARobotPredicate', {});
       $provide.value('bbpConfig', bbpConfig);
     })
   );
