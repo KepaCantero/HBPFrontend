@@ -14,6 +14,9 @@
     this.getLinkFromIntersections = jasmine.createSpy(
       'getLinkFromIntersections'
     );
+    this.getNormalizedScreenCoords = jasmine.createSpy(
+      'getNormalizedScreenCoords'
+    );
 
     this.gui = {
       emitter: {

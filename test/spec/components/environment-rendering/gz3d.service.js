@@ -271,4 +271,43 @@ describe('testing the gz3d service', function() {
         .intersection
     ).toBe(mockIntersections[2]);
   });
+
+  it(' - getNormalizedScreenCoords()', function() {
+    let mockView = {
+      container: {
+        getBoundingClientRect: jasmine
+          .createSpy('getBoundingClientRect')
+          .and.returnValue({
+            x: 0,
+            y: 0,
+            width: 200,
+            height: 100
+          })
+      }
+    };
+
+    let normalized = gz3d.getNormalizedScreenCoords(mockView, 100, 50);
+    expect(normalized.x).toBe(0);
+    expect(normalized.y).toBe(0);
+
+    normalized = gz3d.getNormalizedScreenCoords(mockView, 0, 0);
+    expect(normalized.x).toBe(-1);
+    expect(normalized.y).toBe(1);
+
+    normalized = gz3d.getNormalizedScreenCoords(mockView, 200, 0);
+    expect(normalized.x).toBe(1);
+    expect(normalized.y).toBe(1);
+
+    normalized = gz3d.getNormalizedScreenCoords(mockView, 0, 100);
+    expect(normalized.x).toBe(-1);
+    expect(normalized.y).toBe(-1);
+
+    normalized = gz3d.getNormalizedScreenCoords(mockView, 200, 100);
+    expect(normalized.x).toBe(1);
+    expect(normalized.y).toBe(-1);
+
+    normalized = gz3d.getNormalizedScreenCoords(mockView, 150, 75);
+    expect(normalized.x).toBe(0.5);
+    expect(normalized.y).toBe(-0.5);
+  });
 });

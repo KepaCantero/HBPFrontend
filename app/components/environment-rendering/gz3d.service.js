@@ -207,11 +207,10 @@
           clickPos,
           view = this.scene.viewManager.mainUserView
         ) => {
-          let containerRect = view.container.getBoundingClientRect();
-
-          let normalizedScreenCoords = new THREE.Vector2(
-            (clickPos.x - containerRect.x) / containerRect.width * 2 - 1,
-            -((clickPos.y - containerRect.y) / containerRect.height) * 2 + 1
+          let normalizedScreenCoords = this.getNormalizedScreenCoords(
+            view,
+            clickPos.x,
+            clickPos.y
           );
 
           let raycaster = new THREE.Raycaster();
@@ -248,6 +247,14 @@
           }
 
           return undefined;
+        };
+
+        this.getNormalizedScreenCoords = (view, x, y) => {
+          let containerRect = view.container.getBoundingClientRect();
+          return new THREE.Vector2(
+            (x - containerRect.x) / containerRect.width * 2 - 1,
+            -((y - containerRect.y) / containerRect.height) * 2 + 1
+          );
         };
       }
 

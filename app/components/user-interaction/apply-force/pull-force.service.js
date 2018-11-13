@@ -143,41 +143,35 @@
         };
 
         const onStartPulling = mouseEvent => {
-          if (!gz3d.scene.selectedEntity) {
+          /*if (!gz3d.scene.selectedEntity) {
             return;
-          }
+          }*/
 
           // only start polling an object if the user clicked on a valid link
           const mousePos = { x: mouseEvent.clientX, y: mouseEvent.clientY };
 
-          let model = gz3d.getRayCastModel(mousePos);
+          this.targetModel = gz3d.getRayCastModel(mousePos);
 
           if (
-            model !== undefined &&
-            model.userData &&
-            !model.userData.is_static
+            this.targetModel !== undefined &&
+            this.targetModel !== null &&
+            this.targetModel.userData &&
+            !this.targetModel.userData.is_static
           ) {
             let intersections = gz3d.getRayCastIntersections(mousePos);
             const linkIntersection = gz3d.getLinkFromIntersections(
               intersections,
-              model
+              this.targetModel
             );
             if (linkIntersection !== undefined) {
               userNavigationService.controls.enabled = false;
               startPullLink = linkIntersection.link;
 
               const userView = gz3d.scene.viewManager.mainUserView;
-              const normalizedScreenCoords = new THREE.Vector2(
-                (mousePos.x - userView.renderer.domElement.offsetLeft) /
-                  userView.container.clientWidth *
-                  2 -
-                  1,
-                -(
-                  (mousePos.y - userView.renderer.domElement.offsetTop) /
-                  userView.container.clientHeight
-                ) *
-                  2 +
-                  1
+              const normalizedScreenCoords = gz3d.getNormalizedScreenCoords(
+                userView,
+                mousePos.x,
+                mousePos.y
               );
               raycaster.setFromCamera(normalizedScreenCoords, userView.camera);
               intersectionPlane.setFromNormalAndCoplanarPoint(
@@ -185,10 +179,12 @@
                 linkIntersection.intersection.point
               );
               mouseStart = raycaster.ray.intersectPlane(intersectionPlane);
-              this.targetModel = model;
 
               this.pullForceGizmos.push(
-                createGizmo(model, linkIntersection.intersection.point)
+                createGizmo(
+                  this.targetModel,
+                  linkIntersection.intersection.point
+                )
               );
               this.domElementPointerBindings.addEventListener(
                 'mouseup',
@@ -372,8 +368,8 @@
         };
 
         this.Activate = () => {
-          pushForceService.disableApplyForceMode();
-          pushForceService.detachGizmo();
+          //pushForceService.disableApplyForceMode();
+          //pushForceService.detachGizmo();
           const userViewDOM = gz3d.scene.viewManager.mainUserView.container;
           this.domElementPointerBindings = userViewDOM ? userViewDOM : document;
           this.domElementPointerBindings.addEventListener(

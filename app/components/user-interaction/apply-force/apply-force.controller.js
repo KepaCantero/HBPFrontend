@@ -27,11 +27,6 @@
 
   class ApplyForceController {
     constructor($scope, baseEventHandler, pullForceService, pushForceService) {
-      $scope.$on('$destroy', () => {
-        pullForceService.Deactivate();
-        pushForceService.disableApplyForceMode();
-      });
-
       this.pushForceService = pushForceService;
       this.pullForceService = pullForceService;
 
@@ -39,8 +34,10 @@
       this.advancedMode = false;
 
       this.pullForceService.Activate();
+
       $scope.$on('$destroy', () => {
-        this.pullForceService.Deactivate();
+        pullForceService.Deactivate();
+        pushForceService.disableApplyForceMode();
       });
 
       $scope.suppressKeyPress = function(event) {
