@@ -99,9 +99,7 @@
                   });
                   $scope.entities = $scope.parseEntityList(robots).map(r => {
                     r.configpath = window.encodeURIComponent(
-                      `${storageServer.STORAGE_BASE_URL}/custommodelconfig/${window.encodeURIComponent(
-                        r.path
-                      )}`
+                      `${storageServer.STORAGE_BASE_URL}/custommodelconfig/${r.path}`
                     );
                     return r;
                   });
