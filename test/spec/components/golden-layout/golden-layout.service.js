@@ -28,9 +28,12 @@ describe('Service: GoldenLayoutService', function() {
       createDragSource: jasmine.createSpy('createDragSource'),
       root: {
         getItemsById: jasmine.createSpy('getItemsById'),
+        addChild: jasmine.createSpy('addChild'),
+        removeChild: jasmine.createSpy('removeChild'),
         contentItems: [
           {
-            addChild: jasmine.createSpy('addChild')
+            addChild: jasmine.createSpy('addChild'),
+            config: {}
           }
         ]
       }
@@ -128,6 +131,7 @@ describe('Service: GoldenLayoutService', function() {
   });
 
   it(' - openTool', function() {
+    spyOn(goldenLayoutService, 'addTool');
     goldenLayoutService.layout = mockLayout;
 
     let mockToolConfig = {
@@ -141,28 +145,25 @@ describe('Service: GoldenLayoutService', function() {
 
     // first call for a singleton tool, success
     goldenLayoutService.openTool(mockToolConfig);
-    expect(mockLayout.root.contentItems[0].addChild).toHaveBeenCalledWith(
-      mockToolConfig
-    );
+    expect(goldenLayoutService.addTool).toHaveBeenCalledWith(mockToolConfig);
 
     // second call for a singletion tool, failure
-    mockLayout.root.contentItems[0].addChild.calls.reset();
+    goldenLayoutService.addTool.calls.reset();
     mockLayout.root.getItemsById.and.returnValue([
       { close: jasmine.createSpy('close') }
     ]);
     goldenLayoutService.openTool(mockToolConfig);
-    expect(mockLayout.root.contentItems[0].addChild).not.toHaveBeenCalled();
+    expect(goldenLayoutService.addTool).not.toHaveBeenCalled();
 
     // not a singleton tool with same elements open, success
-    mockLayout.root.contentItems[0].addChild.calls.reset();
+    goldenLayoutService.addTool.calls.reset();
     mockToolConfig.componentState.singleton = false;
     goldenLayoutService.openTool(mockToolConfig);
-    expect(mockLayout.root.contentItems[0].addChild).toHaveBeenCalledWith(
-      mockToolConfig
-    );
+    expect(goldenLayoutService.addTool).toHaveBeenCalledWith(mockToolConfig);
   });
 
   it(' - toggleTool', function() {
+    spyOn(goldenLayoutService, 'addTool');
     goldenLayoutService.layout = mockLayout;
 
     let mockToolConfig = {
@@ -176,23 +177,46 @@ describe('Service: GoldenLayoutService', function() {
 
     // first call for a singleton tool, success
     goldenLayoutService.toggleTool(mockToolConfig);
-    expect(mockLayout.root.contentItems[0].addChild).toHaveBeenCalledWith(
-      mockToolConfig
-    );
+    expect(goldenLayoutService.addTool).toHaveBeenCalledWith(mockToolConfig);
 
     // second call for a singletion tool, failure
-    mockLayout.root.contentItems[0].addChild.calls.reset();
+    goldenLayoutService.addTool.calls.reset();
     let mockItems = [{ close: jasmine.createSpy('close') }];
     mockLayout.root.getItemsById.and.returnValue(mockItems);
 
     goldenLayoutService.toggleTool(mockToolConfig);
-    expect(mockLayout.root.contentItems[0].addChild).not.toHaveBeenCalled();
+    expect(goldenLayoutService.addTool).not.toHaveBeenCalled();
     expect(mockItems[0].close).toHaveBeenCalled();
 
     // not a singleton tool with same elements open, success
-    mockLayout.root.contentItems[0].addChild.calls.reset();
+    goldenLayoutService.addTool.calls.reset();
     mockToolConfig.componentState.singleton = false;
     goldenLayoutService.openTool(mockToolConfig);
+    expect(goldenLayoutService.addTool).toHaveBeenCalledWith(mockToolConfig);
+  });
+
+  it(' - addTool', function() {
+    goldenLayoutService.layout = mockLayout;
+
+    let mockToolConfig = {
+      id: 'mock-id',
+      componentState: {
+        singleton: true
+      }
+    };
+
+    // not a stack to be added to
+    mockLayout.root.contentItems[0].isStack = false;
+
+    goldenLayoutService.addTool(mockToolConfig);
+    expect(mockLayout.root.contentItems[0].addChild).toHaveBeenCalledWith(
+      mockToolConfig
+    );
+
+    // add tool to stack, convert stack to row
+    mockLayout.root.contentItems[0].isStack = true;
+
+    goldenLayoutService.addTool(mockToolConfig);
     expect(mockLayout.root.contentItems[0].addChild).toHaveBeenCalledWith(
       mockToolConfig
     );

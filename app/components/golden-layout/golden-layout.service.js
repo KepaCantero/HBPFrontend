@@ -84,7 +84,7 @@
         return;
       }
 
-      this.layout.root.contentItems[0].addChild(toolConfig);
+      this.addTool(toolConfig);
     }
 
     toggleTool(toolConfig) {
@@ -98,7 +98,30 @@
         return;
       }
 
-      this.layout.root.contentItems[0].addChild(toolConfig);
+      this.addTool(toolConfig);
+    }
+
+    addTool(toolConfig) {
+      if (
+        this.layout.root.contentItems.length === 1 &&
+        this.layout.root.contentItems[0].isStack
+      ) {
+        let newContent = [];
+        if (this.layout.root.contentItems[0].contentItems) {
+          this.layout.root.contentItems[0].contentItems.forEach(content => {
+            newContent.push(content.config);
+          });
+        }
+        newContent.push(toolConfig);
+
+        this.layout.root.removeChild(this.layout.root.contentItems[0]);
+        this.layout.root.addChild({
+          type: 'row',
+          content: newContent
+        });
+      } else {
+        this.layout.root.contentItems[0].addChild(toolConfig);
+      }
     }
   }
 
