@@ -3,12 +3,6 @@
 <!-- endbuild -->
 
 <div class="object-inspector-widget">
-  <div id="header" class="object-inspector-header">
-    <!-- minimize button -->
-    <button type="button" class="button-minimize" ng-click="minimized = !minimized">
-      <i ng-class="{'fa fa-plus': minimized, 'fa fa-minus': !minimized}" aria-hidden="true"></i>
-    </button>
-  </div>
 
   <div style="flex-shrink: 0;">
     <h4 class="selected-object-name">{{objectInspectorService.selectedObject ? objectInspectorService.selectedObject.name : 'nothing selected'}}</h4>
