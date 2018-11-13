@@ -48,8 +48,7 @@
           'components/brain-visualizer/brain-visualizer.template.html',
         restrict: 'E',
         scope: {
-          data: '=',
-          reload: '&'
+          data: '='
         },
         link: function(scope, element) {
           var brain3D;
@@ -127,7 +126,7 @@
                 'brainvisualizer',
                 JSON.stringify(userdata, null, '\t')
               )
-              .then(() => scope.reload())
+              .then(() => scope.initContent())
               .catch(err =>
                 clbErrorDialog.open({
                   type: 'BackendError.',
