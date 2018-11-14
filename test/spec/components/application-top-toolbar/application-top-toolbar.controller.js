@@ -8,7 +8,6 @@ describe('Controller: ApplicationTopToolbarController', function() {
     bbpConfig,
     environmentRenderingService,
     experimentViewService,
-    goldenLayoutService,
     nrpAnalytics,
     simToolsSidebarService,
     simulationInfo,
@@ -25,7 +24,6 @@ describe('Controller: ApplicationTopToolbarController', function() {
   // used inside simulation
   beforeEach(module('environmentRenderingServiceMock'));
   beforeEach(module('experimentViewServiceMock'));
-  beforeEach(module('goldenLayoutServiceMock'));
   beforeEach(module('simToolsSidebarServiceMock'));
   beforeEach(module('simulationInfoMock'));
   beforeEach(module('stateServiceMock'));
@@ -39,7 +37,6 @@ describe('Controller: ApplicationTopToolbarController', function() {
       _bbpConfig_,
       _environmentRenderingService_,
       _experimentViewService_,
-      _goldenLayoutService_,
       _nrpAnalytics_,
       _simToolsSidebarService_,
       _simulationInfo_,
@@ -53,7 +50,6 @@ describe('Controller: ApplicationTopToolbarController', function() {
       bbpConfig = _bbpConfig_;
       environmentRenderingService = _environmentRenderingService_;
       experimentViewService = _experimentViewService_;
-      goldenLayoutService = _goldenLayoutService_;
       nrpAnalytics = _nrpAnalytics_;
       simToolsSidebarService = _simToolsSidebarService_;
       simulationInfo = _simulationInfo_;
@@ -179,13 +175,8 @@ describe('Controller: ApplicationTopToolbarController', function() {
     });
 
     it(' - onButtonEnvironmentSettings()', function() {
-      environmentRenderingService.loadingEnvironmentSettingsPanel = true;
-      applicationTopToolbarController.onButtonEnvironmentSettings();
-      expect(goldenLayoutService.openTool).not.toHaveBeenCalled();
-
       environmentRenderingService.loadingEnvironmentSettingsPanel = false;
       applicationTopToolbarController.onButtonEnvironmentSettings();
-      expect(goldenLayoutService.toggleTool).toHaveBeenCalled();
       expect(nrpAnalytics.eventTrack).toHaveBeenCalled();
     });
 
