@@ -47,7 +47,7 @@
 
             if (TOOL_CONFIGS[attr.glToolSource].componentState.singleton) {
               goldenLayoutService.toggleTool(TOOL_CONFIGS[attr.glToolSource]);
-            } else {
+            } else if (attr.glToolSource !== 'ROBOT_CAMERA_RENDERING') {
               goldenLayoutService.openTool(TOOL_CONFIGS[attr.glToolSource]);
             }
           });
