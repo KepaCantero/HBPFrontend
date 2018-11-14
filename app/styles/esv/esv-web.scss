@@ -61,19 +61,13 @@
 
 .list-entry-container {
   display: flex;
-  max-height: 144px;
-  min-height: 144px;
 }
 
 .list-entry-container.hover {
   background: linear-gradient(to right, #ffffff 0%, #eeeeee 50%, #ffffff 100%);
-  max-height: 144px;
-  min-height: 144px;
 }
 
 .list-entry-container.selected {
-  max-height: unset;
-  min-height: unset;
   background: linear-gradient(
     to right,
     rgba(255, 255, 255, 0.8) 0%,
@@ -90,8 +84,6 @@
 }
 
 .list-entry-container.selected-wizard {
-  max-height: unset;
-  min-height: unset;
   background: linear-gradient(
     to right,
     rgba(255, 255, 255, 0.8) 0%,
@@ -101,51 +93,46 @@
 
 .list-entry-container.left-right {
   flex-direction: row;
-  min-height: unset;
 }
 
 .list-entry-container.up-down {
   flex-direction: column;
-  max-height: none;
 }
 
 .list-entry-container.title-line {
   align-items: baseline;
-  min-height: unset;
 }
 
 .list-entry-container.center {
   align-items: center;
   justify-content: center;
-  min-height: unset;
 }
 
 .list-entry-main {
-  flex: 8;
+  flex: 1;
 }
 
 .list-entry-left {
-  flex: 1;
-  width: 200px;
+  flex-shrink: 0;
+  flex-grow: 0;
+  width: 229px;
   padding-right: 15px;
   padding-left: 15px;
-  transition: all cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.5s;
+  transition: width ease-in-out 0.5s;
 }
 
 .list-entry-left.selected {
-  flex: 1.8;
+  width: 359px;
 }
 
 .list-entry-left > img {
-  min-width: 130px;
   width: 100%;
   object-fit: contain;
   object-position: top;
   height: 100%;
-  max-height: 225px;
 }
 .list-entry-middle {
-  flex: 8;
+  flex: 1;
 }
 
 .list-entry-running {
