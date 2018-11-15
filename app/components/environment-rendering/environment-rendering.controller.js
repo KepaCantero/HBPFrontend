@@ -275,7 +275,7 @@
         : '';
     }
 
-    onMouseUp(event) {
+    onMouseDown(event) {
       switch (event.button) {
         case 2: {
           let model = this.gz3d.scene.getRayCastModel(

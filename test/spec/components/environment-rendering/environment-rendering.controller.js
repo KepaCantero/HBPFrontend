@@ -445,7 +445,7 @@ describe('Controller: EnvironmentRenderingController', function() {
       expect(url).toBe(testUrl + '&t=' + testState + reconnectTrials);
     });
 
-    it(' - onMouseUp()', function() {
+    it(' - onMouseDown()', function() {
       let mockEvent = {
         button: 0,
         offsetX: 10,
@@ -453,12 +453,12 @@ describe('Controller: EnvironmentRenderingController', function() {
       };
       let mockModel = {};
 
-      environmentRenderingController.onMouseUp(mockEvent);
+      environmentRenderingController.onMouseDown(mockEvent);
       expect(gz3d.scene.getRayCastModel).not.toHaveBeenCalled();
 
       mockEvent.button = 2;
       gz3d.scene.getRayCastModel.and.returnValue(mockModel);
-      environmentRenderingController.onMouseUp(mockEvent);
+      environmentRenderingController.onMouseDown(mockEvent);
       expect(gz3d.scene.getRayCastModel).toHaveBeenCalled();
       expect(gz3d.scene.selectEntity).toHaveBeenCalledWith(mockModel);
     });
