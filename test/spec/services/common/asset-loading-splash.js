@@ -98,15 +98,15 @@
   });
 
   describe('Controller: AssetLoadingSplashCtrl', function() {
-    var scope, timeout, $location, assetLoadingSplash;
+    let scope, timeout, $location, assetLoadingSplash;
 
-    var assetLoadingSplashMock = {};
-    var environmentRenderingServiceMock = {
+    let assetLoadingSplashMock = {};
+    let environmentRenderingServiceMock = {
       onSceneLoaded: jasmine.createSpy('onSceneLoaded'),
       scene3DSettingsReady: true
     };
-    var scopeMock = {};
-    var timeoutMock = jasmine.createSpy('$timeout');
+    let scopeMock = {};
+    let timeoutMock = jasmine.createSpy('$timeout');
 
     beforeEach(module('exdFrontendApp'));
     beforeEach(
@@ -169,9 +169,11 @@
     });
 
     it('should close the splash close and redirect to esv-private', function() {
+      scope.changeLocation = jasmine.createSpy();
+
       scope.close();
       expect(assetLoadingSplash.close).toHaveBeenCalled();
-      expect($location.path).toHaveBeenCalledWith('esv-private');
+      expect(scope.changeLocation).toHaveBeenCalledWith('/#/esv-private');
     });
 
     it('should watch gz3d when assets are loaded without error', function() {
@@ -186,7 +188,7 @@
         .args[0](exampleData);
       expect(scope.$watch).toHaveBeenCalled();
 
-      var ncalls = timeout.calls.count();
+      const ncalls = timeout.calls.count();
       timeout.calls.argsFor(ncalls - 1)[0]();
 
       expect(scope.loadedAssets).toEqual(3);

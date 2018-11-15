@@ -91,7 +91,6 @@
     'assetLoadingSplash',
     'environmentRenderingService',
     'gz3d',
-    '$location',
     '$window',
     function(
       $rootScope,
@@ -100,7 +99,6 @@
       assetLoadingSplash,
       environmentRenderingService,
       gz3d,
-      $location,
       $window
     ) {
       $scope.progressData = {};
@@ -113,7 +111,12 @@
 
       $scope.close = function() {
         assetLoadingSplash.close();
-        $location.path('esv-private');
+        $scope.changeLocation('/#/esv-private');
+      };
+
+      $scope.changeLocation = locationURL => {
+        // $location.path() doesn't work in Firefox, fall back to lower level API
+        $window.location.href = locationURL;
         $window.location.reload();
       };
 
