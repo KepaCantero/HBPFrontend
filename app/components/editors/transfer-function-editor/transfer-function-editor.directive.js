@@ -1356,19 +1356,39 @@ def {0}(t):
               autoSaveService.setDirty();
             };
 
+            /**
+             * Toggles the TF active status
+             * If TF status is set to 'active', first it tries to apply it in the backend
+             *  - If the TF apply suceeds, then it makes sure the 'active' status
+             *    is synchronized to the backend
+             *  - If the TF apply fails, then the active status is set back to 'inactive'
+             * Otherwise, if the TF status is set to disabled, it simply syncs it to the backend
+             * */
             scope.toggleActive = function(tf) {
-              scope.applyScript(tf, (res, err) => {
-                if (err) return;
+              const activeOriginalState = tf.active;
+              tf.active = !tf.active;
+
+              const setBackendTFStatus = tf => {
+                //syncs the tf active status to the backend
                 backendInterfaceService.setActivateTransferFunction(
                   tf.name,
                   null,
                   tf.active,
-                  () => {
-                    tf.active = !tf.active;
-                  },
-                  () => {}
+                  angular.noop,
+                  () => (tf.active = activeOriginalState)
                 );
-              });
+              };
+
+              if (!tf.active) {
+                //TF disabled: sync backend active status
+                setBackendTFStatus(tf);
+              } else {
+                //TF enabled: make sure TF is valid before synching the active status to the backend
+                scope.applyScript(tf, (res, err) => {
+                  if (err) tf.active = false;
+                  else setBackendTFStatus(tf);
+                });
+              }
             };
 
             scope.updateNTransferFunctionDirty = function() {

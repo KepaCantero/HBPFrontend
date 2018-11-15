@@ -1295,12 +1295,10 @@ def tf2(t):
       expect(isolateScope.isSavingCSVToCollab).toBe(false);
     });
 
-    it('should toggleActive only script is applyied sucessfully', function() {
+    it('should toggleActive only script is applied sucessfully', function() {
       var tf = { active: false, code: 'some code', error: {} };
 
-      spyOn(isolateScope, 'applyScript').and.callFake((tf, cb) =>
-        cb([null, null])
-      );
+      spyOn(isolateScope, 'applyScript').and.callFake((tf, cb) => cb());
       spyOn(
         backendInterfaceServiceMock,
         'setActivateTransferFunction'
@@ -1313,6 +1311,65 @@ def tf2(t):
         backendInterfaceService.setActivateTransferFunction
       ).toHaveBeenCalled();
       expect(tf.active).toBe(true);
+    });
+
+    it('should toggleActive back to disabled if failed to apply script', function() {
+      var tf = { active: false, code: 'some code', error: {} };
+
+      spyOn(isolateScope, 'applyScript').and.callFake((tf, cb) => {
+        const someError = {};
+        cb(null, someError);
+      });
+      spyOn(
+        backendInterfaceServiceMock,
+        'setActivateTransferFunction'
+      ).and.callFake((name, data, activate, successCallback) =>
+        successCallback()
+      );
+      isolateScope.toggleActive(tf);
+      expect(isolateScope.applyScript).toHaveBeenCalled();
+      expect(
+        backendInterfaceService.setActivateTransferFunction
+      ).not.toHaveBeenCalled();
+      expect(tf.active).toBe(false);
+    });
+
+    it('should toggleActive back to disabled if failed to set active status in backend script', function() {
+      var tf = { active: false, code: 'some code', error: {} };
+
+      spyOn(isolateScope, 'applyScript').and.callFake((tf, cb) => {
+        cb();
+      });
+      spyOn(
+        backendInterfaceServiceMock,
+        'setActivateTransferFunction'
+      ).and.callFake((name, data, activate, successCallback, errCallback) =>
+        errCallback()
+      );
+      isolateScope.toggleActive(tf);
+      expect(isolateScope.applyScript).toHaveBeenCalled();
+      expect(
+        backendInterfaceService.setActivateTransferFunction
+      ).toHaveBeenCalled();
+      expect(tf.active).toBe(false);
+    });
+
+    it('toggleActive should not apply script if disabling TF', function() {
+      var tf = { active: true, code: 'some code', error: {} };
+
+      spyOn(isolateScope, 'applyScript');
+      spyOn(
+        backendInterfaceServiceMock,
+        'setActivateTransferFunction'
+      ).and.callFake((name, data, activate, successCallback) =>
+        successCallback()
+      );
+      isolateScope.toggleActive(tf);
+      expect(isolateScope.applyScript).not.toHaveBeenCalled();
+      expect(
+        backendInterfaceService.setActivateTransferFunction
+      ).toHaveBeenCalled();
+      expect(tf.active).toBe(false);
     });
 
     it('should change the name of TF correctly', function() {
