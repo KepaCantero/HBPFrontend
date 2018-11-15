@@ -34,23 +34,21 @@
       restrict: 'A',
       scope: {},
       link: (scope, element, attr) => {
-        $rootScope.$on('ASSETS_LOADED', () => {
-          //register GL drag source
-          goldenLayoutService.createDragSource(
-            element[0],
-            TOOL_CONFIGS[attr.glToolSource]
-          );
+        //register GL drag source
+        goldenLayoutService.createDragSource(
+          element[0],
+          TOOL_CONFIGS[attr.glToolSource]
+        );
 
-          // open tool on click
-          element[0].addEventListener('mouseup', () => {
-            if (helpTooltipService.visible === helpTooltipService.HELP) return;
+        // open tool on click
+        element[0].addEventListener('mouseup', () => {
+          if (helpTooltipService.visible === helpTooltipService.HELP) return;
 
-            if (TOOL_CONFIGS[attr.glToolSource].componentState.singleton) {
-              goldenLayoutService.toggleTool(TOOL_CONFIGS[attr.glToolSource]);
-            } else if (attr.glToolSource !== 'ROBOT_CAMERA_RENDERING') {
-              goldenLayoutService.openTool(TOOL_CONFIGS[attr.glToolSource]);
-            }
-          });
+          if (TOOL_CONFIGS[attr.glToolSource].componentState.singleton) {
+            goldenLayoutService.toggleTool(TOOL_CONFIGS[attr.glToolSource]);
+          } else if (attr.glToolSource !== 'ROBOT_CAMERA_RENDERING') {
+            goldenLayoutService.openTool(TOOL_CONFIGS[attr.glToolSource]);
+          }
         });
       }
     })

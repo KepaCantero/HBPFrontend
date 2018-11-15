@@ -216,6 +216,17 @@
         angularDirective: '<environment-settings-panel />',
         singleton: true
       }
+    },
+    NOISE_MODEL_VIEWER: {
+      type: 'component',
+      title: 'Noise Model viewer',
+      id: 'noise-model-viewer',
+      componentName: 'angularModuleComponent',
+      componentState: {
+        module: 'noiseModelModule',
+        angularDirective: '<noise-model />',
+        singleton: true
+      }
     }
   });
 })();

@@ -25,9 +25,7 @@
   'use strict';
 
   angular.module('noiseModelModule').service('noiseModelService', [
-    'dynamicViewOverlayService',
-    'DYNAMIC_VIEW_CHANNELS',
-    function(dynamicViewOverlayService, DYNAMIC_VIEW_CHANNELS) {
+    function() {
       function NoiseModelService() {
         this.sensorname = '';
         this.modelname = '';
@@ -38,9 +36,6 @@
           nodeSensorName,
           nodeSensorType
         ) {
-          dynamicViewOverlayService.createDynamicOverlay(
-            DYNAMIC_VIEW_CHANNELS.MODEL_VIEWER
-          );
           this.modelname = nodeModelName;
           this.sensorname = nodeSensorName;
           this.sensortype = nodeSensorType;

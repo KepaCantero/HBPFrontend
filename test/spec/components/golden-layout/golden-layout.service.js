@@ -120,6 +120,11 @@ describe('Service: GoldenLayoutService', function() {
 
   it(' - createDragSource', function() {
     goldenLayoutService.layout = mockLayout;
+    spyOn(goldenLayoutService, 'initialized').and.returnValue({
+      then: jasmine.createSpy('then').and.callFake(cb => {
+        cb();
+      })
+    });
 
     let mockElement = {},
       mockToolConfig = {};

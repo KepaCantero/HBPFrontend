@@ -8,7 +8,7 @@
     <h4 class="selected-object-name">{{objectInspectorService.selectedObject ? objectInspectorService.selectedObject.name : 'nothing selected'}}</h4>
   </div>
 
-  <!-- sections of the object inspector -->
+  <!-- sections of the object inspector --> 
   <div id="sections" ng-show="!minimized" style="display:flex">
     <ol class="sections-list">
       <!-- section - object identifier -->
@@ -263,9 +263,8 @@
             </div>
 
             <div>
-
-              <button ng-disabled="!robotComponentsService.isCameraComponentTopic(objectInspectorService.selectedRobotComponent)"
-                      type="button" class="btn btn-default very-small-button" ng-click="objectInspectorService.addNoiseButtonClicked()" style="width:100%; margin-bottom: 5px;">
+              <button gl-tool-source="NOISE_MODEL_VIEWER" ng-disabled="!robotComponentsService.isCameraComponentTopic(objectInspectorService.selectedRobotComponent)"
+                      type="button" class="btn btn-default very-small-button" ng-click="objectInspectorService.setDataNoiseModel()" style="width:100%; margin-bottom: 5px;">
                 <i class="glyphicon glyphicon-equalizer"></i>
                 <span>Add Noise</span>
               </button>

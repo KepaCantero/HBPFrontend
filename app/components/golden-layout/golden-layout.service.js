@@ -26,8 +26,10 @@
   'use strict';
 
   class GoldenLayoutService {
-    constructor($compile, $rootScope, TOOL_CONFIGS) {
+    constructor($compile, $rootScope, $q, TOOL_CONFIGS) {
       this.TOOL_CONFIGS = TOOL_CONFIGS;
+
+      this.deferredInitialized = $q.defer();
 
       this.angularModuleComponent = function(container, state) {
         let element = container.getElement();
@@ -39,6 +41,10 @@
         });
         $compile(element[0])(scope);
       };
+    }
+
+    initialized() {
+      return this.deferredInitialized.promise;
     }
 
     createLayout() {
@@ -65,6 +71,8 @@
       $(window).resize(() => this.refreshSize());
       setTimeout(() => this.refreshSize());
 
+      this.deferredInitialized.resolve();
+
       return this.layout;
     }
 
@@ -73,7 +81,9 @@
     }
 
     createDragSource(element, toolConfig) {
-      this.layout.createDragSource(element, toolConfig);
+      this.initialized().then(() => {
+        this.layout.createDragSource(element, toolConfig);
+      });
     }
 
     openTool(toolConfig) {
@@ -126,7 +136,12 @@
   }
 
   GoldenLayoutService.$$ngIsClass = true;
-  GoldenLayoutService.$inject = ['$compile', '$rootScope', 'TOOL_CONFIGS'];
+  GoldenLayoutService.$inject = [
+    '$compile',
+    '$rootScope',
+    '$q',
+    'TOOL_CONFIGS'
+  ];
 
   angular
     .module('goldenLayoutModule')

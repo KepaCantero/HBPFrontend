@@ -107,10 +107,10 @@
             );
           };
 
-          this.addNoiseButtonClicked = function() {
+          this.setDataNoiseModel = function() {
             if (this.selectedRobotComponent.userData.type == 'sensor') {
               noiseModelService.setDataNoiseModel(
-                'robot',
+                this.selectedObject.name,
                 this.selectedRobotComponent.sensorname,
                 this.selectedRobotComponent.sensortype
               );

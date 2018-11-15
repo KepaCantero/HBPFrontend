@@ -1,7 +1,7 @@
 'use strict';
 
 describe('Services: noise-model-service', function() {
-  var dynamicViewOverlayService, DYNAMIC_VIEW_CHANNELS, noiseModelService;
+  var noiseModelService;
   beforeEach(module('noiseModelModule'));
   beforeEach(module('dynamicViewModule'));
   beforeEach(module('dynamicViewOverlayServiceMock'));
@@ -9,13 +9,7 @@ describe('Services: noise-model-service', function() {
   beforeEach(module('exdFrontendApp'));
   beforeEach(module('exd.templates'));
   beforeEach(
-    inject(function(
-      _dynamicViewOverlayService_,
-      _DYNAMIC_VIEW_CHANNELS_,
-      _noiseModelService_
-    ) {
-      dynamicViewOverlayService = _dynamicViewOverlayService_;
-      DYNAMIC_VIEW_CHANNELS = _DYNAMIC_VIEW_CHANNELS_;
+    inject(function(_noiseModelService_) {
       noiseModelService = _noiseModelService_;
     })
   );
@@ -28,9 +22,6 @@ describe('Services: noise-model-service', function() {
       mockModelName,
       mockSensorName,
       mockSensorType
-    );
-    expect(dynamicViewOverlayService.createDynamicOverlay).toHaveBeenCalledWith(
-      DYNAMIC_VIEW_CHANNELS.MODEL_VIEWER
     );
     expect(noiseModelService.modelname).toEqual(mockModelName);
     expect(noiseModelService.sensorname).toEqual(mockSensorName);
