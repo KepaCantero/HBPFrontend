@@ -5293,7 +5293,8 @@ GZ3D.GZIface = function(scene, gui)
   this.webSocketConnectionCallbacks = [];
   let deleteRobotViewsCallback = function(entity) {
     if (GZ3D.isRobot(entity)) {
-      scene.viewManager.deleteRobotViews.bind(scene.viewManager);
+      let deleteRobotViews = scene.viewManager.deleteRobotViews.bind(scene.viewManager);
+      deleteRobotViews(entity);
     }
   };
   this.onDeleteEntityCallbacks = [deleteRobotViewsCallback];

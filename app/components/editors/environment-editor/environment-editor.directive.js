@@ -42,13 +42,10 @@
     'gz3d',
     'stateService',
     'simulationInfo',
-    'sceneInfo',
-    'backendInterfaceService',
     'clbErrorDialog',
     'downloadFileService',
     'environmentService',
     'goldenLayoutService',
-    'DYNAMIC_VIEW_CHANNELS',
     '$http',
     function(
       STATE,
@@ -59,13 +56,10 @@
       gz3d,
       stateService,
       simulationInfo,
-      sceneInfo,
-      backendInterfaceService,
       clbErrorDialog,
       downloadFileService,
       environmentService,
       goldenLayoutService,
-      DYNAMIC_VIEW_CHANNELS,
       $http
     ) {
       return {
@@ -85,17 +79,6 @@
           scope.assetsPath = serverConfig.gzweb.assets;
           scope.EDIT_MODE = EDIT_MODE;
           scope.gz3d = gz3d;
-
-          // Register a callback which deletes the robot in the back-end on the corresponding "deleteEntity" event
-          // and refresh the robots list managed by the SceneInfo service
-          var deleteBackendRobotCallback = function(entity) {
-            if (sceneInfo.isRobot(entity)) {
-              backendInterfaceService.deleteRobot(entity.name);
-              sceneInfo.refreshRobotsList();
-            }
-          };
-          gz3d.iface.addOnDeleteEntityCallbacks(deleteBackendRobotCallback);
-          gz3d.iface.addOnCreateEntityCallbacks(sceneInfo.refreshRobotsList);
 
           scope.isPrivateExperiment = environmentService.isPrivateExperiment();
           scope.isSavingToCollab = false;

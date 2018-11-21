@@ -129,11 +129,6 @@ describe('Directive: environment-designer', function() {
     })
   );
 
-  it('should register callbacks for createEntity and modelUpdate events', function() {
-    expect($scope.gz3d.iface.addOnDeleteEntityCallbacks).toHaveBeenCalled();
-    expect($scope.gz3d.iface.addOnCreateEntityCallbacks).toHaveBeenCalled();
-  });
-
   it('should emit "duplicate_entity" on duplicate', function() {
     spyOn($scope.gz3d.gui.guiEvents, 'emit');
     $scope.duplicateModel();

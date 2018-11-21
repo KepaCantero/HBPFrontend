@@ -39,8 +39,8 @@ describe('testing the gz3d service', function() {
   var GuiObject = {};
   var GZIfaceObject = {
     addCanDeletePredicate: angular.noop,
-    addOnDeleteEntityCallback: angular.noop,
-    addOnCreateEntityCallback: angular.noop
+    addOnDeleteEntityCallbacks: jasmine.createSpy('addOnDeleteEntityCallbacks'),
+    addOnCreateEntityCallbacks: jasmine.createSpy('addOnCreateEntityCallbacks')
   };
   var SdfParserObject = {};
   GZ3D = {};
@@ -51,23 +51,15 @@ describe('testing the gz3d service', function() {
     .createSpy('SdfParser')
     .and.returnValue(SdfParserObject);
 
-  var simulationInfo = {
-    serverID: 'bbpce016',
-    simulationID: 'mocked_simulation_id',
-    serverConfig: {
-      gzweb: { assets: 'https://assets', websocket: 'wss://websocket' }
-    },
-    Initialize: jasmine.createSpy('Initialize')
-  };
-
   var bbpConfig = {};
   bbpConfig.get = jasmine.createSpy('get').and.returnValue('toto');
 
   beforeEach(module('gz3dModule'));
   beforeEach(module('sceneInfoMock'));
+  beforeEach(module('simulationInfoMock'));
+  beforeEach(module('backendInterfaceServiceMock'));
   beforeEach(
     module(function($provide) {
-      $provide.value('simulationInfo', simulationInfo);
       $provide.value('bbpConfig', bbpConfig);
     })
   );
@@ -139,6 +131,11 @@ describe('testing the gz3d service', function() {
     expect(gz3d.gui).toBeDefined();
     expect(gz3d.scene).toBeDefined();
     expect(gz3d.MODEL_LIBRARY).toBeDefined();
+  });
+
+  it('should register callbacks for createEntity and modelUpdate events', function() {
+    expect(gz3d.iface.addOnDeleteEntityCallbacks).toHaveBeenCalled();
+    expect(gz3d.iface.addOnCreateEntityCallbacks).toHaveBeenCalled();
   });
 
   it('should not initialize when already initialized', function() {

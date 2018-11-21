@@ -33,20 +33,16 @@
   //var gz3dModule = angular.module('gz3dModule', ['simulationInfoService']);
 
   angular.module('gz3dModule').factory('gz3d', [
-    '$rootScope',
-    '$window',
-    '$compile',
     '$http',
     'simulationInfo',
     'sceneInfo',
+    'backendInterfaceService',
     'bbpConfig',
     function(
-      $rootScope,
-      $window,
-      $compile,
       $http,
       simulationInfo,
       sceneInfo,
+      backendInterfaceService,
       bbpConfig
     ) {
       /* moved from the gz3d-view.html*/
@@ -134,6 +130,19 @@
           this.gui = new GZ3D.Gui(this.scene);
           this.iface = new GZ3D.GZIface(this.scene, this.gui);
           this.sdfParser = new GZ3D.SdfParser(this.scene, this.gui, this.iface);
+
+          // Register a callback which deletes the robot in the back-end on the corresponding "deleteEntity" event
+          // and refresh the robots list managed by the SceneInfo service
+          var deleteBackendRobotCallback = function(entity) {
+            if (sceneInfo.isRobot(entity)) {
+              backendInterfaceService
+                .deleteRobot(entity.name)
+                .then(() => sceneInfo.refreshRobotsList());
+            }
+          };
+          this.iface.addOnDeleteEntityCallbacks(deleteBackendRobotCallback);
+          // Refresh robots list also on updateModel() calls
+          this.iface.addOnCreateEntityCallbacks(sceneInfo.refreshRobotsList);
 
           isInitialized = true;
         };

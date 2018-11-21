@@ -106,9 +106,7 @@
         },
         // delete
         {
-          enabled: () =>
-            gz3d.scene.selectedEntity &&
-            !sceneInfo.isRobot(gz3d.scene.selectedEntity),
+          enabled: () => Boolean(gz3d.scene.selectedEntity),
           text: 'Delete',
           displayed: () => {
             return Boolean(gz3d.scene.selectedEntity);
