@@ -404,69 +404,96 @@
                 });
             };
 
+            // Generate a regexp that will use to check if a population is used by a transfer function
+            let populationRegExp = function(populationName) {
+              return new RegExp('\\W' + populationName + '(?=\\W)', 'gm');
+            };
+            // Check if a given population is used by some transfer function
+            let aPopulationNeedsToBeReplaced = function(
+              transferFunctions,
+              options
+            ) {
+              const aPopulationNeedsToBeDeleted =
+                options && options.hasOwnProperty('populationToDeleteIndex');
+              const populationToDelete = aPopulationNeedsToBeDeleted
+                ? scope.populations[options.populationToDeleteIndex].name
+                : undefined;
+              for (let tf in transferFunctions) {
+                if (
+                  populationToDelete &&
+                  transferFunctions[tf].match(
+                    populationRegExp(populationToDelete)
+                  )
+                )
+                  return true;
+                if (!aPopulationNeedsToBeDeleted) {
+                  for (let p of scope.populations) {
+                    if (
+                      p.previousName !== p.name &&
+                      transferFunctions[tf].match(
+                        populationRegExp(p.previousName)
+                      )
+                    ) {
+                      return true;
+                    }
+                  }
+                }
+              }
+              return false;
+            };
+
             scope.apply = function(options) {
               // If editing populations are valid first
               scope.loading = true;
 
-              for (let pop of scope.populations) pop.editing = false;
+              for (let p of scope.populations) p.editing = false;
 
               storageServer
                 .getTransferFunctions(simulationInfo.experimentID)
                 .then(result => {
                   let tfs = result.data;
-                  // Check if we need to do some find and replace first
-
-                  let mightNeedReplace = false;
-                  const hasAPopulationToDelete =
+                  // We check if we need to do some find and replace first.
+                  // The case of deleted population is a special case.
+                  const aPopulationNeedsToBeDeleted =
                     options &&
                     options.hasOwnProperty('populationToDeleteIndex');
-                  for (let tf in tfs)
-                    for (let pop of scope.populations) {
-                      if (
-                        pop.previousName !== pop.name ||
-                        hasAPopulationToDelete
-                      ) {
-                        const name = hasAPopulationToDelete
-                          ? scope.populations[options.populationToDeleteIndex]
-                          : pop.previousName;
-                        if (
-                          tfs[tf].match(
-                            new RegExp('(?<=\\W)' + name + '(?=\\W)', 'igm')
-                          )
-                        )
-                          mightNeedReplace = true;
-                      }
-                    }
 
-                  if (mightNeedReplace) {
+                  const aPopNeedsToBeReplaced = aPopulationNeedsToBeReplaced(
+                    tfs,
+                    options
+                  );
+                  if (aPopulationNeedsToBeDeleted && aPopNeedsToBeReplaced) {
+                    scope.loading = false;
+                    clbErrorDialog.open({
+                      // The delete operation will be cancelled; no DELETE request will be sent to the back-end.
+                      type: 'Population referred by Transfer Functions',
+                      message:
+                        'This population is referred to by transfer functions. ' +
+                        'Please remove all references to this population in your transfer functions and try again.'
+                    });
+                  } else if (aPopNeedsToBeReplaced) {
+                    // With user's agreement, populations will be automatically renamed in the transfer functions
                     clbConfirm
                       .open({
                         title: 'Confirm changing neural network',
                         confirmLabel: 'Yes',
                         cancelLabel: 'Cancel',
                         template:
-                          'Applying your changes may update population references of your transfer functions. Do you wish to continue?',
+                          'Applying your changes will update population references of your transfer functions. Do you wish to continue?',
                         closable: false
                       })
                       .then(() => {
-                        // Find and replace
-
+                        // Find and replace former population names in transfer functions
                         let tflist = [];
-
                         for (let tf in tfs) {
-                          for (let pop of scope.populations)
-                            if (pop.previousName !== pop.name)
+                          for (let p of scope.populations)
+                            if (p.previousName !== p.name)
                               tfs[tf] = tfs[tf].replace(
-                                new RegExp(
-                                  '(?<=\\W)' + pop.previousName + '(?=\\W)',
-                                  'igm'
-                                ),
-                                pop.name
+                                populationRegExp(p.previousName),
+                                p.name
                               );
-
                           tflist.push(tfs[tf]);
                         }
-
                         storageServer
                           .saveTransferFunctions(
                             simulationInfo.experimentID,
