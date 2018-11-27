@@ -39,12 +39,14 @@
 
 
     <div class="ed-object-list-border">
-
         <div ng-controller="insertControl" class="ed-object-list">
-            <li ng-repeat="model in visibleModels" class="ed-objectlist-item" >
-                <div owner-only id="insert-entity-{{model.modelPath}}" ng-mousedown="addModel(model.modelPath);"
-                    data-role="button" class="ed-objectlist-content" style="border: 2px solid {{model.color}};">
-
+            <li ng-repeat="model in visibleModels" class="ed-objectlist-item">
+                <div owner-only id="insert-entity-{{model.modelPath}}" 
+                     ng-mousedown="!(model.custom || model.public) && addModel(model.modelPath);"
+                     data-role="button" class="ed-objectlist-content" style="border: 2px solid {{model.color}};">
+                    <div ng-if="model.public" class="ed-public-tag noselect"> public </div>
+                    <div ng-if="model.custom" class="ed-private-tag noselect"> private </div>
+                
                     <div class="ed-objectlist-content-img-box">
                         <img ng-src="{{model.thumbnail?model.thumbnail:assetsPath+'/'+model.modelPath+'/thumbnail.png'}}"
                             draggable="false" class="ed-img-thumbnail ed-environment-thumbnail" ng-class="stateService.currentState === STATE.INITIALIZED || ownerOnlyDisabled? 'disabled-image' : 'clickable'"
@@ -54,7 +56,7 @@
 
                     <div class="env-object-caption-box">
                         <div class="env-object-caption" style="background: {{model.color}};">
-                            {{model.modelTitle}}
+                            {{model.modelTitle | limitTo:15}}...
                         </div>
                     </div>
 

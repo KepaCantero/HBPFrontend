@@ -47,6 +47,9 @@
     'environmentService',
     'goldenLayoutService',
     '$http',
+    'newExperimentProxyService',
+    '$q',
+    'storageServer',
     function(
       STATE,
       EDIT_MODE,
@@ -60,7 +63,10 @@
       downloadFileService,
       environmentService,
       goldenLayoutService,
-      $http
+      $http,
+      newExperimentProxyService,
+      $q,
+      storageServer
     ) {
       return {
         templateUrl:
@@ -69,6 +75,7 @@
         link: function(scope) {
           scope.stateService = stateService;
           scope.STATE = STATE;
+          scope.devMode = environmentService.isDevMode();
 
           document.addEventListener('contextmenu', event =>
             event.preventDefault()
@@ -105,10 +112,81 @@
             scope.updateVisibleModels();
           };
 
+          scope.generateRobotsModels = function() {
+            return $q
+              .all([
+                newExperimentProxyService.getTemplateModels('robots'),
+                storageServer.getCustomModels('robots')
+              ])
+              .then(([templateRobots, customRobots]) => {
+                /*
+                For future reference when we implement the drag and drop
+                template robots looks like : 
+                [{
+                  name:'robot1 name', 
+                  description:'robot1 description',
+                  thumbnail :'<robot png data>',
+                  id: 'robot1',
+                  path : 'robots/<robot folder>/model.config'
+                }]
+                we add a public key through the map
+                
+                private robots looks like:
+                [{
+                  name:'custom robot1 name', 
+                  description:'custom robot1 description',
+                  thumbnail :'<robot png data>',
+                  id: 'robot1',
+                  fileName : robots/robot1.zip,
+                  path: "robots%2Frobot1.zip"
+                }]
+                we add a custom key through the map
+                */
+                templateRobots.data.forEach(robot => (robot.public = true));
+                customRobots.forEach(robot => (robot.custom = true));
+                return [...templateRobots.data, ...customRobots].map(robot => ({
+                  modelPath: robot.path,
+                  modelTitle: robot.name,
+                  thumbnail: robot.thumbnail,
+                  custom: robot.custom,
+                  public: robot.public
+                }));
+              });
+          };
+
           const modelLibrary = scope.assetsPath + '/' + gz3d.MODEL_LIBRARY;
           $http.get(modelLibrary).then(function(res) {
             scope.categories = res.data;
+            //if not dev mode we don't show the robots
+            var modelsPromise;
+            if (!scope.devMode) {
+              modelsPromise = $q.resolve();
+            } else {
+              // if the generate robots models fails, we open an error panel
+              // but still continue with the rest of the objects in the env editor
+              modelsPromise = scope
+                .generateRobotsModels()
+                .then(templateRobots => {
+                  scope.categories.push({
+                    thumbnail: 'robots.png',
+                    title: 'Robots',
+                    models: templateRobots
+                  });
+                })
+                .catch(err =>
+                  clbErrorDialog.open({
+                    type: 'Model libraries error.',
+                    message: `Could not retrieve robots models: \n${err}`
+                  })
+                );
+            }
+            modelsPromise.finally(() => {
+              scope.createModelsCategories();
+              scope.updateVisibleModels();
+            });
+          });
 
+          scope.createModelsCategories = function() {
             for (var i = 0; i < scope.categories.length; i++) {
               scope.categories[i].models = scope.categories[i].models.filter(
                 m => !m.physicsIgnore || m.physicsIgnore !== scope.physicsEngine
@@ -130,9 +208,7 @@
                 (10 + i / (scope.categories.length + 1) * 360.0) +
                 ',100%,70%)'; // Mouse down
             }
-
-            scope.updateVisibleModels();
-          });
+          };
 
           scope.setEditMode = function(mode) {
             var setMode = function(m) {
@@ -166,14 +242,13 @@
             scope.gz3d.gui.guiEvents._events.notification_popup =
               scope.default_notification_popup_handle;
 
-            var obj = scope.gz3d.scene.getByName(scope.expectedObjectName);
+            var expectedObj = scope.gz3d.scene.getByName(
+              scope.expectedObjectName
+            );
             scope.expectedObjectName = null;
 
-            if (obj) {
-              scope.gz3d.scene.selectEntity(obj);
-              /*dynamicViewOverlayService.createDynamicOverlay(
-                DYNAMIC_VIEW_CHANNELS.OBJECT_INSPECTOR
-              );*/
+            if (expectedObj) {
+              scope.gz3d.scene.selectEntity(expectedObj);
               goldenLayoutService.openTool(TOOL_CONFIGS.OBJECT_INSPECTOR);
             }
           };

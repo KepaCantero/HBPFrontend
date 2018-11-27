@@ -9,7 +9,10 @@ describe('Directive: environment-designer', function() {
     simulationInfo,
     clbErrorDialog,
     goldenLayoutService,
-    httpBackend;
+    httpBackend,
+    storageServer,
+    newExperimentProxyService,
+    $q;
 
   beforeEach(module('exdFrontendApp'));
   beforeEach(module('exd.templates'));
@@ -57,9 +60,11 @@ describe('Directive: environment-designer', function() {
       _simulationSDFWorld_,
       _simulationInfo_,
       _clbErrorDialog_,
-      _environmentService_,
       _goldenLayoutService_,
-      _$httpBackend_
+      _$httpBackend_,
+      _storageServer_,
+      _newExperimentProxyService_,
+      _$q_
     ) {
       $scope = $rootScope.$new();
       $scope.EDIT_MODE = EDIT_MODE;
@@ -72,7 +77,9 @@ describe('Directive: environment-designer', function() {
       clbErrorDialog = _clbErrorDialog_;
       goldenLayoutService = _goldenLayoutService_;
       httpBackend = _$httpBackend_;
-
+      storageServer = _storageServer_;
+      newExperimentProxyService = _newExperimentProxyService_;
+      $q = _$q_;
       var modelLibraryMock = [
         {
           title: 'Shapes',
@@ -119,7 +126,6 @@ describe('Directive: environment-designer', function() {
           ]
         }
       ];
-
       httpBackend.whenGET(/.*assets.*/).respond(modelLibraryMock);
 
       element = $compile('<environment-designer />')($scope);
@@ -212,6 +218,54 @@ describe('Directive: environment-designer', function() {
     $scope.toggleVisibleCategory({ visible: true });
 
     expect($scope.updateVisibleModels).toHaveBeenCalled();
+  });
+
+  it('should generate the robots models from the proxy call', function() {
+    spyOn(newExperimentProxyService, 'getTemplateModels').and.returnValue(
+      $q.resolve({
+        data: [
+          {
+            name: 'robot1 name',
+            description: 'robot1 description',
+            thumbnail: '<robot png data>',
+            id: 'robot1',
+            path: 'robots/<robot folder>/model.config'
+          }
+        ]
+      })
+    );
+    spyOn(storageServer, 'getCustomModels').and.returnValue(
+      $q.resolve([
+        {
+          name: 'custom robot1 name',
+          description: 'custom robot1 description',
+          thumbnail: '<robot png data>',
+          id: 'robot1',
+          fileName: 'robots/robot1.zip',
+          path: 'robots%2Frobot1.zip'
+        }
+      ])
+    );
+
+    $scope.generateRobotsModels().then(res =>
+      expect(res).toEqual([
+        Object({
+          modelPath: 'robots/<robot folder>/model.config',
+          modelTitle: 'robot1 name',
+          thumbnail: '<robot png data>',
+          custom: undefined,
+          public: true
+        }),
+        Object({
+          modelPath: 'robots%2Frobot1.zip',
+          modelTitle: 'custom robot1 name',
+          thumbnail: '<robot png data>',
+          custom: true,
+          public: undefined
+        })
+      ])
+    );
+    $scope.$digest();
   });
 
   it('should not spawn models when in INITIALIZED state', function() {
@@ -338,5 +392,160 @@ describe('Directive: environment-designer', function() {
     saveSpy.calls.argsFor(0)[3]();
     expect($scope.isSavingToCollab).toBe(false);
     expect(clbErrorDialog.open).toHaveBeenCalled();
+  });
+});
+
+describe('Directive: environment-designer robots models', function() {
+  var $scope,
+    httpBackend,
+    storageServer,
+    newExperimentProxyService,
+    environmentService,
+    $q;
+
+  beforeEach(module('exdFrontendApp'));
+  beforeEach(module('exd.templates'));
+  beforeEach(module('currentStateMockFactory'));
+  beforeEach(module('simulationInfoMock'));
+  beforeEach(module('stateServiceMock'));
+  beforeEach(module('dynamicViewOverlayServiceMock'));
+  beforeEach(module('goldenLayoutServiceMock'));
+  beforeEach(module('gz3dMock'));
+  beforeEach(module('sceneInfoMock'));
+  beforeEach(
+    module(function($provide) {
+      $provide.value(
+        'simulationSDFWorld',
+        jasmine.createSpy('simulationSDFWorld').and.callThrough()
+      );
+      $provide.value('bbpConfig', {
+        get: jasmine.createSpy('get').and.returnValue({
+          bbpce016: {
+            gzweb: {
+              assets: 'mock_assets',
+              websocket: 'mock_websocket'
+            }
+          }
+        })
+      });
+      $provide.value('panels', {
+        close: jasmine.createSpy('close')
+      });
+    })
+  );
+
+  beforeEach(
+    inject(function(
+      $rootScope,
+      $compile,
+      $document,
+      EDIT_MODE,
+      STATE,
+      TOOL_CONFIGS,
+      _currentStateMockFactory_,
+      _stateService_,
+      _objectInspectorService_,
+      _panels_,
+      _simulationSDFWorld_,
+      _simulationInfo_,
+      _clbErrorDialog_,
+      _environmentService_,
+      _goldenLayoutService_,
+      _$httpBackend_,
+      _storageServer_,
+      _newExperimentProxyService_,
+      _$q_
+    ) {
+      $scope = $rootScope.$new();
+      $scope.EDIT_MODE = EDIT_MODE;
+      $scope.STATE = STATE;
+      $scope.TOOL_CONFIGS = TOOL_CONFIGS;
+      httpBackend = _$httpBackend_;
+      storageServer = _storageServer_;
+      newExperimentProxyService = _newExperimentProxyService_;
+      environmentService = _environmentService_;
+      $q = _$q_;
+      var modelLibraryMock = [
+        {
+          title: 'Shapes',
+          thumbnail: 'shapes.png',
+          models: [
+            {
+              modelPath: 'box',
+              modelTitle: 'Box',
+              thumbnail: 'img/esv/objects/box.png'
+            },
+            {
+              modelPath: 'sphere',
+              modelTitle: 'Sphere',
+              thumbnail: 'img/esv/objects/sphere.png'
+            },
+            {
+              modelPath: 'cylinder',
+              modelTitle: 'Cylinder',
+              thumbnail: 'img/esv/objects/cylinder.png',
+              physicsIgnore: 'opensim'
+            }
+          ]
+        },
+        {
+          title: 'Lights',
+          thumbnail: 'lights.png',
+          models: [
+            {
+              modelPath: 'pointlight',
+              modelTitle: 'Point Light',
+              thumbnail: 'img/esv/objects/pointlight.png'
+            },
+            {
+              modelPath: 'spotlight',
+              modelTitle: 'Spot Light',
+              thumbnail: 'img/esv/objects/spotlight.png'
+            },
+            {
+              modelPath: 'directionallight',
+              modelTitle: 'Directional Light',
+              thumbnail: 'img/esv/objects/directionallight.png',
+              physicsIgnore: 'bullet'
+            }
+          ]
+        }
+      ];
+      httpBackend.whenGET(/.*assets.*/).respond(modelLibraryMock);
+
+      $compile('<environment-designer />')($scope);
+      spyOn(environmentService, 'isDevMode').and.returnValue(true);
+      spyOn(newExperimentProxyService, 'getTemplateModels').and.returnValue(
+        $q.resolve({
+          data: [
+            {
+              name: 'robot1 name',
+              description: 'robot1 description',
+              thumbnail: '<robot png data>',
+              id: 'robot1',
+              path: 'robots/<robot folder>/model.config'
+            }
+          ]
+        })
+      );
+      spyOn(storageServer, 'getCustomModels').and.returnValue(
+        $q.resolve([
+          {
+            name: 'custom robot1 name',
+            description: 'custom robot1 description',
+            thumbnail: '<robot png data>',
+            id: 'robot1',
+            fileName: 'robots/robot1.zip',
+            path: 'robots%2Frobot1.zip'
+          }
+        ])
+      );
+      $scope.$digest();
+      httpBackend.flush();
+    })
+  );
+
+  it('should should check that dev mode is correctly set', function() {
+    expect($scope.devMode).toBe(true);
   });
 });

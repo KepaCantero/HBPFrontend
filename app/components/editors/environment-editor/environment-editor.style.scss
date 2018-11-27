@@ -256,3 +256,47 @@ environment-designer {
   padding-bottom: 3px;
   padding-top: 1px;
 }
+
+.ed-objectlist-item {
+  position: relative;
+}
+
+.ed-private-tag {
+  cursor: pointer;
+  width: 43px;
+  height: 18px;
+  background: #d25c2b;
+  color: white;
+  margin-left: 6px;
+  margin-top: 6px;
+  padding: 2px;
+  font-size: 11px;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+// class to prevent text highlight
+.noselect {
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Safari */
+  -khtml-user-select: none; /* Konqueror HTML */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome and Opera */
+}
+
+.ed-public-tag {
+  cursor: pointer;
+  width: 40px;
+  height: 18px;
+  background: #3679b6;
+  color: white;
+  margin-left: 6.5px;
+  margin-top: 6px;
+  padding: 2px;
+  font-size: 11px;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
