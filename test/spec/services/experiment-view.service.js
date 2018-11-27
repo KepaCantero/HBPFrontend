@@ -375,7 +375,7 @@ describe('Service: ExperimentViewService', function() {
       experimentViewService.resetSimulation();
     });
 
-    it('should notify the widgets when resetting brain/camera/robot', function() {
+    it('should notify the widgets when resetting camera/robot', function() {
       spyOn(experimentViewService, 'notifyResetToWidgets').and.callThrough();
 
       mockResetRequest.resetType = RESET_TYPE.RESET_FULL;
@@ -383,20 +383,15 @@ describe('Service: ExperimentViewService', function() {
       $timeout.flush(100);
       expect(experimentViewService.notifyResetToWidgets).not.toHaveBeenCalled();
 
-      mockResetRequest.resetType = RESET_TYPE.RESET_BRAIN;
+      mockResetRequest.resetType = RESET_TYPE.RESET_CAMERA_VIEW;
       experimentViewService.resetSimulation();
       $timeout.flush(100);
       expect(experimentViewService.notifyResetToWidgets.calls.count()).toBe(0);
 
-      mockResetRequest.resetType = RESET_TYPE.RESET_CAMERA_VIEW;
-      experimentViewService.resetSimulation();
-      $timeout.flush(100);
-      expect(experimentViewService.notifyResetToWidgets.calls.count()).toBe(1);
-
       mockResetRequest.resetType = RESET_TYPE.RESET_ROBOT_POSE;
       experimentViewService.resetSimulation();
       $timeout.flush(100);
-      expect(experimentViewService.notifyResetToWidgets.calls.count()).toBe(2);
+      expect(experimentViewService.notifyResetToWidgets.calls.count()).toBe(1);
     });
 
     it('should make respective calls when resetting camera view', function() {
@@ -404,31 +399,6 @@ describe('Service: ExperimentViewService', function() {
       experimentViewService.resetSimulation();
       $timeout.flush(150);
       expect(gz3d.scene.resetView).toHaveBeenCalled();
-    });
-
-    it('should pass the radio button value to resetService when Collab not available', function() {
-      spyOn(experimentViewService, 'notifyResetToWidgets');
-      mockResetRequest.resetType = RESET_TYPE.RESET_ROBOT_POSE;
-
-      experimentViewService.resetSimulation();
-      $timeout.flush(150);
-
-      environmentService.setPrivateExperiment(false); //Collab IS NOT available
-
-      expect(backendInterfaceService.reset).toHaveBeenCalledWith(
-        mockResetRequest,
-        jasmine.any(Function),
-        jasmine.any(Function)
-      );
-
-      var successCallback = backendInterfaceService.reset.calls.mostRecent()
-        .args[1];
-      successCallback();
-      $timeout.flush(100);
-      expect(gz3d.scene.applyComposerSettings).toHaveBeenCalledWith(
-        true,
-        false
-      );
     });
 
     it('should reset GUI when reset type is RESET.RESET_ALL', function() {
@@ -440,32 +410,17 @@ describe('Service: ExperimentViewService', function() {
       expect(experimentViewService.resetGUI).toHaveBeenCalled();
     });
 
-    it('notify everything to update panel ui if there is a RESET of the brain', function() {
-      spyOn($rootScope, '$broadcast').and.callThrough();
-      mockResetRequest.resetType = RESET_TYPE.RESET_BRAIN;
-
-      experimentViewService.resetSimulation();
-      $timeout.flush(100);
-
-      expect($rootScope.$broadcast, 'UPDATE_PANEL_UI').toHaveBeenCalled();
-    });
-
     it('should pass the radio button value to resetCollabService when Storage is available', function() {
       spyOn(_, 'defer');
 
-      var testWorld = {
+      const testWorld = {
         type: RESET_TYPE.RESET_WORLD,
         headline: 'Resetting Environment',
         subHeadline: 'Downloading World SDF from the Storage'
       };
-      var testBrain = {
-        type: RESET_TYPE.RESET_BRAIN,
-        headline: 'Resetting Brain',
-        subHeadline: 'Downloading brain configuration file from the Storage'
-      };
-      var testCases = [testWorld, testBrain];
+      const testCases = [testWorld];
 
-      for (var i = 0; i < testCases.length; i++) {
+      for (let i = 0; i < testCases.length; i++) {
         experimentViewService.resetSimulation();
         mockResetRequest.resetType = testCases[i].type; // overwrites default button state | Fake user input
         environmentService.setPrivateExperiment(true); //Collab IS available
@@ -474,7 +429,7 @@ describe('Service: ExperimentViewService', function() {
         $timeout.flush(100);
 
         //ensureStateBeforeExecuting's first parameter is a state, second is a callback
-        var resetFunction = stateService.ensureStateBeforeExecuting.calls.mostRecent()
+        const resetFunction = stateService.ensureStateBeforeExecuting.calls.mostRecent()
           .args[1];
 
         resetFunction(); // call the callback

@@ -18,9 +18,9 @@ describe('Directive: brainvisualizer', function() {
       backendInterfaceServiceMock.getBrain = function(callback) {
         var testData = {};
         /* eslint-disable camelcase*/
-        testData.additional_populations = new Object();
-        testData.additional_populations.record = { to: 2, step: null, from: 0 };
-        testData.additional_populations.sensors = [0, 1];
+        testData.brain_populations = new Object();
+        testData.brain_populations.record = { to: 2, step: null, from: 0 };
+        testData.brain_populations.sensors = [0, 1];
         callback(testData);
       };
 

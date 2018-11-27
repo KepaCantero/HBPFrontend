@@ -101,7 +101,7 @@
             // Register for the status updates as well as the timing stats
             // Note that we have two different connections here, hence we only put one as a callback for
             // $rootScope.iface and the other one not!
-            /* Listen for status informations */
+            /* Listen for status information */
             stateService.startListeningForStatusInformation();
             this.messageCallbackHandler = stateService.addMessageCallback(
               message => this.messageCallback(message)
@@ -148,7 +148,7 @@
           this.exitSimulation();
         } else {
           // In demo mode, we don't show the end splash screen,
-          //TODO (Sandro): i think splashscreen stuff should be handled with a message callback inside the splashscreen service itself, not here
+          //TODO (Sandro): i think splash-screen stuff should be handled with a message callback inside the splashscreen service itself, not here
           //TODO: but first onSimulationDone() has to be moved to experiment service or replaced
           /* splashScreen == null means it has been already closed and should not be reopened */
 
@@ -297,7 +297,6 @@
 
               this.$timeout(() => {
                 if (
-                  resetType === this.RESET_TYPE.RESET_BRAIN ||
                   resetType === this.RESET_TYPE.RESET_CAMERA_VIEW ||
                   resetType === this.RESET_TYPE.RESET_ROBOT_POSE
                 ) {
@@ -316,61 +315,39 @@
                   this.splash.splashScreen =
                     this.splash.splashScreen ||
                     this.splash.open(false, undefined);
-                  if (this.environmentService.isPrivateExperiment()) {
-                    //reset from collab
-                    //open splash screen, blocking ui (i.e. no ok button) and no closing callback
 
-                    let resetWhat = '',
-                      downloadWhat = '';
+                  //open splash screen, blocking ui (i.e. no ok button) and no closing callback
 
-                    (resetType => {
-                      //customize user message depending on the reset type
-                      if (resetType === this.RESET_TYPE.RESET_WORLD) {
-                        resetWhat = 'Environment';
-                        downloadWhat = 'World SDF ';
-                      } else if (resetType === this.RESET_TYPE.RESET_BRAIN) {
-                        resetWhat = 'Brain';
-                        downloadWhat = 'brain configuration file ';
-                      }
-                    })(resetType);
+                  let resetWhat = '',
+                    downloadWhat = '';
 
-                    const messageHeadline = 'Resetting ' + resetWhat;
-                    const messageSubHeadline =
-                      'Downloading ' + downloadWhat + 'from the Storage';
-
-                    _.defer(() => {
-                      this.splash.spin = true;
-                      this.splash.setMessage({
-                        headline: messageHeadline,
-                        subHeadline: messageSubHeadline
-                      });
-                    });
-                    //Workaround for resseting correctly the PBR textures
-                    this.pbrMaterial = this.gz3d.scene.composerSettings.pbrMaterial;
-                    this.gz3d.scene.composerSettings.pbrMaterial = false;
-                    this.gz3d.scene.applyComposerSettings();
-                    this.backendInterfaceService.resetCollab(
-                      this.resetRequest,
-                      this.splash.closeSplash,
-                      this.splash.closeSplash
-                    );
-                  } else {
-                    //other kinds of reset
-                    this.backendInterfaceService.reset(
-                      this.resetRequest,
-                      () => {
-                        // Success callback
-                        // do not close the splash if successful
-                        // it will be closed by messageCallback
-                        this.gz3d.scene.applyComposerSettings(true, false);
-                        this.splash.closeSplash();
-                        if (resetType === this.RESET_TYPE.RESET_BRAIN) {
-                          this.updatePanelUI();
-                        }
-                      },
-                      this.splash.closeSplash
-                    );
+                  if (resetType === this.RESET_TYPE.RESET_WORLD) {
+                    resetWhat = 'Environment';
+                    downloadWhat = 'World SDF ';
                   }
+
+                  const messageHeadline = 'Resetting ' + resetWhat;
+                  const messageSubHeadline =
+                    'Downloading ' + downloadWhat + 'from the Storage';
+
+                  _.defer(() => {
+                    this.splash.spin = true;
+                    this.splash.setMessage({
+                      headline: messageHeadline,
+                      subHeadline: messageSubHeadline
+                    });
+                  });
+
+                  //Workaround for resetting correctly the PBR textures
+                  this.pbrMaterial = this.gz3d.scene.composerSettings.pbrMaterial;
+                  this.gz3d.scene.composerSettings.pbrMaterial = true;
+                  this.gz3d.scene.applyComposerSettings();
+
+                  this.backendInterfaceService.resetCollab(
+                    this.resetRequest,
+                    this.splash.closeSplash,
+                    this.splash.closeSplash
+                  );
                 }
               }, 150);
             }

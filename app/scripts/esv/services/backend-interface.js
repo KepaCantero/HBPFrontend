@@ -266,7 +266,7 @@
               data: data,
               brain_type: brainType,
               data_type: dataType,
-              additional_populations: brainPopulations,
+              brain_populations: brainPopulations,
               change_population: changePopulation
             }
           ).$promise;
