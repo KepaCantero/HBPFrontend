@@ -25,9 +25,14 @@
 (function() {
   'use strict';
 
+  // Layout based on constraint or not. If not, uses column based layout
+  const USE_SIZE_CONSTRAINED_LAYOUTER = true;
+
   class GoldenLayoutService {
-    constructor($compile, $rootScope, $q, TOOL_CONFIGS) {
+    constructor($compile, $rootScope, $q, TOOL_CONFIGS, layouter) {
       this.TOOL_CONFIGS = TOOL_CONFIGS;
+      // layout logic implemented in layouter as a strategy
+      this.layouter = layouter;
 
       this.deferredInitialized = $q.defer();
 
@@ -49,12 +54,8 @@
 
     createLayout() {
       let config = {
-        content: [
-          {
-            type: 'row',
-            content: [this.TOOL_CONFIGS.ENVIRONMENT_RENDERING]
-          }
-        ],
+        content: [this.TOOL_CONFIGS.ENVIRONMENT_RENDERING],
+
         settings: {
           showPopoutIcon: false
         }
@@ -112,26 +113,7 @@
     }
 
     addTool(toolConfig) {
-      if (
-        this.layout.root.contentItems.length === 1 &&
-        this.layout.root.contentItems[0].isStack
-      ) {
-        let newContent = [];
-        if (this.layout.root.contentItems[0].contentItems) {
-          this.layout.root.contentItems[0].contentItems.forEach(content => {
-            newContent.push(content.config);
-          });
-        }
-        newContent.push(toolConfig);
-
-        this.layout.root.removeChild(this.layout.root.contentItems[0]);
-        this.layout.root.addChild({
-          type: 'row',
-          content: newContent
-        });
-      } else {
-        this.layout.root.contentItems[0].addChild(toolConfig);
-      }
+      this.layouter.addComponent(this.layout, toolConfig);
     }
   }
 
@@ -140,7 +122,10 @@
     '$compile',
     '$rootScope',
     '$q',
-    'TOOL_CONFIGS'
+    'TOOL_CONFIGS',
+    USE_SIZE_CONSTRAINED_LAYOUTER
+      ? 'constraintBasedLayouter'
+      : 'addAsColumnLayouter'
   ];
 
   angular

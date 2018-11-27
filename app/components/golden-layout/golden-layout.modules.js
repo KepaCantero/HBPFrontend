@@ -36,7 +36,9 @@
         angularDirective: '<environment-rendering />',
         singleton: true
       },
-      isClosable: false
+      isClosable: false,
+      pwidth: 800, // prefered width in px
+      pheight: 600 // prefered height in px
     },
     /* (SandroWeber)
      This component is really nothing different from ENVIRONMENT_RENDERING but to keep current
@@ -52,7 +54,9 @@
       componentState: {
         module: 'environmentRenderingModule',
         angularDirective: '<environment-rendering />'
-      }
+      },
+      pwidth: 300,
+      pheight: 200
     },
     ENVIRONMENT_EDITOR: {
       type: 'component',
@@ -63,7 +67,9 @@
         module: 'exdFrontendApp',
         angularDirective: '<environment-designer />',
         singleton: true
-      }
+      },
+      pwidth: 600,
+      pheight: 800
     },
     TRANSFER_FUNCTION_EDITOR: {
       type: 'component',
@@ -74,7 +80,9 @@
         module: 'exdFrontendApp',
         angularDirective: '<transfer-function-editor />',
         singleton: true
-      }
+      },
+      pwidth: 900,
+      pheight: 700
     },
     BRAIN_EDITOR: {
       type: 'component',
@@ -85,7 +93,9 @@
         module: 'exdFrontendApp',
         angularDirective: '<pynn-editor />',
         singleton: true
-      }
+      },
+      pwidth: 800,
+      pheight: 900
     },
     SMACH_EDITOR: {
       type: 'component',
@@ -96,7 +106,9 @@
         module: 'exdFrontendApp',
         angularDirective: '<smach-editor />',
         singleton: true
-      }
+      },
+      pwidth: 800,
+      pheight: 900
     },
     RESOURCES_EDITOR: {
       type: 'component',
@@ -107,7 +119,9 @@
         module: 'exdFrontendApp',
         angularDirective: '<resources-editor />',
         singleton: true
-      }
+      },
+      pwidth: 600,
+      pheight: 800
     },
     ROS_TERMINAL: {
       type: 'component',
@@ -118,7 +132,9 @@
         module: 'exdFrontendApp',
         angularDirective: '<ros-terminal />',
         singleton: true
-      }
+      },
+      pwidth: 400,
+      pheight: 300
     },
     PULL_FORCE: {
       type: 'component',
@@ -129,7 +145,9 @@
         module: 'exdFrontendApp',
         angularDirective: '<apply-force />',
         singleton: true
-      }
+      },
+      pwidth: 200,
+      pheight: 250
     },
     SPIKE_TRAIN: {
       type: 'component',
@@ -140,7 +158,9 @@
         module: 'exdFrontendApp',
         angularDirective: '<spike-train />',
         singleton: true
-      }
+      },
+      pwidth: 600,
+      pheight: 300
     },
     JOINT_PLOT: {
       type: 'component',
@@ -150,7 +170,9 @@
       componentState: {
         module: 'exdFrontendApp',
         angularDirective: '<joint-plot />'
-      }
+      },
+      pwidth: 800,
+      pheight: 400
     },
     BRAIN_VISUALIZER: {
       type: 'component',
@@ -161,7 +183,9 @@
         module: 'exdFrontendApp',
         angularDirective: '<brainvisualizer />',
         singleton: true
-      }
+      },
+      pwidth: 800,
+      pheight: 600
     },
     LOG_CONSOLE: {
       type: 'component',
@@ -172,7 +196,9 @@
         module: 'exdFrontendApp',
         angularDirective: '<log-console />',
         singleton: true
-      }
+      },
+      pwidth: 400,
+      pheight: 300
     },
     SERVER_VIDEO_STREAM: {
       type: 'component',
@@ -182,7 +208,9 @@
       componentState: {
         module: 'exdFrontendApp',
         angularDirective: '<video-stream />'
-      }
+      },
+      pwidth: 600,
+      pheight: 400
     },
     PERFORMANCE_VIEW: {
       type: 'component',
@@ -193,7 +221,9 @@
         module: 'exdFrontendApp',
         angularDirective: '<performance-monitor />',
         singleton: true
-      }
+      },
+      pwidth: 300,
+      pheight: 500
     },
     OBJECT_INSPECTOR: {
       type: 'component',
@@ -204,7 +234,9 @@
         module: 'exdFrontendApp',
         angularDirective: '<object-inspector />',
         singleton: true
-      }
+      },
+      pwidth: 300,
+      pheight: 800
     },
     ENVIRONMENT_RENDERING_SETTINGS: {
       type: 'component',
@@ -215,7 +247,9 @@
         module: 'exdFrontendApp',
         angularDirective: '<environment-settings-panel />',
         singleton: true
-      }
+      },
+      pwidth: 400,
+      pheight: 300
     },
     NOISE_MODEL_VIEWER: {
       type: 'component',
@@ -227,6 +261,8 @@
         angularDirective: '<noise-model />',
         singleton: true
       }
-    }
+    },
+    pwidth: 400,
+    pheight: 300
   });
 })();

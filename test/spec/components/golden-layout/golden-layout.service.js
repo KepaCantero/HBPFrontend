@@ -199,31 +199,4 @@ describe('Service: GoldenLayoutService', function() {
     goldenLayoutService.openTool(mockToolConfig);
     expect(goldenLayoutService.addTool).toHaveBeenCalledWith(mockToolConfig);
   });
-
-  it(' - addTool', function() {
-    goldenLayoutService.layout = mockLayout;
-
-    let mockToolConfig = {
-      id: 'mock-id',
-      componentState: {
-        singleton: true
-      }
-    };
-
-    // not a stack to be added to
-    mockLayout.root.contentItems[0].isStack = false;
-
-    goldenLayoutService.addTool(mockToolConfig);
-    expect(mockLayout.root.contentItems[0].addChild).toHaveBeenCalledWith(
-      mockToolConfig
-    );
-
-    // add tool to stack, convert stack to row
-    mockLayout.root.contentItems[0].isStack = true;
-
-    goldenLayoutService.addTool(mockToolConfig);
-    expect(mockLayout.root.contentItems[0].addChild).toHaveBeenCalledWith(
-      mockToolConfig
-    );
-  });
 });

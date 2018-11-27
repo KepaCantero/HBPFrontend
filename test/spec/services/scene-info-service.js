@@ -6,7 +6,6 @@ describe('Services: server-info-service', function() {
   beforeEach(module('exdFrontendApp'));
   beforeEach(module('exd.templates'));
   beforeEach(module('simulationInfoMock'));
-  beforeEach(function() {});
 
   beforeEach(
     inject(function(_sceneInfo_, _simulationInfo_, _$httpBackend_) {
@@ -22,7 +21,6 @@ describe('Services: server-info-service', function() {
       '/simulation/' +
       simulationInfo.simulationID +
       '/robots';
-    console.error(url);
     httpBackend.expectGET(url).respond({ robots: ['robot', 'icub'] });
     spyOn(sceneInfo, 'refreshRobotsList').and.callThrough();
     sceneInfo.initialize().then(function() {
@@ -37,6 +35,5 @@ describe('Services: server-info-service', function() {
       expect(sceneInfo.robots).toEqual(['robot']);
       done();
     });
-    httpBackend.flush();
   });
 });

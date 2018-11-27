@@ -3,6 +3,10 @@
     "es6": true,
     "browser": true
   },
+  "parserOptions": {
+    "ecmaVersion": 2018,
+    "impliedStrict": true
+  },
   "extends": ["eslint:recommended", "prettier"],
   "rules": {
     "linebreak-style": ["error", "unix"],
