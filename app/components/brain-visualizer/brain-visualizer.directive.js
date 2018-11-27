@@ -29,7 +29,6 @@
     'backendInterfaceService',
     'RESET_TYPE',
     'spikeListenerService',
-    'simulationInfo',
     'collab3DSettingsService',
     'environmentService',
     'clbErrorDialog',
@@ -38,7 +37,6 @@
       backendInterfaceService,
       RESET_TYPE,
       spikeListenerService,
-      simulationInfo,
       collab3DSettingsService,
       environmentService,
       clbErrorDialog
@@ -53,7 +51,6 @@
         link: function(scope, element) {
           var brain3D;
           var brainContainer = element.find('.esv-brainvisualizer-main');
-          scope.isPrivateExperiment = environmentService.isPrivateExperiment();
 
           scope.BRAIN3D = BRAIN3D;
 
@@ -369,10 +366,13 @@
             scope.update();
           });
 
-          // Clean up on leaving
+          // Clean up and save on leaving
+          let isPrivateExperiment = environmentService.isPrivateExperiment();
           scope.$on('$destroy', function() {
+            if (isPrivateExperiment) {
+              scope.saveSettings();
+            }
             brain3D && brain3D.terminate();
-
             spikeListenerService.stopListening(onNewSpikesMessageReceived);
           });
 

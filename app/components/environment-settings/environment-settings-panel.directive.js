@@ -25,17 +25,17 @@
   'use strict';
 
   angular.module('exdFrontendApp').directive('environmentSettingsPanel', [
-    'CAMERA_SENSITIVITY_RANGE',
     'gz3d',
     'collab3DSettingsService',
     'userInteractionSettingsService',
     'simulationInfo',
+    'environmentService',
     function(
-      CAMERA_SENSITIVITY_RANGE,
       gz3d,
       collab3DSettingsService,
       userInteractionSettingsService,
-      simulationInfo
+      simulationInfo,
+      environmentService
     ) {
       return {
         templateUrl:
@@ -60,6 +60,14 @@
             collab3DSettingsService.saveSettings();
             userInteractionSettingsService.saveSettings();
           };
+
+          // Save on leaving
+          let isPrivateExperiment = environmentService.isPrivateExperiment();
+          scope.$on('$destroy', function() {
+            if (isPrivateExperiment) {
+              scope.saveSettings();
+            }
+          });
         }
       };
     }
