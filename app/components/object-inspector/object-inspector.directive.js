@@ -49,10 +49,10 @@
       'TIP_CODES',
       'storageServer',
       'robotComponentsService',
-      'TF_CONFIG',
       'goldenLayoutService',
       'TOOL_CONFIGS',
       'backendInterfaceService',
+      '$rootScope',
       function(
         OBJECT_VIEW_MODE,
         $timeout,
@@ -66,10 +66,10 @@
         TIP_CODES,
         storageServer,
         robotComponentsService,
-        TF_CONFIG,
         goldenLayoutService,
         TOOL_CONFIGS,
-        backendInterfaceService
+        backendInterfaceService,
+        $rootScope
       ) {
         return {
           templateUrl:
@@ -171,6 +171,8 @@ def ${tfname}(${['t', ...parameters].join(', ')}):
                       )
                     )
                     .then(() => {
+                      // Notify the components which display transfer functions info (e.g., the Transfer Functions editor) that an update is required
+                      $rootScope.$broadcast('TRANSFER_FUNCTIONS_CHANGED');
                       goldenLayoutService.openTool(
                         TOOL_CONFIGS.TRANSFER_FUNCTION_EDITOR
                       );

@@ -175,6 +175,8 @@ describe('Directive: object-inspector', function() {
       window.$q.resolve()
     );
 
+    spyOn($rootScope, '$broadcast').and.callThrough();
+
     objectInspectorService.selectedRobotComponent = {
       userData: {
         rosType: 'sometype',
@@ -186,6 +188,9 @@ describe('Directive: object-inspector', function() {
     elementScope.$digest();
     expect(storageServer.saveTransferFunctions).toHaveBeenCalled();
     expect(backendInterfaceService.editTransferFunction).toHaveBeenCalled();
+    expect($rootScope.$broadcast).toHaveBeenCalledWith(
+      'TRANSFER_FUNCTIONS_CHANGED'
+    );
   });
 
   it('should throw when createTopicTF and backend service fails', function() {

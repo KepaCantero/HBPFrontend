@@ -236,6 +236,20 @@ describe('Directive: transferFunctionEditor', function() {
     expect(isolateScope.refresh).toHaveBeenCalled();
   });
 
+  it('should refresh if the transfer functions have been modified by another component', function() {
+    spyOn(isolateScope, 'refresh');
+    isolateScope.$broadcast('TRANSFER_FUNCTIONS_CHANGED');
+    isolateScope.$digest();
+    expect(isolateScope.refresh).toHaveBeenCalled();
+  });
+
+  it('should refresh if the populations have been modified by another component', function() {
+    spyOn(isolateScope, 'refresh');
+    isolateScope.$broadcast('pynn.populationsChanged');
+    isolateScope.$digest();
+    expect(isolateScope.refresh).toHaveBeenCalled();
+  });
+
   it('should print populations nicely', function() {
     expect(
       isolateScope.getFriendlyPopulationName({

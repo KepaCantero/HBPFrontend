@@ -145,6 +145,7 @@ describe('Directive: pynnEditor', function() {
       element = $compile('<pynn-editor control="control"/>')($scope);
       $scope.$digest();
       isolateScope = element.isolateScope();
+      spyOn($rootScope, '$broadcast').and.callThrough();
     })
   );
 
@@ -438,6 +439,9 @@ describe('Directive: pynnEditor', function() {
       backendInterfaceService.setBrain.calls.reset();
       isolateScope.deletePopulation(0);
       isolateScope.$apply();
+      expect($rootScope.$broadcast).toHaveBeenCalledWith(
+        'pynn.populationsChanged'
+      );
       isolateScope.deletePopulation(1);
       isolateScope.$apply();
       expect(isolateScope.applyBackend).toHaveBeenCalled();

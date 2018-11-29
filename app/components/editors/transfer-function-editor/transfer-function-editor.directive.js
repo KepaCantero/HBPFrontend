@@ -108,7 +108,6 @@ def {0}(t):
       }
     ])
     .directive('transferFunctionEditor', [
-      '$log',
       'backendInterfaceService',
       'STATE',
       'stateService',
@@ -138,7 +137,6 @@ def {0}(t):
       'bbpConfig',
       'TF_CONFIG',
       function(
-        $log,
         backendInterfaceService,
         STATE,
         stateService,
@@ -768,6 +766,18 @@ def {0}(t):
             $timeout(() => {
               scope.refresh();
             }, 100);
+
+            // refresh the editor if the transfer functions list
+            // has been changed by another component, e.g., the object inspector
+            scope.$on('TRANSFER_FUNCTIONS_CHANGED', () => {
+              scope.refresh();
+            });
+
+            // refresh the editor if the populations list
+            // has been changed by another component, e.g., the brain file editor
+            scope.$on('pynn.populationsChanged', () => {
+              scope.refresh();
+            });
 
             /**************************************/
             // Loading TF content
