@@ -176,7 +176,9 @@
       gz3dViewsService,
       sceneInfo,
       stateService,
-      videoStreamService
+      videoStreamService,
+      tipTooltipService,
+      TIP_CODES
     ) {
       this.backendInterfaceService = backendInterfaceService;
       this.stateService = stateService;
@@ -187,6 +189,8 @@
       this.gz3d = gz3d;
       this.gz3dViewsService = gz3dViewsService;
       this.videoStreamService = videoStreamService;
+      this.tipTooltipService = tipTooltipService;
+      this.TIP_CODES = TIP_CODES;
 
       this.view = undefined;
       this.videoUrl = undefined;
@@ -277,6 +281,7 @@
     }
 
     onMouseDown(event) {
+      this.tipTooltipService.setCurrentTip(this.TIP_CODES.TEXTURES);
       switch (event.button) {
         case 2: {
           let model = this.gz3d.scene.getRayCastModel(
@@ -308,7 +313,8 @@
     'sceneInfo',
     'stateService',
     'videoStreamService',
-    'dynamicViewOverlayService'
+    'tipTooltipService',
+    'TIP_CODES'
   ];
 
   /**
