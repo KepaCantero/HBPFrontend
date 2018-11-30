@@ -26,10 +26,28 @@
   'use strict';
 
   class GoldenLayoutController {
-    constructor($scope, goldenLayoutService) {
+    constructor(
+      $scope,
+      goldenLayoutService,
+      nrpUser,
+      userInteractionSettingsService
+    ) {
       this.goldenLayoutService = goldenLayoutService;
+      this.nrpUser = nrpUser;
+      this.userInteractionSettingsService = userInteractionSettingsService;
 
-      this.layout = this.goldenLayoutService.createLayout();
+      this.nrpUser.getCurrentUser().then(profile => {
+        this.userInteractionSettingsService.settings.then(settings => {
+          let lastWorkspaceLayout =
+            settings.autosaveOnExit &&
+            settings.autosaveOnExit.lastWorkspaceLayouts &&
+            settings.autosaveOnExit.lastWorkspaceLayouts[profile.id];
+
+          this.layout = this.goldenLayoutService.createLayout(
+            lastWorkspaceLayout
+          );
+        });
+      });
 
       $scope.$on('$destroy', () => this.onDestroy());
     }
@@ -42,6 +60,8 @@
   angular.module('goldenLayoutModule').controller('GoldenLayoutController', [
     '$scope',
     'goldenLayoutService',
+    'nrpUser',
+    'userInteractionSettingsService',
     function(...args) {
       return new GoldenLayoutController(...args);
     }

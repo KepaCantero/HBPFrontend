@@ -5,7 +5,7 @@ describe('Controller: GoldenLayoutController', function() {
 
   let controller;
 
-  let goldenLayoutService;
+  let goldenLayoutService, nrpUser, userInteractionSettingsService;
 
   let mockLayout;
 
@@ -14,14 +14,24 @@ describe('Controller: GoldenLayoutController', function() {
 
     // mocks
     module('goldenLayoutServiceMock');
+    module('nrpUserMock');
+    module('userInteractionSettingsServiceMock');
   });
 
   beforeEach(
-    inject(function(_$controller_, _$rootScope_, _goldenLayoutService_) {
+    inject(function(
+      _$controller_,
+      _$rootScope_,
+      _goldenLayoutService_,
+      _nrpUser_,
+      _userInteractionSettingsService_
+    ) {
       $controller = _$controller_;
       $rootScope = _$rootScope_;
 
       goldenLayoutService = _goldenLayoutService_;
+      nrpUser = _nrpUser_;
+      userInteractionSettingsService = _userInteractionSettingsService_;
     })
   );
 
@@ -40,8 +50,22 @@ describe('Controller: GoldenLayoutController', function() {
 
   it(' - constructor', function() {
     expect(controller).toBeDefined();
-    expect(goldenLayoutService.createLayout).toHaveBeenCalled();
+    expect(goldenLayoutService.createLayout).toHaveBeenCalledWith(undefined);
     expect(controller.layout).toBe(mockLayout);
+
+    // with predefined layout
+    let initConfig = {};
+    userInteractionSettingsService.settingsData.autosaveOnExit = {};
+    userInteractionSettingsService.settingsData.autosaveOnExit.lastWorkspaceLayouts = {};
+    userInteractionSettingsService.settingsData.autosaveOnExit.lastWorkspaceLayouts[
+      nrpUser.currentUser.id
+    ] = initConfig;
+
+    controller = $controller('GoldenLayoutController', {
+      $rootScope: $rootScope,
+      $scope: $scope
+    });
+    expect(goldenLayoutService.createLayout).toHaveBeenCalledWith(initConfig);
   });
 
   it(' - onDestroy', function() {

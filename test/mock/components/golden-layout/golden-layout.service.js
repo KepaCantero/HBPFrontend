@@ -7,7 +7,8 @@
       this.layout = {
         root: {
           getItemsById: jasmine.createSpy('getItemsById')
-        }
+        },
+        toConfig: jasmine.createSpy('toConfig')
       };
 
       this.createLayout = jasmine.createSpy('createLayout');

@@ -29,12 +29,10 @@
   const USE_SIZE_CONSTRAINED_LAYOUTER = true;
 
   class GoldenLayoutService {
-    constructor($compile, $rootScope, $q, TOOL_CONFIGS, layouter) {
+    constructor($compile, $rootScope, TOOL_CONFIGS, layouter) {
       this.TOOL_CONFIGS = TOOL_CONFIGS;
       // layout logic implemented in layouter as a strategy
       this.layouter = layouter;
-
-      this.deferredInitialized = $q.defer();
 
       this.angularModuleComponent = function(container, state) {
         let element = container.getElement();
@@ -48,19 +46,36 @@
       };
     }
 
-    initialized() {
-      return this.deferredInitialized.promise;
+    isLayoutInitialised() {
+      let promise = new Promise(resolve => {
+        let checkInitialized = () => {
+          if (this.layout && this.layout.isInitialised) {
+            resolve();
+          } else {
+            setTimeout(checkInitialized, 100);
+          }
+        };
+
+        checkInitialized();
+      });
+
+      return promise;
     }
 
-    createLayout() {
-      let config = {
-        content: [this.TOOL_CONFIGS.ENVIRONMENT_RENDERING],
+    createLayout(initConfig) {
+      if (typeof initConfig === 'undefined') {
+        initConfig = {
+          content: [this.TOOL_CONFIGS.ENVIRONMENT_RENDERING],
+          settings: {
+            showPopoutIcon: false
+          }
+        };
+      }
 
-        settings: {
-          showPopoutIcon: false
-        }
-      };
-      this.layout = new window.GoldenLayout(config, '#golden-layout-container');
+      this.layout = new window.GoldenLayout(
+        initConfig,
+        '#golden-layout-container'
+      );
 
       this.layout.registerComponent(
         'angularModuleComponent',
@@ -72,8 +87,6 @@
       $(window).resize(() => this.refreshSize());
       setTimeout(() => this.refreshSize());
 
-      this.deferredInitialized.resolve();
-
       return this.layout;
     }
 
@@ -82,7 +95,7 @@
     }
 
     createDragSource(element, toolConfig) {
-      this.initialized().then(() => {
+      this.isLayoutInitialised().then(() => {
         this.layout.createDragSource(element, toolConfig);
       });
     }
@@ -121,7 +134,6 @@
   GoldenLayoutService.$inject = [
     '$compile',
     '$rootScope',
-    '$q',
     'TOOL_CONFIGS',
     USE_SIZE_CONSTRAINED_LAYOUTER
       ? 'constraintBasedLayouter'

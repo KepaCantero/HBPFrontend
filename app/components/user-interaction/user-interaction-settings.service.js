@@ -28,17 +28,24 @@
   class UserInteractionSettingsService {
     constructor(
       $q,
+      $rootScope,
       CAMERA_SENSITIVITY_RANGE,
       UIS_DEFAULTS,
+      goldenLayoutService,
+      nrpUser,
       simulationConfigService
     ) {
       this.$q = $q;
       this.CAMERA_SENSITIVITY_RANGE = CAMERA_SENSITIVITY_RANGE;
       this.UIS_DEFAULTS = UIS_DEFAULTS;
+      this.goldenLayoutService = goldenLayoutService;
+      this.nrpUser = nrpUser;
       this.simulationConfigService = simulationConfigService;
 
       this.settingsData = undefined;
       this.lastSavedSettingsData = undefined;
+
+      $rootScope.$on('EXIT_SIMULATION', () => {});
     }
 
     loadSettings() {
@@ -77,10 +84,12 @@
     saveSetting(...settingType) {
       let clone = Object.assign({}, this.lastSavedSettingsData); // shallow
 
-      //update lastSaved's clone with the new data from settingsData
-      settingType.forEach(sType => (clone[sType] = this.settingsData[sType]));
+      this.getCurrentWorkspaceLayout().then(() => {
+        //update lastSaved's clone with the new data from settingsData
+        settingType.forEach(sType => (clone[sType] = this.settingsData[sType]));
 
-      return this._persistToFile(clone);
+        return this._persistToFile(clone);
+      });
     }
 
     clampCameraSensitivity() {
@@ -105,6 +114,27 @@
       }
     }
 
+    getCurrentWorkspaceLayout() {
+      if (
+        !this.goldenLayoutService.layout ||
+        !this.goldenLayoutService.layout.isInitialised
+      )
+        return;
+
+      if (!this.settingsData.autosaveOnExit) {
+        this.settingsData.autosaveOnExit = {};
+      }
+      if (!this.settingsData.autosaveOnExit.lastWorkspaceLayouts) {
+        this.settingsData.autosaveOnExit.lastWorkspaceLayouts = {};
+      }
+
+      return this.nrpUser.getCurrentUser().then(profile => {
+        this.settingsData.autosaveOnExit.lastWorkspaceLayouts[
+          profile.id
+        ] = this.goldenLayoutService.layout.toConfig();
+      });
+    }
+
     get settings() {
       var deferred = this.$q.defer();
 
@@ -123,8 +153,11 @@
   UserInteractionSettingsService.$$ngIsClass = true;
   UserInteractionSettingsService.$inject = [
     '$q',
+    '$rootScope',
     'CAMERA_SENSITIVITY_RANGE',
     'UIS_DEFAULTS',
+    'goldenLayoutService',
+    'nrpUser',
     'simulationConfigService'
   ];
 

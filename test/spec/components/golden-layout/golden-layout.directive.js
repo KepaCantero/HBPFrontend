@@ -8,6 +8,8 @@ describe('Directive: golden-layout', function() {
     module('goldenLayoutModule');
 
     module('goldenLayoutServiceMock');
+    module('nrpUserMock');
+    module('userInteractionSettingsServiceMock');
   });
 
   beforeEach(

@@ -10,7 +10,11 @@
       };
       this.getCurrentUser = jasmine
         .createSpy('getCurrentUser')
-        .and.returnValue($q.when(this.currentUser));
+        .and.returnValue({
+          then: jasmine.createSpy('then').and.callFake(cb => {
+            cb(this.currentUser);
+          })
+        });
       this.getReservation = jasmine.createSpy('getReservation');
       this.isMemberOfClusterReservationGroup = jasmine
         .createSpy('isMemberOfClusterReservationGroup')

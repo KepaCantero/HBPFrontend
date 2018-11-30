@@ -7,18 +7,13 @@ describe('Services: userInteractionSettingsService', function() {
 
   var $rootScope;
   var CAMERA_SENSITIVITY_RANGE, UIS_DEFAULTS;
-  var simulationConfigService;
-
-  /*beforeEach(module('exdFrontendApp'));
-  beforeEach(module('exd.templates')); // import html template
-
-  beforeEach(module('dynamicViewOverlayModule'));
-  beforeEach(module('clientLoggerServiceMock'));
-  beforeEach(module('simulationInfoMock'));*/
+  var goldenLayoutService, nrpUser, simulationConfigService;
 
   beforeEach(module('userInteractionModule'));
   beforeEach(module('userNavigationModule'));
 
+  beforeEach(module('goldenLayoutServiceMock'));
+  beforeEach(module('nrpUserMock'));
   beforeEach(module('simulationConfigServiceMock'));
 
   beforeEach(function() {});
@@ -30,8 +25,12 @@ describe('Services: userInteractionSettingsService', function() {
       _$rootScope_,
       _CAMERA_SENSITIVITY_RANGE_,
       _UIS_DEFAULTS_,
+      _goldenLayoutService_,
+      _nrpUser_,
       _simulationConfigService_
     ) {
+      goldenLayoutService = _goldenLayoutService_;
+      nrpUser = _nrpUser_;
       userInteractionSettingsService = _userInteractionSettingsService_;
 
       $rootScope = _$rootScope_;
@@ -185,6 +184,14 @@ describe('Services: userInteractionSettingsService', function() {
       typeB: 'true',
       typeC: 1
     };
+    spyOn(
+      userInteractionSettingsService,
+      'getCurrentWorkspaceLayout'
+    ).and.returnValue({
+      then: jasmine.createSpy('then').and.callFake(cb => {
+        cb();
+      })
+    });
 
     userInteractionSettingsService.saveSetting('typeA', 'typeB');
 
@@ -194,5 +201,29 @@ describe('Services: userInteractionSettingsService', function() {
     });
 
     done();
+  });
+
+  it(' - getCurrentWorkspaceLayout()', function() {
+    userInteractionSettingsService.settingsData = {
+      autosaveOnExit: undefined
+    };
+
+    // layout not initialised
+    goldenLayoutService.layout.isInitialised = false;
+    userInteractionSettingsService.getCurrentWorkspaceLayout();
+    expect(
+      userInteractionSettingsService.settingsData.autosaveOnExit
+    ).not.toBeDefined();
+
+    // initialised layout
+    goldenLayoutService.layout.isInitialised = true;
+    let mockConfig = {};
+    console.info(goldenLayoutService.layout);
+    goldenLayoutService.layout.toConfig.and.returnValue(mockConfig);
+    userInteractionSettingsService.getCurrentWorkspaceLayout();
+    expect(
+      userInteractionSettingsService.settingsData.autosaveOnExit
+        .lastWorkspaceLayouts[nrpUser.currentUser.id]
+    ).toBe(mockConfig);
   });
 });

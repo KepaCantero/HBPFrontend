@@ -120,7 +120,7 @@ describe('Service: GoldenLayoutService', function() {
 
   it(' - createDragSource', function() {
     goldenLayoutService.layout = mockLayout;
-    spyOn(goldenLayoutService, 'initialized').and.returnValue({
+    spyOn(goldenLayoutService, 'isLayoutInitialised').and.returnValue({
       then: jasmine.createSpy('then').and.callFake(cb => {
         cb();
       })
@@ -198,5 +198,30 @@ describe('Service: GoldenLayoutService', function() {
     mockToolConfig.componentState.singleton = false;
     goldenLayoutService.openTool(mockToolConfig);
     expect(goldenLayoutService.addTool).toHaveBeenCalledWith(mockToolConfig);
+  });
+
+  it(' - isLayoutInitialised', function(done) {
+    goldenLayoutService.layout = {
+      isInitialised: true
+    };
+
+    goldenLayoutService.isLayoutInitialised().then(() => {
+      done();
+    });
+  });
+
+  it(' - addTool', function() {
+    goldenLayoutService.layouter = {
+      addComponent: jasmine.createSpy('addComponent')
+    };
+    goldenLayoutService.layout = {};
+
+    let config = {};
+
+    goldenLayoutService.addTool(config);
+    expect(goldenLayoutService.layouter.addComponent).toHaveBeenCalledWith(
+      goldenLayoutService.layout,
+      config
+    );
   });
 });
