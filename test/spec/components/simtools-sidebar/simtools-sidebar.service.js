@@ -1,6 +1,6 @@
 'use strict';
 
-describe('Controller: SimToolsSidebarController', function() {
+describe('Service: SimToolsSidebarService', function() {
   let simToolsSidebarService;
 
   beforeEach(module('simToolsSidebarModule'));
@@ -27,20 +27,14 @@ describe('Controller: SimToolsSidebarController', function() {
 
   it(' - isOverflowingY()', function() {
     spyOn(document, 'getElementById').and.returnValue(undefined);
-    expect(
-      simToolsSidebarService.isOverflowingY('mockElementID')
-    ).not.toBeDefined();
+    expect(simToolsSidebarService.isOverflowingY('mockElementID')).toBe(false);
 
     let mockElement = {
-      style: {
-        overflow: 'visible'
-      },
       clientHeight: 10,
       scrollHeight: 20
     };
     document.getElementById.and.returnValue(mockElement);
 
     expect(simToolsSidebarService.isOverflowingY('mockElementID')).toBe(true);
-    expect(mockElement.style.overflow).toBe('visible');
   });
 });

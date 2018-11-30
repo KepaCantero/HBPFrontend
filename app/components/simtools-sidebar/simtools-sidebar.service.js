@@ -42,21 +42,7 @@
 
     isOverflowingY(elementID) {
       let element = document.getElementById(elementID);
-      if (!angular.isDefined(element)) {
-        return undefined;
-      }
-
-      let curOverflow = element.style.overflow;
-
-      if (!curOverflow || curOverflow === 'visible') {
-        element.style.overflow = 'hidden';
-      }
-
-      let isOverflowing = element.clientHeight < element.scrollHeight;
-
-      element.style.overflow = curOverflow;
-
-      return isOverflowing;
+      return element ? element.scrollHeight > element.clientHeight : false;
     }
   }
 
