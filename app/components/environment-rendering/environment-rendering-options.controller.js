@@ -21,35 +21,48 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  * ---LICENSE-END**/
+/* global console: false */
+/* global THREE: false */
 
 (function() {
   'use strict';
 
-  angular.module('goldenLayoutModule').directive('glToolSource', [
-    'goldenLayoutService',
-    'helpTooltipService',
-    'TOOL_CONFIGS',
-    (goldenLayoutService, helpTooltipService, TOOL_CONFIGS) => ({
-      restrict: 'A',
-      scope: {},
-      link: (scope, element, attr) => {
-        //register GL drag source
-        goldenLayoutService.createDragSource(
-          element[0],
-          TOOL_CONFIGS[attr.glToolSource]
-        );
+  class EnvironmentRenderingOptionsController {
+    constructor(userNavigationService, gz3d, NAVIGATION_MODES) {
+      this.userNavigationService = userNavigationService;
+      this.gz3d = gz3d;
+      this.NAVIGATION_MODES = NAVIGATION_MODES;
 
-        // open tool on click
-        element[0].addEventListener('mouseup', () => {
-          if (helpTooltipService.visible === helpTooltipService.HELP) return;
+      this.onButtonLightIntensity = direction => {
+        if (
+          (direction < 0 && this.gz3d.isGlobalLightMinReached()) ||
+          (direction > 0 && this.gz3d.isGlobalLightMaxReached())
+        ) {
+          return;
+        }
 
-          if (TOOL_CONFIGS[attr.glToolSource].componentState.singleton) {
-            goldenLayoutService.toggleTool(TOOL_CONFIGS[attr.glToolSource]);
-          } else if (attr.glToolSource !== 'ROBOT_CAMERA_RENDERING') {
-            goldenLayoutService.openTool(TOOL_CONFIGS[attr.glToolSource]);
-          }
-        });
-      }
-    })
-  ]);
+        this.gz3d.scene.emitter.emit('lightChanged', direction * 0.1);
+      };
+    }
+  }
+
+  EnvironmentRenderingOptionsController.$inject = [
+    'userNavigationService',
+    'gz3d',
+    'NAVIGATION_MODES'
+  ];
+
+  /**
+   * @ngdoc function
+   * @name environmentRenderingModule.controller:EnvironmentRenderingOptionsController
+   * @description
+   * # EnvironmentRenderingOptionsController
+   * Options Controller of the environmentRenderingModule
+   */
+  angular
+    .module('environmentRenderingModule')
+    .controller(
+      'EnvironmentRenderingOptionsController',
+      EnvironmentRenderingOptionsController
+    );
 })();

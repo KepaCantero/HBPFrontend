@@ -6,7 +6,7 @@ describe('Controller: SimToolsSidebarController', function() {
   let simToolsSidebarController;
 
   let $controller, $rootScope, $scope, $timeout;
-  let gz3d, simToolsSidebarService, userNavigationService;
+  let simToolsSidebarService, userNavigationService;
 
   // real modules
   beforeEach(() => {
@@ -36,7 +36,6 @@ describe('Controller: SimToolsSidebarController', function() {
       _$controller_,
       _$rootScope_,
       _$timeout_,
-      _gz3d_,
       _simToolsSidebarService_,
       _userNavigationService_
     ) {
@@ -44,7 +43,6 @@ describe('Controller: SimToolsSidebarController', function() {
       $rootScope = _$rootScope_;
       $timeout = _$timeout_;
 
-      gz3d = _gz3d_;
       simToolsSidebarService = _simToolsSidebarService_;
       userNavigationService = _userNavigationService_;
     })
@@ -77,29 +75,6 @@ describe('Controller: SimToolsSidebarController', function() {
         simToolsSidebarController.SIMTOOLS_SIDEBAR_ID.SIDEBAR
       ]
     ).toBe(true);
-  });
-
-  it(' - onButtonLightIntensity()', function() {
-    gz3d.isGlobalLightMinReached.and.returnValue(false);
-    gz3d.isGlobalLightMaxReached.and.returnValue(false);
-
-    // increase
-    simToolsSidebarController.onButtonLightIntensity(1);
-    expect(gz3d.scene.emitter.emit).toHaveBeenCalledWith('lightChanged', 0.1);
-    // decrease
-    simToolsSidebarController.onButtonLightIntensity(-1);
-    expect(gz3d.scene.emitter.emit).toHaveBeenCalledWith('lightChanged', -0.1);
-
-    gz3d.scene.emitter.emit.calls.reset();
-
-    // at max
-    gz3d.isGlobalLightMaxReached.and.returnValue(true);
-    simToolsSidebarController.onButtonLightIntensity(1);
-    expect(gz3d.scene.emitter.emit).not.toHaveBeenCalled();
-    // at min
-    gz3d.isGlobalLightMinReached.and.returnValue(true);
-    simToolsSidebarController.onButtonLightIntensity(-1);
-    expect(gz3d.scene.emitter.emit).not.toHaveBeenCalled();
   });
 
   it(' - onButtonExpandCategory()', function() {

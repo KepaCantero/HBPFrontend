@@ -57,7 +57,6 @@
     constructor(
       $rootScope,
       $timeout,
-      NAVIGATION_MODES,
       SIMTOOLS_SIDEBAR_ID,
       gz3d,
       gz3dViewsService,
@@ -69,7 +68,6 @@
       TIP_CODES,
       clientLoggerService
     ) {
-      this.NAVIGATION_MODES = NAVIGATION_MODES;
       this.SIMTOOLS_SIDEBAR_ID = SIMTOOLS_SIDEBAR_ID;
 
       this.gz3d = gz3d;
@@ -101,17 +99,6 @@
           );
         }, 100);
       });
-    }
-
-    onButtonLightIntensity(direction) {
-      if (
-        (direction < 0 && this.gz3d.isGlobalLightMinReached()) ||
-        (direction > 0 && this.gz3d.isGlobalLightMaxReached())
-      ) {
-        return;
-      }
-
-      this.gz3d.scene.emitter.emit('lightChanged', direction * 0.1);
     }
 
     onButtonCameraTranslate(event) {
@@ -158,7 +145,6 @@
     .controller('SimToolsSidebarController', [
       '$rootScope',
       '$timeout',
-      'NAVIGATION_MODES',
       'SIMTOOLS_SIDEBAR_ID',
       'gz3d',
       'gz3dViewsService',

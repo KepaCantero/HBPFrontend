@@ -25,31 +25,16 @@
 (function() {
   'use strict';
 
-  angular.module('goldenLayoutModule').directive('glToolSource', [
-    'goldenLayoutService',
-    'helpTooltipService',
-    'TOOL_CONFIGS',
-    (goldenLayoutService, helpTooltipService, TOOL_CONFIGS) => ({
-      restrict: 'A',
-      scope: {},
-      link: (scope, element, attr) => {
-        //register GL drag source
-        goldenLayoutService.createDragSource(
-          element[0],
-          TOOL_CONFIGS[attr.glToolSource]
-        );
-
-        // open tool on click
-        element[0].addEventListener('mouseup', () => {
-          if (helpTooltipService.visible === helpTooltipService.HELP) return;
-
-          if (TOOL_CONFIGS[attr.glToolSource].componentState.singleton) {
-            goldenLayoutService.toggleTool(TOOL_CONFIGS[attr.glToolSource]);
-          } else if (attr.glToolSource !== 'ROBOT_CAMERA_RENDERING') {
-            goldenLayoutService.openTool(TOOL_CONFIGS[attr.glToolSource]);
-          }
-        });
-      }
-    })
-  ]);
+  angular
+    .module('environmentRenderingModule')
+    .directive('environmentRenderingOptions', [
+      () => ({
+        templateUrl:
+          'components/environment-rendering/environment-rendering-options.template.html',
+        restrict: 'E',
+        scope: true,
+        controller: 'EnvironmentRenderingOptionsController',
+        controllerAs: 'vm'
+      })
+    ]);
 })();

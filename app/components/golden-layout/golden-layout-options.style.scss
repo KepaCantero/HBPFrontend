@@ -1,0 +1,69 @@
+.gl-config-icon {
+  opacity: 1 !important;
+}
+
+.gl-config-icon .fa-cog {
+  color: #4963ef;
+}
+
+.gl-config-icon .fa-cog:hover {
+  color: #0028ff;
+}
+
+.gl-config-icon .gl-config-options {
+  display: block;
+  position: absolute;
+  top: 19px;
+  /* background-color: #ddd; */
+  transform: translate3d(-8px, 0, 0);
+  border-radius: 4px;
+  z-index: 1;
+}
+
+[gl-option-button='false'] [gl-option-hover] {
+  display: none !important;
+}
+
+.gl-config-icon .gl-config-options-container {
+  background-color: #ddd;
+  margin: 2px 2px 2px 2px;
+}
+
+.gl-config-icon .gl-config-button {
+  min-width: 40px;
+  min-height: 40px;
+  margin: 2px;
+  font-size: 20px;
+  line-height: 30px;
+  font-weight: bold;
+  overflow: visible;
+  padding: 0;
+  -webkit-appearance: button;
+  line-height: 40px;
+}
+
+.gl-config-icon .gl-config-button img {
+  width: 22px;
+}
+
+.gl-config-icon .gl-config-button .gl-config-button-submenu {
+  display: flex;
+  flex-direction: row;
+  background: rgba(100, 100, 100, 0.7);
+  border-radius: 10px 3px 3px 10px;
+  right: 31px;
+  position: absolute;
+  z-index: 9;
+  top: 0px;
+  right: 42px;
+}
+
+.gl-config-icon .gl-config-button-submenu .submenu-button {
+  width: 30px;
+  height: 30px;
+  line-height: 0;
+  padding: 0;
+  font-size: 20px;
+  margin: 4px;
+  min-height: 24px;
+}

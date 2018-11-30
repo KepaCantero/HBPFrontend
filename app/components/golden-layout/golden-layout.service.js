@@ -28,22 +28,30 @@
   // Layout based on constraint or not. If not, uses column based layout
   const USE_SIZE_CONSTRAINED_LAYOUTER = true;
 
+  const compileFn = Symbol('compileFn');
+
   class GoldenLayoutService {
-    constructor($compile, $rootScope, TOOL_CONFIGS, layouter) {
+    constructor($compile, $rootScope, $timeout, TOOL_CONFIGS, layouter) {
       this.TOOL_CONFIGS = TOOL_CONFIGS;
       // layout logic implemented in layouter as a strategy
       this.layouter = layouter;
 
-      this.angularModuleComponent = function(container, state) {
-        let element = container.getElement();
-        element.html(state.angularDirective);
+      this.$compile = $compile;
+      this.$rootScope = $rootScope;
+      this.$timeout = $timeout;
 
-        let scope = $rootScope.$new();
-        container.on('destroy', () => {
-          scope.$destroy();
-        });
-        $compile(element[0])(scope);
-      };
+      this.angularModuleComponent = (service =>
+        function(container, state) {
+          let element = container.getElement();
+          element.html(state.angularDirective);
+          service[compileFn](container, element[0]);
+        })(this);
+    }
+
+    [compileFn](container, element) {
+      let scope = this.$rootScope.$new();
+      container.on('destroy', () => scope.$destroy());
+      this.$compile(element)(scope);
     }
 
     isLayoutInitialised() {
@@ -76,6 +84,23 @@
         initConfig,
         '#golden-layout-container'
       );
+
+      this.layout.on('stackCreated', stack => {
+        const OPTIONS_DIRECTIVE = 'golden-layout-options';
+
+        this.$timeout(() => {
+          if (!stack.contentItems.length) return;
+
+          const { customOptionsDirective } = stack.contentItems[0].config;
+          if (!customOptionsDirective) return;
+
+          const controlsContainer = stack.header.controlsContainer;
+          const template = `<${OPTIONS_DIRECTIVE}>${customOptionsDirective}</${OPTIONS_DIRECTIVE}>`;
+          controlsContainer.prepend(template);
+
+          this[compileFn](stack, controlsContainer[0].children[0]);
+        });
+      });
 
       this.layout.registerComponent(
         'angularModuleComponent',
@@ -134,6 +159,7 @@
   GoldenLayoutService.$inject = [
     '$compile',
     '$rootScope',
+    '$timeout',
     'TOOL_CONFIGS',
     USE_SIZE_CONSTRAINED_LAYOUTER
       ? 'constraintBasedLayouter'

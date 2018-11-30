@@ -5,7 +5,7 @@ describe('Service: GoldenLayoutService', function() {
 
   let goldenLayoutService;
 
-  let mock$compile, mockCompiledElement, mockLayout;
+  let mockCompiledElement, mockLayout;
 
   beforeEach(function() {
     module('goldenLayoutModule');
@@ -17,11 +17,9 @@ describe('Service: GoldenLayoutService', function() {
       .and.callFake(scope => {
         return scope;
       });
-    mock$compile = jasmine.createSpy('mock$compile').and.callFake(function() {
-      return mockCompiledElement;
-    });
 
     mockLayout = {
+      on: jasmine.createSpy(),
       registerComponent: jasmine.createSpy('registerComponent'),
       init: jasmine.createSpy('init'),
       updateSize: jasmine.createSpy('updateSize'),
@@ -38,16 +36,10 @@ describe('Service: GoldenLayoutService', function() {
         ]
       }
     };
-
-    module(function($provide) {
-      // Just use callFake to have $compile return a function
-      $provide.value('$compile', mock$compile);
-    });
   });
 
   beforeEach(
     inject(function(
-      _$compile_,
       _$rootScope_,
       _$timeout_,
       _TOOL_CONFIGS_,
@@ -80,6 +72,11 @@ describe('Service: GoldenLayoutService', function() {
       angularDirective: 'mock-angular-directive'
     };
 
+    let mock$compile = jasmine
+      .createSpy('mock$compile')
+      .and.callFake(() => mockCompiledElement);
+
+    goldenLayoutService.$compile = mock$compile;
     goldenLayoutService.angularModuleComponent(mockContainer, mockState);
 
     expect(mockElement.html).toHaveBeenCalledWith(mockState.angularDirective);
@@ -210,6 +207,17 @@ describe('Service: GoldenLayoutService', function() {
     });
   });
 
+  it('hooks stackCreated', () => {
+    spyOn(window, 'GoldenLayout').and.returnValue(mockLayout);
+
+    goldenLayoutService.createLayout();
+
+    expect(mockLayout.on).toHaveBeenCalledWith(
+      'stackCreated',
+      jasmine.any(Function)
+    );
+  });
+
   it(' - addTool', function() {
     goldenLayoutService.layouter = {
       addComponent: jasmine.createSpy('addComponent')
@@ -223,5 +231,53 @@ describe('Service: GoldenLayoutService', function() {
       goldenLayoutService.layout,
       config
     );
+  });
+
+  const stackHookForComponent = component => {
+    inject(($rootScope, $timeout) => {
+      spyOn(window, 'GoldenLayout').and.returnValue(mockLayout);
+
+      goldenLayoutService.createLayout();
+      const stackCreatedFn = mockLayout.on.calls.mostRecent().args[1];
+
+      stackCreatedFn(component);
+
+      $timeout.flush();
+      $rootScope.$digest();
+    });
+  };
+
+  it('GL component with custom options generates GL toolbar extension', () => {
+    const stackMock = {
+      header: {
+        controlsContainer: $('<div/>')
+      },
+      on: jasmine.createSpy(),
+      contentItems: [
+        {
+          config: { customOptionsDirective: 'MOCK_DIRECTIVE' }
+        }
+      ]
+    };
+    stackHookForComponent(stackMock);
+
+    expect(stackMock.header.controlsContainer.children().length).toBe(1);
+  });
+
+  it('GL component with NO custom options generates NO GL toolbar extension', () => {
+    const stackMock = {
+      header: {
+        controlsContainer: $('<div/>')
+      },
+      on: jasmine.createSpy(),
+      contentItems: [
+        {
+          config: {}
+        }
+      ]
+    };
+    stackHookForComponent(stackMock);
+
+    expect(stackMock.header.controlsContainer.children().length).toBe(0);
   });
 });

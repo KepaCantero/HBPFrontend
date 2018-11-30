@@ -37,6 +37,7 @@
         singleton: true
       },
       isClosable: false,
+      customOptionsDirective: '<environment-rendering-options/>',
       pwidth: 800, // prefered width in px
       pheight: 600 // prefered height in px
     },

@@ -30,7 +30,8 @@
     .module('userNavigationModule', [
       'nrpUser',
       'gz3dModule',
-      'userInteractionModule'
+      'userInteractionModule',
+      'exdFrontendApp.Constants'
     ])
     .constant('NAVIGATION_MODES', {
       FREE_CAMERA: 'FreeCamera',

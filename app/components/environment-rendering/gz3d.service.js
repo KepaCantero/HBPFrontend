@@ -30,8 +30,6 @@
 (function() {
   'use strict';
 
-  //var gz3dModule = angular.module('gz3dModule', ['simulationInfoService']);
-
   angular.module('gz3dModule').factory('gz3d', [
     '$http',
     'simulationInfo',

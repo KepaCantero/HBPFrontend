@@ -1,0 +1,94 @@
+<md-button
+  gl-tool-source="PULL_FORCE"
+  class="md-raised gl-config-button md-button"
+  aria-label="Apply Force"
+  gl-option-button
+>
+  <md-tooltip md-direction="top">Apply Force</md-tooltip>
+  <img src="img/esv/force_mode_icon.png" />
+</md-button>
+
+<div
+  class="md-raised gl-config-button md-button"
+  aria-label="Global Lighting"
+  gl-option-button
+>
+  <md-tooltip md-direction="top">Global Lighting</md-tooltip>
+  <i class="fa fa-lightbulb"></i>
+
+  <div class="gl-config-button-submenu" gl-option-hover>
+    <md-button
+      owner-only
+      aria-label="Increase Global Lighting"
+      class="md-fab md-raised md-mini submenu-button"
+      ng-click="vm.onButtonLightIntensity(1)"
+    >
+      <i
+        class="fa fa-arrow-up"
+        ng-class="{'tool-disabled': vm.gz3d.isGlobalLightMaxReached()}"
+      ></i>
+    </md-button>
+    <md-button
+      owner-only
+      aria-label="Decrease Global Lighting"
+      class="md-fab md-raised md-mini submenu-button"
+      ng-click="vm.onButtonLightIntensity(-1)"
+    >
+      <i
+        class="fa fa-arrow-down"
+        ng-class="{'tool-disabled': vm.gz3d.isGlobalLightMinReached()}"
+      ></i>
+    </md-button>
+  </div>
+</div>
+
+<div
+  class="md-raised gl-config-button md-button"
+  aria-label="Scene Navigation"
+  gl-option-button
+>
+  <md-tooltip md-direction="top">Scene Navigation</md-tooltip>
+
+  <i
+    class="fa fa-video"
+    ng-if="vm.userNavigationService.navigationMode === vm.NAVIGATION_MODES.FREE_CAMERA"
+  ></i>
+  <img
+    src="img/esv/lookatrobot_icon.png"
+    ng-if="vm.userNavigationService.navigationMode === vm.NAVIGATION_MODES.LOOKAT"
+  />
+  <i
+    class="fa fa-male"
+    ng-if="vm.userNavigationService.navigationMode === vm.NAVIGATION_MODES.HUMAN_BODY"
+  ></i>
+
+  <div class="gl-config-button-submenu" gl-option-hover>
+    <md-button
+      aria-label="Free Camera"
+      class="md-fab md-mini md-raised md-mini submenu-button"
+      ng-click="vm.userNavigationService.setModeFreeCamera()"
+    >
+      <md-tooltip md-direction="top"
+        >Free Camera (Move: W/A/S/D/R/F, Rotate: hold left mouse button, arrow
+        keys)
+      </md-tooltip>
+      <i class="fa fa-video"></i>
+    </md-button>
+    <md-button
+      aria-label="Robot Camera"
+      class="md-fab md-raised md-mini submenu-button"
+      ng-click="vm.userNavigationService.lookAtRobot()"
+    >
+      <md-tooltip md-direction="top">Robot Camera</md-tooltip>
+      <img src="img/esv/lookatrobot_icon.png" />
+    </md-button>
+    <md-button
+      aria-label="Avatar"
+      class="md-fab md-raised md-mini submenu-button"
+      ng-click="vm.userNavigationService.setModeHumanBody()"
+    >
+      <md-tooltip md-direction="top">Avatar</md-tooltip>
+      <i class="fa fa-male"></i>
+    </md-button>
+  </div>
+</div>

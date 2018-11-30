@@ -61,34 +61,6 @@
         <span>ROS</span>
       </md-button>
 
-      <md-button gl-tool-source="PULL_FORCE"
-                 class="md-raised tool-button tool-editor" aria-label="Apply Force"
-                 help-tooltip="FORCE_APPLY"
-                 ng-class="{'tool-help-highlight': vm.helpTooltipService.helpCode === 'FORCE_APPLY'}">
-        <md-tooltip md-direction="right">Apply Force</md-tooltip>
-        <img src="img/esv/force_mode_icon.png">
-      </md-button>
-
-      <div class="simtools-sidebar-submenu">
-        <md-button class="md-raised tool-button tool-editor simtools-sidebar-submenu-trigger"
-                   aria-label="Global Lighting" help-tooltip="MANIPULATE_LIGHT"
-                   ng-click="vm.isSubmenuLightingOpen = !vm.isSubmenuLightingOpen"
-                   ng-class="{'tool-help-highlight': vm.helpTooltipService.helpCode === 'MANIPULATE_LIGHT'}">
-          <md-tooltip md-direction="right" ng-show="!vm.isSubmenuLightingOpen">Global Lighting</md-tooltip>
-          <i class="fa fa-lightbulb"></i>
-        </md-button>
-
-        <div ng-show="vm.isSubmenuLightingOpen" class="simtools-sidebar-submenu-items">
-          <md-button owner-only aria-label="Increase Global Lighting" class="md-fab md-raised md-mini subtool-button"
-                     ng-click="vm.onButtonLightIntensity(1)">
-            <i class="fa fa-arrow-up" ng-class="{'tool-disabled': vm.gz3d.isGlobalLightMaxReached()}"></i>
-          </md-button>
-          <md-button owner-only aria-label="Decrease Global Lighting" class="md-fab md-raised md-mini subtool-button"
-                     ng-click="vm.onButtonLightIntensity(-1)">
-            <i class="fa fa-arrow-down" ng-class="{'tool-disabled': vm.gz3d.isGlobalLightMinReached()}"></i>
-          </md-button>
-        </div>
-      </div>
     </div>
 
     <div class="tool-category-expand tool-editor" aria-label="Expand Editor Tools"
@@ -212,39 +184,7 @@
         <img src="img/esv/rotation_icon.png">
       </md-button>
 
-      <div class="simtools-sidebar-submenu">
-        <md-button class="md-raised tool-button tool-client-settings simtools-sidebar-submenu-trigger"
-                   aria-label="Scene Navigation" help-tooltip="USER_NAVIGATION"
-                   ng-click="vm.isSubmenuSceneNavigationOpen=!vm.isSubmenuSceneNavigationOpen"
-                   ng-class="{'tool-help-highlight': vm.helpTooltipService.helpCode === 'USER_NAVIGATION'}">
-          <md-tooltip md-direction="right" ng-show="!vm.isSubmenuSceneNavigationOpen">Scene Navigation</md-tooltip>
-          <!--<i class="fa fa-compass"></i>-->
-          <i class="fa fa-video"
-             ng-if="vm.userNavigationService.navigationMode === vm.NAVIGATION_MODES.FREE_CAMERA"></i>
-          <img src="img/esv/lookatrobot_icon.png"
-               ng-if="vm.userNavigationService.navigationMode === vm.NAVIGATION_MODES.LOOKAT">
-          <i class="fa fa-male" ng-if="vm.userNavigationService.navigationMode === vm.NAVIGATION_MODES.HUMAN_BODY"></i>
-        </md-button>
 
-        <div ng-show="vm.isSubmenuSceneNavigationOpen" class="simtools-sidebar-submenu-items">
-          <md-button aria-label="Free Camera" class="md-fab md-mini md-raised md-mini subtool-button"
-                     ng-click="vm.userNavigationService.setModeFreeCamera()">
-            <md-tooltip md-direction="top">Free Camera (Move: W/A/S/D/R/F, Rotate: hold left mouse button, arrow keys)
-            </md-tooltip>
-            <i class="fa fa-video"></i>
-          </md-button>
-          <md-button aria-label="Robot Camera" class="md-fab md-raised md-mini subtool-button"
-                     ng-click="vm.userNavigationService.lookAtRobot()">
-            <md-tooltip md-direction="top">Robot Camera</md-tooltip>
-            <img src="img/esv/lookatrobot_icon.png">
-          </md-button>
-          <md-button aria-label="Avatar" class="md-fab md-raised md-mini subtool-button"
-                     ng-click="vm.userNavigationService.setModeHumanBody()">
-            <md-tooltip md-direction="top">Avatar</md-tooltip>
-            <i class="fa fa-male"></i>
-          </md-button>
-        </div>
-      </div>
     </div>
 
     <div class="tool-category-expand tool-client-settings" aria-label="Expand Client Settings Tools"

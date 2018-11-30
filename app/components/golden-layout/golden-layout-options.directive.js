@@ -25,30 +25,41 @@
 (function() {
   'use strict';
 
-  angular.module('goldenLayoutModule').directive('glToolSource', [
-    'goldenLayoutService',
-    'helpTooltipService',
-    'TOOL_CONFIGS',
-    (goldenLayoutService, helpTooltipService, TOOL_CONFIGS) => ({
+  angular.module('goldenLayoutModule').directive('goldenLayoutOptions', [
+    () => ({
+      templateUrl:
+        'components/golden-layout/golden-layout-options.template.html',
+      restrict: 'E',
+      replace: true,
+      transclude: true,
+      scope: true
+    })
+  ]);
+
+  angular.module('goldenLayoutModule').directive('glOptionButton', [
+    () => ({
       restrict: 'A',
-      scope: {},
-      link: (scope, element, attr) => {
-        //register GL drag source
-        goldenLayoutService.createDragSource(
-          element[0],
-          TOOL_CONFIGS[attr.glToolSource]
-        );
+      link: (scope, element) => {
+        let visible = false;
 
-        // open tool on click
-        element[0].addEventListener('mouseup', () => {
-          if (helpTooltipService.visible === helpTooltipService.HELP) return;
+        const setVisileAttr = () => element.attr('gl-option-button', visible);
 
-          if (TOOL_CONFIGS[attr.glToolSource].componentState.singleton) {
-            goldenLayoutService.toggleTool(TOOL_CONFIGS[attr.glToolSource]);
-          } else if (attr.glToolSource !== 'ROBOT_CAMERA_RENDERING') {
-            goldenLayoutService.openTool(TOOL_CONFIGS[attr.glToolSource]);
-          }
+        setVisileAttr();
+
+        element.click(e => {
+          visible = !visible;
+          setVisileAttr();
+          e.stopPropagation();
         });
+      }
+    })
+  ]);
+
+  angular.module('goldenLayoutModule').directive('glOptionHover', [
+    () => ({
+      restrict: 'A',
+      link: (scope, element) => {
+        element.click(e => e.stopPropagation());
       }
     })
   ]);
