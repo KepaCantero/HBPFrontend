@@ -62,7 +62,6 @@
             data => {
               this.ownerID = data.owner;
               this.experimentConfiguration = data.experimentConfiguration;
-              this.environmentConfiguration = data.environmentConfiguration;
               this.creationDate = data.creationDate;
 
               this.experimentDescription =

@@ -381,20 +381,15 @@
           return experimentProxyService
             .getServerConfig(server)
             .then(function(serverConfig) {
-              function launch(environmentConfiguration) {
-                return launchExperimentOnServer(
-                  experiment.id,
-                  experiment.private,
-                  experiment.configuration.experimentConfiguration,
-                  environmentConfiguration,
-                  brainProcesses,
-                  server,
-                  serverConfig,
-                  reservation
-                ).catch(oneSimulationFailed);
-              }
-
-              return launch();
+              return launchExperimentOnServer(
+                experiment.id,
+                experiment.private,
+                experiment.configuration.experimentConfiguration,
+                brainProcesses,
+                server,
+                serverConfig,
+                reservation
+              ).catch(oneSimulationFailed);
             });
         }
 
@@ -415,7 +410,6 @@
         experimentID,
         privateExperiment,
         experimentConfiguration,
-        environmentConfiguration,
         brainProcesses,
         server,
         serverConfiguration,
@@ -441,10 +435,6 @@
           creationUniqueID: (Date.now() + Math.random()).toString(),
           ctxId: $stateParams.ctx
         };
-
-        if (environmentConfiguration) {
-          simInitData.environmentConfiguration = environmentConfiguration.path;
-        }
 
         // Create a new simulation.
         simulationGenerator(serverURL).create(simInitData);

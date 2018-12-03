@@ -72,7 +72,7 @@
     }
   }
 
-  //"brainProcesses":1,"environmentConfiguration":null,"owner":"default-owner","reservation":null,"creationDate":"2018-02-05T14:38:06.397089+01:00","creationUniqueID":"1517837886389.447","gzserverHost":"local","experimentConfiguration":"benchmark_p3dx/BenchmarkPioneer.exc","playbackPath":null,"experimentID":"BenchmarkPioneer","state":"paused","simulationID":0}
+  //"brainProcesses":1,"owner":"default-owner","reservation":null,"creationDate":"2018-02-05T14:38:06.397089+01:00","creationUniqueID":"1517837886389.447","gzserverHost":"local","experimentConfiguration":"benchmark_p3dx/BenchmarkPioneer.exc","playbackPath":null,"experimentID":"BenchmarkPioneer","state":"paused","simulationID":0}
 
   AdminService.$inject = ['$resource', 'bbpConfig'];
 

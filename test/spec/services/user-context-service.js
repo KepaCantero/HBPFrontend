@@ -56,7 +56,6 @@ describe('Services: userContextService', function() {
             rescallback({
               owner: 'Some owner id',
               experimentConfiguration: 'expconf',
-              environmentConfiguration: 'envconf',
               creationDate: '19.02.1970'
             });
           }

@@ -9,7 +9,6 @@ describe('Services: experimentService', function() {
   var simulationData = {
     owner: 'Some owner id',
     experimentConfiguration: 'expconf',
-    environmentConfiguration: 'envconf',
     creationDate: '19.02.1970'
   };
 
