@@ -171,7 +171,7 @@ describe('Directive: brainvisualizer', function() {
             setColorMap: function(p) {
               _$rootScope_.colorMap = p;
             },
-            displaySpikes: jasmine.createSpy('displaySpikes'),
+            displaySpikes: jasmine.createSpy('population', 'displaySpikes'),
             updatePopulationVisibility: angular.noop,
             terminate: jasmine.createSpy('terminate'),
             userData: {
@@ -377,7 +377,7 @@ describe('Directive: brainvisualizer', function() {
               _$rootScope_.shape = p;
             },
             setColorMap: jasmine.createSpy('setColorMap'),
-            displaySpikes: jasmine.createSpy('displaySpikes'),
+            displaySpikes: jasmine.createSpy('population', 'displaySpikes'),
             updatePopulationVisibility: angular.noop,
             terminate: jasmine.createSpy('terminate'),
             userData: {

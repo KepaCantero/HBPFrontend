@@ -75,7 +75,7 @@ BRAIN3D.MainView.prototype.init = function ()
     this.paused = false;
     this.totalParticles = 0;
     this.particles = [];
-    this.indexToParticles = {};
+    this.populationIndexToParticles = {};
     this.waitingSpikes = [];
     this.spikeScaleFactor = 0.0;
     this.spikeFactorChanged = false;
@@ -339,17 +339,18 @@ BRAIN3D.MainView.prototype.newParticle = function (index, pop, posx, posy, posz,
         psuper.nextlevel = newp;
     }
 
-    if (index in this.indexToParticles)
-    {
-        this.indexToParticles[index].push(newp);
+    if (this.populationIndexToParticles[pop.name] == undefined) {
+      this.populationIndexToParticles[pop.name] = {};
+      this.populationIndexToParticles[pop.name][index] = [newp];
+    } else {
+      if (this.populationIndexToParticles[pop.name][index] == undefined) {
+        this.populationIndexToParticles[pop.name][index] = [newp];
+      } else {
+        this.populationIndexToParticles[pop.name][index].push(newp);
+      }
     }
-    else
-    {
-        this.indexToParticles[index] = [newp];
-    }
-
     return newp;
-};
+  };
 
 BRAIN3D.MainView.prototype.create3DMaterial = function ()
 {
@@ -384,7 +385,6 @@ BRAIN3D.MainView.prototype.init3DBrain = function ()     // Init brain 3D object
     // Particles
 
     this.particles = [];
-    this.indexToParticles = {};
     this.totalParticles = 0;
 
     if (this.object)
@@ -395,9 +395,9 @@ BRAIN3D.MainView.prototype.init3DBrain = function ()     // Init brain 3D object
     }
 
     var visibleNeurons = {};
-    var visibleNeuronsLastLevel = {};
+    var popVisibleNeuronsLastLevel = {};
 
-    this.addParticleForNeuron = function (i)
+    this.addParticleForNeuron = function (populationName, i)
     {
         var nsize = 1.0;
 
@@ -415,11 +415,25 @@ BRAIN3D.MainView.prototype.init3DBrain = function ()     // Init brain 3D object
             nsize = 1.0 - ((visibleNeurons[i] - 1.0) * BRAIN3D.OVERLAPPING_NEURONS_RESIZE_FACTOR);
         }
 
-        var previousLevel = (visibleNeuronsLastLevel.hasOwnProperty(i)) ? visibleNeuronsLastLevel[i] : null;
+        var previousLevel = null
+        if ((popVisibleNeuronsLastLevel[populationName] != undefined) && (popVisibleNeuronsLastLevel[populationName][i] != undefined)) {
+          previousLevel = popVisibleNeuronsLastLevel[populationName][i];
+        }
 
-        visibleNeuronsLastLevel[i] = this.newParticle(i, popValues, 0, 0, 0, nsize, previousLevel);
+        if (popVisibleNeuronsLastLevel[populationName] == undefined) {
+          popVisibleNeuronsLastLevel[populationName] = {};
+        }
+        popVisibleNeuronsLastLevel[populationName][i] = this.newParticle(
+          i,
+          popValues,
+          0,
+          0,
+          0,
+          nsize,
+          previousLevel
+        );
         this.totalParticles++;
-    };
+      };
 
     for (var popname in this.populations)
     {
@@ -433,7 +447,7 @@ BRAIN3D.MainView.prototype.init3DBrain = function ()     // Init brain 3D object
 
             for (var j in nlist)
             {
-                this.addParticleForNeuron(nlist[j]);
+                this.addParticleForNeuron(popname, nlist[j]);
             }
         }
         else
@@ -447,7 +461,7 @@ BRAIN3D.MainView.prototype.init3DBrain = function ()     // Init brain 3D object
 
             for (var i = start; i < end; i += step)
             {
-                this.addParticleForNeuron(i);
+                this.addParticleForNeuron(popname, i);
             }
         }
     }
@@ -713,9 +727,9 @@ BRAIN3D.MainView.prototype.periodicalUpdate = function ()
 //------------------------------
 // Spikes
 
-BRAIN3D.MainView.prototype.applySpikeEffect = function (neuron)
+BRAIN3D.MainView.prototype.applySpikeEffect = function (populationName, neuron)
 {
-    var particles = this.indexToParticles[neuron];
+    var particles = this.populationIndexToParticles[populationName][neuron];
     for (var i = 0; i < particles.length; i++)
     {
         var p = particles[i];
@@ -744,16 +758,20 @@ BRAIN3D.MainView.prototype.processWaitingSpikes = function (elapsed)
         spike.time -= elapsed;
         if (spike.time <= 0)
         {
-            this.applySpikeEffect(spike.neuron);
+            this.applySpikeEffect(spike.population, spike.neuron);
             this.waitingSpikes.splice(i, 1);
             i--;
         }
     }
 };
 
-BRAIN3D.MainView.prototype.displaySpikes = function (spikes)
+BRAIN3D.MainView.prototype.displaySpikes = function (populationName, spikes)
 {
     // Spike format: [{"neuron":INDEX,"time":TIME},{"neuron":INDEX,"time":TIME}, ...]
+
+    if (this.populations[populationName] == undefined) {
+      return;
+    }
 
     var baseTime;
 
@@ -764,7 +782,7 @@ BRAIN3D.MainView.prototype.displaySpikes = function (spikes)
         if (i === 0)
         {
             baseTime = spike.time;
-            this.applySpikeEffect(spike.neuron);
+            this.applySpikeEffect(populationName, spike.neuron);
         }
         else
         {
@@ -772,11 +790,15 @@ BRAIN3D.MainView.prototype.displaySpikes = function (spikes)
 
             if (timeDiff < 1.0 / 30.0)
             {
-                this.applySpikeEffect(spike.neuron);
+                this.applySpikeEffect(populationName, spike.neuron);
             }
             else
             {
-                this.waitingSpikes.push({ "neuron": spike.neuron, "time": spike.time - baseTime });
+              this.waitingSpikes.push({
+                neuron: spike.neuron,
+                time: spike.time - baseTime,
+                population: populationName
+              });
             }
         }
     }

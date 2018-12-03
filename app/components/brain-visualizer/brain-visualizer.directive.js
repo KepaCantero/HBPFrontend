@@ -280,7 +280,7 @@
           };
 
           var onNewSpikesMessageReceived = function(message) {
-            brain3D.displaySpikes(message.spikes);
+            brain3D.displaySpikes(message.populationLabel, message.spikes);
           };
 
           scope.updateSpikeScaler = function() {
