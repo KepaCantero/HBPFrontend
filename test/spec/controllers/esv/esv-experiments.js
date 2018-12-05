@@ -7,7 +7,9 @@
   var hostName = 'myBackend';
 
   var matureExperiment = {
+    id: 'Mature experiment name',
     configuration: {
+      isShared: false,
       maturity: 'production',
       name: 'Mature experiment name',
       tags: ['tag1']
@@ -42,6 +44,7 @@
       matureExperiment: matureExperiment,
       developementExperiment: {
         configuration: {
+          isShared: false,
           maturity: 'devel',
           name: 'Developement experiment name',
           tags: ['tag1', 'tag2']
@@ -109,7 +112,8 @@
       clbErrorDialog,
       clbConfirm,
       $window,
-      selectedSharedExperiment;
+      selectedSharedExperiment,
+      nrpModalService;
 
     var serverErrorMock = {
       displayHTTPError: jasmine
@@ -162,8 +166,10 @@
         _$q_,
         _clbErrorDialog_,
         _clbConfirm_,
-        _selectedSharedExperiment_
+        _selectedSharedExperiment_,
+        _nrpModalService_
       ) {
+        nrpModalService = _nrpModalService_;
         selectedSharedExperiment = _selectedSharedExperiment_;
         $http = _$http_;
         $controller = _$controller_;
@@ -206,14 +212,18 @@
       $httpBackend.whenGET('package.json').respond(200, { version: '1.0' });
 
       $httpBackend
+        .whenGET(proxyUrl + '/storage/sharedvalue/')
+        .respond(200, { data: 'Private' });
+      $httpBackend
+        .whenGET(proxyUrl + '/storage/sharedusers')
+        .respond(200, ['userId']);
+      $httpBackend
         .whenGET(proxyUrl + '/identity/' + defaultPageOptions.me.id)
         .respond(200, pageOptions.userQuery);
-
       environmentService.setPrivateExperiment(pageOptions.collab);
       $httpBackend
         .whenPOST(bbpConfig.get('api.versionCheck.checkUpdate'))
         .respond(200, { version: '1.0' });
-
       $httpBackend
         .whenGET(new RegExp(proxyUrl + '/experiments'))
         .respond(200, pageOptions.experiments);
@@ -229,14 +239,15 @@
       $httpBackend
         .whenGET(proxyUrl + '/identity/me')
         .respond(200, pageOptions.me);
-      $httpBackend
-        .whenGET(proxyUrl + '/identity/me/groups')
-        .respond(200, pageOptions.groups);
       $httpBackend.whenGET(/api\/collab\/configuration/).respond(200);
       spyOn(storageServer, 'getExperimentConfig').and.returnValue(
         $q.when(expConfigMock)
       );
-
+      $httpBackend.whenGET(proxyUrl + '/identity/me/users').respond(200, []);
+      $httpBackend
+        .whenGET(new RegExp(proxyUrl + '/sharedExperiments'))
+        .respond(200, {});
+      $httpBackend.whenGET(proxyUrl + '/user/me/users').respond(200, {});
       let $ctrl = $controller('esvExperimentsCtrl', {
         $rootScope: $rootScope,
         $scope: $rootScope,
@@ -717,6 +728,79 @@
         collabContextUrl = 'http://proxy/storage/experiments';
         $stateParams.ctx = ctx;
       });
+      describe('shared experiment', function() {
+        beforeEach(function() {});
+
+        it('should launch shared window', function() {
+          var page = renderEsvWebPage();
+          spyOn(nrpModalService, 'createModal').and.callFake(function() {
+            return;
+          });
+          var scope = getExperimentListScope(page);
+          scope.launchSharedExperimentWindow('expId');
+          expect(nrpModalService.createModal).toHaveBeenCalled();
+        });
+
+        it('should update the shared option for the experiment', function() {
+          spyOn(storageServer, 'updateSharedExperimentMode').and.returnValue(
+            $q.when('ok')
+          );
+
+          var page = renderEsvWebPage();
+          var scope = getExperimentListScope(page);
+          scope.updateSharedExperimentMode('private');
+          expect(storageServer.updateSharedExperimentMode).toHaveBeenCalled();
+        });
+
+        it('should search user change', function() {
+          var page = renderEsvWebPage();
+          var scope = getExperimentListScope(page);
+          scope.allUsers = ['user0'];
+          var result = scope.searchUserChange('user0');
+          expect(result[0]).toBe('user0');
+        });
+
+        it('should get the correct Experiment shared option', function() {
+          var page = renderEsvWebPage();
+          var scope = getExperimentListScope(page);
+          scope.getSharedExperimentMode();
+          $httpBackend.flush();
+          expect(scope.model.experimentSharedMode.data).toBe('Private');
+        });
+
+        it('should update shared user list', function() {
+          spyOn(storageServer, 'addSharedUsers').and.returnValue($q.when('ok'));
+          var page = renderEsvWebPage();
+          var scope = getExperimentListScope(page);
+          scope.allUsers = ['user1'];
+          scope.selectedUserChange({ searchUser: 'user1' });
+          expect(storageServer.addSharedUsers).toHaveBeenCalled();
+          $httpBackend.flush();
+        });
+
+        it('should delete a user from the shared user list', function() {
+          spyOn(storageServer, 'deleteSharedUser').and.returnValue(
+            $q.when('ok')
+          );
+          var page = renderEsvWebPage();
+          var scope = getExperimentListScope(page);
+          spyOn(scope, 'getSharedUsers').and.returnValue($q.when('ok'));
+          scope.model.experimentSharedMode = 'Shared';
+          scope.deleteSharedUser('user1');
+          expect(storageServer.deleteSharedUser).toHaveBeenCalled();
+        });
+
+        it('should not delete in private and public option', function() {
+          spyOn(storageServer, 'deleteSharedUser').and.returnValue(
+            $q.when('ok')
+          );
+          var page = renderEsvWebPage();
+          var scope = getExperimentListScope(page);
+          scope.experimentSharedMode = 'Public';
+          scope.deleteSharedUser('user1');
+          expect(storageServer.deleteSharedUser).not.toHaveBeenCalled();
+        });
+      });
 
       describe('yet to clone', function() {
         beforeEach(function() {
@@ -820,8 +904,22 @@
           );
           spyOn(scope, 'changeExpName').and.returnValue($q.when());
           scope.cloneClonedExperiment('Exp_0');
+          scope.cloneClonedExperiment('Exp_0', 'no');
           expect(storageServer.cloneClonedExperiment).toHaveBeenCalled();
           expect(scope.isCloneRequested).toBe(true);
+        });
+
+        it('should clone a shared experiment load the private experiments', function() {
+          var page = renderEsvWebPage({ tab: 'MyExperiments' });
+          var scope = getExperimentListScope(page);
+          spyOn(storageServer, 'cloneClonedExperiment').and.returnValue(
+            $q.when({ clonedExp: 'fakeUUID', originalExp: 'fake_uuid' })
+          );
+          spyOn(scope, 'loadPrivateExperiments').and.returnValue($q.when([]));
+          spyOn(scope, 'changeExpName').and.returnValue($q.when());
+          scope.cloneClonedExperiment('Exp_0', 'yes');
+          $rootScope.$digest();
+          expect(scope.loadPrivateExperiments).toHaveBeenCalled();
         });
 
         it('should fail to clone a cloned experiment', function() {
@@ -830,7 +928,7 @@
           spyOn(storageServer, 'cloneClonedExperiment').and.returnValue(
             $q.reject({ data: 'Error' })
           );
-          scope.cloneClonedExperiment('Exp_0');
+          scope.cloneClonedExperiment('Exp_0', 'no');
           expect(storageServer.cloneClonedExperiment).toHaveBeenCalled();
           expect(scope.isCloneRequested).toBe(true);
         });
@@ -853,7 +951,7 @@
           $httpBackend
             .whenPOST('http://proxy/activity_log/clone_experiment')
             .respond({});
-          scope.clone('Exp_0');
+          scope.clone(matureExperiment);
           $httpBackend.flush();
         });
 
@@ -865,7 +963,7 @@
           $httpBackend
             .whenPOST('http://proxy/activity_log/clone_experiment')
             .respond({});
-          scope.clone('Exp_0');
+          scope.clone(matureExperiment);
           expect(scope.cloneExperiment).toHaveBeenCalled();
           $httpBackend.flush();
         });

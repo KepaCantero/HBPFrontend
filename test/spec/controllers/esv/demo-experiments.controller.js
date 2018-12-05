@@ -193,6 +193,9 @@
       $httpBackend
         .whenGET(slurmUrl + '/api/v1/partitions/interactive')
         .respond(200, pageOptions.slurm);
+      $httpBackend
+        .whenGET(new RegExp(proxyUrl + '/sharedExperiments'))
+        .respond(200, pageOptions.experiments);
       $httpBackend.whenGET(oidcUrl + '/user/me').respond(200, pageOptions.me);
       $httpBackend
         .whenGET(oidcUrl + '/user/me/groups')

@@ -14,15 +14,23 @@
       return this.$q
         .all([
           this.experimentProxyService.getAvailableServers(),
-          this.experimentProxyService.getExperiments()
+          this.experimentProxyService.getExperiments(),
+          this.experimentProxyService.getSharedExperiments()
         ])
-        .then(([availableServers, experiments]) =>
-          _.map(experiments, (exp, id) => {
+        .then(([availableServers, experiments, sharedExperiments]) => {
+          var experimentsArray = _.map(experiments, (exp, id) => {
             exp.id = id;
             exp.availableServers = availableServers;
             return exp;
-          })
-        );
+          });
+          Object.keys(sharedExperiments).forEach(id => {
+            let exp = sharedExperiments[id];
+            exp.id = id;
+            exp.availableServers = availableServers;
+            experimentsArray.push(exp);
+          });
+          return experimentsArray;
+        });
     }
 
     getExperimentImage(exp) {

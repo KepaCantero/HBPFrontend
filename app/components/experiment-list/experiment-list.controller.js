@@ -55,6 +55,9 @@
       'tipTooltipService',
       '$rootScope',
       'selectedSharedExperiment',
+      '$http',
+      'nrpModalService',
+      'bbpConfig',
       function(
         $scope,
         $location,
@@ -68,8 +71,19 @@
         clbConfirm,
         tipTooltipService,
         $rootScope,
-        selectedSharedExperiment
+        selectedSharedExperiment,
+        $http,
+        nrpModalService,
+        bbpConfig
       ) {
+        const ExperimentModeSharedOption = 'Shared';
+        $scope.allUsers = [];
+        $scope.sharedUsers = [];
+        $scope.search = { searchUser: '' };
+        $scope.throttle = 150;
+        var experimentSelected = '';
+        $scope.model = {};
+        $scope.model.experimentSharedMode = 'Private';
         $scope.pageState = {};
         $scope.isPrivateExperiment = environmentService.isPrivateExperiment();
         $scope.devMode = environmentService.isDevMode();
@@ -84,6 +98,18 @@
           !$scope.isPrivateExperiment;
 
         $scope.config.canCloneExperiments = $scope.isPrivateExperiment;
+        function excludeExperimentOwner(user) {
+          return user != $scope.currentUserName;
+        }
+
+        storageServer.getAllUsers().then(users =>
+          // a list of possible users to share the experiment
+          nrpUser.getCurrentUser().then(currentuser => {
+            $scope.currentUserName = currentuser.displayName;
+            //we exclude the owner of the experiment
+            $scope.allUsers = users.filter(excludeExperimentOwner);
+          })
+        );
 
         $scope.changeExpName = (newExpId, oldExpId) => {
           return storageServer
@@ -134,10 +160,14 @@
           });
 
           if (
-            $scope.config
-              .canLaunchExperiments /* means we are cloning a cloned experiment*/
+            $scope.config.canLaunchExperiments ||
+            experiment.configuration.isShared
+            /* means we are cloning a cloned experiment*/
           ) {
-            $scope.cloneClonedExperiment(experiment.id);
+            $scope.cloneClonedExperiment(
+              experiment.id,
+              experiment.configuration.isShared
+            );
           } else {
             $scope.cloneExperiment(experiment);
           }
@@ -162,14 +192,18 @@
             $scope.pageState.showJoin = false;
           }
         };
-        $scope.cloneClonedExperiment = function(experimentId) {
+
+        $scope.cloneClonedExperiment = function(experimentId, isShared) {
           $scope.isCloneRequested = true;
           storageServer
             .cloneClonedExperiment(experimentId)
             .then(newExp =>
               $scope.changeExpName(newExp.clonedExp, newExp.originalExp)
             )
-            .then(() => $scope.reinit())
+            .then(
+              () =>
+                isShared ? $scope.loadPrivateExperiments() : $scope.reinit()
+            )
             .catch(err => $scope.throwCloningError(err))
             .finally(() => ($scope.isCloneRequested = false));
         };
@@ -355,6 +389,95 @@
           // Stop an already initialized or running experiment
           $scope.stopSimulation = function(simulation, experiment) {
             experimentsService.stopExperiment(simulation, experiment);
+          };
+
+          $scope.launchSharedExperimentWindow = function(expId) {
+            experimentSelected = expId;
+            nrpModalService.createModal({
+              templateUrl:
+                'components/experiment-sharing/experiment-sharing.template.html',
+              closable: true,
+              scope: $scope,
+              size: 'lg',
+              windowClass: 'modal-window'
+            });
+          };
+
+          $scope.updateSharedExperimentMode = function() {
+            storageServer
+              .updateSharedExperimentMode(
+                experimentSelected,
+                $scope.model.experimentSharedMode
+              )
+              .catch(err =>
+                console.error(
+                  `Failed the updating of the shared-mode in the experiment :\n${err}`
+                )
+              );
+          };
+
+          $scope.selectedUserChange = function(search) {
+            if ($scope.allUsers.includes(search.searchUser)) {
+              storageServer
+                .addSharedUsers(experimentSelected, search.searchUser)
+                .then(() => {
+                  search.searchUser = '';
+                  return $scope.getSharedUsers();
+                })
+                .catch(err =>
+                  console.error(
+                    `Failed to add a shared user into the experiment :\n${err}`
+                  )
+                );
+            }
+          };
+
+          $scope.searchUserChange = function(user) {
+            return $scope.allUsers.filter(person =>
+              String(person).startsWith(user)
+            );
+          };
+
+          $scope.getSharedExperimentMode = function() {
+            var url =
+              bbpConfig.get('api.proxy.url') +
+              '/storage/sharedvalue/' +
+              experimentSelected;
+            return $http
+              .get(url)
+              .then(
+                response => ($scope.model.experimentSharedMode = response.data)
+              )
+              .catch(err =>
+                console.error(
+                  `Failed getting the shared-mode of the experiment:\n${err}`
+                )
+              );
+          };
+
+          $scope.getSharedUsers = function() {
+            storageServer
+              .getSharedUsers(experimentSelected)
+              .then(users => {
+                $scope.sharedUsers = [];
+                users.forEach(user => $scope.sharedUsers.push({ name: user }));
+              })
+              .catch(err =>
+                console.error(
+                  `Failed getting the shared users of the experiment:\n${err}`
+                )
+              );
+          };
+
+          $scope.deleteSharedUser = function(user) {
+            if ($scope.model.experimentSharedMode != ExperimentModeSharedOption)
+              return;
+            storageServer
+              .deleteSharedUser(experimentSelected, user)
+              .then(() => $scope.getSharedUsers())
+              .catch(err =>
+                console.error(`Failed deleting a shared user:\n${err}`)
+              );
           };
 
           $scope.joinExperiment = function(simul, exp) {

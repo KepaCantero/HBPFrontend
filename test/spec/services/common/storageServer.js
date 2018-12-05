@@ -50,6 +50,23 @@
       $httpBackend.flush();
       $rootScope.$digest();
     });
+
+    it('should retrieve all customs models', function(done) {
+      var customModels = {
+        uuid: 'fileName',
+        fileName: 'fileName',
+        userId: 'token'
+      };
+      $httpBackend
+        .expectGET(/custommodels/)
+        .respond(200, angular.copy(customModels, []));
+      storageServer.getAllCustomModels().then(function(res) {
+        expect(res[0]).toBe(customModels[0]);
+        done();
+      });
+      $httpBackend.flush();
+      $rootScope.$digest();
+    });
     it('should retrieve customs models', function(done) {
       var customModels = {
         uuid: 'fileName',
@@ -88,6 +105,38 @@
         storageServer.storageServerTokenManager.STORAGE_KEY,
         '[{"access_token":"test"}]'
       );
+    });
+
+    it('should update SharedExperiments Option', function() {
+      $httpBackend
+        .expectPOST('http://proxy/storage/sharedmode')
+        .respond(200, []);
+      storageServer.updateSharedExperimentMode();
+      $httpBackend.flush();
+    });
+
+    it('should delete a user the Shared User list', function() {
+      $httpBackend
+        .expectPOST('http://proxy/storage/sharedusers')
+        .respond(200, []);
+      storageServer.addSharedUsers();
+      $httpBackend.flush();
+    });
+
+    it('should add a user into the Shared User list ', function() {
+      $httpBackend
+        .expectDELETE('http://proxy/storage/sharedusers')
+        .respond(200, []);
+      storageServer.deleteSharedUser();
+      $httpBackend.flush();
+    });
+
+    it('should get the share option of the experiment ', function() {
+      $httpBackend
+        .expectGET('http://proxy/storage/sharedvalue')
+        .respond(200, {});
+      storageServer.getSharedExperimentMode();
+      $httpBackend.flush();
     });
   });
 })();

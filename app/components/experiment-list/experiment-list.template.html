@@ -31,7 +31,10 @@
         ng-mouseenter="isHovered = true" ng-mouseleave="isHovered = false" ng-mouseup="isHovered = false" ng-click="selectExperiment(exp);"
         editable-experiment experiment-details="exp">
         <div class="list-entry-container left-right" ng-class="{selected: (exp.id == pageState.selected),hover:isHovered && (exp.id != pageState.selected)}">
-            <div class="list-entry-left" ng-class="{selected: exp.id == pageState.selected}">
+            <div class="list-entry-left" style="position:relative" ng-class="{selected: exp.id == pageState.selected}">
+                <div ng-if="exp.configuration.isShared" style="position:absolute">
+                    <div class="shared-tag"> shared </div>
+                </div>
                 <img class="entity-thumbnail" ng-src="{{exp.imageUrl || ''}}" />
             </div>
             <div class="list-entry-middle list-entry-container up-down">
@@ -170,7 +173,11 @@
 
                             <i class="fa fa-list-alt"></i> Files
                         </button>
-
+                        <!-- Shared button -->
+                        <button ng-if="config.canLaunchExperiments" analytics-on analytics-event="Explorer" class="btn btn-default" analytics-label="Collab"
+                            analytics-value="exp.id" class="btn btn-default" ng-click="launchSharedExperimentWindow(exp.id)">
+                            <i class="fas fa-share-alt"></i> Share
+                        </button>
                     </div>
                 </div>
                 <div uib-collapse="pageState.startingExperiment != exp.id">

@@ -1,0 +1,66 @@
+/**---LICENSE-BEGIN - DO NOT CHANGE OR MOVE THIS HEADER
+ * This file is part of the Neurorobotics Platform software
+ * Copyright (C) 2014,2015,2016,2017 Human Brain Project
+ * https://www.humanbrainproject.eu
+ *
+ * The Human Brain Project is a European Commission funded project
+ * in the frame of the Horizon2020 FET Flagship plan.
+ * http://ec.europa.eu/programmes/horizon2020/en/h2020-section/fet-flagships
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * ---LICENSE-END**/
+
+.md-autocomplete-suggestions-container {
+  z-index: 105000 !important;
+  /* any number of choice > 1050*/
+}
+
+.modal-content {
+  min-width: 450px;
+  min-height: 250px;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding-left: 5px;
+}
+
+.share-window-hide {
+  float: right;
+  margin-top: 20px;
+  font-size: 11px;
+  cursor: pointer;
+  color: #fbffdb;
+  background-color: #796c54;
+  border-radius: 5px;
+  height: 16px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin-right: 5px;
+}
+.notshared .table {
+  color: #aaa;
+}
+.search-users-input {
+  width: 420px;
+}
+
+.delete-shared-icon {
+  height: 5px;
+  width: 5px;
+}
+.shared-users-row {
+  width: 420px;
+}

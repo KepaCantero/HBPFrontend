@@ -17,6 +17,7 @@
     "angular-ui-codemirror": "0.3.0",
     "angular-ui-router": "0.4.2",
     "angular.panels": "*",
+    "angular-smart-table": "2.1.11",
     "bootstrap-sass-official": "3.3.7",
     "es5-shim": "4.5.9",
     "font-awesome": "5.2.0",

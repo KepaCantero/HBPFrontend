@@ -43,9 +43,15 @@
           getExperiments: getExperiments,
           getImage: getImage,
           getServerConfig: _.memoize(getServerConfig),
-          getAvailableServers: getAvailableServers
+          getAvailableServers: getAvailableServers,
+          getSharedExperiments: getSharedExperiments
         };
-
+        function getSharedExperiments() {
+          var url = getProxyUrl() + '/sharedExperiments';
+          return $http.get(url).then(function(response) {
+            return response.data;
+          });
+        }
         function getServerConfig(serverId) {
           return $http
             .get(getProxyUrl() + '/server/' + serverId)

@@ -195,6 +195,37 @@
           getExperimentConfig: buildAction({
             method: 'GET',
             url: `${this.EXPERIMENT_BASE_URL}/:experimentId/config`
+          }),
+          getAllUsers: buildAction({
+            method: 'GET',
+            isArray: true,
+            url: `${this.IDENTITY_BASE_URL}/me/users`
+          }),
+          updateSharedExperimentMode: buildAction({
+            method: 'POST',
+            isArray: true,
+            url: `${this
+              .STORAGE_BASE_URL}/sharedmode/:experimentId/:sharedValue`
+          }),
+          addSharedUsers: buildAction({
+            method: 'POST',
+            isArray: true,
+            url: `${this.STORAGE_BASE_URL}/sharedusers/:experimentId/:userId`
+          }),
+          deleteSharedUser: buildAction({
+            method: 'DELETE',
+            isArray: true,
+            url: `${this.STORAGE_BASE_URL}/sharedusers/:experimentId/:userId`
+          }),
+          getSharedExperimentMode: buildAction({
+            method: 'GET',
+            isArray: false,
+            url: `${this.STORAGE_BASE_URL}/sharedvalue/:experimentId`
+          }),
+          getSharedUsers: buildAction({
+            method: 'GET',
+            isArray: true,
+            url: `${this.STORAGE_BASE_URL}/sharedusers/:experimentId`
           })
         }
       );
@@ -209,6 +240,37 @@
     setCustomModel(modelName, modelType, fileContent) {
       return this.proxyRsc.setCustomModel({ modelName, modelType }, fileContent)
         .$promise;
+    }
+
+    updateSharedExperimentMode(experimentId, sharedValue) {
+      return this.proxyRsc.updateSharedExperimentMode(
+        {
+          experimentId,
+          sharedValue
+        },
+        {}
+      ).$promise;
+    }
+
+    addSharedUsers(experimentId, userId) {
+      return this.proxyRsc.addSharedUsers({ experimentId, userId }, {})
+        .$promise;
+    }
+
+    deleteSharedUser(experimentId, userId) {
+      return this.proxyRsc.deleteSharedUser({ experimentId, userId }).$promise;
+    }
+
+    getAllUsers() {
+      return this.proxyRsc.getAllUsers().$promise;
+    }
+
+    getSharedUsers(experimentId) {
+      return this.proxyRsc.getSharedUsers({ experimentId }).$promise;
+    }
+
+    getSharedExperimentMode(experimentId) {
+      return this.proxyRsc.getSharedExperimentMode({ experimentId }).$promise;
     }
 
     getExperiments(filter) {

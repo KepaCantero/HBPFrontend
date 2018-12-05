@@ -105,7 +105,8 @@
       'changelog',
       'simToolsSidebarModule',
       'goldenLayoutModule',
-      'ui.bootstrap.contextMenu'
+      'ui.bootstrap.contextMenu',
+      'smart-table'
     ])
     // Routes
     .config([

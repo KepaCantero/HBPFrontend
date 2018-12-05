@@ -1,0 +1,70 @@
+<!-- build:css(.tmp) components/experiment-sharing/experiment-sharing.style.css -->
+<link rel="stylesheet" href="components/experiment-sharing/experiment-sharing.style.css">
+<!-- endbuild -->
+<div ng-click="$close();" class="share-window-hide">
+    <i class="fa fa-times"></i>
+</div>
+<div class="container-with-navbar-margin exit-panel-modal" ng-class="{'notshared': model.experimentSharedMode !== 'Shared'} " >
+
+    <label ng-init="getSharedExperimentMode() && getSharedUsers()" class="label-bold">Project visibility </label>
+    <div >
+        <input type="radio" ng-model="model.experimentSharedMode" ng-change="updateSharedExperimentMode()" value="Public">Public
+        <input type="radio" ng-model="model.experimentSharedMode" ng-change="updateSharedExperimentMode()" value="Private">Private
+        <input type="radio" ng-model="model.experimentSharedMode" ng-change="updateSharedExperimentMode()" value="Shared">Shared
+    </div>
+
+  <div>
+    <table st-table="sourceUsers" st-safe-src="sharedUsers" class="table table-striped">
+      <thead>
+        <tr>
+          <th>Add User</th>
+        </tr>
+        <tr>
+            <td>
+            <md-autocomplete md-autoselect=true placeholder="Type the name of the user..." md-item-text="user" md-items="user in allUsers" md-menu-class="autocomplete-custom-template"
+              md-min-length="2" md-delay="throttle" md-search-text="search.searchUser" md-search-text-change="searchUserChange(search.searchUser)"
+              md-select-on-match=true md-match-case-insensitive=true md-selected-item-change="selectedUserChange(search)" md-selected-item="selectedItem" 
+              ng-disabled="model.experimentSharedMode !== 'Shared'">
+              <md-item-template>
+                <span class="item-title">
+                  <span md-highlight-flags="^i" md-highlight-text="searchUser">
+                    {{user}}
+                  </span>
+                </span>
+              </md-item-template>
+              <md-not-found>
+                No match found.
+              </md-not-found>
+            </td>
+        <tr>
+          <th>Shared With</th>
+        </tr>
+        <tr>
+          <td>
+            <input ng-disabled="model.experimentSharedMode !== 'Shared'" st-search placeholder="search users" class="search-users-input input-sm form-control" type="search" />
+          </td>
+
+        </tr>
+      </thead>
+      <tbody>
+        <tr  ng-disabled="model.experimentSharedMode !== 'Shared'" st-select-row="row" ng-repeat="row in sourceUsers">
+          <label>{{row}}</label>
+          <td >
+            <label class= "shared-users-row">{{row.name}}</label>
+            <div class="btn-group" role="group" aria-label="...">
+              <span ng-click="deleteSharedUser(row.name)" class="glyphicon glyphicon-trash delete-shared-icon">
+              </span>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="2" class="text-center">
+            <div st-items-by-page="5" st-pagination=""></div>
+          </td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</div>

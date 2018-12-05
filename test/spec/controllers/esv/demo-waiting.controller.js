@@ -57,6 +57,9 @@ describe('Controller: demo-waiting', function() {
       $httpBackend
         .whenGET(new RegExp(proxyUrl + '/experimentImage/'))
         .respond(200, {});
+      $httpBackend
+        .whenGET(new RegExp(proxyUrl + '/sharedExperiments'))
+        .respond(200, experiments);
       $httpBackend.whenGET(new RegExp(proxyUrl + '/identity')).respond(200, {});
       $controller('DemoAutorunExperimentController', {
         $scope: scope,
