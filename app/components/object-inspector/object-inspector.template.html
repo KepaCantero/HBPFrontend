@@ -8,8 +8,8 @@
     <h4 class="selected-object-name">{{objectInspectorService.selectedObject ? objectInspectorService.selectedObject.name : 'nothing selected'}}</h4>
   </div>
 
-  <!-- sections of the object inspector --> 
-  <div id="sections" ng-show="!minimized" style="display:flex">
+  <!-- sections of the object inspector -->
+  <div id="sections" ng-show="!minimized" style="display:flex;flex-grow: 1;">
     <ol class="sections-list">
       <!-- section - object identifier -->
 
@@ -239,12 +239,11 @@
         </uib-tab>
 
         <uib-tab heading="Robot" index="1" disable="!objectInspectorService.isRobot()" select="objectInspectorService.setRobotMode(true);">
-          <div style="max-height: calc(100% - 130px); margin-top: 30px; overflow-y: auto;">
+          <div style="overflow-y: auto;padding-top:20px;">
             <robot-tree-view ng-if="objectInspectorService.isRobot()" on-selection-change="objectInspectorService.selectedRobotComponent = $selectedObject"></robot-tree-view>
           </div>
-          <hr>
 
-          <div style="display:flex; margin-left: 10px;">
+          <div style="display:flex; padding: 10px 10px 0 0;">
 
             <div>
 
