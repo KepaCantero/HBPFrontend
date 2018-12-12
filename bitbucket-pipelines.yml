@@ -6,8 +6,9 @@
 image: hbpneurorobotics/nrp_frontend:dev
 
 pipelines:
-  default:
-    - step:
+  branches:
+    development:
+      - step:
         name: Build
         script: # Modify the commands below to build your repository.
 
