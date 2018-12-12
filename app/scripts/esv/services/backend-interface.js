@@ -200,22 +200,6 @@
         );
       };
 
-      var resourceCSVRecordesFiles = function(backendBaseUrl) {
-        return $resource(
-          backendBaseUrl + '/simulation/:sim_id/:experimentId/csv-recorders',
-          {},
-          {
-            dump: {
-              method: 'PUT',
-              interceptor: { responseError: serverError.displayHTTPError },
-              url:
-                backendBaseUrl +
-                '/simulation/:sim_id/:experimentId/csv-recorders'
-            }
-          }
-        );
-      };
-
       /* eslint-disable camelcase*/
 
       var resourceRobots = function(backendBaseUrl) {
@@ -302,16 +286,6 @@
               transfer_function_name: name
             },
             callback
-          );
-        },
-        saveCSVRecordersFiles: function(successCallback, errorCallback) {
-          resourceCSVRecordesFiles(simulationInfo.serverBaseUrl).dump(
-            {
-              sim_id: simulationInfo.simulationID
-            },
-            {},
-            successCallback,
-            errorCallback
           );
         },
         getServerBaseUrl: function() {

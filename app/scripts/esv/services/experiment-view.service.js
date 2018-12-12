@@ -35,7 +35,6 @@
       EDIT_MODE,
       RESET_TYPE,
       STATE,
-      autosaveOnExitService,
       backendInterfaceService,
       bbpConfig,
       clbConfirm,
@@ -63,7 +62,6 @@
       this.RESET_TYPE = RESET_TYPE;
       this.STATE = STATE;
 
-      this.autosaveOnExitService = autosaveOnExitService;
       this.backendInterfaceService = backendInterfaceService;
       this.bbpConfig = bbpConfig;
       this.clbConfirm = clbConfirm;
@@ -374,24 +372,20 @@
         this.splash.splashScreen = null; // do not reopen splashscreen if further messages happen
         this.$location.path('esv-demo-wait');
       } else {
-        this.autosaveOnExitService.onExit().then(() => {
-          this.cleanUp();
-          this.splash.splashScreen = null; // do not reopen splashscreen if further messages happen
-          this.$window.location.href = this.$location.path(
-            'esv-private'
-          ).$$absUrl;
-          this.$window.location.reload();
-        });
+        this.cleanUp();
+        this.splash.splashScreen = null; // do not reopen splashscreen if further messages happen
+        this.$window.location.href = this.$location.path(
+          'esv-private'
+        ).$$absUrl;
+        this.$window.location.reload();
       }
     }
 
     stopSimulation() {
-      this.autosaveOnExitService.onExit().then(() => {
-        this.storageServer.logActivity('simulation_stop', {
-          simulationID: this.simulationInfo.experimentID
-        });
-        this.setSimulationState(this.STATE.STOPPED);
+      this.storageServer.logActivity('simulation_stop', {
+        simulationID: this.simulationInfo.experimentID
       });
+      this.setSimulationState(this.STATE.STOPPED);
     }
 
     //TODO: (@SandroWeber) taken from editor-toolbar.controller ... move this, services should clean up after themselves
@@ -444,7 +438,6 @@
     'EDIT_MODE',
     'RESET_TYPE',
     'STATE',
-    'autosaveOnExitService',
     'backendInterfaceService',
     'bbpConfig',
     'clbConfirm',

@@ -55,8 +55,7 @@ describe('Directive: transferFunctionEditor', function() {
       .and.callFake(() => window.$q.resolve()),
     deleteTransferFunction: jasmine.createSpy('deleteTransferFunction'),
     getServerBaseUrl: jasmine.createSpy('getServerBaseUrl'),
-    getTopics: jasmine.createSpy('getTopics'),
-    saveCSVRecordersFiles: jasmine.createSpy('backendInterfaceServiceMock')
+    getTopics: jasmine.createSpy('getTopics')
   };
 
   var documentationURLsMock = {
@@ -1281,32 +1280,6 @@ def tf2(t):
       expect(_.debounce).toHaveBeenCalled();
       _.debounce.calls.mostRecent().args[0]();
       isolateScope.$digest();
-    });
-
-    it('should set the saving flag correctly if csv saving succeed', function() {
-      expect(isolateScope.isSavingCSVToCollab).toBeFalsy();
-      isolateScope.saveCSVIntoCollabStorage();
-      expect(
-        backendInterfaceServiceMock.saveCSVRecordersFiles
-      ).toHaveBeenCalled();
-      expect(isolateScope.isSavingCSVToCollab).toBe(true);
-      backendInterfaceServiceMock.saveCSVRecordersFiles.calls
-        .mostRecent()
-        .args[1]();
-      expect(isolateScope.isSavingCSVToCollab).toBe(false);
-    });
-
-    it('should set the saving flag correctly if csv saving failed', function() {
-      expect(isolateScope.isSavingCSVToCollab).toBeFalsy();
-      isolateScope.saveCSVIntoCollabStorage();
-      expect(
-        backendInterfaceServiceMock.saveCSVRecordersFiles
-      ).toHaveBeenCalled();
-      expect(isolateScope.isSavingCSVToCollab).toBe(true);
-      backendInterfaceServiceMock.saveCSVRecordersFiles.calls
-        .mostRecent()
-        .args[1]();
-      expect(isolateScope.isSavingCSVToCollab).toBe(false);
     });
 
     it('should toggleActive only script is applied sucessfully', function() {

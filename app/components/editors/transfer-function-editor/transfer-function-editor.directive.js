@@ -1469,29 +1469,6 @@ def {0}(t):
               scope.setDirty(scope.transferFunction);
             };
 
-            scope.saveCSVIntoCollabStorage = function() {
-              let deferred = $q.defer();
-              scope.isSavingCSVToCollab = true;
-              backendInterfaceService.saveCSVRecordersFiles(
-                function() {
-                  // Success callback
-                  scope.isSavingCSVToCollab = false;
-                  deferred.resolve();
-                },
-                function() {
-                  // Failure callback
-                  clbErrorDialog.open({
-                    type: 'BackendError.',
-                    message:
-                      'Error while saving recorded CSV files to the Storage.'
-                  });
-                  deferred.reject();
-                  scope.isSavingCSVToCollab = false;
-                }
-              );
-              return deferred.promise;
-            };
-
             /**************************************/
             // Import / Export
 

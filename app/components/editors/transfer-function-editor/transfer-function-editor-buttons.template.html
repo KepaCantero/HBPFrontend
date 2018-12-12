@@ -1,10 +1,3 @@
-<button ng-show="isPrivateExperiment" type="button" class="btn btn-default  btn-md" owner-only ng-click="saveCSVIntoCollabStorage()"
-  ng-disabled="(stateService.currentState === STATE.INITIALIZED)" v-busy="isSavingCSVToCollab" v-busy-label="Saving to Storage"
-  v-pressable>
-  <i class="glyphicon glyphicon glyphicon-stats"></i>
-  <span> Save CSV</span>
-</button>
-
 <!-- The trick here is to use a 'a' tag instead of a 'button' tag -->
 <button owner-only id="download-transfer-functions" ng-disabled="!transferFunction" class="btn btn-default btn-md" ng-click="download()" style="margin-left:10px">
   <i class="glyphicon glyphicon-download"></i>

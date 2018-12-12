@@ -2,11 +2,6 @@
   'use strict';
 
   var mockSettingsData = {
-    autosaveOnExit: {
-      tranferFunctions: {
-        CSVData: true
-      }
-    },
     camera: {
       sensitivity: {
         translation: 0.123,

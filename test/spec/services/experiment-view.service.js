@@ -16,8 +16,6 @@ describe('Service: ExperimentViewService', function() {
     stateService;
 
   beforeEach(module('exdFrontendApp'));
-
-  beforeEach(module('autosaveOnExitServiceMock'));
   beforeEach(module('backendInterfaceServiceMock'));
   beforeEach(module('clbConfirmMock'));
   beforeEach(module('environmentRenderingServiceMock'));
