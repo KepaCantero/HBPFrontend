@@ -44,14 +44,6 @@
       this.lastMessageTime = Number.MIN_VALUE;
 
       this.rosConnection = this.roslib.getOrCreateConnectionTo(this.server);
-      this.jointTopicSubscriber = this.roslib.createTopic(
-        this.rosConnection,
-        this.jointTopic,
-        'sensor_msgs/JointState',
-        // eslint-disable-next-line camelcase
-        { throttle_rate: 1.0 / JointPlotService.POINT_FREQUENCY * 1000.0 }
-      );
-
       this.callbacks = [];
 
       this.jointsType = {};
@@ -74,6 +66,13 @@
       let jointreq = {};
       // TODO: add multirobots support
       modelreq[this.modelProp.param] = sceneInfo.robots[0].robotId;
+      this.jointTopicSubscriber = this.roslib.createTopic(
+        this.rosConnection,
+        '/' + sceneInfo.robots[0].robotId + this.jointTopic,
+        'sensor_msgs/JointState',
+        // eslint-disable-next-line camelcase
+        { throttle_rate: 1.0 / JointPlotService.POINT_FREQUENCY * 1000.0 }
+      );
 
       this.getModelPropertiesService.callService(
         new this.roslib.ServiceRequest(modelreq),

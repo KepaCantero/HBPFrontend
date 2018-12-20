@@ -44,6 +44,14 @@
                 <p>
                     Set timeout on simulation time, new workspace manager
                 </p>
+                <span style="color:red">[COMPATIBILITY BREAK]</span>
+                <ul>
+                    <li>ROS topic names for (almost) all previsously cloned experiments are not valid anymore.
+                      Starting from CLE v2.1.2, robots are added into scene under their own 'robot id' namespaces.
+                      Gazebo therefore prepends robot id to the topic names.
+                      <span style="color:red;">Please make sure your transfer functions are using proper topic names.</span>
+                    </li>
+                </ul>
                 <h3>Features</h3>
                 <ul>
                     <li>You can now define a timeout on simulation time or real time (time="simulation" or time="real" parameter in the timeout tag of the .exc file)</li>

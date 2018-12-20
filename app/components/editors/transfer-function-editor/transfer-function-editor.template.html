@@ -15,6 +15,10 @@
         <a target="_blank" href="{{platformDocumentationURL}}/nrp/tutorials/transfer_function/index.html">
           <b>tutorial</b>
         </a>.
+
+        Starting from CLE v2.1.2, robots are added into scene under their own 'robot id' namespaces.
+        Gazebo therefore prepends robot id to the topic names.
+        <span style="color:red;">Please make sure your transfer functions are using proper topic names.</span>
       </p>
     </div>
 

@@ -6349,7 +6349,7 @@ GZ3D.GZIface.prototype.createModelFromMsg = function(model)
     for (var i = 0; i < link.sensor.length; ++i) {
       var sensor = link.sensor[i];
 
-      var sensorObj = this.createSensorFromMsg(sensor,link.name);
+      var sensorObj = this.createSensorFromMsg(sensor, link.name, '/' + modelObj.name);
       if (sensorObj && !sensorObj.parent)
       {
         linkObj.add(sensorObj);
@@ -6512,7 +6512,7 @@ GZ3D.GZIface.prototype.createLinkInfo = function(link,parent)
   this.createLabel(parent,new THREE.Vector3(0,0,0), link.name.replace('robot::',''),true);
 };
 
-GZ3D.GZIface.prototype.createSensorFromMsg = function(sensor,modelName)
+GZ3D.GZIface.prototype.createSensorFromMsg = function(sensor, modelName, topicPrefix=undefined)
 {
   var sensorObj = new THREE.Object3D();
   sensorObj.name = sensor.name;
@@ -6576,7 +6576,7 @@ GZ3D.GZIface.prototype.createSensorFromMsg = function(sensor,modelName)
       return;
     }
     view.type = sensor.type;
-    view.topic = sensor.topic;
+    view.topic = topicPrefix? topicPrefix + sensor.topic : sensor.topic;
 
     sensorObj.add(view.camera);
   }
