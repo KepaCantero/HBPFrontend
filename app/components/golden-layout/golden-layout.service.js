@@ -109,10 +109,26 @@
 
       this.layout.init();
 
-      $(window).resize(() => this.refreshSize());
-      setTimeout(() => this.refreshSize());
+      this.watchContainerSize();
 
       return this.layout;
+    }
+
+    /**
+     * Refresh the Golden Layout when it's container size changes
+     * at most 250ms after the container resize, and at most every 500ms
+     */
+    watchContainerSize() {
+      if (this.resizeInterval) clearInterval(this.resizeInterval);
+      const glContainer = $('#golden-layout-container');
+      const refreshSizeThrottled = _.throttle(() => this.refreshSize(), 500);
+      this.resizeInterval = setInterval(() => {
+        let size = glContainer.width();
+        if (this.lastSize != size) refreshSizeThrottled();
+        this.lastSize == size;
+      }, 250);
+
+      this.$rootScope.$on('$destroy', () => clearInterval(this.resizeInterval));
     }
 
     refreshSize() {
