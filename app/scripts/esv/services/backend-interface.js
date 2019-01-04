@@ -96,7 +96,8 @@
           }
         );
       };
-      var resourceTransferFunctionSimulation = function(backendBaseUrl) {
+
+      let resourceTransferFunctionSimulation = function(backendBaseUrl) {
         return $resource(
           backendBaseUrl + '/simulation/:sim_id/transfer-functions',
           {},
@@ -104,6 +105,9 @@
             transferFunctions: {
               method: 'GET',
               interceptor: { responseError: serverError.displayHTTPError }
+            },
+            add: {
+              method: 'POST'
             },
             activate: {
               method: 'PUT',
@@ -128,7 +132,7 @@
         );
       };
 
-      var resourceTopics = function(backendBaseUrl) {
+      let resourceTopics = function(backendBaseUrl) {
         return $resource(
           backendBaseUrl + '/simulation/topics',
           {},
@@ -141,7 +145,7 @@
         );
       };
 
-      var resourceBrainSimulation = function(backendBaseUrl) {
+      let resourceBrainSimulation = function(backendBaseUrl) {
         return $resource(
           backendBaseUrl + '/simulation/:sim_id/brain',
           {},
@@ -366,6 +370,18 @@
             {
               sim_id: simulationInfo.simulationID,
               transfer_function_name: name
+            },
+            data,
+            successCallback,
+            errorCallback
+          ).$promise;
+        },
+        addTransferFunction: function(data, successCallback, errorCallback) {
+          return resourceTransferFunctionSimulation(
+            simulationInfo.serverBaseUrl
+          ).add(
+            {
+              sim_id: simulationInfo.simulationID
             },
             data,
             successCallback,

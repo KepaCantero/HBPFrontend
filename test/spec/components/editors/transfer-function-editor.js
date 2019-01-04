@@ -53,6 +53,9 @@ describe('Directive: transferFunctionEditor', function() {
     editTransferFunction: jasmine
       .createSpy('editTransferFunction')
       .and.callFake(() => window.$q.resolve()),
+    addTransferFunction: jasmine
+      .createSpy('addTransferFunction')
+      .and.callFake(() => window.$q.resolve()),
     deleteTransferFunction: jasmine.createSpy('deleteTransferFunction'),
     getServerBaseUrl: jasmine.createSpy('getServerBaseUrl'),
     getTopics: jasmine.createSpy('getTopics')
@@ -803,7 +806,7 @@ describe('Directive: transferFunctionEditor', function() {
         isolateScope.transferFunctions[0].variables.push(csvRecorder);
       });
 
-      it('should parse csvs correctly', function() {
+      it('should parse CSVs correctly', function() {
         isolateScope.parseFilenameAndHeaders(csvRecorder);
         expect(csvRecorder.filename).toEqual('results.csv');
         expect(csvRecorder.headers).toEqual(['Name', 'Value']);

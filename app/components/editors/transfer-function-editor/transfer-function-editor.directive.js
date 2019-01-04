@@ -1154,8 +1154,8 @@ def {0}(t):
               let _doneCallback = doneCallback || angular.noop;
               if (transferFunction) {
                 // Make sure we don't have duplicated names
-                var tfNames = scope.transferFunctions.map(function(tf) {
-                  var tfName = pythonCodeHelper.getFunctionName(tf.rawCode);
+                let tfNames = scope.transferFunctions.map(function(tf) {
+                  let tfName = pythonCodeHelper.getFunctionName(tf.rawCode);
                   return tfName;
                 });
 
@@ -1194,39 +1194,52 @@ def {0}(t):
                   ) || [''])[0];
                 }
 
-                backendInterfaceService
-                  .editTransferFunction(
-                    transferFunction.name,
+                //ADD new TFs and EDIT the already existing ones
+                let successCallback = function() {
+                  transferFunction.dirty = false;
+                  scope.dirtyTFNames.delete(transferFunction.name);
+                  transferFunction.local = false;
+
+                  scope.updateNTransferFunctionDirty();
+                  transferFunction.oldName = transferFunction.name = pythonCodeHelper.getFunctionName(
                     transferFunction.rawCode
-                  )
-                  .then(function() {
-                    transferFunction.dirty = false;
-                    scope.dirtyTFNames.delete(transferFunction.name);
-                    transferFunction.local = false;
+                  );
 
-                    scope.updateNTransferFunctionDirty();
-                    transferFunction.oldName = transferFunction.name = pythonCodeHelper.getFunctionName(
-                      transferFunction.rawCode
-                    );
+                  if (
+                    scope.transferFunction &&
+                    scope.transferFunction.name === transferFunction.name
+                  ) {
+                    scope.selectTransferFunction(transferFunction.name);
+                  }
 
-                    if (
-                      scope.transferFunction &&
-                      scope.transferFunction.name === transferFunction.name
-                    ) {
-                      scope.selectTransferFunction(transferFunction.name);
+                  _doneCallback();
+                  $timeout(() => {
+                    if ($.isEmptyObject(transferFunction.error)) {
+                      transferFunction.decoratorDirty = false;
                     }
+                  }, 1.0);
+                };
 
-                    _doneCallback();
-                    $timeout(() => {
-                      if ($.isEmptyObject(transferFunction.error)) {
-                        transferFunction.decoratorDirty = false;
-                      }
-                    }, 1.0);
-                  })
-                  .catch(function(error) {
-                    serverError.displayHTTPError(error);
-                    _doneCallback(null, error);
-                  });
+                let failCallback = function(error) {
+                  serverError.displayHTTPError(error);
+                  _doneCallback(null, error);
+                };
+
+                if (transferFunction.local) {
+                  // new TF
+                  backendInterfaceService
+                    .addTransferFunction(transferFunction.rawCode)
+                    .then(successCallback)
+                    .catch(failCallback);
+                } else {
+                  backendInterfaceService
+                    .editTransferFunction(
+                      transferFunction.name,
+                      transferFunction.rawCode
+                    )
+                    .then(successCallback)
+                    .catch(failCallback);
+                }
               }
             };
 
@@ -1368,7 +1381,7 @@ def {0}(t):
             /**
              * Toggles the TF active status
              * If TF status is set to 'active', first it tries to apply it in the backend
-             *  - If the TF apply suceeds, then it makes sure the 'active' status
+             *  - If the TF apply succeeds, then it makes sure the 'active' status
              *    is synchronized to the backend
              *  - If the TF apply fails, then the active status is set back to 'inactive'
              * Otherwise, if the TF status is set to disabled, it simply syncs it to the backend

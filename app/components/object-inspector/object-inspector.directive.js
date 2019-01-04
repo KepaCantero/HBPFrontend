@@ -165,10 +165,7 @@ def ${tfname}(${['t', ...parameters].join(', ')}):
                       newTF
                     ])
                     .then(() =>
-                      backendInterfaceService.editTransferFunction(
-                        tfname,
-                        newTF
-                      )
+                      backendInterfaceService.addTransferFunction(newTF)
                     )
                     .then(() => {
                       // Notify the components which display transfer functions info (e.g., the Transfer Functions editor) that an update is required

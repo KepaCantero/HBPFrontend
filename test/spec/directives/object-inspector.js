@@ -171,7 +171,7 @@ describe('Directive: object-inspector', function() {
       window.$q.resolve({ data: {} })
     );
 
-    spyOn(backendInterfaceService, 'editTransferFunction').and.returnValue(
+    spyOn(backendInterfaceService, 'addTransferFunction').and.returnValue(
       window.$q.resolve()
     );
 
@@ -187,7 +187,7 @@ describe('Directive: object-inspector', function() {
     elementScope.createTopicTF();
     elementScope.$digest();
     expect(storageServer.saveTransferFunctions).toHaveBeenCalled();
-    expect(backendInterfaceService.editTransferFunction).toHaveBeenCalled();
+    expect(backendInterfaceService.addTransferFunction).toHaveBeenCalled();
     expect($rootScope.$broadcast).toHaveBeenCalledWith(
       'TRANSFER_FUNCTIONS_CHANGED'
     );
@@ -201,7 +201,7 @@ describe('Directive: object-inspector', function() {
       window.$q.resolve({ data: {} })
     );
 
-    spyOn(backendInterfaceService, 'editTransferFunction').and.returnValue(
+    spyOn(backendInterfaceService, 'addTransferFunction').and.returnValue(
       window.$q.reject('error')
     );
 
@@ -217,7 +217,7 @@ describe('Directive: object-inspector', function() {
     elementScope.createTopicTF();
     elementScope.$digest();
     expect(storageServer.saveTransferFunctions).toHaveBeenCalled();
-    expect(backendInterfaceService.editTransferFunction).toHaveBeenCalled();
+    expect(backendInterfaceService.addTransferFunction).toHaveBeenCalled();
     expect(serverError.displayHTTPError).toHaveBeenCalledWith('error');
   });
 });
