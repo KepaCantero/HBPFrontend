@@ -8402,7 +8402,7 @@ GZ3D.Manipulator = function(gz3dScene, mobile)
             {
               tempMatrix.makeRotationFromQuaternion(tempQuaternion)
                   .getInverse(tempMatrix);
-              eye.applyProjection(tempMatrix);
+              eye.applyMatrix4(tempMatrix);
 
               if (name === 'RX')
               {
