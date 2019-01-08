@@ -31,6 +31,7 @@
       $rootScope,
       CAMERA_SENSITIVITY_RANGE,
       UIS_DEFAULTS,
+      autoSaveFactory,
       goldenLayoutService,
       nrpUser,
       simulationConfigService
@@ -41,6 +42,24 @@
       this.goldenLayoutService = goldenLayoutService;
       this.nrpUser = nrpUser;
       this.simulationConfigService = simulationConfigService;
+
+      this.autoSaveService = autoSaveFactory.createService(
+        'user-interaction-settings'
+      );
+      this.autoSaveService.onsave(() => {
+        return this.saveSettings();
+      });
+      this.goldenLayoutService.isLayoutInitialised().then(() => {
+        this.goldenLayoutService.layout.on('stateChanged', () => {
+          let oldAutoSave = JSON.stringify(this.settingsData.autosaveOnExit);
+          this.getCurrentWorkspaceLayout().then(() => {
+            let newAutoSave = JSON.stringify(this.settingsData.autosaveOnExit);
+            if (newAutoSave !== oldAutoSave) {
+              this.autoSaveService.setDirty();
+            }
+          });
+        });
+      });
 
       this.settingsData = undefined;
       this.lastSavedSettingsData = undefined;
@@ -156,6 +175,7 @@
     '$rootScope',
     'CAMERA_SENSITIVITY_RANGE',
     'UIS_DEFAULTS',
+    'autoSaveFactory',
     'goldenLayoutService',
     'nrpUser',
     'simulationConfigService'

@@ -12,6 +12,7 @@ describe('Services: userInteractionSettingsService', function() {
   beforeEach(module('userInteractionModule'));
   beforeEach(module('userNavigationModule'));
 
+  beforeEach(module('autoSaveFactoryMock'));
   beforeEach(module('goldenLayoutServiceMock'));
   beforeEach(module('nrpUserMock'));
   beforeEach(module('simulationConfigServiceMock'));
@@ -225,5 +226,41 @@ describe('Services: userInteractionSettingsService', function() {
       userInteractionSettingsService.settingsData.autosaveOnExit
         .lastWorkspaceLayouts[nrpUser.currentUser.id]
     ).toBe(mockConfig);
+  });
+
+  it('should define proper autoSaveService', function() {
+    expect(userInteractionSettingsService.autoSaveService).toBeDefined();
+
+    spyOn(userInteractionSettingsService, 'saveSettings');
+    let callbackOnSave = userInteractionSettingsService.autoSaveService.onsave.calls.mostRecent()
+      .args[0];
+    callbackOnSave();
+    expect(userInteractionSettingsService.saveSettings).toHaveBeenCalled();
+  });
+
+  it('should set autoSaveService dirty on layout state change', function() {
+    userInteractionSettingsService.settingsData = {
+      autosaveOnExit: {}
+    };
+    spyOn(
+      userInteractionSettingsService,
+      'getCurrentWorkspaceLayout'
+    ).and.callFake(() => {
+      // fake change
+      userInteractionSettingsService.settingsData.autosaveOnExit.newField =
+        'new';
+      return {
+        then: jasmine.createSpy('then').and.callFake(cb => {
+          cb();
+        })
+      };
+    });
+
+    let callbackOnStateChange = goldenLayoutService.layout.on.calls.mostRecent()
+      .args[1];
+    callbackOnStateChange();
+    expect(
+      userInteractionSettingsService.autoSaveService.setDirty
+    ).toHaveBeenCalled();
   });
 });
