@@ -32,7 +32,8 @@
     <input type="file" multiple id="experiment-input">
     <div class="res-explorer">
       <div class="res-left-panel">
-        <span class="title">Resources</span>
+        <span class="title"
+              ng-click="vm.checkAndLoadResourcesFolder()">Resources</span>
         <div class="res-list">
           <experiment-folders parent="vm.resourcesFolder"></experiment-folders>
         </div>
@@ -45,11 +46,14 @@
           <div class="res-file-size">Size</div>
           <div class="res-file-date">Modified</div>
           <div class="res-file-actions" ng-show="vm.selectedParent">
-            <span class="action-button" ng-if="vm.selectedParent.parentFolder" ng-click="!vm.selectedParent.deleting && vm.deleteFolder(vm.selectedParent)">
-              <span class="delete-folder-button" ng-if="!vm.selectedParent.deleting && !vm.selectedParent.loadingFiles" disable-animate title="Delete folder">
-                <i class="fa fa-folder"></i>
-                <i class="fa fa-times"></i>
-              </span>
+            <span class="action-button delete-folder-button" 
+                  ng-if="!vm.selectedParent.deleting && !vm.selectedParent.loadingFiles && !(vm.selectedParent.uuid == vm.resourcesFolder.uuid)" 
+                  disable-animate 
+                  title="Delete folder"
+                  ng-click="!vm.selectedParent.deleting && vm.deleteFolder(vm.selectedParent)">
+              <i class="fa fa-times"></i>
+            </span>
+            <span>  
             <i ng-if="vm.selectedParent.deleting" disable-animate class="fa fa-spinner fa-pulse fa-1x fa-fw" title="Deleting..."></i>
             </span>
             <span class="action-button" owner-only ng-click="!vm.selectedParent.uploading && vm.uploadFileClick()">
