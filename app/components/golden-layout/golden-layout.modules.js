@@ -261,7 +261,9 @@
         module: 'noiseModelModule',
         angularDirective: '<noise-model />',
         singleton: true
-      }
+      },
+      pwidth: 300,
+      pheight: 600
     },
     pwidth: 400,
     pheight: 300
