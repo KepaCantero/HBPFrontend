@@ -66,11 +66,13 @@
       tipList: [
         {
           text:
-            'Welcome to the simulation! Press the "Play" button to run the simulation.<br/>' +
+            'Welcome to the simulation! Use the "Options" button on the top right corner to interact with the camera, ' +
+            'change the light settings or apply a force to the robot.<br/>' +
+            'Press the "Play" button to run the simulation.<br/>' +
             '<b>New</b>: You can now move the tool windows by dragging their title. ' +
             'You can split windows horizontally or vertically. Stacks with tabs are also possible. ' +
             'A shadow will preview the position the window will move to.',
-          image: ['img/tips/play.jpg']
+          image: ['img/tips/cog_wheel.png']
         },
         {
           text:
