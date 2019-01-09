@@ -679,6 +679,7 @@ def {0}(t):
               tf.variables = structured.variables || [];
               tf.topics = structured.topics || [];
               _.forEach(tf.variables, scope.parseFilenameAndHeaders);
+              return tf;
             };
 
             let getTfCodeName = tfCode => {
@@ -1605,8 +1606,10 @@ def {0}(t):
                         new RegExp('def +' + tfName, 'gm'),
                         'def ' + tfNewName
                       );
-                addNewTf(tfNewName, transferFunction.code);
                 scope.nTransferFunctionDirty++;
+                addNewTf(tfNewName, transferFunction.code).then(
+                  tf => (tf.local = true)
+                );
               });
 
               if (
