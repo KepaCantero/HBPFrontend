@@ -370,7 +370,7 @@
       if (isDemoMode) {
         this.cleanUp();
         this.splash.splashScreen = null; // do not reopen splashscreen if further messages happen
-        this.$location.path('esv-demo-wait');
+        this.$location.path('esv-demo');
       } else {
         this.cleanUp();
         this.splash.splashScreen = null; // do not reopen splashscreen if further messages happen

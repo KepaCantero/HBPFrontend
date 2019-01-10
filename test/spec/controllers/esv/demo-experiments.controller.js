@@ -36,6 +36,7 @@
     },
     groups: { result: ['hbp-sp10-user-edit-rights'] },
     experiments: {
+      configuration: { thumbnail: 'thumbnail' },
       matureExperiment: matureExperiment,
       developementExperiment: {
         configuration: {
@@ -43,7 +44,9 @@
           name: 'Developement experiment name'
         },
         availableServers: [],
-        joinableServers: []
+        joinableServers: [
+          { server: 'server', runningSimulation: { simulationID: 'simID' } }
+        ]
       }
     },
     collabExperimentResponse: {
@@ -97,6 +100,19 @@
     var nrpBackendVersionsObject = {
       get: jasmine.createSpy('get')
     };
+
+    var experimentsFactoryMock = {
+      createExperimentsService: jasmine
+        .createSpy('createExperimentService')
+        .and.returnValue({
+          initialize: jasmine.createSpy('initialize'),
+          experiments: {
+            then: (arg1, arg2, callback) =>
+              callback([defaultPageOptions.experiments.developementExperiment])
+          },
+          destroy: jasmine.createSpy('destroy')
+        })
+    };
     beforeEach(module('exdFrontendApp'));
     beforeEach(module('exd.templates'));
 
@@ -110,7 +126,7 @@
         );
         $provide.value('nrpFrontendVersion', { get: jasmine.createSpy('get') });
         $provide.value('serverError', serverErrorMock);
-
+        $provide.value('experimentsFactory', experimentsFactoryMock);
         $provide.value('simulationConfigService', {
           initConfigFiles: jasmine
             .createSpy('initConfigFiles')
@@ -138,7 +154,6 @@
         _$location_,
         _bbpConfig_,
         _roslib_,
-        _experimentsFactory_,
         _SERVER_POLL_INTERVAL_,
         _$window_,
         _$q_
@@ -153,7 +168,6 @@
         bbpConfig = _bbpConfig_;
         proxyUrl = bbpConfig.get('api.proxy.url');
         oidcUrl = bbpConfig.get('api.user.v0');
-
         $q = _$q_;
         environmentService = _environmentService_;
       })
@@ -185,7 +199,7 @@
         .whenGET(new RegExp(proxyUrl + '/availableServers'))
         .respond(200, [hostName]);
       $httpBackend
-        .whenGET(new RegExp(proxyUrl + '/experiments'))
+        .whenGET(new RegExp(proxyUrl + '/storage/experiments'))
         .respond(200, pageOptions.experiments);
       $httpBackend
         .whenGET(new RegExp(proxyUrl + '/experimentImage/'))
@@ -196,6 +210,9 @@
       $httpBackend
         .whenGET(new RegExp(proxyUrl + '/sharedExperiments'))
         .respond(200, pageOptions.experiments);
+      $httpBackend
+        .whenGET(new RegExp(proxyUrl + '/maintenancemode'))
+        .respond(200, false);
       $httpBackend.whenGET(oidcUrl + '/user/me').respond(200, pageOptions.me);
       $httpBackend
         .whenGET(oidcUrl + '/user/me/groups')
@@ -217,51 +234,39 @@
     it('should be able to join a running experiment', function() {
       spyOn($location, 'path').and.returnValue({});
       renderDemoWebPage();
+      spyOn($rootScope.vm, 'tryJoiningExperiment');
+
       $rootScope.vm.$window = { location: { reload: angular.noop } };
       $rootScope.vm.launchExperiment();
-
-      $httpBackend.flush();
-      $timeout.flush(2000);
-
-      var experimentID = Object.keys(defaultPageOptions.experiments)[0];
-      var simulationID = defaultPageOptions.startExperiment.simulationID;
-      var expectedLocation = [
-        'esv-private/experiment-view/' +
-          hostName +
-          '/' +
-          experimentID +
-          '/false/' +
-          simulationID
-      ];
-      expect($location.path.calls.mostRecent().args).toEqual(expectedLocation);
+      $rootScope.$digest();
+      expect($rootScope.vm.tryJoiningExperiment).toHaveBeenCalled();
     });
 
     it('should wait when no experiment is running', function() {
-      spyOn($location, 'path');
+      spyOn($location, 'path').and.returnValue({ $$absUrl: 'testurl' });
 
       matureExperiment.joinableServers = [];
-
       renderDemoWebPage();
+      $rootScope.vm.$window = { location: { reload: angular.noop } };
       $rootScope.vm.launchExperiment();
 
-      $httpBackend.flush();
       $timeout.flush(2000);
-      expect($location.path.calls.mostRecent().args[0]).toEqual('/');
+      expect($location.path).toHaveBeenCalled();
     });
 
     it('should not join experiment if user did cancel', function() {
-      spyOn($location, 'path');
+      spyOn($location, 'path').and.returnValue({ $$absUrl: 'testurl' });
 
       matureExperiment.joinableServers = [];
 
       renderDemoWebPage();
+      $rootScope.vm.$window = { location: { reload: angular.noop } };
       $rootScope.vm.launchExperiment();
       $rootScope.vm.cancelLaunch();
 
-      $httpBackend.flush();
-      $timeout.flush(2000);
+      $timeout.flush(500);
 
-      expect($location.path.calls.mostRecent().args[0]).toEqual('/');
+      expect($location.path).toHaveBeenCalled();
     });
 
     it('should be to cancel a wait for joining an experiment', function() {

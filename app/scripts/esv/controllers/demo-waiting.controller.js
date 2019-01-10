@@ -41,7 +41,9 @@
       scope.process = () => {
         nextTimeToCheck = 500;
         if (!scope.experimentsService) {
-          scope.experimentsService = scope.experimentsFactory.createExperimentsService();
+          scope.experimentsService = scope.experimentsFactory.createExperimentsService(
+            true
+          );
           scope.experimentsService.initialize();
           scope.experimentsService.experiments.then(
             null,

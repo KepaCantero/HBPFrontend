@@ -219,7 +219,7 @@
             setCollabState: [
               'environmentService',
               function(environmentService) {
-                return environmentService.setPrivateExperiment(false);
+                return environmentService.setPrivateExperiment(true);
               }
             ]
           }
@@ -239,7 +239,7 @@
             setCollabState: [
               'environmentService',
               function(environmentService) {
-                return environmentService.setPrivateExperiment(false);
+                return environmentService.setPrivateExperiment(true);
               }
             ]
           }

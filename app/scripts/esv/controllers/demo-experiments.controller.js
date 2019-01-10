@@ -109,7 +109,9 @@
     launchExperiment() {
       this.joiningExperiment = true;
       if (!this.experimentsService) {
-        this.experimentsService = this.experimentsFactory.createExperimentsService();
+        this.experimentsService = this.experimentsFactory.createExperimentsService(
+          true
+        );
         this.experimentsService.initialize();
         this.experimentsService.experiments.then(null, null, experiments => {
           this.experiments = experiments;

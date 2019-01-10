@@ -275,7 +275,7 @@ describe('Service: ExperimentViewService', function() {
     });
 
     experimentViewService.exitSimulation();
-    expect($location.path()).toEqual('/esv-demo-wait');
+    expect($location.path()).toEqual('/esv-demo');
   });
 
   it('disable rebirth if state is stopped', function() {

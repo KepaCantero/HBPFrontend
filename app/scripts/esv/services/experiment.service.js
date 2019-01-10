@@ -43,6 +43,7 @@
       nrpFrontendVersion,
       nrpBackendVersions
     ) {
+      let isDemoMode = bbpConfig.get('demomode.demoCarousel', false);
       //this.experiment is a promise that resolves to the same value as the service
       this.experiment = simulationInfo.initialized.then(() => {
         this.versionString = '';
@@ -60,7 +61,8 @@
             { sim_id: simulationInfo.simulationID },
             /*eslint-enable camelcase*/
             data => {
-              this.ownerID = data.owner;
+              // in demo mode noone should have edit rights
+              this.ownerID = isDemoMode ? '' : data.owner;
               this.experimentConfiguration = data.experimentConfiguration;
               this.creationDate = data.creationDate;
 
