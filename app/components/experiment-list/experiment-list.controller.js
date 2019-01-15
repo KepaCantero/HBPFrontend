@@ -88,7 +88,7 @@
         $scope.isPrivateExperiment = environmentService.isPrivateExperiment();
         $scope.devMode = environmentService.isDevMode();
         $scope.tipTooltipService = tipTooltipService;
-
+        var experimentsService;
         $scope.config = {
           loadingMessage: 'Loading list of experiments...'
         };
@@ -193,6 +193,41 @@
           }
         };
 
+        $scope.startPizDaintExperiment = function() {
+          $scope.startingJob = true;
+          $scope.jobProgressMessage = 'Submitting job request';
+          experimentsService.startPizDaintExperiment().then(
+            function(res) {
+              $scope.jobProgressMessage =
+                'Job Sucessfully started. Job status: ' + res;
+            }, // succeeded
+            function(err) {
+              $scope.startingJob = false;
+              err = {
+                type: 'Error while starting job',
+                data: err,
+                message:
+                  'There was an error when trying to start the job. Please check the logs',
+                code: err
+              };
+              clbErrorDialog.open(err).then(() => {});
+            }, // failed
+            function(msg) {
+              $scope.jobProgressMessage =
+                'Job submitted. Waiting for job to start (this may take some time). Current job status: ' +
+                msg;
+            } //in progress
+          );
+        };
+        $scope.getPizDaintJobs = function() {
+          $scope.loadingJobs = true;
+          $scope.config.loadingMessage = 'Retrieving job information..';
+          experimentsService.getPizDaintJobs().then(function(jobs) {
+            $scope.pizdaintJobs = jobs;
+            $scope.loadingJobs = false;
+          });
+        };
+
         $scope.cloneClonedExperiment = function(experimentId, isShared) {
           $scope.isCloneRequested = true;
           storageServer
@@ -285,9 +320,9 @@
         $scope.$watch('query', () => filterExperiments());
 
         var loadExperiments = function(loadPrivateExperiments = false) {
-          var experimentsService = ($scope.experimentsService = experimentsFactory.createExperimentsService(
+          experimentsService = $scope.experimentsService = experimentsFactory.createExperimentsService(
             loadPrivateExperiments
-          ));
+          );
           experimentsService.initialize();
           experimentsService.experiments.then(null, null, function(
             experiments

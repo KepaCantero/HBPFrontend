@@ -49,6 +49,7 @@
           ExperimentFiles: TIP_CODES.EXPERIMENT_FILES,
           CloneExperiment: TIP_CODES.TEMPLATES,
           RunningExperiments: TIP_CODES.RUNNING_SIMULATIONS,
+          PizDaintExperiments: TIP_CODES.PIZ_DAINT_JOBS,
           NewExperiment: TIP_CODES.NEW_EXPERIMENT
         };
 

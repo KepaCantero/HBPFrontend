@@ -173,7 +173,8 @@ describe('experimentSimulationService', function() {
     experimentSimulationService,
     bbpConfig,
     statusListenerSubscribe,
-    removeAllListenersFn;
+    removeAllListenersFn,
+    $interval;
 
   beforeEach(module('simulationControlServices'));
   beforeEach(module('experimentServices'));
@@ -216,13 +217,15 @@ describe('experimentSimulationService', function() {
       _experimentSimulationService_,
       _$rootScope_,
       _$timeout_,
-      _bbpConfig_
+      _bbpConfig_,
+      _$interval_
     ) {
       experimentSimulationService = _experimentSimulationService_;
       $httpBackend = _$httpBackend_;
       $rootScope = _$rootScope_;
       $timeout = _$timeout_;
       bbpConfig = _bbpConfig_;
+      $interval = _$interval_;
     })
   );
 
@@ -271,6 +274,24 @@ describe('experimentSimulationService', function() {
     ]);
 
     expect(removeAllListenersFn).toHaveBeenCalled();
+  });
+
+  it('should start Piz daint Job', function() {
+    var proxyUrl = bbpConfig.get('api.proxy.url');
+    $httpBackend.whenGET(proxyUrl + '/getjobinfo?jobUrl=jobUrl').respond(200, {
+      status: 'SUCCESSFUL'
+    });
+    $httpBackend.whenGET(proxyUrl + '/submitjob').respond(200, 'jobUrl');
+    $httpBackend
+      .whenGET(proxyUrl + '/getjoboutcome?jobUrl=jobUrl')
+      .respond(200, ['stdout', 'stderr']);
+
+    experimentSimulationService.startPizDaintExperiment().then(function(res) {
+      expect(res).toEqual('SUCCESSFUL');
+    });
+    $httpBackend.flush();
+    $interval.flush(10000);
+    $httpBackend.flush();
   });
 
   afterEach(function() {

@@ -44,7 +44,11 @@
           getImage: getImage,
           getServerConfig: _.memoize(getServerConfig),
           getAvailableServers: getAvailableServers,
-          getSharedExperiments: getSharedExperiments
+          getSharedExperiments: getSharedExperiments,
+          submitJob: submitJob,
+          getPizDaintJobs: getPizDaintJobs,
+          getJobStatus: getJobStatus,
+          getJobOutcome: getJobOutcome
         };
         function getSharedExperiments() {
           var url = getProxyUrl() + '/sharedExperiments';
@@ -76,6 +80,45 @@
           return $http
             .get(getProxyUrl() + '/availableServers')
             .then(response => response.data)
+            .catch(serverError.displayHTTPError);
+        }
+        function getPizDaintJobs() {
+          return $http
+            .get(getProxyUrl() + '/getjobs')
+            .then(function(response) {
+              return response.data;
+            })
+            .catch(serverError.displayHTTPError);
+        }
+
+        function submitJob() {
+          return $http
+            .get(getProxyUrl() + '/submitjob')
+            .then(function(response) {
+              return response.data;
+            })
+            .catch(serverError.displayHTTPError);
+        }
+        function getJobStatus(jobUrl) {
+          return $http({
+            url: getProxyUrl() + '/getjobinfo',
+            method: 'GET',
+            params: { jobUrl: jobUrl }
+          })
+            .then(function(response) {
+              return response.data;
+            })
+            .catch(serverError.displayHTTPError);
+        }
+        function getJobOutcome(jobUrl) {
+          return $http({
+            url: getProxyUrl() + '/getjoboutcome',
+            method: 'GET',
+            params: { jobUrl: jobUrl }
+          })
+            .then(function(response) {
+              return response.data;
+            })
             .catch(serverError.displayHTTPError);
         }
       }

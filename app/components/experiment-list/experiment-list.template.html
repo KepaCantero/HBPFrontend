@@ -15,8 +15,23 @@
     <div ng-if="!experiments">
         <i class="fa fa-2x fa-spinner fa-spin"></i>&nbsp; <i>{{config.loadingMessage}}</i>
     </div>
+    <div ng-if="pizdaint">
+        <button class="btn btn-default" ng-click="startPizDaintExperiment();">
+            <i class="fa fa-plus"></i> Start Piz Daint job
+        </button>
+        <div ng-show="startingJob">
+            <uib-progressbar   value="100" class="progress-striped active top-buffer"><i><b>{{jobProgressMessage}}</b></i></uib-progressbar>
+        </div>
+        <button class="btn btn-default" ng-click="getPizDaintJobs();">
+            <i class="fa fa-plus"></i> Get list of Piz Daint jobs
+        </button>
+        <div ng-if="loadingJobs">
+          <i class="fa fa-2x fa-spinner fa-spin"></i>&nbsp; <i>{{config.loadingMessage}}</i>
+        </div>
+    </div>    
 
-    <div class="no-experiment-msg" ng-show="experiments && running && !atLeastOneExperimentRunning()">
+
+    <div class="no-experiment-msg" ng-show="experiments && running && !atLeastOneExperimentRunning() && !pizdaint">
         There is no simulation running now...
         <hr class="list-separator">
     </div>
@@ -26,7 +41,43 @@
         <hr class="list-separator">
     </div>
 
-    <div ng-show="experiments && (!running || (config.canLaunchExperiments && exp.joinableServers.length > 0))"
+    <div ng-show="pizdaintJobs">
+    <div class="table-wrapper" >
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Status</th>
+                        <th>Creator</th>
+                        <th>Submission time</th>
+                        <th>Termination time</th>
+                        <th>&nbsp;</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="job in pizdaintJobs">
+                        <td>{{job.status}}</td>
+                        <td>{{job.owner}}</td>
+                        <td class="monospace-text">{{job.submissionTime}}</td>
+                        <td>{{job.terminationTime}}</td>
+                        <td>
+                            <!-- Join button enabled provided simulation state is consistent-->
+                            <a analytics-on analytics-event="Join" analytics-category="Experiment" ng-click=""
+                                type="button" class="btn btn-default" ng-disabled="(job.status === 'FAILED') || (job.status === 'SUCCESSFUL') || (job.status === 'STAGINGOUT')">
+                                Join »</a>
+                            <!-- Stop button enabled provided simulation state is consistent-->
+                            <a analytics-on analytics-event="Stop" analytics-category="Experiment" ng-click=""
+                                type="button" class="btn btn-default" ng-if="(job.status !== 'FAILED') || (job.status !== 'SUCCESSFUL') || (job.status !== 'STAGINGOUT')"
+                                ng-disabled="simul.stopping">
+                                <i class="fa fa-spinner fa-spin" ng-if="simul.stopping"></i> Stop
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div ng-show="!pizdaint && experiments && (!running || (config.canLaunchExperiments && exp.joinableServers.length > 0))"
         ng-repeat="exp in filteredExperiments | orderBy:'configuration.name':false" class="experiment-box"
         ng-mouseenter="isHovered = true" ng-mouseleave="isHovered = false" ng-mouseup="isHovered = false" ng-click="selectExperiment(exp);"
         editable-experiment experiment-details="exp">

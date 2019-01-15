@@ -290,6 +290,7 @@
     'bbpConfig',
     'simulationConfigService',
     'environmentService',
+    '$interval',
     function(
       $q,
       $http,
@@ -304,7 +305,8 @@
       experimentProxyService,
       bbpConfig,
       simulationConfigService,
-      environmentService
+      environmentService,
+      $interval
     ) {
       var rosConnection, statusListener;
 
@@ -531,10 +533,44 @@
         );
       };
 
+      var startPizDaintExperiment = function() {
+        var deferred = $q.defer();
+        experimentProxyService.submitJob().then(function(jobUrl) {
+          deferred.notify('submitted. Job url: ' + jobUrl);
+          var doneStates = ['SUCCESSFUL', 'FAILED']; // TODO add RUNNING back in once we have full job
+          const checkResult = () => {
+            return experimentProxyService
+              .getJobStatus(jobUrl)
+              .then(function(response) {
+                deferred.notify(response.status);
+                return response.status;
+              })
+              .then(status => {
+                if (doneStates.indexOf(status) === -1) return;
+                $interval.cancel(intervalStatus);
+                // get error/status codes
+                return experimentProxyService
+                  .getJobOutcome(jobUrl)
+                  .then(function(response) {
+                    console.log('stdout:');
+                    console.log(response[0]);
+                    console.log('stderr:');
+                    console.log(response[1]);
+                    if (status === doneStates[1]) deferred.reject(status);
+                    else deferred.resolve(status);
+                  });
+              });
+          };
+          let intervalStatus = $interval(checkResult, 10000);
+        });
+        return deferred.promise;
+      };
+
       // Public methods of the service
       var experimentSimulationService = {
         stopExperimentOnServer: stopExperimentOnServer,
-        startNewExperiment: startNewExperiment
+        startNewExperiment: startNewExperiment,
+        startPizDaintExperiment: startPizDaintExperiment
       };
 
       return experimentSimulationService;

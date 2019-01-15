@@ -31,6 +31,7 @@
       scope: {
         private: '=',
         running: '=',
+        pizdaint: '=',
         loadPrivateExperiments: '&',
         reinit: '&',
         experimentEmpty: '&',

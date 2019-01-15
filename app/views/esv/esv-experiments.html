@@ -53,6 +53,12 @@
         </div>
         <div ng-show="tabSelection=='RunningExperiments'" class="underlined-box"></div>
       </div>
+      <div class="underlined-tab" ng-click="tabChanged('PizDaintExperiments')" ng-show="devMode">
+        <div ng-class="{'underlined-tab-selected':tabSelection=='PizDaintExperiments'}">
+          Piz Daint Jobs
+        </div>
+        <div ng-show="tabSelection=='PizDaintExperiments'" class="underlined-box"></div>
+      </div>
 
     </div>
 
@@ -77,7 +83,7 @@
 
   <div ng-if="tabSelection!='NewExperiment'" style="flex-shrink: 1;flex-grow:1;overflow-y: auto; flex-basis: 0;">
     <experiment-list ng-if="tabSelection=='MyExperiments' && showMyExperiments" query="query" experiment-empty="experimentEmpty()"
-      reinit="reloadMyExperiments()" running="false" private="true">
+      reinit="reloadMyExperiments()" running="false" private="true" pizdaint="false">
     </experiment-list>
 
     <div ng-if="tabSelection=='MyExperiments'" style="display: flex;justify-content: flex-end;margin-bottom:10px;padding-right: 20px;">
@@ -89,10 +95,13 @@
     </div>
 
     <experiment-list ng-if="tabSelection=='CloneExperiment'" query="query" running="false" experiment-empty="experimentEmpty()"
-      private="false" load-private-experiments="reloadMyExperiments()"></experiment-list>
+      private="false"  pizdaint="false" load-private-experiments="reloadMyExperiments()"></experiment-list>
 
     <experiment-list ng-if="tabSelection=='RunningExperiments' && showMyExperiments" experiment-empty="experimentEmpty()" query="query"
-      reinit="reloadMyExperiments()" running="true" private="true"></experiment-list>
+      reinit="reloadMyExperiments()" running="true" pizdaint="false" private="true"></experiment-list>
+
+      <experiment-list ng-if="tabSelection=='PizDaintExperiments' && showMyExperiments" experiment-empty="experimentEmpty()" query="query"
+      reinit="reloadMyExperiments()" running="true" pizdaint="true" private="true"></experiment-list>
 
   </div>
 

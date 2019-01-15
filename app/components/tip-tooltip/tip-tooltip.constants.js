@@ -110,6 +110,9 @@
         'Advanced tip: You can upload your own texture in the resources/textures folder and display it on an object from a state machine',
       image: 'img/tips/chess-board-solid.svg',
       stackMode: true
+    },
+    PIZ_DAINT_JOBS: {
+      text: 'You can see a list of all your sumbitted Piz Daint jobs.'
     }
   });
 })();

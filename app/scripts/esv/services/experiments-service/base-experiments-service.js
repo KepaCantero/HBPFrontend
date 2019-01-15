@@ -138,6 +138,24 @@
         });
     }
 
+    getPizDaintJobs() {
+      return this.experimentProxyService
+        .getPizDaintJobs()
+        .then(function(results) {
+          return results;
+        });
+    }
+
+    startPizDaintExperiment() {
+      return this.experimentSimulationService
+        .startPizDaintExperiment()
+        .catch(fatalErrorWasShown => {
+          if (!fatalErrorWasShown)
+            this.clbErrorDialog.open('Error starting Piz Daint job');
+          return this.$q.reject(fatalErrorWasShown);
+        });
+    }
+
     stopExperiment(simulation) {
       simulation.stopping = true;
       if (!this.stoppingExperiments[simulation.server])
