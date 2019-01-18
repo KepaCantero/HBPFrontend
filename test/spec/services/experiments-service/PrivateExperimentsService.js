@@ -1,7 +1,12 @@
 'use strict';
 
 describe('Services: PrivateExperimentsService', function() {
-  var privateExperimentsService, storageServer, $rootScope;
+  var privateExperimentsService,
+    storageServer,
+    $rootScope,
+    experimentProxyService,
+    experimentSimulationService,
+    clbErrorDialog;
 
   beforeEach(module('exdFrontendApp'));
 
@@ -9,12 +14,12 @@ describe('Services: PrivateExperimentsService', function() {
     inject(function(
       _storageServer_,
       $stateParams,
-      experimentProxyService,
+      _experimentProxyService_,
       SERVER_POLL_INTERVAL,
-      experimentSimulationService,
+      _experimentSimulationService_,
       uptimeFilter,
       nrpUser,
-      clbErrorDialog,
+      _clbErrorDialog_,
       FAIL_ON_SELECTED_SERVER_ERROR,
       FAIL_ON_ALL_SERVERS_ERROR,
       $interval,
@@ -22,6 +27,9 @@ describe('Services: PrivateExperimentsService', function() {
       _$rootScope_
     ) {
       storageServer = _storageServer_;
+      experimentProxyService = _experimentProxyService_;
+      experimentSimulationService = _experimentSimulationService_;
+      clbErrorDialog = _clbErrorDialog_;
       $rootScope = _$rootScope_;
 
       /*global PrivateExperimentsService*/
@@ -53,6 +61,28 @@ describe('Services: PrivateExperimentsService', function() {
         done();
       });
     $rootScope.$digest();
+  });
+
+  it('should return pizdaint jobs', function(done) {
+    spyOn(experimentProxyService, 'getPizDaintJobs').and.returnValue(
+      window.$q.when('somedata')
+    );
+    privateExperimentsService.getPizDaintJobs().then(function(res) {
+      expect(res).toBe('somedata');
+      done();
+    });
+    $rootScope.$digest();
+  });
+
+  it('should show error when error starting piz daint exp', function() {
+    spyOn(clbErrorDialog, 'open');
+    spyOn(
+      experimentSimulationService,
+      'startPizDaintExperiment'
+    ).and.returnValue(window.$q.reject(false));
+    privateExperimentsService.startPizDaintExperiment();
+    $rootScope.$digest();
+    expect(clbErrorDialog.open).toHaveBeenCalled();
   });
 
   it('should delete an experiment successfully', function(done) {

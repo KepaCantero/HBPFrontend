@@ -684,6 +684,55 @@
       expect(experimentsService.destroy).toHaveBeenCalled();
     });
 
+    it('startPizdaintJob should ', function() {
+      var experimentsService;
+      var createExperimentsService =
+        experimentsFactory.createExperimentsService;
+      spyOn(
+        experimentsFactory,
+        'createExperimentsService'
+      ).and.callFake(function() {
+        experimentsService = createExperimentsService.apply(
+          experimentsFactory,
+          arguments
+        );
+        return experimentsService;
+      });
+      var page = renderEsvWebPage({ dev: true });
+      spyOn(experimentsService, 'startPizDaintExperiment').and.returnValue(
+        $q.when()
+      );
+      var scope = getExperimentListScope(page);
+      scope.startPizDaintExperiment();
+      $rootScope.$digest();
+      expect(experimentsService.startPizDaintExperiment).toHaveBeenCalled();
+    });
+
+    it('should get PizDaintJobs', function() {
+      $httpBackend.whenGET(proxyUrl + '/getjobs').respond(200, 'jobs');
+
+      var experimentsService;
+      var createExperimentsService =
+        experimentsFactory.createExperimentsService;
+      spyOn(
+        experimentsFactory,
+        'createExperimentsService'
+      ).and.callFake(function() {
+        experimentsService = createExperimentsService.apply(
+          experimentsFactory,
+          arguments
+        );
+        return experimentsService;
+      });
+      var page = renderEsvWebPage({ dev: true });
+      spyOn(experimentsService, 'getPizDaintJobs').and.callThrough();
+      var scope = getExperimentListScope(page);
+      scope.getPizDaintJobs();
+      $httpBackend.flush();
+      $rootScope.$digest();
+      expect(experimentsService.getPizDaintJobs).toHaveBeenCalled();
+    });
+
     describe('esvExperimentsCtrl without a context id', function() {
       it('should show the right buttons', function() {
         spyOn(storageServer, 'getExperiments').and.returnValue(
