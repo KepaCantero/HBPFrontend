@@ -4,7 +4,7 @@ describe('Controller: admin-page.controller', function() {
   beforeEach(module('exdFrontendApp'));
   beforeEach(module('bbpStubFactory'));
 
-  let $rootScope, $httpBackend, adminPageCtrl, adminService;
+  let $rootScope, $httpBackend, adminPageCtrl, adminService, scheduler;
 
   beforeEach(
     inject(function(_$rootScope_, _$httpBackend_, $controller, _adminService_) {
@@ -18,7 +18,16 @@ describe('Controller: admin-page.controller', function() {
         .whenGET('http://proxy/admin/status')
         .respond({ maintenance: false });
 
-      $httpBackend.whenGET('http://proxy/admin/servers').respond([]);
+      $httpBackend
+        .whenGET('http://proxy/admin/servers')
+        .respond([{ server: 'server1' }, { server: 'server2' }]);
+
+      scheduler = new Rx.TestScheduler();
+
+      const originalTimer = Rx.Observable.timer;
+      spyOn(Rx.Observable, 'timer').and.callFake((initialDelay, dueTime) =>
+        originalTimer(initialDelay, dueTime, scheduler)
+      );
 
       adminPageCtrl = $controller('adminPageCtrl', {
         $scope: $rootScope
@@ -27,6 +36,19 @@ describe('Controller: admin-page.controller', function() {
       $rootScope.$apply();
     })
   );
+
+  it('should update ctrl servers when new servers received', function() {
+    expect(adminPageCtrl.servers).toEqual({});
+
+    spyOn(adminPageCtrl, 'updateServerVersions');
+    scheduler.flush();
+    $httpBackend.flush();
+
+    expect(adminPageCtrl.servers).toEqual({
+      server1: { server: 'server1' },
+      server2: { server: 'server2' }
+    });
+  });
 
   it('should call backend when setting status', function() {
     $httpBackend.expectPOST('http://proxy/admin/status/true').respond({});
@@ -62,6 +84,38 @@ describe('Controller: admin-page.controller', function() {
     adminPageCtrl.restartServer();
     $rootScope.$apply();
     expect(adminPageCtrl.clbErrorDialog.open).toHaveBeenCalled();
+  });
+
+  it('should fill-in versions in existing server objects', () => {
+    /* eslint-disable camelcase */
+    const versions = {
+      hbp_nrp_backend: 1.1,
+      hbp_nrp_common: 1.2
+    };
+    $httpBackend.whenGET(/server[12]\/version/).respond(versions);
+
+    adminPageCtrl.servers = {
+      server1: { api: 'server1' },
+      server2: { api: 'server2' }
+    };
+
+    adminPageCtrl.updateServerVersions();
+
+    $rootScope.$apply();
+    $httpBackend.flush();
+    expect(_.map(adminPageCtrl.servers, s => s.mainVersion)).toEqual([
+      1.1,
+      1.1
+    ]);
+    const mappedVersions = [
+      { name: 'hbp_nrp_backend', version: 1.1 },
+      { name: 'hbp_nrp_common', version: 1.2 }
+    ];
+    expect(_.map(adminPageCtrl.servers, s => s.versions)).toEqual([
+      mappedVersions,
+      mappedVersions
+    ]);
+    /* eslint-enable camelcase */
   });
 
   it('should unsubscribe on controller destroy', function() {

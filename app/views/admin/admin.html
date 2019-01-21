@@ -29,6 +29,7 @@
         <thead>
           <tr>
             <th scope="col">Name</th>
+            <th scope="col" width="240px">Version</th>
             <th scope="col">Health</th>
             <th scope="col">Errors</th>
             <th scope="col">Simulations</th>
@@ -39,6 +40,14 @@
         <tbody>
           <tr ng-repeat="server in $ctrl.servers">
             <th scope="row">{{server.server}}</th>
+            <td>
+                <a href ng-click="server.showDetails=!server.showDetails">{{server.mainVersion}}</a>
+                <div ng-if="server.showDetails">
+                    <div ng-repeat="lib in server.versions | orderBy: 'name'">
+                        {{lib.name}} {{lib.version}}
+                    </div>
+                </div>
+            </td>
             <td>{{server.health.state}}</td>
             <td>{{server.health.errors}}</td>
             <td>{{server.health.simulations}}</td>

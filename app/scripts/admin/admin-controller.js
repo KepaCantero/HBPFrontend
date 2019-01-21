@@ -29,7 +29,8 @@
       return 5000;
     }
 
-    constructor($scope, adminService, nrpUser, clbErrorDialog) {
+    constructor($scope, $http, adminService, nrpUser, clbErrorDialog) {
+      this.$http = $http;
       this.clbErrorDialog = clbErrorDialog;
       this.adminService = adminService;
       this.adminRights = false;
@@ -40,7 +41,10 @@
       this.serversPolling$ = Rx.Observable
         .timer(0, AdminPageCtrl.SERVER_POLL_INTERVAL)
         .subscribe(() =>
-          adminService.getServers().then(servers => this.updateServers(servers))
+          adminService.getServers().then(servers => {
+            this.updateServers(servers.map(s => s.toJSON()));
+            this.updateServerVersions();
+          })
         );
 
       // work around a but that prevents the $onDestroy from beeing called for controllers  instantiated by the router
@@ -48,6 +52,22 @@
       $scope.$on('$destroy', () => this.$onDestroy());
     }
 
+    updateServerVersions() {
+      _.forEach(this.servers, serverObj => {
+        if (serverObj.mainVersion) return;
+        this.getServerVersion(serverObj.api).then(({ data: versions }) => {
+          serverObj.versions = _.map(versions, (v, k) => ({
+            name: k,
+            version: v
+          }));
+          serverObj.mainVersion = versions.hbp_nrp_backend;
+        });
+      });
+    }
+
+    getServerVersion(serverAPI) {
+      return this.$http({ method: 'GET', url: `${serverAPI}/version` });
+    }
     updateServers(servers) {
       _.merge(this.servers, _.keyBy(servers, 'server'));
     }
@@ -74,6 +94,7 @@
 
   AdminPageCtrl.$inject = [
     '$scope',
+    '$http',
     'adminService',
     'nrpUser',
     'clbErrorDialog'
