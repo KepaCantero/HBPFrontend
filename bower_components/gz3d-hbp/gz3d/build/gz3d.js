@@ -3792,19 +3792,19 @@ GZ3D.Gui.prototype.init = function()
   );
 
   // Create temp model
-  guiEvents.on('spawn_entity_start', function(entity)
+  guiEvents.on('spawn_entity_start', function(modelPath, modelSDF)
       {
         // manually trigger view mode
         that.scene.setManipulationMode('view');
         $('#view-mode').prop('checked', true);
         $('input[type="radio"]').checkboxradio('refresh');
 
-        var name = getNameFromPath(entity);
+        var name = getNameFromPath(modelPath);
 
         that.spawnState = 'START';
-        that.scene.spawnModel.start(entity,function(obj)
+        that.scene.spawnModel.start(modelPath, modelSDF, name, function(obj)
             {
-              that.emitter.emit('entityCreated', obj, entity);
+              that.emitter.emit('entityCreated', obj, modelPath);
             });
         guiEvents.emit('notification_popup',
             'Place '+name+' at the desired position');
@@ -5727,7 +5727,7 @@ GZ3D.GZIface.prototype.onConnected = function()
         }
         i++;
       }
-      this.onCreateEntityCallbacks.forEach(function (callback) { callback(); });
+      this.onCreateEntityCallbacks.forEach(function (callback) { callback(modelObj); });
     } else {
       this.updateModelFromMsg(this.scene.getGazeboObject(message), message);
     }
@@ -13396,9 +13396,15 @@ GZ3D.SdfParser.prototype.spawnLightFromSDF = function(sdfObj)
  * @returns {object} pose - pose object having position (x,y,z)(THREE.Vector3)
  * and orientation (THREE.Quaternion) properties
  */
-GZ3D.SdfParser.prototype.parsePose = function(poseStr)
+GZ3D.SdfParser.prototype.parsePose = function(pose)
 {
-  var values = poseStr.trim().split(' ');
+  var values;
+  if (typeof pose === 'string') {
+    values = pose.trim().split(' ');
+  }
+  else {
+    values = [0, 0, 0, 0, 0, 0];
+  }
 
   var position = new THREE.Vector3(parseFloat(values[0]),
           parseFloat(values[1]), parseFloat(values[2]));
@@ -13409,12 +13415,12 @@ GZ3D.SdfParser.prototype.parsePose = function(poseStr)
           parseFloat(values[5]), 'ZYX');
   quaternion.setFromEuler(euler);
 
-  var pose = {
+  var result = {
     'position': position,
     'orientation': quaternion
   };
 
-  return pose;
+  return result;
 
 };
 
@@ -13799,9 +13805,9 @@ GZ3D.SdfParser.prototype.spawnFromSDF = function(sdf)
  * @returns {THREE.Object3D} modelObject - 3D object which is created
  * according to SDF model.
  */
-GZ3D.SdfParser.prototype.loadSDF = function(modelName)
+GZ3D.SdfParser.prototype.loadSDF = function(filePath)
 {
-  var sdf = this.loadModel(modelName);
+  var sdf = this.loadModel(filePath);
   return this.spawnFromSDF(sdf);
 };
 
@@ -14121,9 +14127,9 @@ GZ3D.SdfParser.prototype.createCylinderSDF = function(translation, euler)
  * @param {string} modelName - name of the model
  * @returns {XMLDocument} modelDOM - SDF DOM object of the loaded model
  */
-GZ3D.SdfParser.prototype.loadModel = function(modelName)
+GZ3D.SdfParser.prototype.loadModel = function(filePath)
 {
-  var modelFile = this.MATERIAL_ROOT + modelName + '/model.sdf';
+  var modelFile = this.MATERIAL_ROOT + filePath;
 
   var xhttp = new XMLHttpRequest();
   xhttp.overrideMimeType('text/xml');
@@ -14162,10 +14168,10 @@ GZ3D.SpawnModel.prototype.init = function ()
 /**
  * Start spawning an entity. Only simple shapes supported so far.
  * Adds a temp object to the scene which is not registered on the server.
- * @param {string} entity
+ * @param {string} modelPath
  * @param {function} callback
  */
-GZ3D.SpawnModel.prototype.start = function (entity, callback, position, quaternion,scale)
+GZ3D.SpawnModel.prototype.start = function (modelPath, modelSDF, modelName, callback, position, quaternion, scale)
 {
   if (this.active)
   {
@@ -14187,42 +14193,43 @@ GZ3D.SpawnModel.prototype.start = function (entity, callback, position, quaterni
 
    this.autoAlignModel.start(this.obj);
 
-  if (entity === 'box')
+  if (modelPath === 'box')
   {
     mesh = this.scene.createBox(1, 1, 1);
-    this.obj.userData.shapeName = entity;
+    this.obj.userData.shapeName = modelPath;
   }
-  else if (entity === 'sphere')
+  else if (modelPath === 'sphere')
   {
     mesh = this.scene.createSphere(0.5);
-    this.obj.userData.shapeName = entity;
+    this.obj.userData.shapeName = modelPath;
   }
-  else if (entity === 'cylinder')
+  else if (modelPath === 'cylinder')
   {
     mesh = this.scene.createCylinder(0.5, 1.0);
-    this.obj.userData.shapeName = entity;
+    this.obj.userData.shapeName = modelPath;
   }
-  else if (entity === 'pointlight')
+  else if (modelPath === 'pointlight')
   {
     mesh = this.scene.createLight(this.scene.LIGHT_POINT);
   }
-  else if (entity === 'spotlight')
+  else if (modelPath === 'spotlight')
   {
     mesh = this.scene.createLight(this.scene.LIGHT_SPOT);
   }
-  else if (entity === 'directionallight')
+  else if (modelPath === 'directionallight')
   {
     mesh = this.scene.createLight(this.scene.LIGHT_DIRECTIONAL);
   }
   else
   {
-    mesh = this.sdfParser.loadSDF(entity);
+    if (typeof modelSDF === 'undefined') modelSDF = 'model.sdf';
+    mesh = this.sdfParser.loadSDF(modelPath + '/' + modelSDF);
     //TODO: add transparency to the object
     zoffset = 0;
     this.autoAlignModel.alignOnMeshBase();
   }
 
-  this.obj.name = this.generateUniqueName(entity);
+  this.obj.name = this.generateUniqueName(modelName);
   this.obj.add(mesh);
 
   var viewWidth = this.scene.getDomElement().clientWidth;

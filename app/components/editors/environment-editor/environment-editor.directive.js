@@ -21,7 +21,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  * ---LICENSE-END**/
+
 /* global THREE: false */
+/* global GZ3D: false */
+
 (function() {
   'use strict';
 
@@ -50,6 +53,7 @@
     'newExperimentProxyService',
     '$q',
     'storageServer',
+    'backendInterfaceService',
     function(
       STATE,
       EDIT_MODE,
@@ -66,7 +70,8 @@
       $http,
       newExperimentProxyService,
       $q,
-      storageServer
+      storageServer,
+      backendInterfaceService
     ) {
       return {
         templateUrl:
@@ -119,38 +124,21 @@
                 storageServer.getCustomModels('robots')
               ])
               .then(([templateRobots, customRobots]) => {
-                /*
-                For future reference when we implement the drag and drop
-                template robots looks like : 
-                [{
-                  name:'robot1 name', 
-                  description:'robot1 description',
-                  thumbnail :'<robot png data>',
-                  id: 'robot1',
-                  path : 'robots/<robot folder>/model.config'
-                }]
-                we add a public key through the map
-                
-                private robots looks like:
-                [{
-                  name:'custom robot1 name', 
-                  description:'custom robot1 description',
-                  thumbnail :'<robot png data>',
-                  id: 'robot1',
-                  fileName : robots/robot1.zip,
-                  path: "robots%2Frobot1.zip"
-                }]
-                we add a custom key through the map
-                */
                 templateRobots.data.forEach(robot => (robot.public = true));
                 customRobots.forEach(robot => (robot.custom = true));
-                return [...templateRobots.data, ...customRobots].map(robot => ({
-                  modelPath: robot.path,
-                  modelTitle: robot.name,
-                  thumbnail: robot.thumbnail,
-                  custom: robot.custom,
-                  public: robot.public
-                }));
+                return [...templateRobots.data, ...customRobots].map(robot => {
+                  return {
+                    configPath: robot.path,
+                    modelPath: robot.id,
+                    zipURI: robot.zipURI && robot.zipURI.replace(/%2F/gi, '/'),
+                    modelSDF: robot.sdf,
+                    modelTitle: robot.name,
+                    thumbnail: robot.thumbnail,
+                    custom: robot.custom,
+                    public: robot.public,
+                    isRobot: true
+                  };
+                });
               });
           };
 
@@ -167,11 +155,13 @@
               modelsPromise = scope
                 .generateRobotsModels()
                 .then(templateRobots => {
-                  scope.categories.push({
+                  let robotCategory = {
                     thumbnail: 'robots.png',
                     title: 'Robots',
                     models: templateRobots
-                  });
+                  };
+                  scope.categories.push(robotCategory);
+                  GZ3D.modelList.push(robotCategory);
                 })
                 .catch(err =>
                   clbErrorDialog.open({
@@ -237,61 +227,93 @@
             }
           };
 
-          scope.selectCreatedEntity = function() {
-            /*eslint-disable camelcase*/
-            scope.gz3d.gui.guiEvents._events.notification_popup =
-              scope.default_notification_popup_handle;
+          scope.onModelMouseDown = (event, model) => {
+            event.preventDefault();
 
-            var expectedObj = scope.gz3d.scene.getByName(
-              scope.expectedObjectName
-            );
-            scope.expectedObjectName = null;
-
-            if (expectedObj) {
-              scope.gz3d.scene.selectEntity(expectedObj);
-              goldenLayoutService.openTool(TOOL_CONFIGS.OBJECT_INSPECTOR);
-            }
-          };
-
-          scope.interceptEntityCreationEvent = function(model, type) {
-            if (
-              scope.defaultEntityCreatedCallback !==
-              scope.interceptEntityCreationEvent
-            ) {
-              scope.defaultEntityCreatedCallback(model, type);
-            }
-
-            scope.gz3d.iface.gui.emitter._events.entityCreated =
-              scope.defaultEntityCreatedCallback;
-            scope.defaultEntityCreatedCallback =
-              scope.interceptEntityCreationEvent;
-            // local variable <model> holds a temporary object;
-            // another THREE.Object3D is about to be created by
-            // modelUpdate method from GZ3D.GZIface.prototype.onConnected
-            // with this.createModelFromMsg(message). We assign a notification
-            // handler for that event.
-            scope.expectedObjectName = model.name;
-            scope.default_notification_popup_handle =
-              scope.gz3d.gui.guiEvents._events.notification_popup;
-            scope.gz3d.gui.guiEvents._events.notification_popup =
-              scope.selectCreatedEntity;
-          };
-
-          scope.addModel = function(modelName) {
-            if (stateService.currentState !== STATE.INITIALIZED) {
-              window.guiEvents.emit('spawn_entity_start', modelName);
-
-              if (
-                scope.gz3d.iface.gui.emitter._events.entityCreated !==
-                scope.interceptEntityCreationEvent
-              ) {
-                scope.defaultEntityCreatedCallback =
-                  scope.gz3d.iface.gui.emitter._events.entityCreated;
-                scope.gz3d.iface.gui.emitter._events.entityCreated =
-                  scope.interceptEntityCreationEvent;
+            if (model.isRobot) {
+              if (model.custom) {
+                backendInterfaceService
+                  .getCustomRobot(model.zipURI.split('/')[1])
+                  .then(() => {
+                    scope.addRobot(model);
+                  });
+              } else {
+                scope.addRobot(model);
               }
+            } else {
+              scope.addModel(model);
             }
           };
+
+          scope.addModel = function(model) {
+            if (stateService.currentState !== STATE.INITIALIZED) {
+              window.guiEvents.emit(
+                'spawn_entity_start',
+                model.modelPath,
+                model.modelSDF
+              );
+            }
+          };
+
+          scope.addRobot = model => {
+            if (stateService.currentState !== STATE.INITIALIZED) {
+              // manually trigger view mode
+              gz3d.scene.setManipulationMode('view');
+
+              gz3d.gui.spawnState = 'START';
+              gz3d.scene.spawnModel.start(
+                model.modelPath,
+                model.modelSDF,
+                model.modelTitle,
+                obj => {
+                  let pose = {
+                    x: obj.position.x,
+                    y: obj.position.y,
+                    z: obj.position.z,
+                    roll: obj.rotation.x,
+                    pitch: obj.rotation.y,
+                    yaw: obj.rotation.z
+                  };
+                  let robotID = obj.name.toLowerCase().replace(/ /gi, '_');
+
+                  let onCreateCallback = model => {
+                    if (model.name === robotID) {
+                      gz3d.scene.selectEntity(model);
+                      goldenLayoutService.openTool(
+                        TOOL_CONFIGS.OBJECT_INSPECTOR
+                      );
+                    }
+
+                    let callbackIndex = gz3d.iface.onCreateEntityCallbacks.indexOf(
+                      onCreateCallback
+                    );
+                    gz3d.iface.onCreateEntityCallbacks.splice(callbackIndex, 1);
+                  };
+                  gz3d.iface.addOnCreateEntityCallbacks(onCreateCallback);
+
+                  let robotRelativePath;
+                  let isCustom = model.custom ? 'True' : 'False';
+                  if (model.custom) {
+                    robotRelativePath = model.zipURI.split('/')[1];
+                  } else {
+                    robotRelativePath = model.modelPath + '/' + model.modelSDF;
+                  }
+                  backendInterfaceService.addRobot(
+                    robotID,
+                    robotRelativePath,
+                    pose,
+                    isCustom
+                  );
+                }
+              );
+            }
+          };
+
+          scope.onEntityCreated = modelCreated => {
+            gz3d.scene.selectEntity(modelCreated);
+            goldenLayoutService.openTool(TOOL_CONFIGS.OBJECT_INSPECTOR);
+          };
+          gz3d.iface.gui.emitter.on('entityCreated', scope.onEntityCreated);
 
           scope.deleteModel = function() {
             gz3d.gui.guiEvents.emit('delete_entity');

@@ -206,10 +206,13 @@
 
       /* eslint-disable camelcase*/
 
-      var resourceRobots = function(backendBaseUrl) {
+      var resourceRobots = function(backendBaseUrl, robotID) {
         return $resource(
           backendBaseUrl + '/simulation/:sim_id/robots',
-          { sim_id: simulationInfo.simulationID },
+          {
+            sim_id: simulationInfo.simulationID,
+            robot_id: robotID
+          },
           {
             getRobots: {
               method: 'GET',
@@ -224,6 +227,31 @@
             delete: {
               method: 'DELETE',
               url: backendBaseUrl + '/simulation/:sim_id/robots/:robot_id',
+              interceptor: { responseError: serverError.displayHTTPError }
+            },
+            add: {
+              method: 'POST',
+              url: backendBaseUrl + '/simulation/:sim_id/robots/:robot_id',
+              interceptor: { responseError: serverError.displayHTTPError }
+            }
+          }
+        );
+      };
+
+      var resourceFiles = function(backendBaseUrl, fileType, filePath) {
+        return $resource(
+          backendBaseUrl + '/simulation/:sim_id/files',
+          {
+            sim_id: simulationInfo.simulationID,
+            file_type: fileType,
+            file_path: filePath
+          },
+          {
+            get: {
+              method: 'GET',
+              url:
+                backendBaseUrl +
+                '//simulation/:sim_id/files/:file_type/:file_path',
               interceptor: { responseError: serverError.displayHTTPError }
             }
           }
@@ -442,6 +470,33 @@
           return resourceRobots(simulationInfo.serverBaseUrl).delete({
             robot_id: robotId
           }).$promise;
+        },
+        /**
+         *  Delete a robot specified by its robot ID string
+         * @param robotId The id of the robot to be deleted
+         * @return A promise with the operation result
+         */
+        addRobot: function(robotId, robotRelPath, robotPose, isCustom) {
+          return resourceRobots(simulationInfo.serverBaseUrl).add(
+            { robot_id: robotId },
+            {
+              robotRelPath: robotRelPath,
+              robotPose: robotPose,
+              isCustom: isCustom
+            }
+          ).$promise;
+        },
+        /**
+         *  Get and extract a custom robot model from .zip
+         * @param robotId The id of the robot to be deleted
+         * @return A promise with the operation result
+         */
+        getCustomRobot: function(filePath) {
+          return resourceFiles(
+            simulationInfo.serverBaseUrl,
+            'robots',
+            filePath
+          ).get({}).$promise;
         }
       };
     }

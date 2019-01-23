@@ -61,7 +61,7 @@
     },
     ENVIRONMENT_EDITOR: {
       type: 'component',
-      title: 'Environment Editor',
+      title: 'Object Library',
       id: 'environment-designer',
       componentName: 'angularModuleComponent',
       componentState: {

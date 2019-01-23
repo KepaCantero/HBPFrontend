@@ -20,7 +20,8 @@
 
     this.gui = {
       emitter: {
-        emit: jasmine.createSpy('emit')
+        emit: jasmine.createSpy('emit'),
+        on: jasmine.createSpy('on')
       },
       guiEvents: new window.EventEmitter2({ verbose: true }),
       canModelBeDuplicated: jasmine
@@ -129,7 +130,10 @@
       toggleScreenChangeMenu: jasmine.createSpy('toggleScreenChangeMenu'),
       attachEventListeners: jasmine.createSpy('attachEventListeners'),
       getRayCastModel: jasmine.createSpy('getRayCastModel'),
-      setSkinVisible: jasmine.createSpy('setSkinVisible')
+      setSkinVisible: jasmine.createSpy('setSkinVisible'),
+      spawnModel: {
+        start: jasmine.createSpy('start')
+      }
     };
 
     this.iface = {
@@ -151,7 +155,8 @@
       },
       gui: {
         emitter: {
-          _events: { entityCreated: jasmine.createSpy('entityCreated') }
+          _events: { entityCreated: jasmine.createSpy('entityCreated') },
+          on: jasmine.createSpy('on')
         }
       },
       emitter: {

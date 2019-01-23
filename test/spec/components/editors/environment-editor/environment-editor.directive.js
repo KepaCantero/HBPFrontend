@@ -14,6 +14,8 @@ describe('Directive: environment-designer', function() {
     newExperimentProxyService,
     $q;
 
+  let modelLibraryMock;
+
   beforeEach(module('exdFrontendApp'));
   beforeEach(module('exd.templates'));
   beforeEach(module('currentStateMockFactory'));
@@ -80,7 +82,8 @@ describe('Directive: environment-designer', function() {
       storageServer = _storageServer_;
       newExperimentProxyService = _newExperimentProxyService_;
       $q = _$q_;
-      var modelLibraryMock = [
+
+      modelLibraryMock = [
         {
           title: 'Shapes',
           thumbnail: 'shapes.png',
@@ -209,7 +212,8 @@ describe('Directive: environment-designer', function() {
     var addBoxBtn = angular.element(addBoxBtnDomElem);
 
     addBoxBtn.triggerHandler('mousedown');
-    expect($scope.addModel).toHaveBeenCalledWith('box');
+    expect($scope.addModel).toHaveBeenCalled();
+    expect($scope.addModel.calls.mostRecent().args[0].modelPath).toBe('box');
   });
 
   it('should update visible models when toggling category', function() {
@@ -226,6 +230,7 @@ describe('Directive: environment-designer', function() {
         data: [
           {
             name: 'robot1 name',
+            sdf: 'model.sdf',
             description: 'robot1 description',
             thumbnail: '<robot png data>',
             id: 'robot1',
@@ -241,6 +246,7 @@ describe('Directive: environment-designer', function() {
           description: 'custom robot1 description',
           thumbnail: '<robot png data>',
           id: 'robot1',
+          zipURI: 'robot1.zip',
           fileName: 'robots/robot1.zip',
           path: 'robots%2Frobot1.zip'
         }
@@ -250,18 +256,26 @@ describe('Directive: environment-designer', function() {
     $scope.generateRobotsModels().then(res =>
       expect(res).toEqual([
         Object({
-          modelPath: 'robots/<robot folder>/model.config',
+          configPath: 'robots/<robot folder>/model.config',
+          modelPath: 'robot1',
+          zipURI: undefined,
+          modelSDF: 'model.sdf',
           modelTitle: 'robot1 name',
           thumbnail: '<robot png data>',
           custom: undefined,
-          public: true
+          public: true,
+          isRobot: true
         }),
         Object({
-          modelPath: 'robots%2Frobot1.zip',
+          configPath: 'robots%2Frobot1.zip',
+          modelPath: 'robot1',
+          zipURI: 'robot1.zip',
+          modelSDF: undefined,
           modelTitle: 'custom robot1 name',
           thumbnail: '<robot png data>',
           custom: true,
-          public: undefined
+          public: undefined,
+          isRobot: true
         })
       ])
     );
@@ -276,7 +290,8 @@ describe('Directive: environment-designer', function() {
     var addBoxBtn = angular.element(addBoxBtnDomElem);
 
     addBoxBtn.triggerHandler('mousedown');
-    expect($scope.addModel).toHaveBeenCalledWith('box');
+    expect($scope.addModel).toHaveBeenCalled();
+    expect($scope.addModel.calls.mostRecent().args[0].modelPath).toBe('box');
     expect(window.guiEvents.emit).not.toHaveBeenCalledWith(
       'spawn_entity_start',
       'box'
@@ -294,42 +309,27 @@ describe('Directive: environment-designer', function() {
     //should emit 'spawn_entity_start'
     expect(window.guiEvents.emit).toHaveBeenCalledWith(
       'spawn_entity_start',
-      'box'
+      'box',
+      undefined
     );
   });
 
   it('should open object inspector after adding a model', function() {
-    var objName = 'cylinder_0';
-    var obj = {};
-    obj.name = objName;
+    let mockModel = {
+      modelPath: 'model-path',
+      modelSDF: 'model.sdf'
+    };
+    let mockModelCreated = {};
 
-    $scope.expectedObjectName = objName;
-    $scope.gz3d.scene.getByName.and.returnValue(objName);
+    $scope.addModel(mockModel);
+    $scope.onEntityCreated(mockModelCreated, mockModel.modelPath);
 
-    $scope.selectCreatedEntity(objName + ' created');
-
-    expect($scope.gz3d.scene.selectedEntity === obj);
+    expect($scope.gz3d.scene.selectEntity).toHaveBeenCalledWith(
+      mockModelCreated
+    );
     expect(goldenLayoutService.openTool).toHaveBeenCalledWith(
       $scope.TOOL_CONFIGS.OBJECT_INSPECTOR
     );
-  });
-
-  it('should check interceptEntityCreationEvent', function() {
-    stateService.currentSate = $scope.STATE.STARTED;
-
-    var objName = 'cylinder_0';
-    var obj = {};
-    obj.name = objName;
-
-    $scope.addModel(objName);
-
-    // $scope.defaultEntityCreatedCallback is overwritten within
-    // $scope.interceptEntityCreationEvent()
-    var toBeCalled = $scope.defaultEntityCreatedCallback;
-
-    $scope.interceptEntityCreationEvent(obj);
-
-    expect(toBeCalled).toHaveBeenCalled();
   });
 
   it('should create a new dummy anchor and click it when exporting the environment', function() {
@@ -397,7 +397,10 @@ describe('Directive: environment-designer', function() {
 
 describe('Directive: environment-designer robots models', function() {
   var $scope,
+    backendInterfaceService,
+    gz3d,
     httpBackend,
+    stateService,
     storageServer,
     newExperimentProxyService,
     environmentService,
@@ -412,6 +415,7 @@ describe('Directive: environment-designer robots models', function() {
   beforeEach(module('goldenLayoutServiceMock'));
   beforeEach(module('gz3dMock'));
   beforeEach(module('sceneInfoMock'));
+
   beforeEach(
     module(function($provide) {
       $provide.value(
@@ -431,6 +435,8 @@ describe('Directive: environment-designer robots models', function() {
       $provide.value('panels', {
         close: jasmine.createSpy('close')
       });
+
+      window.GZ3D.modelList = [];
     })
   );
 
@@ -439,12 +445,13 @@ describe('Directive: environment-designer robots models', function() {
       $rootScope,
       $compile,
       $document,
-      EDIT_MODE,
-      STATE,
-      TOOL_CONFIGS,
+      _EDIT_MODE_,
+      _STATE_,
+      _TOOL_CONFIGS_,
+      _backendInterfaceService_,
       _currentStateMockFactory_,
+      _gz3d_,
       _stateService_,
-      _objectInspectorService_,
       _panels_,
       _simulationSDFWorld_,
       _simulationInfo_,
@@ -457,10 +464,14 @@ describe('Directive: environment-designer robots models', function() {
       _$q_
     ) {
       $scope = $rootScope.$new();
-      $scope.EDIT_MODE = EDIT_MODE;
-      $scope.STATE = STATE;
-      $scope.TOOL_CONFIGS = TOOL_CONFIGS;
+      $scope.EDIT_MODE = _EDIT_MODE_;
+      $scope.STATE = _STATE_;
+      $scope.TOOL_CONFIGS = _TOOL_CONFIGS_;
+
+      backendInterfaceService = _backendInterfaceService_;
+      gz3d = _gz3d_;
       httpBackend = _$httpBackend_;
+      stateService = _stateService_;
       storageServer = _storageServer_;
       newExperimentProxyService = _newExperimentProxyService_;
       environmentService = _environmentService_;
@@ -545,7 +556,96 @@ describe('Directive: environment-designer robots models', function() {
     })
   );
 
-  it('should should check that dev mode is correctly set', function() {
+  it('should check that dev mode is correctly set', function() {
     expect($scope.devMode).toBe(true);
+  });
+
+  it(' - addRobot()', function() {
+    spyOn(backendInterfaceService, 'addRobot');
+
+    let robotModel = {
+      modelPath: 'my_robot',
+      modelSDF: 'model.sdf',
+      modelTitle: 'MyRobot',
+      custom: false,
+      zipURI: undefined,
+      isRobot: true
+    };
+
+    // call with invalid state
+    stateService.currentState = $scope.STATE.INITIALIZED;
+    $scope.addRobot(robotModel);
+    expect(gz3d.scene.spawnModel.start).not.toHaveBeenCalled();
+    expect(backendInterfaceService.addRobot).not.toHaveBeenCalled();
+
+    // valid state, no custom model
+    stateService.currentState = $scope.STATE.STARTED;
+    let obj = {
+      name: 'my_robot_scene_name',
+      position: { x: 1, y: 2, z: 3 },
+      rotation: { x: 4, y: 5, z: 6 }
+    };
+    gz3d.iface.addOnCreateEntityCallbacks.and.callFake(callback => {
+      callback(obj);
+    });
+    gz3d.iface.onCreateEntityCallbacks = [];
+    gz3d.scene.spawnModel.start.and.callFake(
+      (modelPath, modelSDF, modelTitle, callback) => {
+        callback(obj);
+      }
+    );
+    $scope.addRobot(robotModel);
+    expect(backendInterfaceService.addRobot).toHaveBeenCalledWith(
+      jasmine.any(String),
+      jasmine.any(String),
+      jasmine.any(Object),
+      'False'
+    );
+
+    // custom model
+    robotModel.custom = true;
+    robotModel.zipURI = 'path/to/zip';
+    gz3d.scene.spawnModel.start.and.callFake(
+      (modelPath, modelSDF, modelTitle, callback) => {
+        callback(obj);
+      }
+    );
+    $scope.addRobot(robotModel);
+    expect(backendInterfaceService.addRobot).toHaveBeenCalledWith(
+      jasmine.any(String),
+      jasmine.any(String),
+      jasmine.any(Object),
+      'True'
+    );
+  });
+
+  it(' - onModelMouseDown(), robot', function() {
+    spyOn($scope, 'addRobot');
+    spyOn(backendInterfaceService, 'getCustomRobot').and.returnValue({
+      then: callback => {
+        callback();
+      }
+    });
+
+    let robotModel = {
+      modelPath: 'my_robot',
+      modelSDF: 'model.sdf',
+      modelTitle: 'MyRobot',
+      custom: false,
+      zipURI: undefined,
+      isRobot: true
+    };
+
+    // no custom robot
+    let event = { preventDefault: jasmine.createSpy('preventDefault') };
+    $scope.onModelMouseDown(event, robotModel);
+    expect($scope.addRobot).toHaveBeenCalledWith(robotModel);
+
+    // custom robot
+    robotModel.custom = true;
+    robotModel.zipURI = 'path/to/zip';
+    $scope.onModelMouseDown(event, robotModel);
+    expect(backendInterfaceService.getCustomRobot).toHaveBeenCalled();
+    expect($scope.addRobot).toHaveBeenCalledWith(robotModel);
   });
 });

@@ -145,6 +145,10 @@
             isArray: true,
             url: `${this.STORAGE_BASE_URL}/custommodels/:modelType`
           }),
+          extractZip: buildAction({
+            method: 'PUT',
+            url: `${this.STORAGE_BASE_URL}/custommodel/:modelPath`
+          }),
           cloneTemplate: buildAction({
             method: 'POST',
             url: `${this.STORAGE_BASE_URL}/clone/`
@@ -438,6 +442,10 @@
         { experimentId },
         JSON.stringify({ transferFunctions })
       ).$promise;
+    }
+
+    extractZip(modelPath) {
+      return this.proxyRsc.extractZip({ modelPath }, null).$promise;
     }
 
     getRobotConfigPath(experimentID) {
