@@ -386,7 +386,6 @@
               return launchExperimentOnServer(
                 experiment.id,
                 experiment.private,
-                experiment.configuration.experimentConfiguration,
                 brainProcesses,
                 server,
                 serverConfig,
@@ -411,7 +410,6 @@
       var launchExperimentOnServer = function(
         experimentID,
         privateExperiment,
-        experimentConfiguration,
         brainProcesses,
         server,
         serverConfiguration,
@@ -428,7 +426,6 @@
           serverConfiguration.serverJobLocation || 'local';
 
         var simInitData = {
-          experimentConfiguration: experimentConfiguration,
           gzserverHost: serverJobLocation,
           private: privateExperiment,
           experimentID: experimentID,
