@@ -94,6 +94,26 @@ application-top-toolbar {
     margin-right: 20px;
     align-self: center;
   }
+
+  .record-color {
+    color: red;
+  }
+
+  .record-paused-colorblink {
+    color: red;
+    animation: colorblink 2s infinite;
+  }
+  @keyframes colorblink {
+    0% {
+      color: #000000;
+    }
+    50% {
+      color: #ff0000;
+    }
+    100% {
+      color: #000000;
+    }
+  }
 }
 
 // unfortunately necessary as md-menu will manipulate hmtl.style.overflowY when opened, causing a scrollbar to appear

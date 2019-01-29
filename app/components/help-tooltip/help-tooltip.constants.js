@@ -30,6 +30,7 @@
       PLAY_BUTTON:
         "Here you can start the simulation on the server. The simulation will then run until either you stop it or the simulation times out. The timeout is shown in the toolbar, named 'Timeout'.",
       PAUSE_BUTTON: 'Here you can pause the simulation on the server.',
+      RECORD_BUTTON: 'Here you can start/stop recording a simulation.',
       STOP_BUTTON: 'Here you can stop the simulation on the server.',
       RESET_BUTTON: 'Here you can activate the reset menu.',
       TIME_DISPLAY:

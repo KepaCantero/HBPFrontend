@@ -1,0 +1,91 @@
+<!-- build:css(.tmp) /components/recorder-panel/recorder-panel.style.css -->
+<link rel="stylesheet" href="/components/recorder-panel/recorder-panel.style.css" />
+<!-- endbuild -->
+
+  <div ng-show="!vm.recorderPanelService.hidden">
+
+    <div  class="recorder-panel">
+
+    <div style="display:flex; flex-direction: column;">
+
+      <div ng-if="!vm.recorderPanelService.waitingForUserConfirm()" style="display:flex">
+
+        <div ng-if="vm.recorderPanelService.isSaving()" >Saving...</div>
+        <div ng-if="vm.recorderPanelService.isPaused()" >Recording paused...</div>
+        <div ng-if="vm.recorderPanelService.isRecording()" >Recording...</div>
+
+      </div>
+
+      <div ng-if="vm.recorderPanelService.waitingForUserConfirm()" style="display:flex;width: 100%;">
+
+        <div style="display:flex; flex-direction: column;width: 100%;">
+
+          <div style="font-weight: bold">
+              Do you want to save this record ?
+          </div>
+
+        <div>
+            Description (optional):
+        </div>
+
+        <div>
+
+          <div class="experiment-name-wrapper">
+              <textarea style="width:100%; min-width: 100%" ng-model="vm.recorderPanelService.descriptionText"
+              ng-keydown="suppressKeyPress($event)"></textarea>
+          </div>
+
+        </div>
+
+        <div style="display:flex; flex-direction: row-reverse;">
+
+          <div ng-click="vm.recorderPanelService.cancelSave()" ng-class="{'recorder-panel-button':true}">
+            cancel
+          </div>
+
+          <div ng-click="vm.recorderPanelService.save()"
+               ng-class="{'recorder-panel-button':true}">
+            save
+          </div>
+
+        </div>
+
+       </div>
+
+      </div>
+
+      <div ng-if="!vm.recorderPanelService.waitingForUserConfirm()" style="display:flex">
+
+          <div style="display: flex;flex-direction: row-reverse;">
+
+            <div ng-if="!vm.recorderPanelService.isPaused() && vm.recorderPanelService.isRecording()"
+                ng-click="vm.recorderPanelService.pause(true)" ng-class="{'recorder-panel-button':true}">
+              pause
+            </div>
+
+            <div ng-if="vm.recorderPanelService.isPaused()"
+                ng-click="vm.recorderPanelService.pause(false)" ng-class="{'recorder-panel-button':true}">
+              continue
+            </div>
+
+            <div ng-if="vm.recorderPanelService.isStopped()"
+                ng-click="vm.recorderPanelService.start()" ng-class="{'recorder-panel-button':true}">
+              start
+            </div>
+
+            <div  ng-if="vm.recorderPanelService.isRecording() || vm.recorderPanelService.isPaused() "
+                 ng-click="vm.recorderPanelService.stop()"
+                 ng-class="{'recorder-panel-button':true}">
+              stop
+            </div>
+
+          </div>
+
+      </div>
+
+    </div>
+
+
+    </div>
+
+  </div>

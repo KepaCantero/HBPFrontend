@@ -39,7 +39,8 @@
       nrpAnalytics,
       storageServerTokenManager,
       userContextService,
-      updateChecker
+      updateChecker,
+      recorderPanelService
     ) {
       this.$injector = $injector;
       this.$scope = $scope;
@@ -53,6 +54,7 @@
       this.storageServerTokenManager = storageServerTokenManager;
       this.updateChecker = updateChecker;
       this.userContextService = userContextService;
+      this.recorderPanelService = recorderPanelService;
 
       this.show = true;
 
@@ -116,6 +118,22 @@
       });
     }
 
+    isRecording() {
+      return this.recorderPanelService.isRecording();
+    }
+
+    isRecordingPaused() {
+      return this.recorderPanelService.isPaused();
+    }
+
+    onButtonRecord() {
+      this.recorderPanelService.toggleShow();
+    }
+
+    allowRecording() {
+      return this.userContextService.isOwner();
+    }
+
     allowPlayPause() {
       return this.userContextService.isOwner();
     }
@@ -143,6 +161,7 @@
       'storageServerTokenManager',
       'userContextService',
       'updateChecker',
+      'recorderPanelService',
       function(...args) {
         return new ApplicationTopToolbarController(...args);
       }

@@ -35,6 +35,16 @@
                    ng-disabled="vm.stateService.statePending" ng-click="vm.onButtonSetSimulationState(vm.STATE.PAUSED)">
           <md-icon ng-bind="'pause'"></md-icon>
         </md-button>
+
+        <md-button class="md-icon-button" aria-label="Start/Stop recording" help-tooltip="RECORD_BUTTON"
+                   ng-if="vm.allowRecording()"
+                   ng-disabled="vm.stateService.statePending" ng-click="vm.onButtonRecord()">
+
+          <md-icon ><div ng-bind="'fiber_manual_record'"
+            ng-class="{'record-color':vm.isRecording(), 'record-paused-colorblink ':vm.isRecordingPaused()}"></div></md-icon>
+
+        </md-button>
+
       </div>
 
       <div class="app-top-toolbar-section" ng-show="vm.experimentViewService.isInSimulationView()">

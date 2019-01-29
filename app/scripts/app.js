@@ -94,6 +94,7 @@
       'experimentExplorer',
       'newExperiment',
       'tipTooltipModule',
+      'recorderPanelModule',
       'experimentList',
       'rosTerminalModule',
       'userInteractionModule',

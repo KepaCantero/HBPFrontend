@@ -1,0 +1,93 @@
+/**---LICENSE-BEGIN - DO NOT CHANGE OR MOVE THIS HEADER
+ * This file is part of the Neurorobotics Platform software
+ * Copyright (C) 2014,2015,2016,2017 Human Brain Project
+ * https://www.humanbrainproject.eu
+ *
+ * The Human Brain Project is a European Commission funded project
+ * in the frame of the Horizon2020 FET Flagship plan.
+ * http://ec.europa.eu/programmes/horizon2020/en/h2020-section/fet-flagships
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * ---LICENSE-END**/
+
+recorder-panel {
+  position: absolute;
+  margin-top: 0px;
+  left: 250px;
+  //width: 100%;
+  //height: 100%;
+}
+
+.recorder-panel {
+  background-color: #ececec;
+  color: gray;
+  border-top-left-radius: 0px;
+  border-top-right-radius: 0px;
+  border-bottom-right-radius: 6px;
+  border-bottom-left-radius: 6px;
+  bottom: 150%;
+  width: 100%;
+  height: 100%;
+  padding: 5px;
+  border: 2px solid #cfcfcf;
+  box-shadow: 2px 5px 11px 0px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  font-size: 13px;
+}
+
+.recorder-panel-hide {
+  font-size: 11px;
+  cursor: pointer;
+  color: #fbffdb;
+  background-color: #796c54;
+  border-radius: 5px;
+  height: 16px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+.recorder-panel-button {
+  font-size: 11px;
+
+  cursor: pointer;
+
+  color: #fff;
+
+  border-radius: 5px;
+
+  height: 16px;
+
+  margin-left: 5px;
+
+  padding-left: 5px;
+
+  padding-right: 7px;
+
+  width: 62px;
+
+  margin-top: 4px;
+
+  background-color: #696969;
+
+  text-align: center;
+}
+
+.recorder-panel-button-disabled {
+  background-color: #bdbdbd;
+  cursor: default;
+}

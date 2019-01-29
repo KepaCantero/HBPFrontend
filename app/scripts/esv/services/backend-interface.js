@@ -258,7 +258,76 @@
         );
       };
 
+      var simulationRecorder = function(backendBaseUrl) {
+        return $resource(
+          backendBaseUrl + '/simulation/:sim_id/recorder',
+          { sim_id: simulationInfo.simulationID },
+          {
+            getRecording: {
+              method: 'GET',
+              url: backendBaseUrl + '/simulation/:sim_id/recorder/is-recording',
+              interceptor: { responseError: serverError.displayHTTPError }
+            },
+            start: {
+              method: 'POST',
+              url: backendBaseUrl + '/simulation/:sim_id/recorder/start',
+              interceptor: { responseError: serverError.displayHTTPError }
+            },
+            stop: {
+              method: 'POST',
+              url: backendBaseUrl + '/simulation/:sim_id/recorder/stop',
+              interceptor: { responseError: serverError.displayHTTPError }
+            },
+            cancel: {
+              method: 'POST',
+              url: backendBaseUrl + '/simulation/:sim_id/recorder/cancel',
+              interceptor: { responseError: serverError.displayHTTPError }
+            },
+            reset: {
+              method: 'POST',
+              url: backendBaseUrl + '/simulation/:sim_id/recorder/reset',
+              interceptor: { responseError: serverError.displayHTTPError }
+            },
+            save: {
+              method: 'POST',
+              url: backendBaseUrl + '/simulation/:sim_id/recorder/save',
+              interceptor: { responseError: serverError.displayHTTPError }
+            }
+          }
+        );
+      };
+
       return {
+        getRecording: function() {
+          return simulationRecorder(simulationInfo.serverBaseUrl).getRecording({
+            sim_id: simulationInfo.simulationID
+          }).$promise;
+        },
+        startRecording: function() {
+          return simulationRecorder(simulationInfo.serverBaseUrl).start({
+            sim_id: simulationInfo.simulationID
+          }).$promise;
+        },
+        stopRecording: function() {
+          return simulationRecorder(simulationInfo.serverBaseUrl).stop({
+            sim_id: simulationInfo.simulationID
+          }).$promise;
+        },
+        cancelRecording: function() {
+          return simulationRecorder(simulationInfo.serverBaseUrl).cancel({
+            sim_id: simulationInfo.simulationID
+          }).$promise;
+        },
+        resetRecording: function() {
+          return simulationRecorder(simulationInfo.serverBaseUrl).reset({
+            sim_id: simulationInfo.simulationID
+          }).$promise;
+        },
+        saveRecording: function() {
+          return simulationRecorder(simulationInfo.serverBaseUrl).save({
+            sim_id: simulationInfo.simulationID
+          }).$promise;
+        },
         getBrain: function(callback) {
           resourceBrainSimulation(simulationInfo.serverBaseUrl).get(
             { sim_id: simulationInfo.simulationID },
