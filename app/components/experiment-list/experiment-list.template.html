@@ -28,7 +28,7 @@
         <div ng-if="loadingJobs">
           <i class="fa fa-2x fa-spinner fa-spin"></i>&nbsp; <i>{{config.loadingMessage}}</i>
         </div>
-    </div>    
+    </div>
 
 
     <div class="no-experiment-msg" ng-show="experiments && running && !atLeastOneExperimentRunning() && !pizdaint">
@@ -127,8 +127,9 @@
                 <div ng-if="exp.id != pageState.selected">{{exp.configuration.description | limitTo: 200}}...</div>
                 <div ng-if="exp.id == pageState.selected && config.canLaunchExperiments" style="position:relative">
                     <br />
-                    <i ng-if="exp.configuration.timeout != undefined">Timeout: {{exp.configuration.timeout |
-                        timeDDHHMMSS}}</i><br />
+                    <i ng-if="exp.configuration.timeout != undefined">Timeout:
+                        {{exp.configuration.timeout | timeDDHHMMSS}}
+                        ({{(exp.configuration.timeoutType==='simulation' ? 'simulation' : 'real')}} time)</i><br />
                     <!-- temporary placeholder to notify the user an experiment requires multiple processes -->
                     <i>Brain processes: {{exp.configuration.brainProcesses}}</i><br />
                     <span ng-if="devMode && config.canLaunchExperiments">

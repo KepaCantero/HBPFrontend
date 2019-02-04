@@ -12,7 +12,7 @@
     <simulation-timeout-extender
       extent-auto-condition="{{vm.simulationInfo.simTimeoutText < vm.simulationInfo.simMaxAutoTimeOutText}}"
       extent-timeout-condition="{{vm.simulationInfo.simTimeoutText < vm.simulationInfo.simMaxTimeOutText}}"
-      ng-if="vm.userContextService.isOwner()">
+      ng-if="vm.userContextService.isOwner() && vm.simulationInfo.timeoutType != 'simulation'">
     </simulation-timeout-extender>
 
     <help-tooltip-popover></help-tooltip-popover>

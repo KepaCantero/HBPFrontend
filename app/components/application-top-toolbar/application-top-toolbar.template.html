@@ -61,7 +61,7 @@
               <span>Real time:</span>
               <br/>
               <span
-                ng-style="{ color: vm.simulationInfo.simTimeoutText !== undefined && vm.simulationInfo.simTimeoutText < vm.simulationInfo.simMaxTimeOutText ? 'red' : '' }">Timeout:</span>
+                ng-style="{ color: vm.simulationInfo.simTimeoutText !== undefined && vm.simulationInfo.simTimeoutText < vm.simulationInfo.simMaxTimeOutText ? 'red' : '' }">{{vm.simulationInfo.timeoutType == 'simulation'?'Simulation':'Real'}} timeout:</span>
             </div>
             <div>
               <span id="simTime">{{vm.simulationInfo.simulationTimeText | timeDDHHMMSS}}</span>

@@ -199,6 +199,7 @@
           analyticsEventTimeout();
         }
         this.simulationInfo.simTimeoutText = message.timeout;
+        this.simulationInfo.timeoutType = message.timeout_type;
       }
       if (angular.isDefined(message.simulationTime)) {
         this.simulationInfo.simulationTimeText = message.simulationTime;
