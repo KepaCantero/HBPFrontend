@@ -37,17 +37,24 @@
       var myModal;
       var progressObserver;
 
+      let unhandledProgressMsg = null;
       // We have to work around a bit here: The controller of the HTML will register
       // a function as a callback. This function will then update the contents of the
       // HTML.
       var setProgressObserver = function(callback) {
         progressObserver = callback;
+        if (unhandledProgressMsg) {
+          callback(unhandledProgressMsg);
+          unhandledProgressMsg = null;
+        }
       };
 
       var setProgress = function(data) {
         // Notify our controller that we have an update!
         if (progressObserver) {
           progressObserver(data);
+        } else {
+          unhandledProgressMsg = data;
         }
       };
 
