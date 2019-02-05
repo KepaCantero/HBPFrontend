@@ -355,21 +355,6 @@
         window.console.debug = $log.debug;
       }
     ])
-    .factory('timeoutHttpInterceptor', function() {
-      // Here we specify a global http request timeout value for all requests, for all browsers
-      return {
-        request: function(config) {
-          // config.timeout = 120 * 1000; //request timeout in milliseconds
-          return config;
-        }
-      };
-    })
-    .config([
-      '$httpProvider',
-      function($httpProvider) {
-        $httpProvider.interceptors.push('timeoutHttpInterceptor');
-      }
-    ])
     .run([
       '$rootScope',
       '$location',

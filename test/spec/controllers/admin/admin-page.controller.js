@@ -118,6 +118,47 @@ describe('Controller: admin-page.controller', function() {
     /* eslint-enable camelcase */
   });
 
+  it('should show error when failing to retrieve server logs', () => {
+    const filereaderMock = {
+      readAsText: jasmine.createSpy()
+    };
+    spyOn(window, 'FileReader').and.returnValue(filereaderMock);
+    spyOn(adminPageCtrl.clbErrorDialog, 'open');
+
+    const serverObj = { server: 'localhost' };
+    $httpBackend
+      .whenPOST('http://proxy/admin/backendlogs/localhost')
+      .respond(500, new Blob(['error']));
+    adminPageCtrl.retrieveServerLogs(serverObj);
+    $rootScope.$apply();
+    expect(serverObj.busy).toBe(true);
+    $httpBackend.flush();
+    $rootScope.$apply();
+    expect(filereaderMock.readAsText).toHaveBeenCalled();
+    filereaderMock.onload();
+    expect(adminPageCtrl.clbErrorDialog.open).toHaveBeenCalled();
+  });
+
+  it('should retrieve server logs', () => {
+    const dummyAnchorElement = {
+      style: {},
+      click: jasmine.createSpy('click')
+    };
+
+    spyOn(document, 'createElement').and.returnValue(dummyAnchorElement);
+    spyOn(document.body, 'appendChild').and.stub();
+    spyOn(document.body, 'removeChild').and.stub();
+    const serverObj = { server: 'localhost' };
+    $httpBackend
+      .whenPOST('http://proxy/admin/backendlogs/localhost')
+      .respond('serverlogs');
+    adminPageCtrl.retrieveServerLogs(serverObj);
+    $rootScope.$apply();
+    expect(serverObj.busy).toBe(true);
+    $httpBackend.flush();
+    expect(dummyAnchorElement.click).toHaveBeenCalled();
+  });
+
   it('should unsubscribe on controller destroy', function() {
     spyOn(adminPageCtrl.serversPolling$, 'unsubscribe');
     $rootScope.$destroy();

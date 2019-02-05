@@ -48,6 +48,13 @@
           restartServer: {
             method: 'POST',
             url: `${STORAGE_BASE_URL}/admin/restart/:server`
+          },
+          retrieveServerLogs: {
+            method: 'POST',
+            isArray: false,
+            responseType: 'blob',
+            transformResponse: data => ({ data }),
+            url: `${STORAGE_BASE_URL}/admin/backendlogs/:server`
           }
         }
       );
@@ -66,13 +73,33 @@
     }
 
     restartServer(serverStatus) {
-      serverStatus.restarting = true;
+      serverStatus.busy = true;
       return this.proxyRsc.restartServer({ server: serverStatus.server }, null)
         .$promise;
     }
-  }
 
-  //"brainProcesses":1,"owner":"default-owner","reservation":null,"creationDate":"2018-02-05T14:38:06.397089+01:00","creationUniqueID":"1517837886389.447","gzserverHost":"local","experimentConfiguration":"benchmark_p3dx/BenchmarkPioneer.exc","playbackPath":null,"experimentID":"BenchmarkPioneer","state":"paused","simulationID":0}
+    downloadBlob(blob, fineName) {
+      const link = document.createElement('a');
+      link.style.display = 'none';
+      document.body.appendChild(link);
+      link.href = URL.createObjectURL(blob);
+      link.download = fineName;
+      link.click();
+      window.URL.revokeObjectURL && window.URL.revokeObjectURL(link.href);
+      document.body.removeChild(link);
+    }
+    retrieveServerLogs(serverStatus) {
+      serverStatus.busy = true;
+      return this.proxyRsc
+        .retrieveServerLogs({ server: serverStatus.server }, null)
+        .$promise.then(response =>
+          this.downloadBlob(
+            response.data,
+            `log_${serverStatus.server}_${new Date().toISOString()}.tar.gz`
+          )
+        );
+    }
+  }
 
   AdminService.$inject = ['$resource', 'bbpConfig'];
 

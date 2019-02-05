@@ -67,11 +67,15 @@
               </div>
             </td>
             <td>
-              <button type="button" ng-disabled="!$ctrl.adminRights || server.restarting"
-              v-busy="server.restarting"
+              <button type="button" ng-disabled="!$ctrl.adminRights || server.busy"
+              v-busy="server.busy"
               v-pressable
               v-busy-label="Restart"
               class="btn" ng-class="{'btn-danger':$ctrl.adminRights}" ng-click="$ctrl.restartServer(server)">Restart</button>
+              <button type="button" ng-disabled="!$ctrl.adminRights" v-busy="server.busy"
+              v-pressable
+              v-busy-label="Retrieve Logs"
+              class="btn" ng-class="{'btn-info':$ctrl.adminRights}" ng-click="$ctrl.retrieveServerLogs(server)">Retrieve Logs</button>
             </td>
           </tr>
         </tbody>

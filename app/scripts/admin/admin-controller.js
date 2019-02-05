@@ -72,19 +72,39 @@
       _.merge(this.servers, _.keyBy(servers, 'server'));
     }
 
-    handleError() {
-      this.clbErrorDialog.open({
-        type: 'Execution error.',
-        message:
+    handleError(err) {
+      const showError = errMsg =>
+        this.clbErrorDialog.open({
+          type: 'Execution error.',
+          message: errMsg
+        });
+
+      if (err && err.data && err.data.data instanceof Blob) {
+        var reader = new FileReader();
+        reader.onload = () => showError(reader.result);
+        reader.readAsText(err.data.data);
+      } else
+        showError(
           'Failed to execute action. Please reload the page and try again.'
-      });
+        );
     }
+
     setMaintenanceMode(maintenance) {
-      this.adminService.setStatus(maintenance).catch(() => this.handleError());
+      this.adminService
+        .setStatus(maintenance)
+        .catch(err => this.handleError(err));
     }
 
     restartServer(server) {
-      this.adminService.restartServer(server).catch(() => this.handleError());
+      this.adminService
+        .restartServer(server)
+        .catch(err => this.handleError(err));
+    }
+
+    retrieveServerLogs(server) {
+      this.adminService
+        .retrieveServerLogs(server)
+        .catch(err => this.handleError(err));
     }
 
     $onDestroy() {
