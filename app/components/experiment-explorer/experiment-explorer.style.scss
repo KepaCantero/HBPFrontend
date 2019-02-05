@@ -101,6 +101,7 @@
 
       .experiment-list {
         flex-grow: 1;
+        overflow-y: auto;
 
         .experiment-title,
         .experiment-folder {
