@@ -5,16 +5,15 @@ describe('Controller: GoldenLayoutController', function() {
 
   let controller;
 
-  let goldenLayoutService, nrpUser, userInteractionSettingsService;
+  let goldenLayoutService, userInteractionSettingsService;
 
-  let mockLayout;
+  let mockLayout, mockWorkspaces;
 
   beforeEach(function() {
     module('goldenLayoutModule');
 
     // mocks
     module('goldenLayoutServiceMock');
-    module('nrpUserMock');
     module('userInteractionSettingsServiceMock');
   });
 
@@ -23,20 +22,22 @@ describe('Controller: GoldenLayoutController', function() {
       _$controller_,
       _$rootScope_,
       _goldenLayoutService_,
-      _nrpUser_,
       _userInteractionSettingsService_
     ) {
       $controller = _$controller_;
       $rootScope = _$rootScope_;
 
       goldenLayoutService = _goldenLayoutService_;
-      nrpUser = _nrpUser_;
       userInteractionSettingsService = _userInteractionSettingsService_;
     })
   );
 
   beforeEach(function() {
     mockLayout = {};
+    mockWorkspaces = {};
+    userInteractionSettingsService.workspaces.then.and.callFake(callback => {
+      callback(mockWorkspaces);
+    });
     goldenLayoutService.createLayout.and.returnValue(mockLayout);
   });
 
@@ -49,23 +50,20 @@ describe('Controller: GoldenLayoutController', function() {
   });
 
   it(' - constructor', function() {
+    // no predefined layout
     expect(controller).toBeDefined();
     expect(goldenLayoutService.createLayout).toHaveBeenCalledWith(undefined);
-    expect(controller.layout).toBe(mockLayout);
 
     // with predefined layout
-    let initConfig = {};
-    userInteractionSettingsService.settingsData.autosaveOnExit = {};
-    userInteractionSettingsService.settingsData.autosaveOnExit.lastWorkspaceLayouts = {};
-    userInteractionSettingsService.settingsData.autosaveOnExit.lastWorkspaceLayouts[
-      nrpUser.currentUser.id
-    ] = initConfig;
+    mockWorkspaces.autosave = {};
 
     controller = $controller('GoldenLayoutController', {
       $rootScope: $rootScope,
       $scope: $scope
     });
-    expect(goldenLayoutService.createLayout).toHaveBeenCalledWith(initConfig);
+    expect(goldenLayoutService.createLayout).toHaveBeenCalledWith(
+      mockWorkspaces.autosave
+    );
   });
 
   it(' - onDestroy', function() {

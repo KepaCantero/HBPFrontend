@@ -3,12 +3,14 @@
 describe('Service: GoldenLayoutService', function() {
   let TOOL_CONFIGS;
 
-  let goldenLayoutService;
+  let goldenLayoutService, userInteractionSettingsService;
 
   let mockCompiledElement, mockLayout;
 
   beforeEach(function() {
     module('goldenLayoutModule');
+
+    module('userInteractionSettingsServiceMock');
   });
 
   beforeEach(function() {
@@ -34,7 +36,8 @@ describe('Service: GoldenLayoutService', function() {
             config: {}
           }
         ]
-      }
+      },
+      toConfig: jasmine.createSpy('toConfig')
     };
   });
 
@@ -43,11 +46,13 @@ describe('Service: GoldenLayoutService', function() {
       _$rootScope_,
       _$timeout_,
       _TOOL_CONFIGS_,
-      _goldenLayoutService_
+      _goldenLayoutService_,
+      _userInteractionSettingsService_
     ) {
       TOOL_CONFIGS = _TOOL_CONFIGS_;
 
       goldenLayoutService = _goldenLayoutService_;
+      userInteractionSettingsService = _userInteractionSettingsService_;
     })
   );
 
@@ -218,6 +223,17 @@ describe('Service: GoldenLayoutService', function() {
     );
   });
 
+  it('hooks stateChanged', () => {
+    spyOn(window, 'GoldenLayout').and.returnValue(mockLayout);
+
+    goldenLayoutService.createLayout();
+
+    expect(mockLayout.on).toHaveBeenCalledWith(
+      'stateChanged',
+      jasmine.any(Function)
+    );
+  });
+
   it(' - addTool', function() {
     goldenLayoutService.layouter = {
       addComponent: jasmine.createSpy('addComponent')
@@ -238,7 +254,9 @@ describe('Service: GoldenLayoutService', function() {
       spyOn(window, 'GoldenLayout').and.returnValue(mockLayout);
 
       goldenLayoutService.createLayout();
-      const stackCreatedFn = mockLayout.on.calls.mostRecent().args[1];
+      const stackCreatedFn = mockLayout.on.calls.argsFor(
+        mockLayout.on.calls.count() - 2
+      )[1];
 
       stackCreatedFn(component);
 
@@ -279,5 +297,30 @@ describe('Service: GoldenLayoutService', function() {
     stackHookForComponent(stackMock);
 
     expect(stackMock.header.controlsContainer.children().length).toBe(0);
+  });
+
+  it('stateChanged event should trigger autosave', () => {
+    spyOn(window, 'GoldenLayout').and.returnValue(mockLayout);
+    goldenLayoutService.createLayout();
+    const stateChangedCallback = mockLayout.on.calls.mostRecent().args[1];
+    stateChangedCallback();
+    expect(userInteractionSettingsService.autosaveLayout).toHaveBeenCalled();
+  });
+
+  it('re-create added drag sources on createLayout()', () => {
+    let dragSource = { element: {}, toolConfig: {} };
+    goldenLayoutService.dragSources = [dragSource];
+    spyOn(goldenLayoutService, 'isLayoutInitialised').and.returnValue({
+      then: jasmine.createSpy('then').and.callFake(callback => {
+        callback();
+      })
+    });
+    spyOn(window, 'GoldenLayout').and.returnValue(mockLayout);
+
+    goldenLayoutService.createLayout();
+    expect(mockLayout.createDragSource).toHaveBeenCalledWith(
+      dragSource.element,
+      dragSource.toolConfig
+    );
   });
 });

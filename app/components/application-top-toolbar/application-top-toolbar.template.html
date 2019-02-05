@@ -104,6 +104,12 @@
             </md-menu-content>
         </md-menu>
 
+        <md-button id="workspace-settings-button" class="md-icon-button" aria-label="Workspace Settings"
+                   help-tooltip="WORKSPACE_SETTINGS" ng-click="vm.workspaceService.openConfigPanel($event);"
+                   ng-show="vm.experimentViewService.isInSimulationView() && vm.userContextService.isOwner()">
+          <i class="fas fa-table icon-workspace-settings"></i>
+        </md-button>
+
         <md-button gl-tool-source="ENVIRONMENT_RENDERING_SETTINGS" class="md-icon-button" aria-label="Settings" help-tooltip="ENVIRONMENT_SETTINGS"
                    ng-show="vm.experimentViewService.isInSimulationView()" ng-click="vm.onButtonEnvironmentSettings()">
           <md-icon ng-bind="'settings'"></md-icon>

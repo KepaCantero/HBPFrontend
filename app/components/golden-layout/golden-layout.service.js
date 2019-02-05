@@ -31,10 +31,18 @@
   const compileFn = Symbol('compileFn');
 
   class GoldenLayoutService {
-    constructor($compile, $rootScope, $timeout, TOOL_CONFIGS, layouter) {
+    constructor(
+      $compile,
+      $rootScope,
+      $timeout,
+      TOOL_CONFIGS,
+      layouter,
+      userInteractionSettingsService
+    ) {
       this.TOOL_CONFIGS = TOOL_CONFIGS;
       // layout logic implemented in layouter as a strategy
       this.layouter = layouter;
+      this.userInteractionSettingsService = userInteractionSettingsService;
 
       this.$compile = $compile;
       this.$rootScope = $rootScope;
@@ -46,6 +54,8 @@
           element.html(state.angularDirective);
           service[compileFn](container, element[0]);
         })(this);
+
+      this.dragSources = [];
     }
 
     [compileFn](container, element) {
@@ -111,6 +121,21 @@
 
       this.watchContainerSize();
 
+      this.layout.on('stateChanged', () => {
+        this.userInteractionSettingsService.autosaveLayout(
+          this.layout.toConfig()
+        );
+      });
+
+      this.isLayoutInitialised().then(() => {
+        this.dragSources.forEach(dragSource => {
+          this.layout.createDragSource(
+            dragSource.element,
+            dragSource.toolConfig
+          );
+        });
+      });
+
       return this.layout;
     }
 
@@ -136,6 +161,17 @@
     }
 
     createDragSource(element, toolConfig) {
+      if (
+        !this.dragSources.some(dragSource => {
+          return dragSource.element === element;
+        })
+      ) {
+        this.dragSources.push({
+          element: element,
+          toolConfig: toolConfig
+        });
+      }
+
       this.isLayoutInitialised().then(() => {
         this.layout.createDragSource(element, toolConfig);
       });
@@ -179,7 +215,8 @@
     'TOOL_CONFIGS',
     USE_SIZE_CONSTRAINED_LAYOUTER
       ? 'constraintBasedLayouter'
-      : 'addAsColumnLayouter'
+      : 'addAsColumnLayouter',
+    'userInteractionSettingsService'
   ];
 
   angular

@@ -1,0 +1,45 @@
+<!-- build:css(.tmp) components/golden-layout/workspace-settings-panel.style.css -->
+<link rel="stylesheet" href="components/golden-layout/workspace-settings-panel.style.css" />
+<!-- endbuild -->
+
+<div show-on-top class="workspace-settings-panel-wrapper"
+     ng-mousemove="$event.stopPropagation();$event.preventDefault();" ng-mouseover="$event.stopPropagation();$event.preventDefault();">
+  <h6>Workspaces</h6>
+
+  <br />
+
+  <form id="workspace-save-form" ng-submit="vm.saveCustomWorkspace(vm.searchText);">
+    <md-autocomplete
+      class="workspace-save-autocomplete"
+      ng-keydown="$event.stopPropagation();"
+      md-no-cache="vm.noCache"
+      md-selected-item="vm.selectedItem"
+      md-search-text="vm.searchText"
+      md-selected-item-change="vm.selectedItemChange(item)"
+      md-items="item in vm.querySearch(vm.searchText)"
+      md-item-text="item.name"
+      md-min-length="0"
+      placeholder="Save current layout as ..."
+      input-aria-labelledby="favoriteStateLabel"
+      input-aria-describedby="autocompleteDetailedDescription">
+      <md-item-template>
+        <div>
+          <span ng-if="item.newWorkspace">New ... </span>
+          <span md-highlight-text="vm.searchText" md-highlight-flags="^i">{{item.name}}</span>
+        </div>
+      </md-item-template>
+    </md-autocomplete>
+  </form>
+
+  <br />
+
+  <div class="workspace-list">
+    <div ng-repeat="workspace in vm.workspaces.custom" class="workspace-list-item"
+         ng-click="vm.loadCustomWorkspace(workspace.name)">
+      <div class="workspace-list-item-element">{{workspace.name}}</div>
+      <div class="workspace-list-item-element">
+        <i class="fas fa-trash" ng-click="vm.deleteCustomWorkspace($event, workspace.id)"></i>
+      </div>
+    </div>
+  </div>
+</div>

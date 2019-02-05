@@ -1,19 +1,15 @@
 'use strict';
 
 describe('Services: userInteractionSettingsService', function() {
-  //var $rootScope, element;
+  let userInteractionSettingsService;
 
-  var userInteractionSettingsService;
-
-  var $rootScope;
-  var CAMERA_SENSITIVITY_RANGE, UIS_DEFAULTS;
-  var goldenLayoutService, nrpUser, simulationConfigService;
+  let CAMERA_SENSITIVITY_RANGE, UIS_DEFAULTS;
+  let simulationConfigService;
 
   beforeEach(module('userInteractionModule'));
   beforeEach(module('userNavigationModule'));
 
   beforeEach(module('autoSaveFactoryMock'));
-  beforeEach(module('goldenLayoutServiceMock'));
   beforeEach(module('nrpUserMock'));
   beforeEach(module('simulationConfigServiceMock'));
 
@@ -23,18 +19,13 @@ describe('Services: userInteractionSettingsService', function() {
     // inject service for testing.
     inject(function(
       _userInteractionSettingsService_,
-      _$rootScope_,
       _CAMERA_SENSITIVITY_RANGE_,
       _UIS_DEFAULTS_,
-      _goldenLayoutService_,
       _nrpUser_,
       _simulationConfigService_
     ) {
-      goldenLayoutService = _goldenLayoutService_;
-      nrpUser = _nrpUser_;
       userInteractionSettingsService = _userInteractionSettingsService_;
 
-      $rootScope = _$rootScope_;
       CAMERA_SENSITIVITY_RANGE = _CAMERA_SENSITIVITY_RANGE_;
       UIS_DEFAULTS = _UIS_DEFAULTS_;
       simulationConfigService = _simulationConfigService_;
@@ -47,9 +38,9 @@ describe('Services: userInteractionSettingsService', function() {
       'clampCameraSensitivity'
     ).and.callThrough();
 
-    var mockConfig =
+    let mockConfig =
       '{"camera": {"sensitivity": {"translation": 0.1, "rotation": 1.2}}}';
-    var mockConfigPromise = {
+    let mockConfigPromise = {
       then: jasmine.createSpy('then').and.callFake(function(cb) {
         cb(mockConfig);
         return mockConfigPromise;
@@ -114,7 +105,7 @@ describe('Services: userInteractionSettingsService', function() {
   });
 
   it(' - saveSettings()', function() {
-    var mockConfig =
+    let mockConfig =
       '{"camera": {"sensitivity": {"translation": 0.1, "rotation": 1.2}}}';
     simulationConfigService.saveConfigFile = jasmine
       .createSpy('saveConfigFile')
@@ -136,18 +127,19 @@ describe('Services: userInteractionSettingsService', function() {
       })
     });
 
-    var result = userInteractionSettingsService.settings;
-    expect(userInteractionSettingsService.loadSettings).toHaveBeenCalled();
+    userInteractionSettingsService.settings.then(() => {
+      expect(userInteractionSettingsService.loadSettings).toHaveBeenCalled();
 
-    userInteractionSettingsService.settingsData = UIS_DEFAULTS;
-    userInteractionSettingsService.loadSettings.calls.reset();
-    userInteractionSettingsService.settings.then(function(settings) {
-      result = settings;
+      userInteractionSettingsService.settingsData = UIS_DEFAULTS;
+      userInteractionSettingsService.loadSettings.calls.reset();
+      userInteractionSettingsService.settings.then(function(settings) {
+        expect(settings).toBe(UIS_DEFAULTS);
+        expect(
+          userInteractionSettingsService.loadSettings
+        ).not.toHaveBeenCalled();
+        done();
+      });
     });
-    $rootScope.$digest();
-    expect(result).toBe(UIS_DEFAULTS);
-    expect(userInteractionSettingsService.loadSettings).not.toHaveBeenCalled();
-    done();
   });
 
   it(' - persistToFile()', function(done) {
@@ -185,14 +177,6 @@ describe('Services: userInteractionSettingsService', function() {
       typeB: 'true',
       typeC: 1
     };
-    spyOn(
-      userInteractionSettingsService,
-      'getCurrentWorkspaceLayout'
-    ).and.returnValue({
-      then: jasmine.createSpy('then').and.callFake(cb => {
-        cb();
-      })
-    });
 
     userInteractionSettingsService.saveSetting('typeA', 'typeB');
 
@@ -202,30 +186,6 @@ describe('Services: userInteractionSettingsService', function() {
     });
 
     done();
-  });
-
-  it(' - getCurrentWorkspaceLayout()', function() {
-    userInteractionSettingsService.settingsData = {
-      autosaveOnExit: undefined
-    };
-
-    // layout not initialised
-    goldenLayoutService.layout.isInitialised = false;
-    userInteractionSettingsService.getCurrentWorkspaceLayout();
-    expect(
-      userInteractionSettingsService.settingsData.autosaveOnExit
-    ).not.toBeDefined();
-
-    // initialised layout
-    goldenLayoutService.layout.isInitialised = true;
-    let mockConfig = {};
-    console.info(goldenLayoutService.layout);
-    goldenLayoutService.layout.toConfig.and.returnValue(mockConfig);
-    userInteractionSettingsService.getCurrentWorkspaceLayout();
-    expect(
-      userInteractionSettingsService.settingsData.autosaveOnExit
-        .lastWorkspaceLayouts[nrpUser.currentUser.id]
-    ).toBe(mockConfig);
   });
 
   it('should define proper autoSaveService', function() {
@@ -238,29 +198,116 @@ describe('Services: userInteractionSettingsService', function() {
     expect(userInteractionSettingsService.saveSettings).toHaveBeenCalled();
   });
 
-  it('should set autoSaveService dirty on layout state change', function() {
-    userInteractionSettingsService.settingsData = {
-      autosaveOnExit: {}
-    };
-    spyOn(
-      userInteractionSettingsService,
-      'getCurrentWorkspaceLayout'
-    ).and.callFake(() => {
-      // fake change
-      userInteractionSettingsService.settingsData.autosaveOnExit.newField =
-        'new';
-      return {
-        then: jasmine.createSpy('then').and.callFake(cb => {
-          cb();
-        })
-      };
-    });
+  it('GETTER workspaces()', function(done) {
+    userInteractionSettingsService.settingsData = {};
 
-    let callbackOnStateChange = goldenLayoutService.layout.on.calls.mostRecent()
-      .args[1];
-    callbackOnStateChange();
-    expect(
-      userInteractionSettingsService.autoSaveService.setDirty
-    ).toHaveBeenCalled();
+    userInteractionSettingsService.workspaces.then(workspaces => {
+      expect(workspaces).toBe(
+        userInteractionSettingsService.settingsData.workspaces
+      );
+      expect(workspaces.custom).toEqual([]);
+      done();
+    });
+  });
+
+  it('saveCustomWorkspace() - new workspace', function(done) {
+    userInteractionSettingsService.settingsData = {};
+
+    // save new workspace
+    let name = 'MyWorkspace',
+      config = {};
+    userInteractionSettingsService
+      .saveCustomWorkspace(name, config)
+      .then(() => {
+        let customWorkspaces =
+          userInteractionSettingsService.settingsData.workspaces.custom;
+        expect(customWorkspaces.length).toBe(1);
+        expect(customWorkspaces).toContain({
+          id: name.toLowerCase(),
+          name: name,
+          layout: config
+        });
+        expect(
+          userInteractionSettingsService.autoSaveService.setDirty
+        ).toHaveBeenCalled();
+
+        // overwrite existing workspace
+        config = { element: [] };
+        userInteractionSettingsService
+          .saveCustomWorkspace(name, config)
+          .then(() => {
+            let customWorkspaces =
+              userInteractionSettingsService.settingsData.workspaces.custom;
+            expect(customWorkspaces.length).toBe(1);
+            expect(customWorkspaces[0].layout).toBe(config);
+            expect(
+              userInteractionSettingsService.autoSaveService.setDirty
+            ).toHaveBeenCalled();
+
+            done();
+          });
+      });
+  });
+
+  it('deleteCustomWorkspace()', function(done) {
+    userInteractionSettingsService.settingsData = {
+      workspaces: {
+        custom: [{ id: 'my-other-workspace' }]
+      }
+    };
+
+    let customWorkspaces =
+      userInteractionSettingsService.settingsData.workspaces.custom;
+
+    // no editing rights
+
+    // try to delete non-existing workspace
+    let id = 'my-workspace';
+    userInteractionSettingsService.deleteCustomWorkspace(id).then(() => {
+      expect(customWorkspaces.length).toBe(1);
+      expect(
+        userInteractionSettingsService.autoSaveService.setDirty
+      ).not.toHaveBeenCalled();
+
+      // delete existing workspace
+      id = 'my-other-workspace';
+      userInteractionSettingsService.deleteCustomWorkspace(id).then(() => {
+        expect(customWorkspaces.length).toBe(0);
+        expect(
+          userInteractionSettingsService.autoSaveService.setDirty
+        ).toHaveBeenCalled();
+
+        done();
+      });
+    });
+  });
+
+  it('autosaveLayout()', function(done) {
+    let layout = { id: 'my-workspace', config: {} };
+    userInteractionSettingsService.settingsData = {
+      workspaces: {
+        autosave: { id: 'my-workspace', config: {} }
+      }
+    };
+
+    // try autosave for unchanged layout
+    userInteractionSettingsService.autosaveLayout(layout).then(() => {
+      expect(
+        userInteractionSettingsService.autoSaveService.setDirty
+      ).not.toHaveBeenCalled();
+
+      // autosave changed layout
+      layout.id = 'changed-workspace';
+      userInteractionSettingsService.autosaveLayout(layout).then(() => {
+        expect(
+          userInteractionSettingsService.settingsData.workspaces.autosave
+        ).toEqual(layout);
+        expect(
+          userInteractionSettingsService.autoSaveService.setDirty
+        ).toHaveBeenCalled();
+
+        done();
+      });
+    });
   });
 });

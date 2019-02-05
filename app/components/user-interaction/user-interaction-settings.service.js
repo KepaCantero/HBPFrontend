@@ -32,14 +32,12 @@
       CAMERA_SENSITIVITY_RANGE,
       UIS_DEFAULTS,
       autoSaveFactory,
-      goldenLayoutService,
       nrpUser,
       simulationConfigService
     ) {
       this.$q = $q;
       this.CAMERA_SENSITIVITY_RANGE = CAMERA_SENSITIVITY_RANGE;
       this.UIS_DEFAULTS = UIS_DEFAULTS;
-      this.goldenLayoutService = goldenLayoutService;
       this.nrpUser = nrpUser;
       this.simulationConfigService = simulationConfigService;
 
@@ -48,17 +46,6 @@
       );
       this.autoSaveService.onsave(() => {
         return this.saveSettings();
-      });
-      this.goldenLayoutService.isLayoutInitialised().then(() => {
-        this.goldenLayoutService.layout.on('stateChanged', () => {
-          let oldAutoSave = JSON.stringify(this.settingsData.autosaveOnExit);
-          this.getCurrentWorkspaceLayout().then(() => {
-            let newAutoSave = JSON.stringify(this.settingsData.autosaveOnExit);
-            if (newAutoSave !== oldAutoSave) {
-              this.autoSaveService.setDirty();
-            }
-          });
-        });
       });
 
       this.settingsData = undefined;
@@ -73,6 +60,24 @@
         .then(fileContent => {
           this.settingsData = JSON.parse(fileContent);
           this.clampCameraSensitivity();
+
+          // move old to new structure in settings file, can be deleted later on
+          this.nrpUser.getCurrentUser().then(profile => {
+            if (
+              this.settingsData.autosaveOnExit &&
+              this.settingsData.autosaveOnExit.lastWorkspaceLayouts &&
+              this.settingsData.autosaveOnExit.lastWorkspaceLayouts[profile.id]
+            ) {
+              this.workspaces.then(workspaces => {
+                workspaces.autosave = this.settingsData.autosaveOnExit.lastWorkspaceLayouts[
+                  profile.id
+                ];
+                delete this.settingsData.autosaveOnExit.lastWorkspaceLayouts[
+                  profile.id
+                ];
+              });
+            }
+          });
         })
         .catch(() => {
           // error, set all defaults
@@ -103,12 +108,9 @@
     saveSetting(...settingType) {
       let clone = Object.assign({}, this.lastSavedSettingsData); // shallow
 
-      this.getCurrentWorkspaceLayout().then(() => {
-        //update lastSaved's clone with the new data from settingsData
-        settingType.forEach(sType => (clone[sType] = this.settingsData[sType]));
+      settingType.forEach(sType => (clone[sType] = this.settingsData[sType]));
 
-        return this._persistToFile(clone);
-      });
+      return this._persistToFile(clone);
     }
 
     clampCameraSensitivity() {
@@ -133,39 +135,89 @@
       }
     }
 
-    getCurrentWorkspaceLayout() {
-      if (
-        !this.goldenLayoutService.layout ||
-        !this.goldenLayoutService.layout.isInitialised
-      )
-        return;
-
-      if (!this.settingsData.autosaveOnExit) {
-        this.settingsData.autosaveOnExit = {};
-      }
-      if (!this.settingsData.autosaveOnExit.lastWorkspaceLayouts) {
-        this.settingsData.autosaveOnExit.lastWorkspaceLayouts = {};
-      }
-
-      return this.nrpUser.getCurrentUser().then(profile => {
-        this.settingsData.autosaveOnExit.lastWorkspaceLayouts[
-          profile.id
-        ] = this.goldenLayoutService.layout.toConfig();
+    get settings() {
+      return new Promise(resolve => {
+        if (!angular.isDefined(this.settingsData)) {
+          this.loadSettings().then(() => {
+            resolve(this.settingsData);
+          });
+        } else {
+          resolve(this.settingsData);
+        }
       });
     }
 
-    get settings() {
-      var deferred = this.$q.defer();
+    get workspaces() {
+      return new Promise((resolve, reject) => {
+        this.settings
+          .then(settings => {
+            // ensure necessary structure existing
+            settings.workspaces = settings.workspaces || {};
+            settings.workspaces.custom = settings.workspaces.custom || [];
 
-      if (!angular.isDefined(this.settingsData)) {
-        this.loadSettings().then(() => {
-          deferred.resolve(this.settingsData);
+            resolve(settings.workspaces);
+          })
+          .catch(() => {
+            reject();
+          });
+      });
+    }
+
+    saveCustomWorkspace(name, layoutConfig) {
+      return new Promise((resolve, reject) => {
+        let id = name.toLowerCase();
+
+        this.workspaces
+          .then(workspaces => {
+            let workspace = workspaces.custom.find(element => {
+              return element.id === id;
+            });
+
+            if (workspace) {
+              workspace.layout = layoutConfig;
+            } else {
+              workspaces.custom.push({
+                id: id,
+                name: name,
+                layout: layoutConfig
+              });
+            }
+
+            this.autoSaveService.setDirty();
+            resolve();
+          })
+          .catch(error => {
+            reject(error);
+          });
+      });
+    }
+
+    deleteCustomWorkspace(id) {
+      return new Promise(resolve => {
+        this.workspaces.then(workspaces => {
+          workspaces.custom.forEach((element, index) => {
+            if (element.id === id) {
+              workspaces.custom.splice(index, 1);
+              this.autoSaveService.setDirty();
+            }
+          });
+          resolve();
         });
-      } else {
-        deferred.resolve(this.settingsData);
-      }
+      });
+    }
 
-      return deferred.promise;
+    autosaveLayout(layoutConfig) {
+      return new Promise(resolve => {
+        this.workspaces.then(workspaces => {
+          let oldAutosave = JSON.stringify(workspaces.autosave);
+          let newAutosave = JSON.stringify(layoutConfig);
+          if (newAutosave !== oldAutosave) {
+            workspaces.autosave = layoutConfig;
+            this.autoSaveService.setDirty();
+          }
+          resolve();
+        });
+      });
     }
   }
 
@@ -176,7 +228,6 @@
     'CAMERA_SENSITIVITY_RANGE',
     'UIS_DEFAULTS',
     'autoSaveFactory',
-    'goldenLayoutService',
     'nrpUser',
     'simulationConfigService'
   ];
@@ -192,6 +243,7 @@
         translation: 1.0,
         rotation: 1.0
       }
-    }
+    },
+    workspaces: {}
   });
 })();

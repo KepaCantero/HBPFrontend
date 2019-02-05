@@ -227,4 +227,18 @@ describe('Services: backendInterfaceService', function() {
     $httpBackend.flush();
     expect(serverError.displayHTTPError).toHaveBeenCalled();
   });
+
+  it('should call serverError.displayHTTPError when the addRobot POST request fails', function() {
+    $httpBackend.whenPOST(urlRegex).respond(500);
+    backendInterfaceService.addRobot();
+    $httpBackend.flush();
+    expect(serverError.displayHTTPError).toHaveBeenCalled();
+  });
+
+  it('should call serverError.displayHTTPError when the getCustomRobot GET request fails', function() {
+    $httpBackend.expectGET(urlRegex).respond(404);
+    backendInterfaceService.getCustomRobot();
+    $httpBackend.flush();
+    expect(serverError.displayHTTPError).toHaveBeenCalled();
+  });
 });

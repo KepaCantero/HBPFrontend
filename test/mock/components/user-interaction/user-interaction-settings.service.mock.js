@@ -27,5 +27,11 @@
           return window.$q.when();
         });
       this.settingsData = mockSettingsData;
+      this.workspaces = {
+        then: jasmine.createSpy('then')
+      };
+      this.autosaveLayout = jasmine.createSpy('autosaveLayout');
+      this.saveCustomWorkspace = jasmine.createSpy('saveCustomWorkspace');
+      this.deleteCustomWorkspace = jasmine.createSpy('deleteCustomWorkspace');
     });
 })();

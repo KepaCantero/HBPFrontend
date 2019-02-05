@@ -1,0 +1,27 @@
+.workspace-settings-panel-wrapper {
+  padding: 10px;
+  background-color: white;
+}
+
+.workspace-save-autocomplete {
+  width: 300px;
+}
+
+.workspace-list {
+  overflow: auto;
+  max-height: 500px;
+
+  .workspace-list-item {
+    height: 40px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin: 3px 1px 1px 1px;
+    box-shadow: 0px 0px 1px 0px rgba(0, 0, 0, 0.75);
+
+    .workspace-list-item-element {
+      margin: 0px 10px 0px 10px;
+    }
+  }
+}

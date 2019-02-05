@@ -40,6 +40,7 @@
       storageServerTokenManager,
       userContextService,
       updateChecker,
+      workspaceService,
       recorderPanelService
     ) {
       this.$injector = $injector;
@@ -50,10 +51,12 @@
       this.TOOL_CONFIGS = TOOL_CONFIGS;
 
       this.bbpConfig = bbpConfig;
+      this.goldenLayoutService = goldenLayoutService;
       this.nrpAnalytics = nrpAnalytics;
       this.storageServerTokenManager = storageServerTokenManager;
       this.updateChecker = updateChecker;
       this.userContextService = userContextService;
+      this.workspaceService = workspaceService;
       this.recorderPanelService = recorderPanelService;
 
       this.show = true;
@@ -161,6 +164,7 @@
       'storageServerTokenManager',
       'userContextService',
       'updateChecker',
+      'workspaceService',
       'recorderPanelService',
       function(...args) {
         return new ApplicationTopToolbarController(...args);
