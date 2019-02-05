@@ -105,7 +105,7 @@
     onButtonExit() {
       let isDemoMode = this.bbpConfig.get('demomode.demoCarousel', false);
       if (isDemoMode) {
-        this.experimentViewService.exitSimulation();
+        this.experimentViewService.exitDemo();
       } else {
         this.experimentViewService.openExitDialog();
       }

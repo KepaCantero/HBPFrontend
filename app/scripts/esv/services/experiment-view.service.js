@@ -366,12 +366,16 @@
       this.nrpModalService.createModal(exitSimulationTemplate);
     }
 
+    exitDemo() {
+      this.$location.path('esv-demo');
+    }
+
     exitSimulation() {
       let isDemoMode = this.bbpConfig.get('demomode.demoCarousel', false);
       if (isDemoMode) {
         this.cleanUp();
         this.splash.splashScreen = null; // do not reopen splashscreen if further messages happen
-        this.$location.path('esv-demo');
+        this.$location.path('esv-demo-wait');
       } else {
         this.cleanUp();
         this.splash.splashScreen = null; // do not reopen splashscreen if further messages happen

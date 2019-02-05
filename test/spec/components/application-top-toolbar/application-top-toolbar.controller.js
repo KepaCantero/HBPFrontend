@@ -118,7 +118,7 @@ describe('Controller: ApplicationTopToolbarController', function() {
       }
     });
     applicationTopToolbarController.onButtonExit();
-    expect(experimentViewService.exitSimulation).toHaveBeenCalled();
+    expect(experimentViewService.exitDemo).toHaveBeenCalled();
   });
 
   it(' - allowPlayPause()', function() {
