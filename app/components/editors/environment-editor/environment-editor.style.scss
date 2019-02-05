@@ -253,8 +253,10 @@ environment-designer {
   color: black;
   text-align: center;
   font-size: 11px;
-  padding-bottom: 3px;
-  padding-top: 1px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  padding: 1px 3px 3px 3px;
 }
 
 .ed-objectlist-item {
@@ -299,4 +301,12 @@ environment-designer {
   position: absolute;
   top: 0;
   left: 0;
+}
+
+.tooltip-multiline {
+  height: auto;
+  white-space: pre-line;
+  max-width: 500px;
+  line-height: 22px;
+  font-size: 100%;
 }

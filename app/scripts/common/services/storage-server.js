@@ -409,10 +409,10 @@
       }).$promise;
     }
 
-    saveBrain(experimentId, brain, populations) {
+    saveBrain(experimentId, brain, populations, removePopulations, newBrain) {
       return this.proxyRsc.saveBrain(
         { experimentId },
-        JSON.stringify({ brain, populations })
+        JSON.stringify({ brain, populations, removePopulations, newBrain })
       ).$promise;
     }
 

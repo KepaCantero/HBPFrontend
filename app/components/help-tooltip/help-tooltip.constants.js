@@ -68,7 +68,7 @@
         'This button opens the apply force dialog to activate dynamic application of forces on objects.',
       ENVIRONMENT_EDITOR: 'Toggle the environment (add models, etc.)',
       TRANSFER_FUNCTION_EDITOR: 'Toggle the transfer function editor',
-      BRAIN_EDITOR: 'Toggle the PyNN brain editor',
+      BRAIN_EDITOR: 'Toggle the brain editor',
       SMACH_EDITOR: 'Toggle the SMACH state machine editor',
       RESOURCES_EDITOR: 'Edit experiment resources like files, assets, etc.',
       EXPERIMENT_NAME: "The experiment's name",

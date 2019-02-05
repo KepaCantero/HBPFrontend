@@ -46,7 +46,7 @@
                      data-role="button" class="ed-objectlist-content" style="border: 2px solid {{model.color}};">
                     <div ng-if="model.public" class="ed-public-tag noselect"> public </div>
                     <div ng-if="model.custom" class="ed-private-tag noselect"> private </div>
-
+                    <md-tooltip class="tooltip-multiline" ng-if="model.isBrain || model.isRobot">{{model.description}}</md-tooltip>
                     <div class="ed-objectlist-content-img-box">
                         <img ng-src="{{model.thumbnail?model.thumbnail:assetsPath+'/'+model.modelPath+'/thumbnail.png'}}"
                              draggable="false" class="ed-img-thumbnail ed-environment-thumbnail"
@@ -57,7 +57,7 @@
 
                     <div class="env-object-caption-box">
                         <div class="env-object-caption" style="background: {{model.color}};">
-                            {{model.modelTitle | limitTo:15}}...
+                            {{model.modelTitle}}
                         </div>
                     </div>
 
@@ -88,6 +88,17 @@
                 <span> Download World</span>
             </button>
 
+            <button type="button" class="btn btn-default" ng-click="uploadModel('robots')" 
+                    ng-disabled="uploadingModel" ng-if="isCategoryVisible('Robots')">
+                <i disable-animate ng-class="uploadingModel ? 'fa fa-spinner fa-spin' :'glyphicon glyphicon-upload'"></i>
+                <span> Upload Robot</span>
+            </button>
+
+            <button type="button" class="btn btn-default" ng-click="uploadModel('brains')" 
+                    ng-disabled="uploadingModel" ng-if="isCategoryVisible('Brains')">
+                    <i disable-animate ng-class="uploadingModel ? 'fa fa-spinner fa-spin' :'glyphicon glyphicon-upload'"></i>
+                <span> Upload Brain</span>
+            </button>
         </div>
 
     </div>

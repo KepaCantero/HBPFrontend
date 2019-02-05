@@ -5,14 +5,18 @@
 
   <div class="graphical-editor-pynn-container" ng-keydown="suppressKeyPress($event)">
 
-    <h3>PyNN Brain Editor</h3>
+    <h3>Brain Editor</h3>
 
     <div class="alert alert-info">
       <p>
         Network scripts use
         <a target="_blank" href="http://neuralensemble.org/PyNN/">
           <b>PyNN</b>
-        </a> API for loading a network in the simulation. Browse our
+        </a> or 
+        <a target="_blank" href="https://www.nengo.ai">
+          <b>Nengo</b>
+        </a>
+         API for loading a network in the simulation. Browse our
         <a target="_blank" href="{{platformDocumentationURL}}/nrp/user_manual/simulation_setup/hard_reset.html">
           <b>User Manual</b>
         </a> to see how a neural network can be changed at run time.
@@ -20,7 +24,7 @@
       </p>
     </div>
     <div ng-show="pynnScript === undefined" class="alert alert-info" role="alert">
-      There is no PyNN script available for this experiment.
+      There is no brain script available for this experiment.
     </div>
     <div ng-show="pynnScript !== undefined" style="height: calc(100% - 150px); display:flex;     flex-direction: column;">
 

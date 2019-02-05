@@ -155,6 +155,10 @@
                 editor.setOption(key, value);
               });
             };
+
+            $rootScope.$on('BRAIN_SCRIPT_UPDATED', function() {
+              scope.refresh(true);
+            });
             //TODO: get this mess of upwards-downwards intertwined scope definition out and handle refreshing in here alone
             // refresh is called on:
             // * resize
@@ -194,7 +198,7 @@
                       scope.searchToken('si');
                     }, 100);
                   } else {
-                    scope.pynnScript.code = '# Write PyNN script here';
+                    scope.pynnScript.code = '# Write brain script here';
                     scope.populations = [];
                     refreshEditor();
                   }
@@ -528,7 +532,7 @@
                 .catch(() => {
                   clbErrorDialog.open({
                     type: 'BackendError.',
-                    message: 'Error while saving pyNN script to the Storage.'
+                    message: 'Error while saving brain script to the Storage.'
                   });
                 });
             };

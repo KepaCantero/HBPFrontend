@@ -156,8 +156,8 @@
           minHeight: 200
         }
       },
-      PYNN_EDITOR: {
-        name: 'PyNN Editor',
+      BRAIN_EDITOR: {
+        name: 'Brain Editor',
         directive: 'pynn-editor',
         allowMultipleViews: false, // default true
         overlayDefaultSize: {

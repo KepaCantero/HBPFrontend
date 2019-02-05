@@ -54,6 +54,10 @@
     '$q',
     'storageServer',
     'backendInterfaceService',
+    '$rootScope',
+    'clbConfirm',
+    'nrpModalService',
+    'nrpUser',
     function(
       STATE,
       EDIT_MODE,
@@ -71,7 +75,11 @@
       newExperimentProxyService,
       $q,
       storageServer,
-      backendInterfaceService
+      backendInterfaceService,
+      $rootScope,
+      clbConfirm,
+      nrpModalService,
+      nrpUser
     ) {
       return {
         templateUrl:
@@ -96,6 +104,9 @@
           scope.isSavingToCollab = false;
           scope.categories = [];
           scope.physicsEngine = simulationInfo.experimentDetails.physicsEngine;
+          nrpUser
+            .getOwnerDisplayName('me')
+            .then(owner => (scope.owner = owner));
 
           scope.updateVisibleModels = function() {
             scope.visibleModels = [];
@@ -117,12 +128,140 @@
             scope.updateVisibleModels();
           };
 
+          scope.isCategoryVisible = function(category) {
+            const categoryFound = scope.categories.find(
+              cat => cat.title === category
+            );
+            return !!categoryFound && categoryFound.visible;
+          };
+
+          scope.checkIfAppendExistsModelCustom = function(
+            customModelFound,
+            filename
+          ) {
+            if (customModelFound[0].userId == scope.owner) {
+              return clbConfirm
+                .open({
+                  title: `One of your custom models already has the name: ${filename}`,
+                  confirmLabel: 'Yes',
+                  cancelLabel: 'No',
+                  template:
+                    'Are you sure you would like to upload the file again?',
+                  closable: true
+                })
+                .catch(() => $q.resolve());
+            } else {
+              clbErrorDialog.open({
+                type: `A Custom Model already exists with the name ${filename}`,
+                message:
+                  'The model you tried to upload already exists in the database. Rename it and try uploading it again.'
+              });
+              return $q.reject();
+            }
+          };
+
+          scope.existsModelCustom = function(customModels, filename) {
+            var customModelFound = customModels.filter(customModel =>
+              customModel.fileName.includes(filename)
+            );
+            if (customModelFound.length)
+              scope.checkIfAppendExistsModelCustom(customModelFound, filename);
+            return $q.resolve();
+          };
+
+          scope.createErrorPopup = function(errorMessage) {
+            clbErrorDialog.open({
+              type: 'Error.',
+              message: errorMessage
+            });
+          };
+
+          scope.uploadModelZip = function(zip, entityType) {
+            if (zip.type !== 'application/zip') {
+              clbErrorDialog.open({
+                type: 'Error.',
+                message:
+                  'The file you uploaded is not a zip. Please provide a zipped model'
+              });
+              return $q.reject();
+            }
+            return $q(resolve => {
+              let textReader = new FileReader();
+              textReader.onload = e => resolve([zip.name, e.target.result]);
+              textReader.readAsArrayBuffer(zip);
+            }).then(([filename, filecontent]) => {
+              storageServer.getAllCustomModels(entityType).then(customModels =>
+                scope.existsModelCustom(customModels, filename).then(() =>
+                  storageServer
+                    .setCustomModel(filename, entityType, filecontent)
+                    .catch(err => {
+                      nrpModalService.destroyModal();
+                      scope.createErrorPopup(err.data);
+                      return $q.reject(err);
+                    })
+                    .then(() => scope.regenerateModels())
+                    .finally(() => (scope.uploadingModel = false))
+                )
+              );
+            });
+          };
+
+          scope.uploadModel = function(modelType /*i.e. Robot , Brain*/) {
+            var input = $(
+              '<input type="file" style="display:none;" accept:".zip">'
+            );
+            document.body.appendChild(input[0]);
+            input.on('change', e =>
+              scope.uploadModelZip(e.target.files[0], modelType)
+            );
+            input.click();
+            input.on('change', () => {
+              if (
+                input[0].files.length &&
+                input[0].files[0].type === 'application/zip'
+              )
+                scope.uploadingModel = true;
+            });
+            document.body.removeChild(input[0]);
+          };
+
+          scope.generateModels = function(modelType) {
+            return $q.all([
+              newExperimentProxyService.getTemplateModels(modelType),
+              storageServer.getCustomModels(modelType)
+            ]);
+          };
+
+          scope.generateModel = function(category) {
+            if (category === 'Robots') {
+              return scope.generateRobotsModels();
+            } else if (category === 'Brains') {
+              return scope.generateBrainsModels();
+            }
+            return $q.reject('Unhandled Category');
+          };
+
+          scope.regenerateModels = function() {
+            let promises = [];
+            ['Robots', 'Brains'].forEach(category => {
+              const modelCategory = scope.categories.find(
+                cat => cat.title === category
+              );
+              if (modelCategory) {
+                promises.push(
+                  scope.generateModel(modelCategory.title).then(res => {
+                    modelCategory.models = res;
+                    scope.updateVisibleModels();
+                  })
+                );
+              }
+            });
+            return $q.all(promises);
+          };
+
           scope.generateRobotsModels = function() {
-            return $q
-              .all([
-                newExperimentProxyService.getTemplateModels('robots'),
-                storageServer.getCustomModels('robots')
-              ])
+            return scope
+              .generateModels('robots')
               .then(([templateRobots, customRobots]) => {
                 templateRobots.data.forEach(robot => (robot.public = true));
                 customRobots.forEach(robot => (robot.custom = true));
@@ -130,16 +269,53 @@
                   return {
                     configPath: robot.path,
                     modelPath: robot.id,
-                    zipURI: robot.zipURI && robot.zipURI.replace(/%2F/gi, '/'),
+                    zipURI: robot.zipURI && decodeURIComponent(robot.zipURI),
                     modelSDF: robot.sdf,
                     modelTitle: robot.name,
                     thumbnail: robot.thumbnail,
                     custom: robot.custom,
                     public: robot.public,
-                    isRobot: true
+                    isRobot: true,
+                    description: robot.description
+                      ? robot.description
+                      : 'Robot has no description'
                   };
                 });
-              });
+              })
+              .catch(err =>
+                clbErrorDialog.open({
+                  type: 'Model libraries error.',
+                  message: `Could not retrieve robots models: \n${err}`
+                })
+              );
+          };
+
+          scope.generateBrainsModels = function() {
+            return scope
+              .generateModels('brains')
+              .then(([templateBrains, customBrains]) => {
+                templateBrains.data.forEach(brain => (brain.public = true));
+                customBrains.forEach(brain => (brain.custom = true));
+                return [...templateBrains.data, ...customBrains].map(brain => ({
+                  configPath: brain.path,
+                  modelPath: brain.id,
+                  modelTitle: brain.name,
+                  thumbnail: brain.thumbnail,
+                  custom: brain.custom,
+                  public: brain.public,
+                  isBrain: true,
+                  script: brain.script,
+                  description: brain.description
+                    ? brain.description
+                    : 'Brain has no description'
+                }));
+              })
+              .catch(err =>
+                clbErrorDialog.open({
+                  type: 'Model libraries error.',
+                  message: `Could not retrieve brains models: \n${err}`
+                })
+              );
           };
 
           const modelLibrary = scope.assetsPath + '/' + gz3d.MODEL_LIBRARY;
@@ -152,23 +328,26 @@
             } else {
               // if the generate robots models fails, we open an error panel
               // but still continue with the rest of the objects in the env editor
-              modelsPromise = scope
-                .generateRobotsModels()
-                .then(templateRobots => {
+              modelsPromise = $q
+                .all([
+                  scope.generateRobotsModels(),
+                  scope.generateBrainsModels()
+                ])
+                .then(([robots, brains]) => {
                   let robotCategory = {
                     thumbnail: 'robots.png',
                     title: 'Robots',
-                    models: templateRobots
+                    models: robots
                   };
                   scope.categories.push(robotCategory);
                   GZ3D.modelList.push(robotCategory);
-                })
-                .catch(err =>
-                  clbErrorDialog.open({
-                    type: 'Model libraries error.',
-                    message: `Could not retrieve robots models: \n${err}`
-                  })
-                );
+                  let brainCategory = {
+                    thumbnail: 'brain.png',
+                    title: 'Brains',
+                    models: brains
+                  };
+                  scope.categories.push(brainCategory);
+                });
             }
             modelsPromise.finally(() => {
               scope.createModelsCategories();
@@ -229,20 +408,16 @@
 
           scope.onModelMouseDown = (event, model) => {
             event.preventDefault();
-
-            if (model.isRobot) {
+            if (model.isBrain) scope.addBrain(model);
+            else if (model.isRobot) {
               if (model.custom) {
                 backendInterfaceService
                   .getCustomRobot(model.zipURI.split('/')[1])
                   .then(() => {
                     scope.addRobot(model);
                   });
-              } else {
-                scope.addRobot(model);
-              }
-            } else {
-              scope.addModel(model);
-            }
+              } else scope.addRobot(model);
+            } else scope.addModel(model);
           };
 
           scope.addModel = function(model) {
@@ -275,7 +450,6 @@
                     yaw: obj.rotation.z
                   };
                   let robotID = obj.name.toLowerCase().replace(/ /gi, '_');
-
                   let onCreateCallback = model => {
                     if (model.name === robotID) {
                       gz3d.scene.selectEntity(model);
@@ -307,6 +481,72 @@
                 }
               );
             }
+          };
+
+          function parseBrainError(error) {
+            const regex = /transfer\s*Function/gim;
+            const matches = regex.exec(error.data.error_message);
+            if (matches)
+              return 'Some of the transfer functions are referencing variables from the old brain script.\
+               Please remove these transfer functions to activate the brain script';
+            else return error.data.error_message;
+          }
+
+          scope.addBrain = model => {
+            // There might not be a brain so we first check the storage
+            let brainExistsPromise;
+            return storageServer
+              .getBrain(simulationInfo.experimentID)
+              .then(res => {
+                // Ask user to confirm brain replacement if brain already there
+                if (res.brain) {
+                  brainExistsPromise = clbConfirm.open({
+                    title: 'Replace brain?',
+                    confirmLabel: 'Yes',
+                    cancelLabel: 'No',
+                    template:
+                      'Are you sure you would like to change the brain script? \
+                If populations in the existing script are referenced in the transfer functions \
+                you might have to delete them.',
+                    closable: true
+                  });
+                } else {
+                  brainExistsPromise = $q.resolve();
+                }
+                return (
+                  brainExistsPromise
+                    // Try to set the brain in the backend
+                    .then(() =>
+                      backendInterfaceService
+                        .setBrain(model.script, {}, 'py', 'text', true)
+                        // If something goes wrong (most likely existing TFs referring to the brain script) open an error dialog
+                        .catch(err =>
+                          clbErrorDialog.open({
+                            type: 'Error while setting brain.',
+                            message: parseBrainError(err)
+                          })
+                        )
+                        // Even if something goes wrong, go ahead and save the brain in the storage as well
+                        .finally(() =>
+                          storageServer
+                            .saveBrain(
+                              simulationInfo.experimentID,
+                              model.script,
+                              {},
+                              true,
+                              model.modelPath
+                            )
+                            // Upon success, open the brain editor
+                            .then(() => {
+                              goldenLayoutService.openTool(
+                                TOOL_CONFIGS.BRAIN_EDITOR
+                              );
+                              $rootScope.$broadcast('BRAIN_SCRIPT_UPDATED');
+                            })
+                        )
+                    )
+                );
+              });
           };
 
           scope.onEntityCreated = modelCreated => {

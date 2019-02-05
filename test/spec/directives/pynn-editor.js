@@ -254,7 +254,7 @@ describe('Directive: pynnEditor', function() {
       isolateScope.refresh();
       isolateScope.$apply();
       expect(storageServer.getBrain).toHaveBeenCalled();
-      expect(isolateScope.pynnScript.code).toBe('# Write PyNN script here');
+      expect(isolateScope.pynnScript.code).toBe('# Write brain script here');
     });
 
     it('should apply changes made on the pynn script and the brain population properly', function() {
