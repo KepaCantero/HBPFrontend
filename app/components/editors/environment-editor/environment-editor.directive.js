@@ -267,9 +267,9 @@
                 customRobots.forEach(robot => (robot.custom = true));
                 return [...templateRobots.data, ...customRobots].map(robot => {
                   return {
-                    configPath: robot.path,
+                    configPath: robot.configPath,
                     modelPath: robot.id,
-                    zipURI: robot.zipURI && decodeURIComponent(robot.zipURI),
+                    path: robot.path && decodeURIComponent(robot.path),
                     modelSDF: robot.sdf,
                     modelTitle: robot.name,
                     thumbnail: robot.thumbnail,
@@ -297,7 +297,8 @@
                 templateBrains.data.forEach(brain => (brain.public = true));
                 customBrains.forEach(brain => (brain.custom = true));
                 return [...templateBrains.data, ...customBrains].map(brain => ({
-                  configPath: brain.path,
+                  configPath: brain.configPath,
+                  path: brain.path && decodeURIComponent(brain.path),
                   modelPath: brain.id,
                   modelTitle: brain.name,
                   thumbnail: brain.thumbnail,
@@ -412,7 +413,7 @@
             else if (model.isRobot) {
               if (model.custom) {
                 backendInterfaceService
-                  .getCustomRobot(model.zipURI.split('/')[1])
+                  .getCustomRobot(model.path.split('/')[1])
                   .then(() => {
                     scope.addRobot(model);
                   });
@@ -468,7 +469,7 @@
                   let robotRelativePath;
                   let isCustom = model.custom ? 'True' : 'False';
                   if (model.custom) {
-                    robotRelativePath = model.zipURI.split('/')[1];
+                    robotRelativePath = model.path.split('/')[1];
                   } else {
                     robotRelativePath = model.modelPath + '/' + model.modelSDF;
                   }

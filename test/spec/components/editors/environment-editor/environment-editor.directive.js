@@ -264,7 +264,7 @@ describe('Directive: environment-designer', function() {
             description: 'robot1 description',
             thumbnail: '<robot png data>',
             id: 'robot1',
-            path: 'robots/<robot folder>/model.config',
+            configPath: 'robots/<robot folder>/model.config',
             isRobot: true
           },
           {
@@ -272,7 +272,7 @@ describe('Directive: environment-designer', function() {
             sdf: 'model.sdf',
             thumbnail: '<robot png data>',
             id: 'robot1',
-            path: 'robots/<robot folder>/model.config',
+            configPath: 'robots/<robot folder>/model.config',
             isRobot: true
           }
         ]
@@ -285,7 +285,6 @@ describe('Directive: environment-designer', function() {
           description: 'custom robot1 description',
           thumbnail: '<robot png data>',
           id: 'robot1',
-          zipURI: 'robot1.zip',
           fileName: 'robots/robot1.zip',
           path: 'robots%2Frobot1.zip'
         },
@@ -293,7 +292,6 @@ describe('Directive: environment-designer', function() {
           name: 'custom robot2 name',
           thumbnail: '<robot png data>',
           id: 'robot2',
-          zipURI: 'robot2.zip',
           fileName: 'robots/robot2.zip',
           path: 'robots%2Frobot2.zip'
         }
@@ -304,7 +302,7 @@ describe('Directive: environment-designer', function() {
       expect(res[0]).toEqual({
         configPath: 'robots/<robot folder>/model.config',
         modelPath: 'robot1',
-        zipURI: undefined,
+        path: undefined,
         modelSDF: 'model.sdf',
         modelTitle: 'robot1 name',
         thumbnail: '<robot png data>',
@@ -342,7 +340,6 @@ describe('Directive: environment-designer', function() {
           description: 'custom brain1 description',
           thumbnail: '<brain1 png data>',
           id: 'brain1',
-          zipURI: 'brain1.zip',
           fileName: 'brain_models/brain1.zip',
           path: 'brains_models%2Fbrain1.zip'
         },
@@ -350,7 +347,6 @@ describe('Directive: environment-designer', function() {
           name: 'custom robot2 name',
           thumbnail: '<brain2 png data>',
           id: 'brain2',
-          zipURI: 'brain2.zip',
           fileName: 'brain_models/brain2.zip',
           path: 'brain_models%2Fbrain2.zip'
         }
@@ -359,7 +355,8 @@ describe('Directive: environment-designer', function() {
 
     $scope.generateBrainsModels().then(res =>
       expect(res[0]).toEqual({
-        configPath: 'brain_models/<brain1 folder>/brain1.py',
+        configPath: undefined,
+        path: 'brain_models/<brain1 folder>/brain1.py',
         modelPath: undefined,
         modelTitle: 'brain1 name',
         thumbnail: undefined,
@@ -937,7 +934,7 @@ describe('Directive: environment-designer robots models', function() {
       modelSDF: 'model.sdf',
       modelTitle: 'MyRobot',
       custom: false,
-      zipURI: undefined,
+      path: undefined,
       isRobot: true
     };
 
@@ -975,7 +972,7 @@ describe('Directive: environment-designer robots models', function() {
 
     // custom model
     robotModel.custom = true;
-    robotModel.zipURI = 'path/to/zip';
+    robotModel.path = 'path/to/zip';
     gz3d.scene.spawnModel.start.and.callFake(
       (modelPath, modelSDF, modelTitle, callback) => {
         callback(obj);
@@ -1003,7 +1000,7 @@ describe('Directive: environment-designer robots models', function() {
       modelSDF: 'model.sdf',
       modelTitle: 'MyRobot',
       custom: false,
-      zipURI: undefined,
+      path: undefined,
       isRobot: true
     };
 
@@ -1014,7 +1011,7 @@ describe('Directive: environment-designer robots models', function() {
 
     // Custom robot
     robotModel.custom = true;
-    robotModel.zipURI = 'path/to/zip';
+    robotModel.path = 'path/to/zip';
     $scope.onModelMouseDown(event, robotModel);
     expect(backendInterfaceService.getCustomRobot).toHaveBeenCalled();
     expect($scope.addRobot).toHaveBeenCalledWith(robotModel);

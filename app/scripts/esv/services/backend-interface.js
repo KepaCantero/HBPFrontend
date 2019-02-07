@@ -557,7 +557,7 @@
         },
         /**
          *  Get and extract a custom robot model from .zip
-         * @param robotId The id of the robot to be deleted
+         * @param robotId The id of the robot to be retrieved
          * @return A promise with the operation result
          */
         getCustomRobot: function(filePath) {
