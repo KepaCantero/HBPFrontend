@@ -112,7 +112,7 @@
         </div>
       </md-button>
 
-      <md-button gl-tool-source="SERVER_VIDEO_STREAM" class="md-raised tool-button tool-monitor"
+      <md-button ng-disabled="!vm.videoStreamService.videoStreamsAvailable" gl-tool-source="SERVER_VIDEO_STREAM" class="md-raised tool-button tool-monitor"
                  aria-label="Video Streams" help-tooltip="SERVER_VIDEO_STREAM"
                  ng-class="{'tool-help-highlight': vm.helpTooltipService.helpCode === 'SERVER_VIDEO_STREAM',
                  'tool-disabled': !vm.videoStreamService.videoStreamsAvailable}">
