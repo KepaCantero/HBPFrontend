@@ -1,7 +1,7 @@
 {
   "name": "gz3d-hbp", 
   "description": "3D rendering component of gzweb, modified for HBP", 
-  "version": "2.1.1", 
+  "version": "2.1.2", 
   "private": true, 
   "repository": {
     "url": "git+ssh://bbpcode.epfl.ch/neurorobotics/gzweb", 
