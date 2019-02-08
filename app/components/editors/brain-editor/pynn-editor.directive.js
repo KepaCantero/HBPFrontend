@@ -331,34 +331,54 @@
               return populations;
             };
 
-            scope.applyBackend = function(options) {
+            scope.updatePopulationBackend = function(options) {
               var restart = stateService.currentState === STATE.STARTED;
-              var populations = objectifyPopulations(scope.populations);
-              let populationToDelete;
-              if (
+              scope.loading = true;
+              let hastoDeletePopulation =
                 options &&
-                options.hasOwnProperty('populationToDeleteIndex')
-              ) {
-                populationToDelete =
-                  scope.populations[options.populationToDeleteIndex];
-                delete populations[populationToDelete.name];
-              }
+                options.hasOwnProperty('populationToDeleteIndex') &&
+                options.populationToDeleteIndex > -1;
+              if (hastoDeletePopulation)
+                scope.populations.splice(options.populationToDeleteIndex, 1);
+              var populations = objectifyPopulations(scope.populations);
 
               for (let popk in populations) {
                 let pop = populations[popk];
                 delete pop.editing;
                 delete pop.displayMode;
               }
+              backendInterfaceService.updatePopulations(
+                'py',
+                scope.stringsToLists(populations),
+                'text',
+                options.changePopulations,
+                function() {
+                  autoSaveService.setDirty();
+                  $rootScope.$broadcast('pynn.populationsChanged');
+                  scope.loading = false;
+                  if (restart) {
+                    stateService.setCurrentState(STATE.STARTED);
+                  }
+                },
+                function(result) {
+                  scope.loading = false;
+                  scope.refresh(true);
+                  clbErrorDialog.open({
+                    type: 'Impossible to update population',
+                    message: result.data.error_message
+                  });
+                }
+              );
+            };
 
-              backendInterfaceService
-                .setBrain(
-                  scope.pynnScript.code,
-                  scope.stringsToLists(populations),
-                  'py',
-                  'text',
-                  true
-                )
-                .then(function() {
+            scope.updateBrainBackend = function() {
+              var restart = stateService.currentState === STATE.STARTED;
+
+              backendInterfaceService.setBrain(
+                'py',
+                'text',
+                scope.pynnScript.code,
+                function() {
                   scope.loading = false;
                   codeEditorsServices.getEditor('pynnEditor').markClean();
                   scope.clearError();
@@ -366,30 +386,11 @@
                   if (restart) {
                     stateService.setCurrentState(STATE.STARTED);
                   }
-                  if (populationToDelete) {
-                    scope.populations.splice(
-                      options.populationToDeleteIndex,
-                      1
-                    );
-                    autoSaveService.setDirty();
-                  }
-                  $rootScope.$broadcast('pynn.populationsChanged');
-                })
-                .catch(function(result) {
+                },
+                function(result) {
                   scope.loading = false;
                   scope.clearError();
                   if (
-                    result.data.error_line === -1 &&
-                    result.data.error_column === -1
-                  ) {
-                    scope.refresh(true);
-                    clbErrorDialog.open({
-                      type: 'Impossible to delete population',
-                      message:
-                        'Please remove all references to the population in the transfer functions and try again.',
-                      data: { error: result.data.error_message }
-                    });
-                  } else if (
                     result.data.error_line === -2 &&
                     result.data.error_column === -2
                   ) {
@@ -405,9 +406,9 @@
                       result.data.error_column
                     );
                   }
-                });
+                }
+              );
             };
-
             // Generate a regexp that will use to check if a population is used by a transfer function
             let populationRegExp = function(populationName) {
               return new RegExp('\\W' + populationName + '(?=\\W)', 'gm');
@@ -446,12 +447,55 @@
               return false;
             };
 
-            scope.apply = function(options) {
+            scope.renamePopulations = function(options) {
+              options.changePopulations = true;
+              storageServer
+                .getTransferFunctions(simulationInfo.experimentID)
+                .then(result => {
+                  let tfs = result.data;
+                  clbConfirm
+                    .open({
+                      title: 'Confirm changing neural network',
+                      confirmLabel: 'Yes',
+                      cancelLabel: 'Cancel',
+                      template:
+                        'Applying your changes will update population references of your transfer functions. Do you wish to continue?',
+                      closable: false
+                    })
+                    .then(() => {
+                      // Find and replace former population names in transfer functions
+                      let tflist = [];
+                      for (let tf in tfs) {
+                        for (let p of scope.populations)
+                          if (p.previousName !== p.name)
+                            tfs[tf] = tfs[tf].replace(
+                              populationRegExp(p.previousName),
+                              p.name
+                            );
+                        tflist.push(tfs[tf]);
+                      }
+                      storageServer
+                        .saveTransferFunctions(
+                          simulationInfo.experimentID,
+                          tflist
+                        )
+                        .then(() => scope.updatePopulationBackend(options))
+                        .catch(() =>
+                          clbErrorDialog.open({
+                            type: 'BackendError.',
+                            message:
+                              'Error while saving transfer functions to the Storage.'
+                          })
+                        )
+                        .finally(() => (scope.loading = false));
+                    });
+                });
+            };
+
+            scope.updatePopulations = function(options) {
               // If editing populations are valid first
               scope.loading = true;
-
               for (let p of scope.populations) p.editing = false;
-
               storageServer
                 .getTransferFunctions(simulationInfo.experimentID)
                 .then(result => {
@@ -461,13 +505,11 @@
                   const aPopulationNeedsToBeDeleted =
                     options &&
                     options.hasOwnProperty('populationToDeleteIndex');
-
                   const aPopNeedsToBeReplaced = aPopulationNeedsToBeReplaced(
                     tfs,
                     options
                   );
                   if (aPopulationNeedsToBeDeleted && aPopNeedsToBeReplaced) {
-                    scope.loading = false;
                     clbErrorDialog.open({
                       // The delete operation will be cancelled; no DELETE request will be sent to the back-end.
                       type: 'Population referred by Transfer Functions',
@@ -475,51 +517,15 @@
                         'This population is referred to by transfer functions. ' +
                         'Please remove all references to this population in your transfer functions and try again.'
                     });
-                  } else if (aPopNeedsToBeReplaced) {
-                    // With user's agreement, populations will be automatically renamed in the transfer functions
-                    clbConfirm
-                      .open({
-                        title: 'Confirm changing neural network',
-                        confirmLabel: 'Yes',
-                        cancelLabel: 'Cancel',
-                        template:
-                          'Applying your changes will update population references of your transfer functions. Do you wish to continue?',
-                        closable: false
-                      })
-                      .then(() => {
-                        // Find and replace former population names in transfer functions
-                        let tflist = [];
-                        for (let tf in tfs) {
-                          for (let p of scope.populations)
-                            if (p.previousName !== p.name)
-                              tfs[tf] = tfs[tf].replace(
-                                populationRegExp(p.previousName),
-                                p.name
-                              );
-                          tflist.push(tfs[tf]);
-                        }
-                        storageServer
-                          .saveTransferFunctions(
-                            simulationInfo.experimentID,
-                            tflist
-                          )
-                          .then(() => scope.applyBackend(options))
-                          .catch(() =>
-                            clbErrorDialog.open({
-                              type: 'BackendError.',
-                              message:
-                                'Error while saving transfer functions to the Storage.'
-                            })
-                          );
-                      }, () => (scope.loading = false))
-                      .finally(() => {
-                        for (let p of scope.populations) {
-                          p.previousName = p.name;
-                        }
-                      });
-                  } else scope.applyBackend(options);
+                    return;
+                  }
+                  scope.updatePopulationBackend(options);
                 })
-                .catch(err => console.error('Failed to load TFS:\n' + err));
+                .finally(() => {
+                  for (let p of scope.populations) {
+                    p.previousName = p.name;
+                  }
+                });
             };
 
             scope.saveIntoStorage = function() {
@@ -544,12 +550,14 @@
             };
 
             scope.applyEditingPopulation = function() {
-              if (scope.editingPopulation()) scope.apply();
+              if (scope.editingPopulation())
+                scope.updatePopulations({ changePopulations: true });
             };
 
             scope.editingFocusLost = function(pop) {
               $timeout(() => {
-                if (!pop.editingHasFocus) scope.apply();
+                if (!pop.editingHasFocus)
+                  scope.updatePopulations({ changePopulations: true });
               });
             };
 
@@ -598,7 +606,11 @@
             };
 
             scope.deletePopulation = function(index) {
-              scope.apply({ populationToDeleteIndex: index });
+              var options = {
+                populationToDeleteIndex: index,
+                changePopulations: true
+              };
+              scope.updatePopulations(options);
               scope.updateRegexPatterns();
             };
 
@@ -674,6 +686,8 @@
                 displayMode: 'range'
               });
               scope.updateRegexPatterns();
+              var options = { changePopulations: true };
+              scope.updatePopulationBackend(options);
             };
 
             scope.generatePopulationName = function() {
@@ -769,7 +783,7 @@
               var textReader = new FileReader();
               textReader.onload = function(e) {
                 scope.pynnScript.code = e.target.result;
-                scope.apply(0);
+                scope.updateBrainBackend();
               };
               textReader.readAsText(file);
             };

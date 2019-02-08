@@ -132,7 +132,7 @@
                         <div style="font-weight:600">Name</div>
 
                         <input type="text" custom-autofocus ng-focus="pop.editingHasFocus=true" ng-blur="pop.editingHasFocus=false;editingFocusLost(pop)"
-                          size="25" owner-only ng-keyup="$event.keyCode==13 && apply()" ng-model="pop.name" ng-change="onPynnChange()"
+                          size="25" owner-only ng-keyup="$event.keyCode==13 && updatePopulations({ changePopulations: true })" ng-model="pop.name" ng-change="onPynnChange()"
                           ng-change="updateRegexPatterns();" ng-pattern="pop.regex" required>
 
                       </div>
@@ -157,28 +157,28 @@
                       <div ng-if-start="pop.displayMode=='range'" class="pynn-population-param">
                         <div style="font-weight:600">From</div>
                         <input size="5" type="number" ng-focus="pop.editingHasFocus=true" ng-blur="pop.editingHasFocus=false;editingFocusLost(pop)"
-                          owner-only ng-keyup="$event.keyCode==13 && apply()" class="neuron-index-field" ng-model="pop.from"
+                          owner-only ng-keyup="$event.keyCode==13 && updatePopulations({ changePopulations: true })" class="neuron-index-field" ng-model="pop.from"
                           min="0" required ng-change="onPynnChange()">
                       </div>
 
                       <div class="pynn-population-param">
                         <div style="font-weight:600">To</div>
                         <input size="5" type="number" ng-focus="pop.editingHasFocus=true" ng-blur="pop.editingHasFocus=false;editingFocusLost(pop)"
-                          owner-only ng-keyup="$event.keyCode==13 && apply()" class="neuron-index-field" ng-model="pop.to"
+                          owner-only ng-keyup="$event.keyCode==13 && updatePopulations({ changePopulations: true })" class="neuron-index-field" ng-model="pop.to"
                           min="1" required ng-change="onPynnChange()">
                       </div>
 
                       <div ng-if-end class="pynn-population-param">
                         <div style="font-weight:600">Step</div>
                         <input size="5" type="number" ng-focus="pop.editingHasFocus=true" ng-blur="pop.editingHasFocus=false;editingFocusLost(pop)"
-                          owner-only ng-keyup="$event.keyCode==13 && apply()" class="neuron-index-field" ng-model="pop.step"
+                          owner-only ng-keyup="$event.keyCode==13 && updatePopulations({ changePopulations: true })" class="neuron-index-field" ng-model="pop.step"
                           min="1" required ng-change="onPynnChange()">
                       </div>
 
                       <div ng-if="pop.displayMode=='list'" class="pynn-population-param">
                         <div style="font-weight:600">Indexes</div>
                         <input size="40" type="text" ng-focus="pop.editingHasFocus=true" ng-blur="pop.editingHasFocus=false;editingFocusLost(pop)"
-                          owner-only ng-keyup="$event.keyCode==13 && apply()" ng-model="pop.list" ng-change="onPynnChange()"
+                          owner-only ng-keyup="$event.keyCode==13 && updatePopulations({ changePopulations: true })" ng-model="pop.list" ng-change="onPynnChange()"
                           ng-pattern="/^\s*\d+\s*(\,\s*\d+\s*)*$/" required>
 
                       </div>
@@ -254,7 +254,7 @@
             </button>
           </div>
 
-          <button type="button" class="btn btn-default btn-md"  ng-class="{'pynn-apply-changes-dirty':localBrainDirty}" owner-only ng-click="apply(0)" ng-disabled="loading || stateService.statePending || (!localBrainDirty && !editingPopulation())"
+          <button type="button" class="btn btn-default btn-md"  ng-class="{'pynn-apply-changes-dirty':localBrainDirty}" owner-only ng-click="updateBrainBackend()" ng-disabled="loading || stateService.statePending || (!localBrainDirty && !editingPopulation())"
             v-busy="loading || stateService.statePending" v-busy-label="Applying changes" v-pressable>
             <i class="glyphicon glyphicon-ok-circle" aria-hidden="true"></i>
             <span> Apply</span>

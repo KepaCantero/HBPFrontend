@@ -169,6 +169,9 @@
             get: {
               method: 'GET',
               interceptor: { responseError: serverError.displayHTTPError }
+            },
+            put: {
+              method: 'PUT'
             }
           }
         );
@@ -337,26 +340,45 @@
           );
         },
         setBrain: function(
-          data,
-          brainPopulations,
           brainType,
           dataType,
-          changePopulation
+          data,
+          successCallback,
+          failureCallback
         ) {
-          return resourceBrainSimulation(simulationInfo.serverBaseUrl).put(
+          resourceBrainSimulation(simulationInfo.serverBaseUrl).put(
             {
               sim_id: simulationInfo.simulationID
             },
             {
-              data: data,
               brain_type: brainType,
               data_type: dataType,
+              data: data
+            },
+            successCallback,
+            failureCallback
+          );
+        },
+        updatePopulations: function(
+          brainType,
+          brainPopulations,
+          dataType,
+          changePopulations,
+          successCallback,
+          failureCallback
+        ) {
+          return resourceBrainPopulations(simulationInfo.serverBaseUrl).put(
+            { sim_id: simulationInfo.simulationID },
+            {
+              brain_type: brainType,
               brain_populations: brainPopulations,
-              change_population: changePopulation
-            }
+              data_type: dataType,
+              change_population: changePopulations
+            },
+            successCallback,
+            failureCallback
           ).$promise;
         },
-
         getPopulations: function(callback) {
           return resourceBrainPopulations(simulationInfo.serverBaseUrl).get(
             { sim_id: simulationInfo.simulationID },

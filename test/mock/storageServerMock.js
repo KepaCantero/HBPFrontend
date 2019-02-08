@@ -34,7 +34,12 @@
             return $q.when([{ name: 'hbp-sp10-user-edit-rights' }]);
           });
 
-        this.getTransferFunctions = jasmine.createSpy('getTransferFunctions');
+        this.getTransferFunctions = jasmine
+          .createSpy('getTransferFunctions')
+          .and.returnValue(
+            $q.resolve({ data: { tfname: 'def tf:\n\tbrain.index=0' } })
+          );
+
         this.saveTransferFunctions = jasmine
           .createSpy('saveTransferFunctions')
           .and.returnValue($q.resolve());
@@ -47,7 +52,12 @@
 
         this.getFileContent = jasmine.createSpy('getFileContent');
         this.setFileContent = jasmine.createSpy('setFileContent');
-
+        this.getBrain = jasmine
+          .createSpy('getBrain')
+          .and.callFake(() => window.$q.resolve({}));
+        this.saveBrain = jasmine
+          .createSpy('saveBrain')
+          .and.callFake(() => window.$q.resolve());
         this.reset = function() {
           this.getCurrentUser.calls.reset();
           this.getUser.calls.reset();

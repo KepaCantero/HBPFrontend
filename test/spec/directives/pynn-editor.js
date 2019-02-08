@@ -7,7 +7,7 @@ describe('Directive: pynnEditor', function() {
   String.prototype.repeat = function(num) {
     return new Array(num + 1).join(this);
   };
-
+  var STATE;
   var $rootScope,
     $compile,
     $scope,
@@ -19,7 +19,32 @@ describe('Directive: pynnEditor', function() {
     $timeout,
     codeEditorsServices,
     simulationInfo,
-    clbConfirm;
+    clbConfirm,
+    PYNN_ERROR,
+    clbErrorDialog,
+    stateService,
+    baseEventHandler;
+
+  /* eslint-disable camelcase*/
+  var mockError1 = {
+    data: {
+      error_message: 'Error',
+      error_line: -2,
+      error_column: -2
+    }
+  };
+
+  var mockError2 = {
+    data: {
+      error_message: 'Another error',
+      error_line: 0,
+      error_column: 0
+    }
+  };
+
+  var baseEventHandlerMock = {
+    suppressAnyKeyPress: jasmine.createSpy('suppressAnyKeyPress')
+  };
 
   var getBrainresponse = {};
   var storageServerMock = {
@@ -57,39 +82,19 @@ describe('Directive: pynnEditor', function() {
     string: 'token'
   };
 
-  var lineMock = {};
-
   var cmMock = {
     getTokenAt: function() {
       return tokenMock;
     },
-    addLineClass: function(/*line, str, str2*/) {
-      return lineMock;
-    },
     addLineWidget: function(/*line, node, boolean*/) {},
-    scrollIntoView: function(/*line*/) {},
+    addLineClass: jasmine.createSpy('addLineClass'),
+    scrollIntoView: jasmine.createSpy('scrollIntoView'),
     removeLineClass: jasmine.createSpy('removeLineClass'),
     clearHistory: jasmine.createSpy('clearHistory'),
     markClean: jasmine.createSpy('markClean')
   };
 
   /* eslint-disable camelcase*/
-  var errorMock1 = {
-    data: {
-      error_message: 'ERROR',
-      error_line: 0,
-      error_column: 1
-    }
-  };
-
-  var errorMock2 = {
-    data: {
-      error_message: "Error Message: The name 'token' is not defined",
-      error_line: 0,
-      error_column: 0
-    }
-  };
-
   var downloadFileServiceMock = {
     downloadFile: jasmine.createSpy('downloadFile')
   };
@@ -99,21 +104,20 @@ describe('Directive: pynnEditor', function() {
   beforeEach(module('simulationInfoMock'));
   beforeEach(module('userContextServiceMock'));
   beforeEach(module('pushForceServiceMock'));
-
+  beforeEach(module('stateServiceMock'));
   beforeEach(
     module(function($provide) {
-      var backendInterfaceServiceMock = {
-        setBrain: jasmine
-          .createSpy('setBrain')
-          .and.callFake(() => window.$q.resolve())
-      };
-      $provide.value('backendInterfaceService', backendInterfaceServiceMock);
       $provide.value('storageServer', storageServerMock);
       $provide.value('documentationURLs', documentationURLsMock);
       $provide.value('downloadFileService', downloadFileServiceMock);
     })
   );
-
+  beforeEach(
+    module(function($provide) {
+      $provide.value('baseEventHandler', baseEventHandlerMock);
+    })
+  );
+  beforeEach(module('backendInterfaceServiceMock'));
   beforeEach(
     inject(function(
       _$rootScope_,
@@ -126,18 +130,25 @@ describe('Directive: pynnEditor', function() {
       _$timeout_,
       _codeEditorsServices_,
       _simulationInfo_,
-      _clbConfirm_
+      _clbConfirm_,
+      _PYNN_ERROR_,
+      _clbErrorDialog_,
+      _stateService_,
+      _STATE_,
+      _baseEventHandler_
     ) {
+      clbErrorDialog = _clbErrorDialog_;
       $rootScope = _$rootScope_;
       $compile = _$compile_;
       RESET_TYPE = _RESET_TYPE_;
       storageServer = _storageServer_;
       backendInterfaceService = _backendInterfaceService_;
-
+      baseEventHandler = _baseEventHandler_;
       $timeout = _$timeout_;
       codeEditorsServices = _codeEditorsServices_;
       simulationInfo = _simulationInfo_;
       clbConfirm = _clbConfirm_;
+      PYNN_ERROR = _PYNN_ERROR_;
 
       $scope = $rootScope.$new();
       $templateCache.put('views/esv/pynn-editor.html', '');
@@ -145,6 +156,8 @@ describe('Directive: pynnEditor', function() {
       element = $compile('<pynn-editor control="control"/>')($scope);
       $scope.$digest();
       isolateScope = element.isolateScope();
+      stateService = _stateService_;
+      STATE = _STATE_;
       spyOn($rootScope, '$broadcast').and.callThrough();
     })
   );
@@ -215,6 +228,34 @@ describe('Directive: pynnEditor', function() {
       expect(isolateScope.applyEditorOptions).toHaveBeenCalled();
     });
 
+    it('should handle the rename populations properly', function() {
+      spyOn(isolateScope, 'updatePopulationBackend');
+      isolateScope.populations = [{ name: 'population_1', list: '2' }];
+      spyOn(clbConfirm, 'open').and.returnValue(window.$q.when({}));
+      var options = {};
+      isolateScope.renamePopulations(options);
+      isolateScope.$apply();
+      expect(storageServer.saveTransferFunctions).toHaveBeenCalled();
+    });
+    it('should call suppresAnyKey when suppreskeyPress is called ', function() {
+      isolateScope.suppressKeyPress();
+      expect(baseEventHandler.suppressAnyKeyPress).toHaveBeenCalled();
+    });
+
+    it('should show error dialog if there is an error in renamíng populations ', function() {
+      spyOn(isolateScope, 'updatePopulationBackend');
+      spyOn(clbErrorDialog, 'open');
+      storageServer.saveTransferFunctions = jasmine
+        .createSpy('setBrain')
+        .and.callFake(() => window.$q.reject());
+      isolateScope.populations = [{ name: 'population_1', list: '2' }];
+      spyOn(clbConfirm, 'open').and.returnValue(window.$q.when({}));
+      var options = {};
+      isolateScope.renamePopulations(options);
+      isolateScope.$apply();
+      expect(storageServer.saveTransferFunctions).toHaveBeenCalled();
+    });
+
     it('should handle the retrieved populations and pynn script properly', function() {
       // Mock getBrain Callback with data as return value
       getBrainresponse = data;
@@ -237,14 +278,25 @@ describe('Directive: pynnEditor', function() {
       isolateScope.startEditing(isolateScope.populations[0]);
       expect(isolateScope.populations[0].editing).toBe(true);
 
-      spyOn(isolateScope, 'apply').and.callThrough();
+      spyOn(isolateScope, 'updatePopulations').and.callThrough();
 
       isolateScope.editingFocusLost(isolateScope.populations[0]);
 
       $timeout.flush(310);
       isolateScope.$apply();
 
-      expect(isolateScope.apply).toHaveBeenCalled();
+      expect(isolateScope.updatePopulations).toHaveBeenCalled();
+    });
+
+    it('should update population when population is editingstart/stop editing a population', function() {
+      spyOn(isolateScope, 'updatePopulations').and.callThrough();
+      spyOn(isolateScope, 'editingPopulation').and.returnValue(true);
+
+      isolateScope.applyEditingPopulation();
+
+      isolateScope.$apply();
+
+      expect(isolateScope.updatePopulations).toHaveBeenCalled();
     });
 
     it('should not load a h5 brain', function() {
@@ -259,22 +311,12 @@ describe('Directive: pynnEditor', function() {
 
     it('should apply changes made on the pynn script and the brain population properly', function() {
       spyOn(clbConfirm, 'open').and.returnValue(window.$q.when({}));
-
+      stateService.currentState = STATE.STARTED;
       isolateScope.pynnScript.code = expectedScript;
-      isolateScope.populations = [
-        { name: 'index2', list: '1', previousName: 'index' }
-      ];
       isolateScope.loading = true;
-      isolateScope.apply();
+      isolateScope.updateBrainBackend();
       isolateScope.$apply();
-      expect(backendInterfaceService.setBrain).toHaveBeenCalledWith(
-        isolateScope.pynnScript.code,
-        { index2: { list: [1], previousName: 'index' } },
-        'py',
-        'text',
-        true
-      );
-      expect(isolateScope.loading).toBe(false);
+      expect(backendInterfaceService.setBrain).toHaveBeenCalled();
     });
 
     it('should save the pynn script and the neuron populations properly', function() {
@@ -290,35 +332,45 @@ describe('Directive: pynnEditor', function() {
       );
     });
 
+    it('should show error message is there is an error in saveIntoStorage', function() {
+      storageServer.saveBrain = jasmine
+        .createSpy('saveBrain')
+        .and.callFake(() => window.$q.reject());
+      spyOn(clbErrorDialog, 'open');
+      isolateScope.pynnScript.code = '# some dummy pynn script';
+      isolateScope.saveIntoStorage();
+      isolateScope.$apply();
+      expect(clbErrorDialog.open).toHaveBeenCalled();
+    });
+
     it('should be able to repeat the same test twice', function() {
       isolateScope.loading = true;
-      isolateScope.apply();
+      isolateScope.updateBrainBackend();
       isolateScope.$apply();
       expect(backendInterfaceService.setBrain).toHaveBeenCalled();
-      expect(isolateScope.loading).toBe(false);
     });
 
     it('should handle an error when sending a pynn script properly (1)', function() {
-      backendInterfaceService.setBrain = jasmine
-        .createSpy('setBrain')
-        .and.callFake(() => window.$q.reject(errorMock1)); // will trigger the error callback
+      backendInterfaceService.itWasSuccessful = false; // will trigger the error callback
+      backendInterfaceService.mockError = mockError1;
+      spyOn(isolateScope, 'clearError');
+      spyOn(clbErrorDialog, 'open');
       isolateScope.loading = true;
-      isolateScope.apply();
-      isolateScope.$apply();
+      isolateScope.updateBrainBackend();
+      $rootScope.$digest();
       expect(backendInterfaceService.setBrain).toHaveBeenCalled();
-      expect(isolateScope.loading).toBe(false);
+      expect(isolateScope.clearError).toHaveBeenCalled();
+      expect(clbErrorDialog.open).toHaveBeenCalled();
     });
 
     it('should handle an error when sending a pynn script properly (2)', function() {
-      backendInterfaceService.setBrain = jasmine
-        .createSpy('setBrain')
-        .and.callFake(() => window.$q.reject(errorMock2)); // will trigger the error callback
+      backendInterfaceService.itWasSuccessful = false; // will trigger the error callback
+      backendInterfaceService.mockError = mockError2;
       isolateScope.loading = true;
-      isolateScope.apply();
+      isolateScope.updateBrainBackend();
       isolateScope.$apply();
       expect(backendInterfaceService.setBrain).toHaveBeenCalled();
       isolateScope.pynnScript.code = 'some pynn script';
-      expect(isolateScope.loading).toBe(false);
     });
 
     it('should not issue any getBrain request after a $destroy event of the parent scope', function() {
@@ -387,6 +439,28 @@ describe('Directive: pynnEditor', function() {
       expect(isolateScope.lineHandle).toBeUndefined();
     });
 
+    it('should check markError function with zeros', function() {
+      isolateScope.clearError();
+
+      spyOn(PYNN_ERROR, 'COMPILE').and.returnValue(0);
+      spyOn(document, 'createElement').and.returnValue({
+        style: {},
+        click: jasmine.createSpy('click'),
+        appendChild: jasmine.createSpy('appendChild')
+      });
+      spyOn(document, 'createTextNode').and.returnValue({
+        style: {},
+        click: jasmine.createSpy('click'),
+        appendChild: jasmine.createSpy('appendChild')
+      });
+      isolateScope.pynnScript = {};
+      isolateScope.pynnScript.error = [];
+      isolateScope.markError('', 1, 1);
+      expect(
+        codeEditorsServices.getEditor('pynnEditor').addLineClass
+      ).toHaveBeenCalled();
+    });
+
     it('should refresh codemirror when collabDirty or localDirty flags are set', function() {
       spyOn(codeEditorsServices, 'refreshEditor').and.callThrough();
 
@@ -434,21 +508,25 @@ describe('Directive: pynnEditor', function() {
     });
 
     it('should delete a population in the scope.populations object', function() {
-      spyOn(isolateScope, 'applyBackend').and.callThrough();
-      isolateScope.applyBackend.calls.reset();
-      backendInterfaceService.setBrain.calls.reset();
       isolateScope.deletePopulation(0);
-      isolateScope.$apply();
+      $rootScope.$digest();
       expect($rootScope.$broadcast).toHaveBeenCalledWith(
         'pynn.populationsChanged'
       );
       isolateScope.deletePopulation(1);
-      isolateScope.$apply();
-      expect(isolateScope.applyBackend).toHaveBeenCalled();
-      expect(backendInterfaceService.setBrain).toHaveBeenCalled();
+      $rootScope.$digest();
+      expect(backendInterfaceService.updatePopulations).toHaveBeenCalled();
       expect(Object.keys(isolateScope.populations).length).toBe(6);
       expect(isolateScope.populations[0].name).toEqual('population_2');
       expect(isolateScope.populations[1].name).toEqual('population_4');
+    });
+
+    it('should not delete a population when there is an error', function() {
+      backendInterfaceService.itWasSuccessful = false;
+      spyOn(isolateScope, 'refresh');
+      isolateScope.deletePopulation(0);
+      $rootScope.$digest();
+      expect(isolateScope.refresh).toHaveBeenCalled();
     });
 
     it('should generate a new population name', function() {
@@ -460,6 +538,8 @@ describe('Directive: pynnEditor', function() {
 
     it('should add a population in the scope.populations object', function() {
       // Add a list with default value {list: '0, 1, 2'} and default name of form population_<number>
+      spyOn(isolateScope, 'updatePopulationBackend').and.callThrough();
+      stateService.currentState = STATE.STARTED;
       var defaultList = { list: '0, 1, 2' };
       isolateScope.addList();
       expect(
@@ -476,6 +556,7 @@ describe('Directive: pynnEditor', function() {
         id: 10
       };
       isolateScope.addSlice();
+      expect(isolateScope.updatePopulationBackend).toHaveBeenCalled();
       expect(
         isolateScope.populations[isolateScope.populations.length - 1].name
       ).toEqual(expectedSlice.name);
@@ -513,6 +594,10 @@ describe('Directive: pynnEditor', function() {
         }
       });
     });
+    it('should return undefined when populations is null when preprocessPopulations', function() {
+      var populations = isolateScope.preprocessPopulations(null);
+      expect(populations).toBe(undefined);
+    });
 
     it('should test whether populations of type list have been converted into strings', function() {
       var populations = {
@@ -545,6 +630,12 @@ describe('Directive: pynnEditor', function() {
   });
 
   describe('Pynn-editor Upload & download', function() {
+    beforeEach(function() {
+      codeEditorsServices.getEditor = jasmine
+        .createSpy('getEditor')
+        .and.returnValue(cmMock);
+    });
+
     it('should call downloadFileService.downloadFile with the right parameters when downloading a file', function() {
       isolateScope.download();
       expect(
