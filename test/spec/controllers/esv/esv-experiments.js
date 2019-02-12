@@ -231,6 +231,9 @@
         .whenGET(new RegExp(proxyUrl + '/availableServers'))
         .respond(200, pageOptions.availableServers);
       $httpBackend
+        .whenGET(new RegExp(proxyUrl + '/serversWithNoBackend'))
+        .respond(200, []);
+      $httpBackend
         .whenGET(new RegExp(proxyUrl + '/experimentImage/'))
         .respond(200, {});
       $httpBackend
@@ -684,7 +687,7 @@
       expect(experimentsService.destroy).toHaveBeenCalled();
     });
 
-    it('startPizdaintJob should ', function() {
+    it('should deal with Piz Daint job failure', function() {
       var experimentsService;
       var createExperimentsService =
         experimentsFactory.createExperimentsService;
@@ -698,14 +701,139 @@
         );
         return experimentsService;
       });
+
       var page = renderEsvWebPage({ dev: true });
-      spyOn(experimentsService, 'startPizDaintExperiment').and.returnValue(
-        $q.when()
-      );
       var scope = getExperimentListScope(page);
-      scope.startPizDaintExperiment();
-      $rootScope.$digest();
+      spyOn(experimentsService, 'startPizDaintExperiment').and.returnValue(
+        $q.when('jobUrl')
+      );
+      spyOn(experimentsService, 'getPizDaintJobStatus').and.returnValue(
+        $q.when('FAILED')
+      );
+      spyOn(experimentsService, 'getPizDaintJobOutcome').and.returnValue(
+        $q.when(['stdout', 'stderr'])
+      );
+      spyOn(clbErrorDialog, 'open').and.returnValue($q.when({}));
+      var experiment = {};
+      scope.startPizDaintExperiment(experiment);
+      scope.$apply();
+      $interval.flush(1000);
       expect(experimentsService.startPizDaintExperiment).toHaveBeenCalled();
+      expect(experimentsService.getPizDaintJobStatus).toHaveBeenCalled();
+      expect(experimentsService.getPizDaintJobOutcome).toHaveBeenCalled();
+
+      expect(clbErrorDialog.open).toHaveBeenCalled();
+    });
+
+    it('should deal with Piz Daint job error', function() {
+      var experimentsService;
+      var createExperimentsService =
+        experimentsFactory.createExperimentsService;
+      spyOn(
+        experimentsFactory,
+        'createExperimentsService'
+      ).and.callFake(function() {
+        experimentsService = createExperimentsService.apply(
+          experimentsFactory,
+          arguments
+        );
+        return experimentsService;
+      });
+
+      var page = renderEsvWebPage({ dev: true });
+      var scope = getExperimentListScope(page);
+      spyOn(experimentsService, 'startPizDaintExperiment').and.returnValue(
+        $q.reject('error')
+      );
+      spyOn(experimentsService, 'getPizDaintJobStatus');
+      spyOn(experimentsService, 'getPizDaintJobOutcome').and.returnValue(
+        $q.when(['stdout', 'stderr'])
+      );
+      spyOn(clbErrorDialog, 'open').and.returnValue($q.when({}));
+      var experiment = {};
+      scope.startPizDaintExperiment(experiment);
+      scope.$apply();
+      expect(experimentsService.startPizDaintExperiment).toHaveBeenCalled();
+      expect(experimentsService.getPizDaintJobStatus).not.toHaveBeenCalled();
+      expect(experimentsService.getPizDaintJobOutcome).toHaveBeenCalled();
+
+      expect(clbErrorDialog.open).toHaveBeenCalled();
+    });
+
+    it('should start experiment when piz daint backend is up', function() {
+      var experimentsService;
+      var createExperimentsService =
+        experimentsFactory.createExperimentsService;
+      spyOn(
+        experimentsFactory,
+        'createExperimentsService'
+      ).and.callFake(function() {
+        experimentsService = createExperimentsService.apply(
+          experimentsFactory,
+          arguments
+        );
+        return experimentsService;
+      });
+
+      var page = renderEsvWebPage({ dev: true });
+      var scope = getExperimentListScope(page);
+      spyOn(experimentsService, 'startPizDaintExperiment').and.returnValue(
+        $q.when('jobUrl')
+      );
+      spyOn(experimentsService, 'getPizDaintJobStatus').and.returnValue(
+        $q.when('RUNNING')
+      );
+      spyOn(experimentsService, 'getPizDaintJobOutcome');
+      spyOn(scope, 'startNewExperiment');
+      var experiment = {
+        availableServers: [{ id: 'tunnelBackend' }],
+        pizServer: 'tunnelBackend'
+      };
+      scope.startPizDaintExperiment(experiment);
+      scope.$apply();
+      $interval.flush(1000);
+      expect(experimentsService.startPizDaintExperiment).toHaveBeenCalled();
+      expect(experimentsService.getPizDaintJobStatus).toHaveBeenCalled();
+      expect(experimentsService.getPizDaintJobOutcome).not.toHaveBeenCalled();
+      expect(scope.startNewExperiment).toHaveBeenCalledWith(
+        experiment,
+        undefined,
+        true,
+        'jobUrl'
+      );
+    });
+
+    it('startNewExperiment should find get job output on failure', function() {
+      var experimentsService;
+      var createExperimentsService =
+        experimentsFactory.createExperimentsService;
+      spyOn(
+        experimentsFactory,
+        'createExperimentsService'
+      ).and.callFake(function() {
+        experimentsService = createExperimentsService.apply(
+          experimentsFactory,
+          arguments
+        );
+        return experimentsService;
+      });
+
+      var page = renderEsvWebPage({ dev: true });
+      var scope = getExperimentListScope(page);
+      spyOn(experimentsService, 'startExperiment').and.returnValue(
+        $q.reject('error')
+      );
+      spyOn(experimentsService, 'getPizDaintJobOutcome').and.returnValue(
+        $q.when(['stdout', 'stderr'])
+      );
+      spyOn(storageServer, 'logActivity');
+      var experiment = {};
+      scope.startNewExperiment(experiment, undefined, true, 'jobUrl');
+      scope.$apply();
+      expect(experimentsService.startExperiment).toHaveBeenCalled();
+      expect(experimentsService.getPizDaintJobOutcome).toHaveBeenCalledWith(
+        'jobUrl'
+      );
     });
 
     it('should get PizDaintJobs', function() {

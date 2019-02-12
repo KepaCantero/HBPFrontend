@@ -285,10 +285,48 @@ describe('experimentSimulationService', function() {
     $httpBackend
       .whenGET(proxyUrl + '/getjoboutcome?jobUrl=jobUrl')
       .respond(200, ['stdout', 'stderr']);
+    var experiment = {
+      configuration: {
+        maturity: 'production',
+        name: 'Mature experiment name'
+      },
+      availableServers: [{ id: 'localhost' }]
+    };
 
-    experimentSimulationService.startPizDaintExperiment().then(function(res) {
-      expect(res).toEqual('SUCCESSFUL');
+    experimentSimulationService
+      .startPizDaintExperiment(experiment)
+      .then(function(res) {
+        expect(res).toEqual('jobUrl');
+      });
+    $httpBackend.flush();
+    $interval.flush(10000);
+    $httpBackend.flush();
+  });
+
+  it('should start Piz daint Job', function() {
+    var proxyUrl = bbpConfig.get('api.proxy.url');
+    $httpBackend.whenGET(proxyUrl + '/getjobinfo?jobUrl=jobUrl').respond(200, {
+      status: 'SUCCESSFUL'
     });
+    $httpBackend
+      .whenGET(proxyUrl + '/submitjob?server=localhost')
+      .respond(200, 'jobUrl');
+    $httpBackend
+      .whenGET(proxyUrl + '/getjoboutcome?jobUrl=jobUrl')
+      .respond(200, ['stdout', 'stderr']);
+    var experiment = {
+      configuration: {
+        maturity: 'production',
+        name: 'Mature experiment name'
+      },
+      pizServer: 'localhost'
+    };
+
+    experimentSimulationService
+      .startPizDaintExperiment(experiment)
+      .then(function(res) {
+        expect(res).toEqual('jobUrl');
+      });
     $httpBackend.flush();
     $interval.flush(10000);
     $httpBackend.flush();

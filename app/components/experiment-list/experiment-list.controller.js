@@ -58,6 +58,7 @@
       '$http',
       'nrpModalService',
       'bbpConfig',
+      '$interval',
       function(
         $scope,
         $location,
@@ -74,7 +75,8 @@
         selectedSharedExperiment,
         $http,
         nrpModalService,
-        bbpConfig
+        bbpConfig,
+        $interval
       ) {
         const ExperimentModeSharedOption = 'Shared';
         $scope.allUsers = [];
@@ -193,27 +195,74 @@
           }
         };
 
-        $scope.startPizDaintExperiment = function() {
+        $scope.startPizDaintExperiment = function(experiment) {
           $scope.startingJob = true;
-          $scope.jobProgressMessage = 'Submitting job request';
-          experimentsService.startPizDaintExperiment().then(
-            function(res) {
-              $scope.jobProgressMessage =
-                'Job Sucessfully started. Job status: ' + res;
+          $scope.pageState.startingExperiment = experiment.id;
+          $scope.progressMessage = { main: 'Submitting job request' };
+          let jobUrl;
+          let errorCode = function(err) {
+            $scope.startingJob = false;
+            $scope.pageState.startingExperiment = null;
+            experimentsService
+              .getPizDaintJobOutcome(jobUrl)
+              .then(function(response) {
+                console.log('stdout:');
+                console.log(response[0]);
+                console.log('stderr:');
+                console.log(response[1]);
+              });
+            err = {
+              type: 'Error while starting job',
+              data: err,
+              message:
+                'There was an error when trying to start the job. Please check the logs',
+              code: err
+            };
+            clbErrorDialog.open(err).then(() => {});
+          };
+
+          experimentsService.startPizDaintExperiment(experiment).then(
+            function(response) {
+              jobUrl = response;
+              $scope.progressMessage.main =
+                'Job Sucessfully started. Job url: ' + jobUrl;
+              experiment.devServer = experiment.pizServer;
+              const checkServer = () => {
+                //get job status
+                return experimentsService
+                  .getPizDaintJobStatus(jobUrl)
+                  .then(function(status) {
+                    if (status !== 'RUNNING') {
+                      $interval.cancel(intervalStatus);
+                      errorCode(
+                        'Job finished before we could start the simulation. Check console logs.'
+                      );
+                    } else {
+                      let found = false;
+                      experiment.availableServers.forEach(server => {
+                        if (server.id === experiment.pizServer) {
+                          found = true;
+                        }
+                      });
+                      if (found) {
+                        $interval.cancel(intervalStatus);
+                        $scope.startNewExperiment(
+                          experiment,
+                          undefined,
+                          true,
+                          jobUrl
+                        );
+                      }
+                    }
+                  });
+              };
+              let intervalStatus = $interval(checkServer, 1000);
             }, // succeeded
             function(err) {
-              $scope.startingJob = false;
-              err = {
-                type: 'Error while starting job',
-                data: err,
-                message:
-                  'There was an error when trying to start the job. Please check the logs',
-                code: err
-              };
-              clbErrorDialog.open(err).then(() => {});
+              errorCode(err);
             }, // failed
             function(msg) {
-              $scope.jobProgressMessage =
+              $scope.progressMessage.main =
                 'Job submitted. Waiting for job to start (this may take some time). Current job status: ' +
                 msg;
             } //in progress
@@ -363,7 +412,12 @@
             $rootScope.$broadcast('explorer');
           };
 
-          $scope.startNewExperiment = function(experiment, launchSingleMode) {
+          $scope.startNewExperiment = function(
+            experiment,
+            launchSingleMode,
+            pizDaintJob,
+            jobUrl
+          ) {
             storageServer.logActivity('simulation_start', {
               experiment: experiment.id
             });
@@ -381,6 +435,16 @@
                 }, // succeeded
                 function() {
                   $scope.pageState.startingExperiment = null;
+                  if (pizDaintJob) {
+                    experimentsService
+                      .getPizDaintJobOutcome(jobUrl)
+                      .then(function(response) {
+                        console.log('stdout:');
+                        console.log(response[0]);
+                        console.log('stderr:');
+                        console.log(response[1]);
+                      });
+                  }
                 }, // failed
                 function(msg) {
                   $scope.progressMessage = msg;

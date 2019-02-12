@@ -146,9 +146,25 @@
         });
     }
 
-    startPizDaintExperiment() {
+    getPizDaintJobStatus(url) {
+      return this.experimentProxyService
+        .getJobStatus(url)
+        .then(function(response) {
+          return response.status;
+        });
+    }
+
+    getPizDaintJobOutcome(url) {
+      return this.experimentProxyService
+        .getJobOutcome(url)
+        .then(function(response) {
+          return response;
+        });
+    }
+
+    startPizDaintExperiment(experiment) {
       return this.experimentSimulationService
-        .startPizDaintExperiment()
+        .startPizDaintExperiment(experiment)
         .catch(fatalErrorWasShown => {
           if (!fatalErrorWasShown)
             this.clbErrorDialog.open('Error starting Piz Daint job');

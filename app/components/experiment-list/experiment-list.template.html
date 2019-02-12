@@ -198,7 +198,20 @@
                             ng-disabled="pageState.startingExperiment == exp.id">
                             <i class="fa fa-plus"></i> Launch in Single Process Mode
                         </button>
+                        <!-- Option to Launch on Piz Daint -->
+                        <!--<button class="btn btn-default" ng-click="startPizDaintExperiment(exp);">
+                            <i class="fa fa-plus"></i> Start Piz Daint job
+                        </button>-->
 
+                        <!-- Option to Launch on Piz Daint -->
+                        <!--<button ng-if="config.canLaunchExperiments && exp.availableServers.length == 0" class="btn btn-default disabled enable-tooltip"
+                        title="Sorry, no available servers.">
+                            <i class="fa fa-plus"></i> Start Piz Daint job
+                        </button>-->
+
+                     <!---<div ng-show="startingJob">
+                            <uib-progressbar   value="100" class="progress-striped active top-buffer"><i><b>{{jobProgressMessage}}</b></i></uib-progressbar>
+                        </div>-->
                         <!-- Delete button -->
                         <button analytics-on analytics-event="Delete" analytics-category="Experiment" ng-if="isPrivateExperiment && config.canLaunchExperiments"
                             class="btn btn-default" ng-click="deleteExperiment(exp.id)" ng-disabled="pageState.deletingExperiment || pageState.startingExperiment == exp.id  ||
@@ -230,7 +243,35 @@
                             analytics-value="exp.id" class="btn btn-default" ng-click="launchSharedExperimentWindow(exp.id)">
                             <i class="fas fa-share-alt"></i> Share
                         </button>
+
+                        <button ng-if="devMode && config.canLaunchExperiments"
+                            class="btn btn-default" ng-disabled="pageState.startingExperiment" ng-click="pageState.showPizDaint = !pageState.showPizDaint">
+                            <i class="fa fa-sign-in"></i> Piz Daint Job »
+                        </button>
                     </div>
+                </div>
+                <div class="table-wrapper" uib-collapse="!config.canLaunchExperiments || (pageState.selected != exp.id)||(!pageState.showPizDaint) || !devMode">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Choose a backend</th>
+                                <th>&nbsp;</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><select ng-model="exp.pizServer" style="background-color: white; margin: 5px;">
+                                    <option value="">All servers</option>
+                                    <option ng-repeat="server in exp.getServersWithNoBackend" value="{{server.id}}">{{server.id}}</option>
+                                </select></td>
+                                <td>
+                                    <button class="btn btn-default" ng-disabled="pageState.startingExperiment" ng-click="startPizDaintExperiment(exp);">
+                                        <i class="fa fa-plus"></i> Start Piz Daint job
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
                 <div uib-collapse="pageState.startingExperiment != exp.id">
                     <uib-progressbar value="100" class="progress-striped active top-buffer"><i><b>{{progressMessage.main}}</b>
@@ -273,7 +314,6 @@
                         </tbody>
                     </table>
                 </div>
-            </div>
         </div>
 
         <hr class="list-separator">

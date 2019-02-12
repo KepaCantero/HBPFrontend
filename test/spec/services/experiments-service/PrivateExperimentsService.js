@@ -74,6 +74,34 @@ describe('Services: PrivateExperimentsService', function() {
     $rootScope.$digest();
   });
 
+  it('should return pizdaint job status', function(done) {
+    spyOn(experimentProxyService, 'getJobStatus').and.returnValue(
+      window.$q.when({ status: 'RUNNING' })
+    );
+    privateExperimentsService
+      .getPizDaintJobStatus('jobUrl')
+      .then(function(res) {
+        expect(res).toBe('RUNNING');
+        expect(experimentProxyService.getJobStatus).toHaveBeenCalled();
+        done();
+      });
+    $rootScope.$digest();
+  });
+
+  it('should return pizdaint job outcome', function(done) {
+    spyOn(experimentProxyService, 'getJobOutcome').and.returnValue(
+      window.$q.when('outcome')
+    );
+    privateExperimentsService
+      .getPizDaintJobOutcome('jobUrl')
+      .then(function(res) {
+        expect(res).toBe('outcome');
+        expect(experimentProxyService.getJobOutcome).toHaveBeenCalled();
+        done();
+      });
+    $rootScope.$digest();
+  });
+
   it('should show error when error starting piz daint exp', function() {
     spyOn(clbErrorDialog, 'open');
     spyOn(

@@ -48,7 +48,8 @@
           submitJob: submitJob,
           getPizDaintJobs: getPizDaintJobs,
           getJobStatus: getJobStatus,
-          getJobOutcome: getJobOutcome
+          getJobOutcome: getJobOutcome,
+          getServersWithNoBackend: getServersWithNoBackend
         };
         function getSharedExperiments() {
           var url = getProxyUrl() + '/sharedExperiments';
@@ -82,6 +83,7 @@
             .then(response => response.data)
             .catch(serverError.displayHTTPError);
         }
+
         function getPizDaintJobs() {
           return $http
             .get(getProxyUrl() + '/getjobs')
@@ -91,9 +93,19 @@
             .catch(serverError.displayHTTPError);
         }
 
-        function submitJob() {
+        function getServersWithNoBackend() {
           return $http
-            .get(getProxyUrl() + '/submitjob')
+            .get(getProxyUrl() + '/serversWithNoBackend')
+            .then(response => response.data)
+            .catch(serverError.displayHTTPError);
+        }
+
+        function submitJob(server) {
+          return $http({
+            url: getProxyUrl() + '/submitjob',
+            method: 'GET',
+            params: { server: server }
+          })
             .then(function(response) {
               return response.data;
             })

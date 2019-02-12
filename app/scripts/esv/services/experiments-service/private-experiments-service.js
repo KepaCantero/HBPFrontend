@@ -14,7 +14,8 @@
       return this.storageServer
         .getExperiments()
         .then(exps => exps.map(exp => this.checkConfiguration(exp)))
-        .then(exps => this.fillServersDataAndDetails(exps));
+        .then(exps => this.fillServersDataAndDetails(exps))
+        .then(exps => this.getServersWithNoBackends(exps));
     }
 
     fillServersDataAndDetails(exps) {
@@ -24,6 +25,18 @@
           exps.map((exp, i) => i).map(i => {
             let exp = exps[i];
             exp.availableServers = availableServers;
+            return exp;
+          })
+        );
+    }
+
+    getServersWithNoBackends(exps) {
+      return this.experimentProxyService
+        .getServersWithNoBackend()
+        .then(servers =>
+          exps.map((exp, i) => i).map(i => {
+            let exp = exps[i];
+            exp.getServersWithNoBackend = servers;
             return exp;
           })
         );

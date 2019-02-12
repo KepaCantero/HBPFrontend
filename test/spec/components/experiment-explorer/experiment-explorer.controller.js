@@ -145,10 +145,13 @@ describe('Controller: ExperimentExplorerController', function() {
       .whenGET(/^http:\/\/proxy\/experiment\/.*\/config/)
       .respond({});
     */
-    spyOn(experimentProxyService, 'getAvailableServers').and.returnValue(
+    spyOn(experimentProxyService, 'getServersWithNoBackend').and.returnValue(
       $q.when([])
     );
 
+    spyOn(experimentProxyService, 'getAvailableServers').and.returnValue(
+      $q.when([])
+    );
     spyOn(storageServer, 'getBase64Content').and.returnValue($q.when());
 
     spyOn(storageServer, 'getExperimentConfig').and.returnValue(
