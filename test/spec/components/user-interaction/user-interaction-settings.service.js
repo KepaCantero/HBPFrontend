@@ -12,6 +12,7 @@ describe('Services: userInteractionSettingsService', function() {
   beforeEach(module('autoSaveFactoryMock'));
   beforeEach(module('nrpUserMock'));
   beforeEach(module('simulationConfigServiceMock'));
+  beforeEach(module('userContextServiceMock'));
 
   beforeEach(function() {});
 

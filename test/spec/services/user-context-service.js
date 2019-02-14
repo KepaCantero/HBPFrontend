@@ -135,21 +135,6 @@ describe('Services: userContextService', function() {
     );
   });
 
-  it(' - hasEditRights()', function() {
-    var avatarMock = {
-      name: 'not_user_avatar'
-    };
-
-    userContextService.userID = 'Some owner id';
-    expect(userContextService.hasEditRights(avatarMock)).toBe(true);
-
-    userContextService.userID = 'not_owner';
-    expect(userContextService.hasEditRights(avatarMock)).toBe(false);
-
-    avatarMock.name = 'user_avatar';
-    expect(userContextService.hasEditRights(avatarMock)).toBe(true);
-  });
-
   it(' - setLockDateAndUser()', function() {
     var lockInfoMock = {
       user: {

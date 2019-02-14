@@ -92,6 +92,8 @@
           init: function() {
             const that = this;
 
+            gz3d.iface.addCanDeletePredicate(this.isUserAvatar);
+
             this.displayHumanNavInfo = function() {
               if (
                 stateService.currentState === STATE.PAUSED &&

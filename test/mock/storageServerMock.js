@@ -63,6 +63,8 @@
           this.getUser.calls.reset();
           this.getCurrentUserGroups.calls.reset();
         };
+
+        this.logActivity = jasmine.createSpy('logActivity');
       }
     ])
     .service('storageServerTokenManager', [

@@ -73,6 +73,8 @@
       RESOURCES_EDITOR: 'Edit experiment resources like files, assets, etc.',
       EXPERIMENT_NAME: "The experiment's name",
       EDIT_EXPERIMENT_NAME: "Edit the experiment's name",
-      SIMTOOLS_SIDEBAR: 'Toggle the sidebar with simulation tools'
+      SIMTOOLS_SIDEBAR: 'Toggle the sidebar with simulation tools',
+      WORKSPACE_SETTINGS:
+        'Toggle the workspace panel, which allows saving/loading/deleting custom workspace layouts.'
     });
 })();

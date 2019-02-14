@@ -6071,7 +6071,7 @@ GZ3D.GZIface.prototype.onConnected = function()
   var publishDeleteEntity = function (entity) {
     var canDelete = !that.canDeletePredicates.length ||
       that.canDeletePredicates
-        .every(function (deletePredicate) {
+        .some(function (deletePredicate) {
           return deletePredicate(entity) !== false;
         });
     if (canDelete) {

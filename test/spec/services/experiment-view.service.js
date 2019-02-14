@@ -4,16 +4,18 @@ describe('Service: ExperimentViewService', function() {
   let experimentViewService;
 
   let $location, $rootScope, $timeout;
-  let RESET_TYPE, STATE;
+  let EDIT_MODE, RESET_TYPE, STATE;
   let backendInterfaceService,
     bbpConfig,
     environmentRenderingService,
     environmentService,
     gz3d,
     nrpModalService,
+    objectInspectorService,
     simulationInfo,
     splash,
-    stateService;
+    stateService,
+    storageServer;
 
   beforeEach(module('exdFrontendApp'));
 
@@ -27,6 +29,7 @@ describe('Service: ExperimentViewService', function() {
   beforeEach(module('simulationInfoMock'));
   beforeEach(module('splashMock'));
   beforeEach(module('stateServiceMock'));
+  beforeEach(module('storageServerMock'));
   beforeEach(module('userContextServiceMock'));
 
   beforeEach(
@@ -35,6 +38,7 @@ describe('Service: ExperimentViewService', function() {
       _$location_,
       _$rootScope_,
       _$timeout_,
+      _EDIT_MODE_,
       _RESET_TYPE_,
       _STATE_,
       _backendInterfaceService_,
@@ -43,9 +47,11 @@ describe('Service: ExperimentViewService', function() {
       _environmentService_,
       _gz3d_,
       _nrpModalService_,
+      _objectInspectorService_,
       _simulationInfo_,
       _splash_,
-      _stateService_
+      _stateService_,
+      _storageServer_
     ) {
       experimentViewService = _experimentViewService_;
       experimentViewService.$window = { location: { reload: angular.noop } };
@@ -53,6 +59,7 @@ describe('Service: ExperimentViewService', function() {
       $location = _$location_;
       $rootScope = _$rootScope_;
       $timeout = _$timeout_;
+      EDIT_MODE = _EDIT_MODE_;
       RESET_TYPE = _RESET_TYPE_;
       STATE = _STATE_;
       backendInterfaceService = _backendInterfaceService_;
@@ -61,9 +68,11 @@ describe('Service: ExperimentViewService', function() {
       environmentService = _environmentService_;
       gz3d = _gz3d_;
       nrpModalService = _nrpModalService_;
+      objectInspectorService = _objectInspectorService_;
       simulationInfo = _simulationInfo_;
       splash = _splash_;
       stateService = _stateService_;
+      storageServer = _storageServer_;
 
       environmentService.$window = {
         location: {
@@ -464,6 +473,33 @@ describe('Service: ExperimentViewService', function() {
         backendInterfaceService.resetCollab.calls.mostRecent().args[2](); //2 is the failure callback
         $timeout.flush(100);
       }
+    });
+
+    it(' - stopSimulation()', function() {
+      spyOn(experimentViewService, 'setSimulationState');
+
+      experimentViewService.stopSimulation();
+
+      expect(storageServer.logActivity).toHaveBeenCalledWith(
+        'simulation_stop',
+        jasmine.any(Object)
+      );
+      expect(experimentViewService.setSimulationState).toHaveBeenCalledWith(
+        STATE.STOPPED
+      );
+    });
+
+    it(' - setSimulationState()', function() {
+      let state = {};
+      gz3d.scene.manipulationMode = EDIT_MODE.ROTATE;
+
+      experimentViewService.setSimulationState(state);
+
+      expect(stateService.setCurrentState).toHaveBeenCalledWith(state);
+      expect(gz3d.scene.setManipulationMode).toHaveBeenCalledWith(
+        EDIT_MODE.VIEW
+      );
+      expect(objectInspectorService.removeEventListeners).toHaveBeenCalled();
     });
   });
 });

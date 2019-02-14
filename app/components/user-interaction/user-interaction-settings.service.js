@@ -33,13 +33,15 @@
       UIS_DEFAULTS,
       autoSaveFactory,
       nrpUser,
-      simulationConfigService
+      simulationConfigService,
+      userContextService
     ) {
       this.$q = $q;
       this.CAMERA_SENSITIVITY_RANGE = CAMERA_SENSITIVITY_RANGE;
       this.UIS_DEFAULTS = UIS_DEFAULTS;
       this.nrpUser = nrpUser;
       this.simulationConfigService = simulationConfigService;
+      this.userContextService = userContextService;
 
       this.autoSaveService = autoSaveFactory.createService(
         'user-interaction-settings'
@@ -165,6 +167,10 @@
 
     saveCustomWorkspace(name, layoutConfig) {
       return new Promise((resolve, reject) => {
+        if (!this.userContextService.isOwner()) {
+          return reject();
+        }
+
         let id = name.toLowerCase();
 
         this.workspaces
@@ -193,7 +199,11 @@
     }
 
     deleteCustomWorkspace(id) {
-      return new Promise(resolve => {
+      return new Promise((resolve, reject) => {
+        if (!this.userContextService.isOwner()) {
+          return reject();
+        }
+
         this.workspaces.then(workspaces => {
           workspaces.custom.forEach((element, index) => {
             if (element.id === id) {
@@ -207,7 +217,11 @@
     }
 
     autosaveLayout(layoutConfig) {
-      return new Promise(resolve => {
+      return new Promise((resolve, reject) => {
+        if (!this.userContextService.isOwner()) {
+          return reject();
+        }
+
         this.workspaces.then(workspaces => {
           let oldAutosave = JSON.stringify(workspaces.autosave);
           let newAutosave = JSON.stringify(layoutConfig);
@@ -229,7 +243,8 @@
     'UIS_DEFAULTS',
     'autoSaveFactory',
     'nrpUser',
-    'simulationConfigService'
+    'simulationConfigService',
+    'userContextService'
   ];
 
   angular

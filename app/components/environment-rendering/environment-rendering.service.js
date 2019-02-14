@@ -123,9 +123,7 @@
             stateService.getCurrentState().then(function() {
               if (stateService.currentState !== STATE.STOPPED) {
                 gz3d.Initialize();
-                gz3d.iface.addCanDeletePredicate(
-                  userContextService.hasEditRights
-                );
+                gz3d.iface.addCanDeletePredicate(userContextService.isOwner);
 
                 // Register for the status updates as well as the timing stats
                 // Note that we have two different connections here, hence we only put one as a callback for

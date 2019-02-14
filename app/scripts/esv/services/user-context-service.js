@@ -35,7 +35,6 @@
       '$q',
       '$window',
       'experimentService',
-      'userNavigationService',
       'collabExperimentLockService',
       'simulationInfo',
       'bbpConfig',
@@ -45,7 +44,6 @@
         $q,
         $window,
         experimentService,
-        userNavigationService,
         collabExperimentLockService,
         simulationInfo,
         bbpConfig,
@@ -107,12 +105,8 @@
             }
           };
 
-          this.isOwner = function() {
+          this.isOwner = () => {
             return this.userID === this.ownerID && !this.demoMode;
-          };
-
-          this.hasEditRights = function(entity) {
-            return that.isOwner() || userNavigationService.isUserAvatar(entity);
           };
 
           this.setLockDateAndUser = function(lockInfo) {

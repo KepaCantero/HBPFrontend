@@ -151,7 +151,7 @@ describe('Services: environmentRenderingService', function() {
     expect(environmentRenderingService.sceneInitialized).toBeDefined();
     expect(gz3d.Initialize).toHaveBeenCalled();
     expect(gz3d.iface.addCanDeletePredicate).toHaveBeenCalledWith(
-      userContextService.hasEditRights
+      userContextService.isOwner
     );
     expect(stateService.addStateCallback).toHaveBeenCalledWith(
       environmentRenderingService.onStateChanged
