@@ -1,3 +1,87 @@
+<!-- build:css(.tmp) components/environment-rendering/environment-rendering-options.style.css -->
+<link rel="stylesheet" href="components/environment-rendering/environment-rendering-options.style.css"/>
+<!-- endbuild -->
+
+<md-button class="md-raised gl-config-button md-button" aria-label="Camera Translation"
+           help-tooltip="CAMERA_TRANSLATION"
+           ng-class="{'tool-help-highlight': vm.helpTooltipService.helpCode === 'CAMERA_TRANSLATION'}">
+  <md-tooltip md-direction="left">Camera Translation</md-tooltip>
+  <img src="img/esv/translation_icon.png">
+
+  <div class="camera-control-grid">
+    <!-- action: none -->
+    <div></div>
+    <!-- action: move up -->
+    <div ng-mousedown="vm.onButtonCameraTranslate($event, 0, 1)"
+         ng-mouseup="vm.onButtonCameraTranslate($event, 0, 1)"
+         ng-mouseleave="vm.onButtonCameraTranslate($event, 0, 1)"></div>
+    <!-- action: move forward -->
+    <div ng-mousedown="vm.onButtonCameraTranslate($event, 0, 2)"
+         ng-mouseup="vm.onButtonCameraTranslate($event, 0, 2)"
+         ng-mouseleave="vm.onButtonCameraTranslate($event, 0, 2)"></div>
+    <!-- action: move left -->
+    <div ng-mousedown="vm.onButtonCameraTranslate($event, 1, 0)"
+         ng-mouseup="vm.onButtonCameraTranslate($event, 1, 0)"
+         ng-mouseleave="vm.onButtonCameraTranslate($event, 1, 0)"></div>
+    <!-- action: init position -->
+    <div ng-mousedown="vm.onButtonCameraTranslate($event, 1, 1)"
+         ng-mouseup="vm.onButtonCameraTranslate($event, 1, 1)"
+         ng-mouseleave="vm.onButtonCameraTranslate($event, 1, 1)"></div>
+    <!-- action: move right -->
+    <div ng-mousedown="vm.onButtonCameraTranslate($event, 1, 2)"
+         ng-mouseup="vm.onButtonCameraTranslate($event, 1, 2)"
+         ng-mouseleave="vm.onButtonCameraTranslate($event, 1, 2)"></div>
+    <!-- action: move back -->
+    <div ng-mousedown="vm.onButtonCameraTranslate($event, 2, 0)"
+         ng-mouseup="vm.onButtonCameraTranslate($event, 2, 0)"
+         ng-mouseleave="vm.onButtonCameraTranslate($event, 2, 0)"></div>
+    <!-- action: move down -->
+    <div ng-mousedown="vm.onButtonCameraTranslate($event, 2, 1)"
+         ng-mouseup="vm.onButtonCameraTranslate($event, 2, 1)"
+         ng-mouseleave="vm.onButtonCameraTranslate($event, 2, 1)"></div>
+    <!-- action: none -->
+    <div class="grid-item"></div>
+  </div>
+</md-button>
+
+<md-button class="md-raised gl-config-button md-button" aria-label="Camera Rotation"
+           help-tooltip="CAMERA_ROTATION"
+           ng-class="{'tool-help-highlight': vm.helpTooltipService.helpCode === 'CAMERA_ROTATION'}">
+  <md-tooltip md-direction="left">Camera Rotation</md-tooltip>
+  <img src="img/esv/rotation_icon.png">
+
+  <div class="camera-control-grid">
+    <!-- action: none -->
+    <div></div>
+    <!-- action: rotate up -->
+    <div ng-mousedown="vm.onButtonCameraRotate($event, 0, 1)"
+         ng-mouseup="vm.onButtonCameraRotate($event, 0, 1)"
+         ng-mouseleave="vm.onButtonCameraRotate($event, 0, 1)"></div>
+    <!-- action: none -->
+    <div></div>
+    <!-- action: rotate left -->
+    <div ng-mousedown="vm.onButtonCameraRotate($event, 1, 0)"
+         ng-mouseup="vm.onButtonCameraRotate($event, 1, 0)"
+         ng-mouseleave="vm.onButtonCameraRotate($event, 1, 0)"></div>
+    <!-- action: init rotation -->
+    <div ng-mousedown="vm.onButtonCameraRotate($event, 1, 1)"
+         ng-mouseup="vm.onButtonCameraRotate($event, 1, 1)"
+         ng-mouseleave="vm.onButtonCameraRotate($event, 1, 1)"></div>
+    <!-- action: rotate right -->
+    <div ng-mousedown="vm.onButtonCameraRotate($event, 1, 2)"
+         ng-mouseup="vm.onButtonCameraRotate($event, 1, 2)"
+         ng-mouseleave="vm.onButtonCameraRotate($event, 1, 2)"></div>
+    <!-- action: none -->
+    <div></div>
+    <!-- action: rotate down -->
+    <div ng-mousedown="vm.onButtonCameraRotate($event, 2, 1)"
+         ng-mouseup="vm.onButtonCameraRotate($event, 2, 1)"
+         ng-mouseleave="vm.onButtonCameraRotate($event, 2, 1)"></div>
+    <!-- action: none -->
+    <div class="grid-item"></div>
+  </div>
+</md-button>
+
 <md-button
   gl-tool-source="PULL_FORCE"
   class="md-raised gl-config-button md-button"

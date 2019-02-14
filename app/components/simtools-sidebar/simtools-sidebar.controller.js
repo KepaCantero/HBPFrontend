@@ -25,34 +25,6 @@
 (function() {
   'use strict';
 
-  let cameraTranslateButtonMapping = [
-    [null, 'moveUp', 'moveForward'],
-    ['moveLeft', 'initPosition', 'moveRight'],
-    ['moveBackward', 'moveDown', null]
-  ];
-  let cameraRotateButtonMapping = [
-    [null, 'rotateUp', null],
-    ['rotateLeft', 'initRotation', 'rotateRight'],
-    [null, 'rotateDown', null]
-  ];
-  let buttonMouseCoordinateOffset = [5, 5];
-
-  let getCameraButtonThirds = mouseEvent => {
-    let targetRect = mouseEvent.currentTarget.getClientRects()[0];
-    let relX = Math.min(
-      (mouseEvent.offsetX + buttonMouseCoordinateOffset[0]) / targetRect.width,
-      1.0
-    );
-    let relY = Math.min(
-      (mouseEvent.offsetY + buttonMouseCoordinateOffset[1]) / targetRect.height,
-      1.0
-    );
-    let thirdX = Math.min(Math.floor(relX * 3), 2),
-      thirdY = Math.min(Math.floor(relY * 3), 2);
-
-    return [thirdX, thirdY];
-  };
-
   class SimToolsSidebarController {
     constructor(
       $rootScope,
@@ -62,7 +34,6 @@
       gz3dViewsService,
       helpTooltipService,
       simToolsSidebarService,
-      userNavigationService,
       videoStreamService,
       tipTooltipService,
       TIP_CODES,
@@ -74,7 +45,6 @@
       this.gz3dViewsService = gz3dViewsService;
       this.helpTooltipService = helpTooltipService;
       this.simToolsSidebarService = simToolsSidebarService;
-      this.userNavigationService = userNavigationService;
       this.videoStreamService = videoStreamService;
 
       this.isSubmenuSceneNavigationOpen = false;
@@ -101,34 +71,6 @@
       });
     }
 
-    onButtonCameraTranslate(event) {
-      let thirds = getCameraButtonThirds(event);
-      let action =
-        cameraTranslateButtonMapping[thirds[1]] &&
-        cameraTranslateButtonMapping[thirds[1]][thirds[0]];
-      if (action) {
-        if (event.type === 'mousedown') {
-          this.userNavigationService.requestCameraTransform(event, action);
-        } else {
-          this.userNavigationService.releaseCameraTransform(event, action);
-        }
-      }
-    }
-
-    onButtonCameraRotate(event) {
-      let thirds = getCameraButtonThirds(event);
-      let action =
-        cameraRotateButtonMapping[thirds[1]] &&
-        cameraRotateButtonMapping[thirds[1]][thirds[0]];
-      if (action) {
-        if (event.type === 'mousedown') {
-          this.userNavigationService.requestCameraTransform(event, action);
-        } else {
-          this.userNavigationService.releaseCameraTransform(event, action);
-        }
-      }
-    }
-
     onButtonExpandCategory(groupID) {
       this.isSubmenuLightingOpen = this.isSubmenuSceneNavigationOpen = false;
 
@@ -150,7 +92,6 @@
       'gz3dViewsService',
       'helpTooltipService',
       'simToolsSidebarService',
-      'userNavigationService',
       'videoStreamService',
       'tipTooltipService',
       'TIP_CODES',

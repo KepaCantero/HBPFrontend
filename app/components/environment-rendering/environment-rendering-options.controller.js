@@ -27,6 +27,17 @@
 (function() {
   'use strict';
 
+  let cameraTranslateButtonMapping = [
+    [null, 'moveUp', 'moveForward'],
+    ['moveLeft', 'initPosition', 'moveRight'],
+    ['moveBackward', 'moveDown', null]
+  ];
+  let cameraRotateButtonMapping = [
+    [null, 'rotateUp', null],
+    ['rotateLeft', 'initRotation', 'rotateRight'],
+    [null, 'rotateDown', null]
+  ];
+
   class EnvironmentRenderingOptionsController {
     constructor(userNavigationService, gz3d, NAVIGATION_MODES) {
       this.userNavigationService = userNavigationService;
@@ -43,6 +54,48 @@
 
         this.gz3d.scene.emitter.emit('lightChanged', direction * 0.1);
       };
+    }
+
+    onButtonCameraTranslate(event, row, col) {
+      if (event.type === 'mouseleave') {
+        event.which = 1;
+        cameraTranslateButtonMapping.forEach(actionRow => {
+          actionRow.forEach(action => {
+            this.userNavigationService.releaseCameraTransform(event, action);
+          });
+        });
+        return;
+      }
+
+      let action = cameraTranslateButtonMapping[row][col];
+      if (action) {
+        if (event.type === 'mousedown') {
+          this.userNavigationService.requestCameraTransform(event, action);
+        } else {
+          this.userNavigationService.releaseCameraTransform(event, action);
+        }
+      }
+    }
+
+    onButtonCameraRotate(event, row, col) {
+      if (event.type === 'mouseleave') {
+        event.which = 1;
+        cameraRotateButtonMapping.forEach(actionRow => {
+          actionRow.forEach(action => {
+            this.userNavigationService.releaseCameraTransform(event, action);
+          });
+        });
+        return;
+      }
+
+      let action = cameraRotateButtonMapping[row][col];
+      if (action) {
+        if (event.type === 'mousedown') {
+          this.userNavigationService.requestCameraTransform(event, action);
+        } else {
+          this.userNavigationService.releaseCameraTransform(event, action);
+        }
+      }
     }
   }
 
