@@ -634,6 +634,58 @@
       $httpBackend.flush();
     });
 
+    it('should load and display record list', function() {
+      $httpBackend
+        .whenGET(proxyUrl + '/storage/Mature%20experiment%20name')
+        .respond(200, [{ name: 'recordings', uuid: 'recordsuuid' }]);
+
+      $httpBackend
+        .whenGET(proxyUrl + '/storage/recordsuuid')
+        .respond(200, [{ name: 'myrecord', uuid: 'myrecorduuid' }]);
+
+      var page = renderEsvWebPage();
+      page
+        .find('.experiment-box')
+        .first()
+        .click();
+
+      page.find('a[analytics-event="ShowRecords"]').click();
+      var scope = getExperimentListScope(page);
+
+      var experimentID = Object.keys(defaultPageOptions.experiments)[0];
+
+      scope.toggleShowRecord(defaultPageOptions.experiments[experimentID]);
+      $httpBackend.flush();
+
+      expect(scope.recordsList).toBeDefined();
+    });
+
+    it('should delete record', function() {
+      $httpBackend
+        .whenDELETE(proxyUrl + '/storage/myrecorduuid?byname=false&type=file')
+        .respond(200);
+
+      var page = renderEsvWebPage();
+      page
+        .find('.experiment-box')
+        .first()
+        .click();
+
+      page.find('a[analytics-event="ShowRecords"]').click();
+      var scope = getExperimentListScope(page);
+
+      spyOn(scope, 'updateRecordList');
+      spyOn(clbConfirm, 'open').and.returnValue($q.when({}));
+      scope.deleteRecord({
+        name: 'myrecord',
+        uuid: 'myrecorduuid',
+        id: 'expid'
+      });
+
+      expect(clbConfirm.open).toHaveBeenCalled();
+      $httpBackend.flush();
+    });
+
     it('should change path when joining a simulation', function() {
       var page = renderEsvWebPage();
       page

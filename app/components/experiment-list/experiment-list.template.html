@@ -219,9 +219,15 @@
                             <i class="fa fa-times"></i> Delete
                         </button>
 
+                        <!-- Records button -->
+                        <button analytics-on analytics-event="ShowRecords" analytics-category="Experiment" ng-if="config.canLaunchExperiments"
+                            class="btn btn-default" ng-disabled="pageState.startingExperiment" ng-click="toggleShowRecord(exp)">
+                            <i class="fa fa-sign-in"></i> Recordings »
+                        </button>
+
                         <!-- Join button -->
                         <button analytics-on analytics-event="Join" analytics-category="Experiment" ng-if="config.canLaunchExperiments && exp.joinableServers.length > 0"
-                            class="btn btn-default" ng-disabled="pageState.startingExperiment" ng-click="pageState.showJoin = !pageState.showJoin">
+                            class="btn btn-default" ng-disabled="pageState.startingExperiment" ng-click="pageState.showJoin = !pageState.showJoin; pageState.showRecords = false;">
                             <i class="fa fa-sign-in"></i> Simulations »
                         </button>
 
@@ -277,6 +283,43 @@
                     <uib-progressbar value="100" class="progress-striped active top-buffer"><i><b>{{progressMessage.main}}</b>
                             {{progressMessage.sub}}</i></uib-progressbar>
                 </div>
+
+                <div class="table-wrapper" uib-collapse="!pageState.showRecords || (pageState.selected != exp.id)">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>File</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+
+                            <tbody ng-if="recordsList.length==0">
+                                    <tr>
+                                            <td>No recordings available...</td>
+                                </tr>
+                            </tbody>
+
+                            <tbody ng-if="recordsList.length>0">
+                                <tr ng-repeat="record in recordsList">
+                                    <td>{{record.name}}</td>
+                                    <td>No description...</td>
+
+                                    <td>
+                                        <a analytics-on analytics-event="StartReplay" analytics-category="Experiment" ng-click="startReplay()"
+                                            type="button" class="btn btn-default" ng-disabled="!config.canLaunchExperiments || exp.availableServers.length == 0"
+                                            style="font-family: 'Gotham', sans-serif;">
+                                            Play »</a>
+                                            
+                                            <a analytics-on analytics-event="DeleteReplay" analytics-category="Experiment" ng-click="deleteRecord(record)"
+                                                type="button" class="btn btn-default" style="font-family: 'Gotham', sans-serif;">
+                                                Delete</a>
+                                    </td>
+    
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
                 <div class="table-wrapper" uib-collapse="!config.canLaunchExperiments || (pageState.selected != exp.id)||(!pageState.showJoin && !running) || !exp.joinableServers.length">
                     <table class="table table-striped">
                         <thead>

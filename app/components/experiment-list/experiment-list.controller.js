@@ -192,6 +192,7 @@
           if (experiment.id !== $scope.pageState.selected) {
             $scope.pageState.selected = experiment.id;
             $scope.pageState.showJoin = false;
+            $scope.pageState.showRecords = false;
           }
         };
 
@@ -577,6 +578,76 @@
               .catch(err =>
                 console.error(`Failed deleting a shared user:\n${err}`)
               );
+          };
+
+          $scope.startReplay = function() {
+            // Will be implemented in another story
+          };
+
+          $scope.deleteRecord = function(record) {
+            clbConfirm
+              .open({
+                title: 'Delete recording?',
+                confirmLabel: 'Yes',
+                cancelLabel: 'No',
+                template:
+                  'Are you sure you would like to delete this recording?',
+                closable: true
+              })
+              .then(() => {
+                $scope.pageState.deletingRecord = true;
+                storageServer
+                  .deleteFile(record.uuid)
+                  .then(() => {
+                    $scope.updateRecordList(record.experiment);
+                  })
+                  .catch(err => {
+                    err = {
+                      type: 'Error while deleting recording',
+                      data: err.data,
+                      message:
+                        'Deleting recording failed. The storage server might be unavailable',
+                      code: err.statusText + ' ' + err.status
+                    };
+                    clbErrorDialog.open(err).then(() => {});
+                  })
+                  .finally(() => {
+                    $scope.pageState.deletingRecord = false;
+                  });
+              });
+          };
+
+          $scope.updateRecordList = function(exp) {
+            $scope.pageState.loadingRecords = true;
+            $scope.recordsList = [];
+
+            storageServer
+              .getExperimentFiles(exp.id)
+              .then(files => {
+                files.forEach(f => {
+                  if (f.name == 'recordings') {
+                    storageServer
+                      .getExperimentFiles(f.uuid)
+                      .then(records => {
+                        records.forEach(f => {
+                          f.name = f.name.slice(0, -4);
+                          f.experiment = exp;
+                          $scope.recordsList.push(f);
+                        });
+                      })
+                      .finally(() => ($scope.pageState.loadingRecords = false));
+                  }
+                });
+              })
+              .catch(() => ($scope.pageState.loadingRecords = false));
+          };
+
+          $scope.toggleShowRecord = function(exp) {
+            $scope.pageState.showRecords = !$scope.pageState.showRecords;
+            $scope.pageState.showJoin = false;
+            if ($scope.pageState.showRecords) {
+              $scope.updateRecordList(exp);
+            }
           };
 
           $scope.joinExperiment = function(simul, exp) {
