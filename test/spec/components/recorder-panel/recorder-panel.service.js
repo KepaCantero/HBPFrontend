@@ -8,6 +8,7 @@ describe('Service: recorder-panel', function() {
 
   beforeEach(module('backendInterfaceServiceMock'));
   beforeEach(module('simulationInfoMock'));
+  beforeEach(module('storageServerMock'));
 
   beforeEach(
     inject(function(_recorderPanelService_, _backendInterfaceService_) {
@@ -21,6 +22,7 @@ describe('Service: recorder-panel', function() {
   });
 
   it('should update visibility ', function() {
+    recorderPanelService.toggleShow();
     recorderPanelService.start();
     recorderPanelService.toggleShow();
     expect(recorderPanelService.hidden).toBe(false);

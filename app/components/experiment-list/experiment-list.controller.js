@@ -584,6 +584,19 @@
             // Will be implemented in another story
           };
 
+          $scope.deleteRecordFiles = function(record) {
+            if (record.descriptionPath) {
+              return Promise.all([
+                storageServer.deleteFile(
+                  record.expID,
+                  record.descriptionPath,
+                  true
+                ),
+                storageServer.deleteFile(record.expID, record.uuid)
+              ]);
+            } else return storageServer.deleteFile(record.uuid);
+          };
+
           $scope.deleteRecord = function(record) {
             clbConfirm
               .open({
@@ -596,8 +609,9 @@
               })
               .then(() => {
                 $scope.pageState.deletingRecord = true;
-                storageServer
-                  .deleteFile(record.uuid)
+
+                $scope
+                  .deleteRecordFiles(record)
                   .then(() => {
                     $scope.updateRecordList(record.experiment);
                   })
@@ -612,7 +626,8 @@
                     clbErrorDialog.open(err).then(() => {});
                   })
                   .finally(() => {
-                    $scope.pageState.deletingRecord = false;
+                    if (!record.descriptionPath)
+                      $scope.pageState.deletingRecord = false;
                   });
               });
           };
@@ -630,9 +645,31 @@
                       .getExperimentFiles(f.uuid)
                       .then(records => {
                         records.forEach(f => {
-                          f.name = f.name.slice(0, -4);
-                          f.experiment = exp;
-                          $scope.recordsList.push(f);
+                          if (f.name.split('.').pop() == 'zip') {
+                            f.name = f.name.slice(0, -4);
+                            f.experiment = exp;
+                            f.description = 'Loading...';
+                            f.showShortDescription = true;
+                            f.expID = exp.id;
+                            $scope.recordsList.push(f);
+
+                            let descriptionPath =
+                              'recordings/' + f.name + '.txt';
+
+                            storageServer
+                              .getFileContent(exp.id, descriptionPath, true)
+                              .then(result => {
+                                f.description = result.data;
+                                f.descriptionPath = descriptionPath;
+                                if (result.data && result.data.length > 30)
+                                  f.shortDescription =
+                                    result.data.substring(0, 30) + '...';
+                                else f.shortDescription = f.description;
+                              })
+                              .catch(() => {
+                                f.description = 'Cannot load description...';
+                              });
+                          }
                         });
                       })
                       .finally(() => ($scope.pageState.loadingRecords = false));

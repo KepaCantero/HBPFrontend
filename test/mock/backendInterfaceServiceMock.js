@@ -17,11 +17,13 @@
       this.resetRecording = jasmine.createSpy('resetRecording');
       this.saveRecording = jasmine.createSpy('saveRecording').and.returnValue({
         then: jasmine.createSpy('then').and.callFake(function(fn) {
-          fn();
+          fn({ filename: 'record.zip' });
         })
       });
       this.getRecording = jasmine.createSpy('getRecording').and.returnValue({
-        then: jasmine.createSpy('then')
+        then: jasmine.createSpy('then').and.callFake(function(fn) {
+          fn({ state: 'True' });
+        })
       });
       this.setBrain = jasmine
         .createSpy('setBrain')

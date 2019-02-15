@@ -302,7 +302,21 @@
                             <tbody ng-if="recordsList.length>0">
                                 <tr ng-repeat="record in recordsList">
                                     <td>{{record.name}}</td>
-                                    <td>No description...</td>
+                                    <td style="max-width:200px">
+                                        <div>{{record.description.length>0?
+                                            (record.showShortDescription?record.shortDescription:
+                                            record.description):                                            
+                                            '-'}}
+                                        </div>
+                                        
+                                        <div>
+                                            <a ng-if="record.description.length>0 && record.description!=record.shortDescription" ng-click="record.showShortDescription=!record.showShortDescription"
+                                            style="font-family: 'Gotham', sans-serif;">
+                                            {{record.showShortDescription?'More':'Less'}}</a>
+                                            </div>
+
+                                        </td>
+
 
                                     <td>
                                         <a analytics-on analytics-event="StartReplay" analytics-category="Experiment" ng-click="startReplay()"

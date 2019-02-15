@@ -33,12 +33,13 @@
   };
 
   class RecorderPanelService {
-    constructor(backendInterfaceService, simulationInfo) {
+    constructor(backendInterfaceService, simulationInfo, storageServer) {
       this.backendInterfaceService = backendInterfaceService;
       this.simulationInfo = simulationInfo;
       this.hidden = true;
       this.state = RecorderState.Stopped;
       this.descriptionText = '';
+      this.storageServer = storageServer;
 
       if (simulationInfo.simulationID)
         this.backendInterfaceService.getRecording().then(response => {
@@ -86,10 +87,21 @@
 
     save() {
       this.state = RecorderState.Saving;
-      this.backendInterfaceService.saveRecording().then(() => {
+      this.backendInterfaceService.saveRecording().then(response => {
         this.state = RecorderState.Stopped;
         this.hidden = true;
         this.backendInterfaceService.resetRecording();
+
+        if (response.filename) {
+          let descFilename =
+            response.filename.substr(0, response.filename.lastIndexOf('.')) +
+            '.txt';
+          this.storageServer.setFileContent(
+            this.simulationInfo.experimentID,
+            'recordings/' + descFilename,
+            this.descriptionText
+          );
+        }
       });
     }
 
@@ -108,7 +120,11 @@
   }
 
   RecorderPanelService.$$ngIsClass = true;
-  RecorderPanelService.$inject = ['backendInterfaceService', 'simulationInfo'];
+  RecorderPanelService.$inject = [
+    'backendInterfaceService',
+    'simulationInfo',
+    'storageServer'
+  ];
 
   angular
     .module('recorderPanelModule')

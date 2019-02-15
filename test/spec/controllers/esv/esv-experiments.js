@@ -640,8 +640,18 @@
         .respond(200, [{ name: 'recordings', uuid: 'recordsuuid' }]);
 
       $httpBackend
+        .whenGET(
+          proxyUrl +
+            '/storage/Mature%20experiment%20name/recordings%2Fmyrecord.txt?byname=true'
+        )
+        .respond(
+          200,
+          'This is a long description of a very long description about a long description'
+        );
+
+      $httpBackend
         .whenGET(proxyUrl + '/storage/recordsuuid')
-        .respond(200, [{ name: 'myrecord', uuid: 'myrecorduuid' }]);
+        .respond(200, [{ name: 'myrecord.zip', uuid: 'myrecorduuid' }]);
 
       var page = renderEsvWebPage();
       page
@@ -658,6 +668,74 @@
       $httpBackend.flush();
 
       expect(scope.recordsList).toBeDefined();
+    });
+
+    it('should show an proper message if cannot get description', function() {
+      $httpBackend
+        .whenGET(proxyUrl + '/storage/Mature%20experiment%20name')
+        .respond(200, [{ name: 'recordings', uuid: 'recordsuuid' }]);
+
+      $httpBackend
+        .whenGET(
+          proxyUrl +
+            '/storage/Mature%20experiment%20name/recordings%2Fmyrecord.txt?byname=true'
+        )
+        .respond(400);
+
+      $httpBackend
+        .whenGET(proxyUrl + '/storage/recordsuuid')
+        .respond(200, [{ name: 'myrecord.zip', uuid: 'myrecorduuid' }]);
+
+      var page = renderEsvWebPage();
+      page
+        .find('.experiment-box')
+        .first()
+        .click();
+
+      page.find('a[analytics-event="ShowRecords"]').click();
+      var scope = getExperimentListScope(page);
+
+      var experimentID = Object.keys(defaultPageOptions.experiments)[0];
+
+      scope.toggleShowRecord(defaultPageOptions.experiments[experimentID]);
+      $httpBackend.flush();
+
+      expect(scope.recordsList[0].description).not.toBe(null);
+    });
+
+    it('should support short text record description', function() {
+      $httpBackend
+        .whenGET(proxyUrl + '/storage/Mature%20experiment%20name')
+        .respond(200, [{ name: 'recordings', uuid: 'recordsuuid' }]);
+
+      $httpBackend
+        .whenGET(
+          proxyUrl +
+            '/storage/Mature%20experiment%20name/recordings%2Fmyrecord.txt?byname=true'
+        )
+        .respond(200, 'This is a short desc');
+
+      $httpBackend
+        .whenGET(proxyUrl + '/storage/recordsuuid')
+        .respond(200, [{ name: 'myrecord.zip', uuid: 'myrecorduuid' }]);
+
+      var page = renderEsvWebPage();
+      page
+        .find('.experiment-box')
+        .first()
+        .click();
+
+      page.find('a[analytics-event="ShowRecords"]').click();
+      var scope = getExperimentListScope(page);
+
+      var experimentID = Object.keys(defaultPageOptions.experiments)[0];
+
+      scope.toggleShowRecord(defaultPageOptions.experiments[experimentID]);
+      $httpBackend.flush();
+
+      expect(scope.recordsList[0].shortDescription).toBe(
+        scope.recordsList[0].description
+      );
     });
 
     it('should delete record', function() {
