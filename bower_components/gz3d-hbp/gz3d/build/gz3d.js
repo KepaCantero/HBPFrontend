@@ -6420,6 +6420,7 @@ GZ3D.GZIface.prototype.createVisualFromMsg = function(visual, modelScale)
     var geom = visual.geometry;
     var visualObj = new THREE.Object3D();
     visualObj.name = visual.name;
+
     if (visual.pose)
     {
       this.scene.setPose(visualObj, visual.pose.position,
@@ -6733,10 +6734,19 @@ GZ3D.GZIface.prototype.createGeom = function(geom, material, parent, modelScale)
           if (modelUri.indexOf('.dae') !== -1)
           {
             var materialName = parent.name + '::' + element.url;
-            that.entityMaterial[materialName] = mat;
 
-            that.scene.loadMesh(element.url, submesh,
-                centerSubmesh, function(dae) {
+            that.scene.loadMesh(element.url, submesh, centerSubmesh, function(dae) {
+              let colladaDefinesMaterials = false;
+              dae.traverse((node) => {
+                if (node.type === 'Mesh' && typeof node.material !== 'undefined') {
+                  colladaDefinesMaterials = true;
+                }
+              });
+
+              if (!colladaDefinesMaterials) {
+                that.entityMaterial[materialName] = mat;
+              }
+
                   if (that.entityMaterial[materialName])
                   {
                     var allChildren = [];
