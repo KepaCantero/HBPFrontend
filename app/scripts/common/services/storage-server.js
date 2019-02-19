@@ -397,15 +397,9 @@
         .$promise;
     }
 
-    demoMode() {
-      return (
-        window.bbpConfig.demomode && window.bbpConfig.demomode.demoCarousel
-      );
-    }
     getBrain(experimentId) {
       return this.proxyRsc.getBrain({
-        experimentId,
-        template: this.demoMode()
+        experimentId
       }).$promise;
     }
 
@@ -418,8 +412,7 @@
 
     getStateMachines(experimentId) {
       return this.proxyRsc.getStateMachines({
-        experimentId,
-        template: this.demoMode()
+        experimentId
       }).$promise;
     }
 
@@ -432,8 +425,7 @@
 
     getTransferFunctions(experimentId) {
       return this.proxyRsc.getTransferFunctions({
-        experimentId,
-        template: this.demoMode()
+        experimentId
       }).$promise;
     }
 
