@@ -13,6 +13,7 @@
          'simtools-sidebar-category-minimized': vm.expandedCategory !== null && vm.expandedCategory !== vm.SIMTOOLS_SIDEBAR_ID.GROUP_EDITORS}">
 
       <md-button gl-tool-source="ENVIRONMENT_EDITOR"
+                 owner-only
                  class="md-raised tool-button tool-editor" aria-label="Object Library"
                  help-tooltip="ENVIRONMENT_EDITOR"
                  ng-class="{'tool-help-highlight': vm.helpTooltipService.helpCode === 'ENVIRONMENT_EDITOR'}">
@@ -47,6 +48,7 @@
       </md-button>
 
       <md-button gl-tool-source="RESOURCES_EDITOR"
+                 owner-only
                  class="md-raised tool-button tool-editor" aria-label="Resources Editor"
                  help-tooltip="RESOURCES_EDITOR"
                  ng-class="{'tool-help-highlight': vm.helpTooltipService.helpCode === 'RESOURCES_EDITOR'}">

@@ -369,6 +369,14 @@
 
         $scope.$watch('query', () => filterExperiments());
 
+        const visibleExperiment = exp => {
+          return (
+            !$scope.private || // see all template experiments (!private)
+            $scope.running || // see all running experiment
+            exp.owned
+          ); // skip shared expriments if seeing private experiments
+        };
+
         var loadExperiments = function(loadPrivateExperiments = false) {
           experimentsService = $scope.experimentsService = experimentsFactory.createExperimentsService(
             loadPrivateExperiments
@@ -377,9 +385,10 @@
           experimentsService.experiments.then(null, null, function(
             experiments
           ) {
-            $scope.experiments = experiments.filter(
-              exp => exp.id != 'TemplateNew'
-            );
+            $scope.experiments = experiments
+              .filter(exp => exp.id != 'TemplateNew')
+              .filter(visibleExperiment);
+
             if (experiments.length === 1) {
               $scope.pageState.selected = experiments[0].id;
             } else {

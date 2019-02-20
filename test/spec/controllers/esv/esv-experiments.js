@@ -8,6 +8,7 @@
 
   var matureExperiment = {
     id: 'Mature experiment name',
+    owned: true,
     configuration: {
       isShared: false,
       maturity: 'production',
@@ -43,6 +44,7 @@
     experiments: {
       matureExperiment: matureExperiment,
       developementExperiment: {
+        owned: true,
         configuration: {
           isShared: false,
           maturity: 'devel',
@@ -496,6 +498,7 @@
       spyOn(storageServer, 'getExperiments').and.returnValue(
         $q.when([
           {
+            owned: true,
             uuid: 'fakeUUID',
             configuration: expConfigMock,
             joinableServers: []
@@ -524,6 +527,7 @@
       spyOn(storageServer, 'getExperiments').and.returnValue(
         $q.when([
           {
+            owned: true,
             uuid: 'matureExperiment',
             id: 'matureExperiment',
             configuration: expConfigMock,
@@ -996,6 +1000,7 @@
         spyOn(storageServer, 'getExperiments').and.returnValue(
           $q.when([
             {
+              owned: true,
               uuid: 'fakeUUID',
               configuration: expConfigMock,
               joinableServers: []
@@ -1302,11 +1307,13 @@
           spyOn(storageServer, 'getExperiments').and.returnValue(
             $q.when([
               {
+                owned: true,
                 uuid: 'fakeUUID',
                 configuration: expConfigMock,
                 joinableServers: []
               },
               {
+                owned: true,
                 uuid: 'dummyUUID',
                 configuration: expConfigMock,
                 joinableServers: []
@@ -1364,7 +1371,7 @@
           expect(scope.selectExperiment).toHaveBeenCalled();
         });
 
-        it('should only show the launch button when the experiment exists in collab', function() {
+        it('should only show the launch button when there is a private experiment', function() {
           var page = renderEsvWebPage({ collab: true, tab: 'MyExperiments' });
           page
             .find('.experiment-box')
