@@ -242,7 +242,7 @@
     deleteFolder(folder) {
       folder.deleting = true;
       let parent = folder.parentFolder;
-      this.storageServer
+      return this.storageServer
         .deleteFolder(this.selectedParent.uuid, folder.uuid)
         .then(() => this.selectParent(parent))
         .catch(err => this.onError('Failed to delete folder', err))
@@ -273,7 +273,7 @@
 
     deleteFile(file) {
       file.deleting = true;
-      this.storageServer
+      return this.storageServer
         .deleteFile(this.selectedParent.uuid, file.uuid)
         .then(() => this.loadParentFileList())
         .catch(err => this.onError('Failed to delete file', err))
@@ -511,7 +511,20 @@
     suppressKeyPress(event) {
       this.baseEventHandler.suppressAnyKeyPress(event);
     }
+
+    deleteFolder(folder) {
+      super
+        .deleteFolder(folder)
+        .then(() => this.backendInterfaceService.cloneFileResources());
+    }
+
+    deleteFile(file) {
+      super
+        .deleteFile(file)
+        .then(() => this.backendInterfaceService.cloneFileResources());
+    }
   }
+
   ResourcesExplorerController.$$ngIsClass = true;
   ResourcesExplorerController.$inject = [
     '$scope',
