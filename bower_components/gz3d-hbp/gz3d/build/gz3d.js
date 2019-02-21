@@ -14425,6 +14425,12 @@ GZ3D.SpawnModel.prototype.moveSpawnedModel = function (positionX, positionY)
  */
 GZ3D.SpawnModel.prototype.generateUniqueName = function (entity)
 {
+  /*
+  The name of the entity is later converted downstream to lower case and has the white spaces replaced by underscores.
+  To avoid conflicts happening later, after that normalization is done, we make sure to use the final format
+  here for correctly detecting collision with pre-existing ids.
+  */
+  entity = entity.toLowerCase().replace(/\s/g, '_');
   var i = 0;
   while (i < 1000)
   {
