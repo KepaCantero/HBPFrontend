@@ -25,23 +25,13 @@
           fn({ state: 'True' });
         })
       });
-      this.setBrain = jasmine
-        .createSpy('setBrain')
-        .and.callFake(
-          (
-            filetype,
-            braintype,
-            scriptCode,
-            successCallback,
-            failureCallback
-          ) => {
-            if (this.itWasSuccessful) {
-              successCallback();
-            } else {
-              failureCallback(this.mockError);
-            }
-          }
-        );
+      this.setBrain = jasmine.createSpy('setBrain').and.callFake(() => {
+        if (this.itWasSuccessful) {
+          return window.$q.resolve();
+        } else {
+          return window.$q.reject(this.mockError);
+        }
+      });
       this.updatePopulations = jasmine
         .createSpy('updatePopulations')
         .and.callFake(

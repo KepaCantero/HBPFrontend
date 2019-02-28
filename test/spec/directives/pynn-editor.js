@@ -323,12 +323,11 @@ describe('Directive: pynnEditor', function() {
       isolateScope.pynnScript.code = '# some dummy pynn script';
       isolateScope.populations = { dummy_population: { list: ' 1, 2, 3 ' } };
       isolateScope.saveIntoStorage();
-      expect(
-        storageServer.saveBrain
-      ).toHaveBeenCalledWith(
+      expect(storageServer.saveBrain).toHaveBeenCalledWith(
         simulationInfo.experimentID,
         isolateScope.pynnScript.code,
-        { dummy_population: { list: [1, 2, 3] } }
+        {},
+        false
       );
     });
 

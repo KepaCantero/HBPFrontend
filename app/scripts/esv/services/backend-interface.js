@@ -339,25 +339,18 @@
             }
           );
         },
-        setBrain: function(
-          brainType,
-          dataType,
-          data,
-          successCallback,
-          failureCallback
-        ) {
-          resourceBrainSimulation(simulationInfo.serverBaseUrl).put(
+        setBrain: function(brainType, dataType, data, brainPopulations) {
+          return resourceBrainSimulation(simulationInfo.serverBaseUrl).put(
             {
               sim_id: simulationInfo.simulationID
             },
             {
               brain_type: brainType,
               data_type: dataType,
-              data: data
-            },
-            successCallback,
-            failureCallback
-          );
+              data: data,
+              brain_populations: brainPopulations
+            }
+          ).$promise;
         },
         updatePopulations: function(
           brainType,

@@ -373,12 +373,16 @@
 
             scope.updateBrainBackend = function() {
               var restart = stateService.currentState === STATE.STARTED;
+              var populations = objectifyPopulations(scope.populations);
 
-              backendInterfaceService.setBrain(
-                'py',
-                'text',
-                scope.pynnScript.code,
-                function() {
+              backendInterfaceService
+                .setBrain(
+                  'py',
+                  'text',
+                  scope.pynnScript.code,
+                  scope.stringsToLists(populations)
+                )
+                .then(() => {
                   scope.loading = false;
                   codeEditorsServices.getEditor('pynnEditor').markClean();
                   scope.clearError();
@@ -386,8 +390,8 @@
                   if (restart) {
                     stateService.setCurrentState(STATE.STARTED);
                   }
-                },
-                function(result) {
+                })
+                .catch(result => {
                   scope.loading = false;
                   scope.clearError();
                   if (
@@ -406,8 +410,7 @@
                       result.data.error_column
                     );
                   }
-                }
-              );
+                });
             };
             // Generate a regexp that will use to check if a population is used by a transfer function
             let populationRegExp = function(populationName) {
@@ -533,7 +536,8 @@
                 .saveBrain(
                   simulationInfo.experimentID,
                   scope.pynnScript.code,
-                  scope.stringsToLists(scope.populations)
+                  {},
+                  false
                 )
                 .catch(() => {
                   clbErrorDialog.open({

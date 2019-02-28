@@ -519,7 +519,7 @@
                     // Try to set the brain in the backend
                     .then(() =>
                       backendInterfaceService
-                        .setBrain(model.script, {}, 'py', 'text', true)
+                        .setBrain('py', 'text', model.script, {})
                         // If something goes wrong (most likely existing TFs referring to the brain script) open an error dialog
                         .catch(err =>
                           clbErrorDialog.open({
