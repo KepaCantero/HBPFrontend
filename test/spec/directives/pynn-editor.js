@@ -326,7 +326,7 @@ describe('Directive: pynnEditor', function() {
       expect(storageServer.saveBrain).toHaveBeenCalledWith(
         simulationInfo.experimentID,
         isolateScope.pynnScript.code,
-        {},
+        isolateScope.stringsToLists(isolateScope.populations),
         false
       );
     });

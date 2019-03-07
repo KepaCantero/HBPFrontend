@@ -536,7 +536,7 @@
                 .saveBrain(
                   simulationInfo.experimentID,
                   scope.pynnScript.code,
-                  {},
+                  scope.stringsToLists(scope.populations),
                   false
                 )
                 .catch(() => {
