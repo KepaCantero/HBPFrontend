@@ -122,9 +122,11 @@
       this.watchContainerSize();
 
       this.layout.on('stateChanged', () => {
-        this.userInteractionSettingsService.autosaveLayout(
-          this.layout.toConfig()
-        );
+        this.userInteractionSettingsService
+          .autosaveLayout(this.layout.toConfig())
+          // There is an unresolved promise exception which floods the console in the case of the demo server,
+          // cause the autosave fails and javascript does not like uncaught promises
+          .catch(() => undefined);
       });
 
       this.isLayoutInitialised().then(() => {

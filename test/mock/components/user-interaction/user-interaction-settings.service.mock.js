@@ -30,7 +30,9 @@
       this.workspaces = {
         then: jasmine.createSpy('then')
       };
-      this.autosaveLayout = jasmine.createSpy('autosaveLayout');
+      this.autosaveLayout = jasmine
+        .createSpy('autosaveLayout')
+        .and.returnValue(Promise.resolve());
       this.saveCustomWorkspace = jasmine.createSpy('saveCustomWorkspace');
       this.deleteCustomWorkspace = jasmine.createSpy('deleteCustomWorkspace');
     });

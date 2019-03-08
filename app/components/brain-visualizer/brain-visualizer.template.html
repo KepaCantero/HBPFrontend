@@ -32,6 +32,7 @@
                     ng-model="currentValues.currentShape" ng-value="BRAIN3D.REP_SHAPE_USER" ng-change="setShape(BRAIN3D.REP_SHAPE_USER)">Custom</label>
 
                 <div type="button"
+                    owner-only
                     ng-if="!userFile && brain3D"
                     style="padding: 1px 12px;display:inline-block;font-size:10px;width: auto;margin-left:12px; margin-top:1px;position:absolute;"
                     class="btn btn-default esv-brainvisualizer-pop-button-down"

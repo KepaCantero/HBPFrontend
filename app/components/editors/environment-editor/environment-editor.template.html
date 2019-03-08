@@ -76,7 +76,7 @@
 
         <div class="ed-bottom-box_buttons">
 
-            <button ng-show="isPrivateExperiment" type="button" class="btn btn-default" ng-click="saveSDFIntoCollabStorage()"
+            <button owner-only ng-show="isPrivateExperiment" type="button" class="btn btn-default" ng-click="saveSDFIntoCollabStorage()"
                 ng-disabled="(stateService.currentState === STATE.INITIALIZED)" v-busy="isSavingToCollab" v-busy-label="Saving to Storage"
                 v-pressable>
                 <i class="glyphicon glyphicon-book"></i>
@@ -88,13 +88,13 @@
                 <span> Download World</span>
             </button>
 
-            <button type="button" class="btn btn-default" ng-click="uploadModel('robots')" 
+            <button owner-only type="button" class="btn btn-default" ng-click="uploadModel('robots')" 
                     ng-disabled="uploadingModel" ng-if="isCategoryVisible('Robots')">
                 <i disable-animate ng-class="uploadingModel ? 'fa fa-spinner fa-spin' :'glyphicon glyphicon-upload'"></i>
                 <span> Upload Robot</span>
             </button>
 
-            <button type="button" class="btn btn-default" ng-click="uploadModel('brains')" 
+            <button owner-only type="button" class="btn btn-default" ng-click="uploadModel('brains')" 
                     ng-disabled="uploadingModel" ng-if="isCategoryVisible('Brains')">
                     <i disable-animate ng-class="uploadingModel ? 'fa fa-spinner fa-spin' :'glyphicon glyphicon-upload'"></i>
                 <span> Upload Brain</span>
