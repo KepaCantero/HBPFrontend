@@ -4215,7 +4215,7 @@ GZ3D.Gui.prototype.init = function()
             var name = getNameFromPath(entity);
 
             that.spawnState = 'START';
-            that.scene.spawnModel.start(entity, function (obj)
+            that.scene.spawnModel.start(entity,undefined, modelEntity.name,function (obj)
             {
               that.emitter.emit('entityCreated', obj, entity);
             },modelEntity.position,modelEntity.quaternion,modelEntity.scale);
