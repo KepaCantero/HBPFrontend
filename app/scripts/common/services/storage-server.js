@@ -167,6 +167,10 @@
             url: `${this.STORAGE_BASE_URL}/custommodels/:modelType/:modelName`,
             transformRequest: []
           }),
+          deleteCustomModel: buildAction({
+            method: 'DELETE',
+            url: `${this.STORAGE_BASE_URL}/custommodel/:modelPath`
+          }),
           logActivity: buildAction({
             method: 'POST',
             url: `${this.PROXY_URL}/activity_log/:activity`,
@@ -244,6 +248,10 @@
     setCustomModel(modelName, modelType, fileContent) {
       return this.proxyRsc.setCustomModel({ modelName, modelType }, fileContent)
         .$promise;
+    }
+
+    deleteCustomModel(modelPath) {
+      return this.proxyRsc.deleteCustomModel({ modelPath }).$promise;
     }
 
     updateSharedExperimentMode(experimentId, sharedValue) {

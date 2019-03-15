@@ -33,6 +33,13 @@
         <div ng-show="tabSelection=='NewExperiment'" class="underlined-box"></div>
       </div>
 
+      <div ng-class="{'underlined-tab':devMode,'underlined-tab-disabled':!devMode}" ng-click="(devMode)?tabChanged('ModelsLibraries'):null">
+        <div ng-class="{'underlined-tab-selected':tabSelection=='ModelsLibraries' && devMode}">
+          Models libraries
+        </div>
+        <div ng-show="tabSelection=='ModelsLibraries'" class="underlined-box"></div>
+      </div>
+
       <div class="underlined-tab" ng-click="tabChanged('ExperimentFiles')">
         <div ng-class="{'underlined-tab-selected':tabSelection=='ExperimentFiles'}">
           Experiment files
@@ -81,7 +88,7 @@
 
   <hr style="margin-bottom: 3px; margin-top: 2px; width: 100%; margin-right:10px; margin-bottom:15px;">
 
-  <div ng-if="tabSelection!='NewExperiment'" style="flex-shrink: 1;flex-grow:1;overflow-y: auto; flex-basis: 0;">
+  <div ng-if="tabSelection!='NewExperiment'&& tabSelection!='ModelsLibraries'" style="flex-shrink: 1;flex-grow:1;overflow-y: auto; flex-basis: 0;">
     <experiment-list ng-if="tabSelection=='MyExperiments' && showMyExperiments" query="query" experiment-empty="experimentEmpty()"
       reinit="reloadMyExperiments()" running="false" private="true" pizdaint="false">
     </experiment-list>
@@ -106,10 +113,12 @@
   </div>
 
   <div ng-if="tabSelection=='NewExperiment'" style="flex-shrink: 1;flex-grow:1;overflow-y: auto;">
+    <new-experiment></new-experiment>
+  </div>
 
-        <new-experiment></new-experiment>
-
-    </div>
+  <div ng-if="tabSelection=='ModelsLibraries'" style="flex-shrink: 1;flex-grow:2;overflow-y: auto;">
+    <models-libraries></models-libraries>
+</div>
 
 
 </div>

@@ -1,0 +1,154 @@
+<!-- build:css(.tmp) /components/new-experiment/new-experiment.style.css -->
+<link rel="stylesheet" href="/components/new-experiment/new-experiment.style.css" />
+<!-- endbuild -->
+
+<!-- build:css(.tmp) styles/esv/esv-web.css -->
+<link rel="stylesheet" href="styles/esv/esv-web.css" />
+<!-- endbuild -->
+
+<!-- build:css(.tmp) /components/models-libraries/models-libraries.style.css-->
+<link rel="stylesheet" href="/components/models-libraries/models-libraries.style.css" />
+<!-- endbuild -->
+
+<div class="collapsible" ng-click="vm.toggleVisibility('environments');"ng-class="{'active':vm.findCategory('environments').visible }">
+  <img class="category-thumbnail" src="img/esv/environment.png" />
+  <h2 class="title">Environments</h2>
+  <i ng-if="!vm.findCategory('environments').visible" class="fa fa-chevron-down down-icon" aria-hidden="true"></i>
+  <i ng-if="vm.findCategory('environments').visible" class="fa fa-chevron-up up-icon" aria-hidden="true"></i>
+  <button ng-if="vm.findCategory('environments').visible" class="btn btn-default enable-tooltip upload-button" title="Upload" 
+  ng-click="vm.uploadModel('environments')"
+  ng-disabled="vm.uploadingModel">
+  <i disable-animate ng-class="vm.uploadingModel ? 'fa fa-spinner fa-spin' :'glyphicon glyphicon-upload'"></i> Upload
+</button>
+</div>
+
+<div ng-repeat="env in vm.findCategory('environments').data | filter: vm.query" class="experiment-box"
+  ng-mouseenter="isHovered = true" ng-mouseleave="isHovered = false" ng-mouseup="isHovered = false"
+  style="padding-bottom:1px" ng-show="vm.findCategory('environments').visible" ng-click="vm.selectEntity(env.path)">
+  <hr class="list-separator">
+  <div class="list-entry-container left-right" ng-show="env.thumbnail!==''"
+    ng-class="{hover: isHovered, selected:env.isSelected}">
+    <div class="list-entry-left" style="position:relative" ng-class="{selected: env.isSelected}">
+
+      <div ng-if="env.public" style="position:absolute">
+        <div class="public-tag"> public </div>
+      </div>
+
+      <div ng-if="env.private" style="position:absolute">
+        <div class="private-tag"> private </div>
+      </div>
+
+      <img ng-if="!env.thumbnail" class="entity-thumbnail" src="img/esv/environment.png" />
+      <img ng-if="env.thumbnail" class="entity-thumbnail" ng-src="{{env.thumbnail}}" />
+    </div>
+    <div class="list-entry-middle list-entry-container up-down">
+      <div class="list-entry-container left-right title-line">
+        <div class="h4" ng-hide="!loadingEdit && editing[nameID] && isPrivateExperiment">{{env.name}}</div>
+      </div>
+      <div ng-if="env.isSelected">{{env.description}}</div>
+      <div ng-if="!env.isSelected">{{env.description | limitTo: 200}}...</div>
+
+    <button ng-if="env.isSelected && env.private" class="btn btn-default delete-model-button" ng-click="vm.deleteModel(env.path)">
+      <i class="fa fa-times"></i> Delete
+    </button>
+    </div>
+  </div>
+</div>
+
+<hr class="list-separator">
+
+<div class="collapsible" ng-click="vm.toggleVisibility('robots');" ng-class="{'active':vm.findCategory('robots').visible }">
+  <img class="category-thumbnail" src="img/esv/robotbody.png" />
+  <h2 class="title">Robots</h2>
+  <i ng-if="!vm.findCategory('robots').visible" class="fa fa-chevron-down down-icon" aria-hidden="true"></i>
+  <i ng-if="vm.findCategory('robots').visible" class="fa fa-chevron-up up-icon" aria-hidden="true"></i>
+  <button ng-if="vm.findCategory('robots').visible" class="btn btn-default enable-tooltip upload-button" title="Upload"
+   ng-click="vm.uploadModel('robots');"
+   ng-disabled="vm.uploadingModel">
+   <i disable-animate ng-class="vm.uploadingModel ? 'fa fa-spinner fa-spin' :'glyphicon glyphicon-upload'"></i> Upload
+</button>
+</div>
+
+<div ng-repeat="robot in vm.findCategory('robots').data | filter: vm.query" class="experiment-box"
+  ng-mouseenter="isHovered = true" ng-mouseleave="isHovered = false" ng-mouseup="isHovered = false"
+  style="padding-bottom:1px" ng-show="vm.findCategory('robots').visible" ng-click="vm.selectEntity(robot.path)">
+  <hr class="list-separator">
+  <div class="list-entry-container left-right" ng-show="robot.thumbnail!==''"
+    ng-class="{hover: isHovered, selected:robot.isSelected}">
+    <div class="list-entry-left" style="position:relative" ng-class="{selected: robot.isSelected}">
+
+      <div ng-if="robot.public" style="position:absolute">
+        <div class="public-tag"> public </div>
+      </div>
+
+      <div ng-if="robot.private" style="position:absolute">
+        <div class="private-tag"> private </div>
+      </div>
+
+      <img ng-if="!robot.thumbnail" class="entity-thumbnail" src="img/esv/robotbody.png" />
+      <img ng-if="robot.thumbnail" class="entity-thumbnail" ng-src="{{robot.thumbnail}}" />
+    </div>
+    <div class="list-entry-middle list-entry-container up-down">
+      <div class="list-entry-container left-right title-line">
+        <div class="h4" ng-hide="!loadingEdit && editing[nameID] && isPrivateExperiment">{{robot.name}}</div>
+      </div>
+      <div ng-if="robot.isSelected">{{robot.description}}
+        <a class="robot-doc-link" href="#/robot-doc?config={{robot.configpath}}" target="_blank"><br>Documentation</a>
+      </div>
+      <div ng-if="!robot.isSelected">{{robot.description | limitTo: 200}}...</div>
+     
+      <button ng-if="robot.isSelected && robot.private" class="btn btn-default delete-model-button" ng-click="vm.deleteModel(robot.path)">
+          <i class="fa fa-times"></i> Delete
+      </button>
+
+    </div>
+  </div>
+</div>
+
+<hr class="list-separator">
+
+
+<div class="collapsible" ng-click="vm.toggleVisibility('brains');" ng-class="{'active':vm.findCategory('brains').visible }">
+    <img class="category-thumbnail" src="img/esv/brain.png" />
+    <h2 class="title">Brains</h2>
+    <i ng-if="!vm.findCategory('brains').visible" class="fa fa-chevron-down down-icon" aria-hidden="true"></i>
+    <i ng-if="vm.findCategory('brains').visible" class="fa fa-chevron-up up-icon" aria-hidden="true"></i>
+    <button ng-if="vm.findCategory('brains').visible" class="btn btn-default enable-tooltip upload-button" title="Upload" 
+    ng-click="vm.uploadModel('brains');"
+    ng-disabled="vm.uploadingModel">
+    <i disable-animate ng-class="vm.uploadingModel ? 'fa fa-spinner fa-spin' :'glyphicon glyphicon-upload'"></i> Upload
+</button>
+  </div>
+
+<div ng-repeat="brain in vm.findCategory('brains').data | filter: vm.query" class="experiment-box"
+  ng-mouseenter="isHovered = true" ng-mouseleave="isHovered = false" ng-mouseup="isHovered = false"
+  style="padding-bottom:1px" ng-show="vm.findCategory('brains').visible" ng-click="vm.selectEntity(brain.path)">
+  <hr class="list-separator">
+  <div class="list-entry-container left-right" ng-show="brain.thumbnail!==''"
+    ng-class="{hover: isHovered, selected:brain.isSelected}">
+    <div class="list-entry-left" style="position:relative" ng-class="{selected: brain.isSelected}">
+      <div ng-if="brain.public" style="position:absolute">
+        <div class="public-tag"> public </div>
+      </div>
+
+      <div ng-if="brain.private" style="position:absolute">
+        <div class="private-tag"> private </div>
+      </div>
+
+      <img ng-if="!brain.thumbnail" class="entity-thumbnail" src="img/esv/brain.png" />
+      <img ng-if="brain.thumbnail" class="entity-thumbnail" ng-src="{{brain.thumbnail}}" />
+    </div>
+    <div class="list-entry-middle list-entry-container up-down">
+      <div class="list-entry-container left-right title-line">
+        <div class="h4" ng-hide="!loadingEdit && editing[nameID] && isPrivateExperiment">{{brain.name}}</div>
+      </div>
+      <div ng-if="brain.isSelected">{{brain.description}}</div>
+      <div ng-if="!brain.isSelected">{{brain.description | limitTo: 200}}...</div>
+
+      <button ng-if="brain.isSelected && brain.private" class="btn btn-default delete-model-button" ng-click="vm.deleteModel(brain.path)">
+        <i class="fa fa-times"></i> Delete
+      </button>
+    </div>
+  </div>
+</div>
+<hr style="margin-top: 0px;margin-bottom: 0px;">

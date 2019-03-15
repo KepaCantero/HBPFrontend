@@ -10,11 +10,40 @@
           displayName: 'theOwnerName'
         });
 
+        const customModels = [
+          {
+            configPath: 'p3dxbenchmark/model.config',
+            description: 'A ROS/Gazebo Pioneer 3DX model.',
+            fileName: 'robots/p3dxbenchmark_world3.zip',
+            id: 'p3dx',
+            name: 'Pioneer 3DX',
+            path: 'robots%2Fp3dx.zip',
+            sdf: 'p3dx.sdf',
+            thumbnail: 'thumbnail.png'
+          }
+        ];
+
         this.getCurrentUser = jasmine
           .createSpy('storageServerMock.getCurrentUser')
           .and.callFake(function() {
             return $q.when(currentUser);
           });
+
+        this.getCustomModels = jasmine
+          .createSpy('storageServerMock.getCustomModels')
+          .and.returnValue($q.resolve(customModels));
+
+        this.getAllCustomModels = jasmine
+          .createSpy('storageServerMock.getAllCustomModels')
+          .and.returnValue($q.resolve(customModels));
+
+        this.setCustomModel = jasmine
+          .createSpy('storageServerMock.setCustomModel')
+          .and.returnValue($q.resolve());
+
+        this.deleteCustomModel = jasmine
+          .createSpy('storageServerMock.deleteCustomModel')
+          .and.returnValue($q.resolve());
 
         this.getUser = jasmine
           .createSpy('storageServerMock.getUser')

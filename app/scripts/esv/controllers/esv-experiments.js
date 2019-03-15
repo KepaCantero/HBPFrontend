@@ -50,7 +50,8 @@
           CloneExperiment: TIP_CODES.TEMPLATES,
           RunningExperiments: TIP_CODES.RUNNING_SIMULATIONS,
           PizDaintExperiments: TIP_CODES.PIZ_DAINT_JOBS,
-          NewExperiment: TIP_CODES.NEW_EXPERIMENT
+          NewExperiment: TIP_CODES.NEW_EXPERIMENT,
+          ModelsLibraries: TIP_CODES.MODELS_LIBRARIES
         };
 
         $scope.tipTooltipService.setCurrentTip(tabToTip[$scope.tabSelection]);

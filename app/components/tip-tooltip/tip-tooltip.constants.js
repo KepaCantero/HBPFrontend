@@ -51,6 +51,10 @@
       text:
         'Create a new experiment here. Simply choose an environment and press next to add robots and configure a brain.'
     },
+    MODELS_LIBRARIES: {
+      text:
+        'View the robots, environments and brain libraries. You can manipulate your uploaded models from here.'
+    },
     NAVIGATION: {
       text:
         'Use the <b>w, s, a, d</b> keys to translate the camera. Move your <b>mouse</b> whilst pressing the <b>left button</b> to rotate the camera. The translation/rotation sensitively can be changed in the <b>User camera</b> section after clicking on the gear icon on the top right.',
