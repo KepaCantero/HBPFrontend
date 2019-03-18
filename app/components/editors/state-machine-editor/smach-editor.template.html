@@ -1,6 +1,7 @@
 <!-- build:css(.tmp) styles/esv/pynn-editor.css -->
 <link rel="stylesheet" href="components/editors/state-machine-editor/smach-editor.style.css"/>
 <!-- endbuild -->
+<link rel="stylesheet" href="styles/esv/experiment-view.css"/>
 
 <div class="smach-editor-container" ng-keydown="baseEventHandler.suppressAnyKeyPress($event)">
 
@@ -22,26 +23,49 @@
 
   </div>
 
+  <div style="margin-bottom: 20px;">
+    <button type="button" owner-only class="btn btn-default btn-md small-icon-button" ng-click="delete(stateMachine)"
+            ng-disabled="(stateService.currentState === STATE.INITIALIZED) || stateService.statePending">
+      <i class="glyphicon glyphicon-trash"></i>
+    </button>
+
+    <button type="button" owner-only class="btn btn-default btn-md small-icon-button"
+            ng-disabled="(stateService.currentState === STATE.INITIALIZED) || stateService.statePending"
+            ng-click="create();">
+      <i class="glyphicon glyphicon-plus"></i>
+    </button>
+
+    <button class="btn btn-default btn-md small-icon-button"
+            ng-click="save()" ng-disabled="stateMachines.length === 0"
+            title="Download">
+      <i class="glyphicon glyphicon-download"></i>
+    </button>
+
+    <button class="btn btn-default btn-md small-icon-button"
+            owner-only
+            type="file"
+            ngf-select="loadStateMachine($file)" accept=".exd"
+            ng-disabled="stateService.statePending"
+            title="Upload">
+      <i class="glyphicon glyphicon-upload"></i>
+    </button>
+
+    <button type="button" ng-class="{'smach-apply-changes-dirty':nStateMachineDirty}" class="btn btn-default btn-md small-icon-button"
+            ng-click="update(stateMachines)"
+            ng-disabled="!nStateMachineDirty || (stateService.currentState === STATE.INITIALIZED) || stateService.statePending"
+            v-busy="nStateMachineDirty && stateService.statePending" v-busy-label="Applying changes" v-pressable
+            title=" Apply All">
+      <i class="glyphicon glyphicon-ok-circle" ng-class="{'smach-apply-changes-dirty':nStateMachineDirty}"></i>
+      <span>All</span>
+    </button>
+
+  </div>
+
   <div class="smach-edit-area">
     <div class="left-panel">
 
       <div class="smach-title-box">
         <div class="smach-title">State Machine Scripts</div>
-
-        <div>
-
-          <button type="button" owner-only class="btn btn-default smach-small-icon-button" ng-click="delete(stateMachine)"
-                  ng-disabled="(stateService.currentState === STATE.INITIALIZED) || stateService.statePending">
-            <i class="glyphicon glyphicon-trash"></i>
-          </button>
-
-          <button type="button" owner-only class="btn btn-default btn-md smach-small-icon-button"
-                  ng-disabled="(stateService.currentState === STATE.INITIALIZED) || stateService.statePending"
-                  ng-click="create();">
-            <i class="glyphicon glyphicon-plus"></i>
-          </button>
-
-        </div>
 
       </div>
 
@@ -67,6 +91,14 @@
                 </div>
 
               </div>
+
+              <button owner-only style="cursor:pointer; margin-left: 2px; min-width: 21px; border:unset; background-color: rgba(0, 0, 0, 0);"
+                      ng-class="{'smach-apply-changes-dirty':sm.dirty}" ng-click="update(sm)"
+                      v-busy="sm.dirty && stateService.statePending" v-busy-label="Applying changes" v-pressable
+                      title="Apply Script"
+                      ng-if="sm.dirty && (stateService.currentState !== STATE.INITIALIZED) && !stateService.statePending">
+                <i class="glyphicon glyphicon-ok" ng-class="{'smach-apply-changes-dirty':sm.dirty}"></i>
+              </button>
             </div>
           </li>
         </ul>
@@ -106,43 +138,6 @@
       </div>
 
     </div>
-
-  </div>
-
-  <div>
-    <div class="smach-button-block" style="display:flex; min-width: 850px; justify-content: space-between;">
-
-      <div style="display:flex">
-        <div ng-include
-             src="'components/editors/state-machine-editor/smach-editor-buttons.template.html'"></div>
-      </div>
-
-      <div style="display:flex">
-
-        <button type="button" ng-class="{'smach-apply-changes-dirty':stateMachine.dirty}" class="btn btn-default btn-md"
-                ng-click="update(stateMachine)"
-                ng-disabled="!stateMachine.dirty || (stateService.currentState === STATE.INITIALIZED) || stateService.statePending"
-                v-busy="stateMachine.dirty && stateService.statePending" v-busy-label="Applying changes" v-pressable
-                style="display:flex;margin-right:10px;">
-          <i class="glyphicon glyphicon-ok-circle" ng-class="{'smach-apply-changes-dirty':stateMachine.dirty}"
-             style="font-size: 15px; padding-right: 6px; padding-top: 1px;"></i>
-          <span> Apply</span>
-        </button>
-
-        <button type="button" ng-class="{'smach-apply-changes-dirty':nStateMachineDirty}" class="btn btn-default btn-md"
-                ng-click="update(stateMachines)"
-                ng-disabled="!nStateMachineDirty || (stateService.currentState === STATE.INITIALIZED) || stateService.statePending"
-                v-busy="nStateMachineDirty && stateService.statePending" v-busy-label="Applying changes" v-pressable
-                style="display:flex">
-          <i class="glyphicon glyphicon-ok-circle" ng-class="{'smach-apply-changes-dirty':nStateMachineDirty}"
-             style="font-size: 15px; padding-right: 6px; padding-top: 1px;"></i>
-          <span> Apply All</span>
-        </button>
-
-      </div>
-
-    </div>
-
 
   </div>
 

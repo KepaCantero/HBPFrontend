@@ -102,3 +102,29 @@
   right: 0;
   top: 0;
 }
+
+.small-icon-button {
+  height: 29px;
+  min-width: 32px;
+  font-size: 13px;
+  padding: 6px;
+  vertical-align: middle;
+  text-align: center;
+
+  .glyphicon {
+    text-align: center;
+  }
+
+  .glyphicon-upload,
+  .glyphicon-download {
+    font-size: 15px;
+  }
+
+  .glyphicon-ok-circle {
+    font-size: 16px;
+  }
+
+  .far {
+    font-size: 15px;
+  }
+}

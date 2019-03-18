@@ -2,6 +2,7 @@
   <!-- build:css(.tmp) components/editors/brain-editor/pynn-editor.style.css -->
   <link rel="stylesheet" href="components/editors/brain-editor/pynn-editor.style.css" />
   <!-- endbuild -->
+  <link rel="stylesheet" href="styles/esv/experiment-view.css"/>
 
   <div class="graphical-editor-pynn-container" ng-keydown="suppressKeyPress($event)">
 
@@ -23,6 +24,25 @@
 
       </p>
     </div>
+
+    <div style="margin-bottom: 20px;">
+      <button class="btn btn-default btn-md small-icon-button" ng-click="download()" title="Download">
+        <i class="glyphicon glyphicon-download"></i>
+      </button>
+
+      <button class="btn btn-default btn-md small-icon-button" owner-only type="file"
+              ngf-select="uploadFile($file)" accept=".py" title="Upload">
+        <i class="glyphicon glyphicon-upload"></i>
+      </button>
+
+      <button type="button" class="btn btn-default btn-md small-icon-button"
+              ng-class="{'pynn-apply-changes-dirty':localBrainDirty}" owner-only ng-click="updateBrainBackend()"
+              ng-disabled="loading || stateService.statePending || (!localBrainDirty && !editingPopulation())"
+              v-busy="loading || stateService.statePending" v-busy-label="Applying changes" v-pressable title="Apply">
+        <i class="glyphicon glyphicon-ok-circle" aria-hidden="true"></i>
+      </button>
+    </div>
+
     <div ng-show="pynnScript === undefined" class="alert alert-info" role="alert">
       There is no brain script available for this experiment.
     </div>
@@ -234,34 +254,6 @@
 
       </div>
 
-
-
-      <!-- Bottom bar -->
-
-      <div>
-
-        <div class="pynn-button-block" style="display:flex; justify-content: space-between;">
-
-          <div style="display:flex">
-
-            <button class="btn btn-default btn-md" ng-click="download()">
-              <i class="glyphicon glyphicon-download"></i>
-              <span> Download</span>
-            </button>
-            <button class="btn btn-default btn-md" style="margin-left: 10px;" owner-only type="file" ngf-select="uploadFile($file)" accept=".py">
-              <i class="glyphicon glyphicon-upload"></i>
-              <span> Upload</span>
-            </button>
-          </div>
-
-          <button type="button" class="btn btn-default btn-md"  ng-class="{'pynn-apply-changes-dirty':localBrainDirty}" owner-only ng-click="updateBrainBackend()" ng-disabled="loading || stateService.statePending || (!localBrainDirty && !editingPopulation())"
-            v-busy="loading || stateService.statePending" v-busy-label="Applying changes" v-pressable>
-            <i class="glyphicon glyphicon-ok-circle" aria-hidden="true"></i>
-            <span> Apply</span>
-          </button>
-
-        </div>
-      </div>
     </div>
 
   </div>

@@ -100,7 +100,7 @@ smach-editor {
   display: flex;
   width: 100%;
   min-width: 830px;
-  height: calc(100% - 210px);
+  height: 100%;
 }
 
 .smallButtonBlock {
@@ -161,6 +161,7 @@ smach-editor {
 .smach-title-box {
   display: flex;
   justify-content: space-between;
+  margin: 5px;
 }
 
 .smach-small-icon-button {
