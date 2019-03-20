@@ -318,11 +318,21 @@
                                         </td>
 
 
-                                    <td>
-                                        <a analytics-on analytics-event="StartReplay" analytics-category="Experiment" ng-click="startReplay()"
+                                    <td>                                  
+
+                                        <a ng-if="config.canLaunchExperiments && exp.availableServers.length > 0 &&
+                                                exp.configuration.experimentFile && exp.configuration.bibiConfSrc"
+                                            analytics-on analytics-event="StartReplay" analytics-category="Experiment" ng-click="startNewExperiment(exp, false, undefined, undefined, record.recordPath)"
                                             type="button" class="btn btn-default" ng-disabled="!config.canLaunchExperiments || exp.availableServers.length == 0"
                                             style="font-family: 'Gotham', sans-serif;">
-                                            Play »</a>
+                                            Play</a>
+
+                                        <a ng-if="config.canLaunchExperiments && exp.availableServers.length == 0"
+                                            analytics-on analytics-event="StartReplay" analytics-category="Experiment"
+                                            type="button" class="btn btn-default disabled enable-tooltip" ng-disabled="!config.canLaunchExperiments || exp.availableServers.length == 0"
+                                            style="font-family: 'Gotham', sans-serif;"
+                                            title="Sorry, no available servers.">
+                                            Play</a>
                                             
                                             <a analytics-on analytics-event="DeleteReplay" analytics-category="Experiment" ng-click="deleteRecord(record)"
                                                 type="button" class="btn btn-default" style="font-family: 'Gotham', sans-serif;">

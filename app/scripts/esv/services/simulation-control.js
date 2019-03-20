@@ -24,8 +24,6 @@
 (function() {
   'use strict';
 
-  /* global console: false */
-
   angular
     .module('exdFrontendApp.Constants')
     .constant('DEFAULT_RESOURCE_GET_TIMEOUT', 10000) // ms = 10sec
@@ -353,7 +351,8 @@
       var launchExperimentInPossibleServers = function(
         experiment,
         launchSingleMode,
-        reservation
+        reservation,
+        playbackRecording
       ) {
         var fatalErrorOccurred = false,
           serversToTry = experiment.devServer
@@ -389,7 +388,8 @@
                 brainProcesses,
                 server,
                 serverConfig,
-                reservation
+                reservation,
+                playbackRecording
               ).catch(oneSimulationFailed);
             });
         }
@@ -413,7 +413,8 @@
         brainProcesses,
         server,
         serverConfiguration,
-        reservation
+        reservation,
+        playbackRecording
       ) {
         var deferred = $q.defer();
 
@@ -434,6 +435,10 @@
           creationUniqueID: (Date.now() + Math.random()).toString(),
           ctxId: $stateParams.ctx
         };
+
+        if (playbackRecording) {
+          simInitData.playbackPath = playbackRecording;
+        }
 
         // Create a new simulation.
         simulationGenerator(serverURL).create(simInitData);
@@ -518,7 +523,8 @@
       var startNewExperiment = function(
         experiment,
         launchSingleMode,
-        reservation
+        reservation,
+        playbackRecording
       ) {
         nrpAnalytics.eventTrack('Start', { category: 'Experiment' });
         nrpAnalytics.tickDurationEvent('Server-initialization');
@@ -526,7 +532,8 @@
         return launchExperimentInPossibleServers(
           experiment,
           launchSingleMode,
-          reservation
+          reservation,
+          playbackRecording
         );
       };
 

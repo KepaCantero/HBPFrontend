@@ -426,7 +426,8 @@
             experiment,
             launchSingleMode,
             pizDaintJob,
-            jobUrl
+            jobUrl,
+            playbackRecording
           ) {
             storageServer.logActivity('simulation_start', {
               experiment: experiment.id
@@ -436,7 +437,8 @@
               .startExperiment(
                 experiment,
                 launchSingleMode,
-                nrpUser.getReservation()
+                nrpUser.getReservation(),
+                playbackRecording
               )
               .then(
                 function(path) {
@@ -660,6 +662,7 @@
                             f.description = 'Loading...';
                             f.showShortDescription = true;
                             f.expID = exp.id;
+                            f.recordPath = 'recordings/' + f.name + '.zip';
                             $scope.recordsList.push(f);
 
                             let descriptionPath =

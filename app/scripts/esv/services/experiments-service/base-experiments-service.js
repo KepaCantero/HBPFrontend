@@ -123,9 +123,19 @@
       );
     }
 
-    startExperiment(experiment, launchSingleMode, reservation) {
+    startExperiment(
+      experiment,
+      launchSingleMode,
+      reservation,
+      playbackRecording
+    ) {
       return this.experimentSimulationService
-        .startNewExperiment(experiment, launchSingleMode, reservation)
+        .startNewExperiment(
+          experiment,
+          launchSingleMode,
+          reservation,
+          playbackRecording
+        )
         .catch(fatalErrorWasShown => {
           if (!fatalErrorWasShown)
             this.clbErrorDialog.open(
