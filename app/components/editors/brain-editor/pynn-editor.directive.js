@@ -63,6 +63,8 @@
       'downloadFileService',
       'baseEventHandler',
       'storageServer',
+      'tipTooltipService',
+      'TIP_CODES',
       function(
         $timeout,
         $rootScope,
@@ -81,7 +83,9 @@
         environmentService,
         downloadFileService,
         baseEventHandler,
-        storageServer
+        storageServer,
+        tipTooltipService,
+        TIP_CODES
       ) {
         return {
           templateUrl:
@@ -98,7 +102,7 @@
                   if (element.is(':visible')) scope.refresh();
               }
             );
-
+            tipTooltipService.setCurrentTip(TIP_CODES.BRAIN_EDITOR);
             scope.isPrivateExperiment = environmentService.isPrivateExperiment();
             scope.loading = false;
             scope.localBrainDirty = false;

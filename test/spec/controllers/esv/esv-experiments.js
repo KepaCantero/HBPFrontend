@@ -342,7 +342,7 @@
     it('should show only mature experiments in normal mode', function() {
       var page = renderEsvWebPage();
       var experiments = page.find('.experiment-box');
-      expect(experiments.length).toBe(2);
+      expect(experiments.length).toBe(1);
       var expTitle = $(experiments)
         .find('.title-line:first > .h4')
         .text();
@@ -355,55 +355,55 @@
       var page = renderEsvWebPage({ dev: true });
 
       var experiments = page.find('.experiment-box');
-      expect(experiments.length).toBe(3);
+      expect(experiments.length).toBe(2);
 
       $rootScope.query = 'test';
       $rootScope.$digest();
       experiments = page.find('.experiment-box');
-      expect(experiments.length).toBe(1);
+      expect(experiments.length).toBe(0);
 
       $rootScope.query = 'develop';
       $rootScope.$digest();
       experiments = page.find('.experiment-box');
-      expect(experiments.length).toBe(2);
+      expect(experiments.length).toBe(1);
 
       $rootScope.query = 'absent';
       $rootScope.$digest();
       experiments = page.find('.experiment-box');
-      expect(experiments.length).toBe(1);
+      expect(experiments.length).toBe(0);
     });
 
     it('should filter experiments by tag', function() {
       var page = renderEsvWebPage({ dev: true });
 
       var experiments = page.find('.experiment-box');
-      expect(experiments.length).toBe(3);
+      expect(experiments.length).toBe(2);
 
       $rootScope.query = 'tag';
       $rootScope.$digest();
       experiments = page.find('.experiment-box');
-      expect(experiments.length).toBe(3);
+      expect(experiments.length).toBe(2);
 
       $rootScope.query = 'tag1';
       $rootScope.$digest();
       experiments = page.find('.experiment-box');
-      expect(experiments.length).toBe(3);
+      expect(experiments.length).toBe(2);
 
       $rootScope.query = 'tag2';
       $rootScope.$digest();
       experiments = page.find('.experiment-box');
-      expect(experiments.length).toBe(2);
+      expect(experiments.length).toBe(1);
 
       $rootScope.query = 'tag3';
       $rootScope.$digest();
       experiments = page.find('.experiment-box');
-      expect(experiments.length).toBe(1);
+      expect(experiments.length).toBe(0);
     });
 
     it('should show all experiments in dev mode', function() {
       var page = renderEsvWebPage({ dev: true });
       var experiments = page.find('.experiment-box');
-      expect(experiments.length).toBe(3);
+      expect(experiments.length).toBe(2);
     });
 
     it('should not allow to chose backend when in dev mode', function() {
@@ -465,10 +465,7 @@
       experimentTitles.pop();
 
       var sortedExperimentNames = _.map(
-        [
-          { configuration: { name: 'Create New Experiment' } },
-          { configuration: { name: 'Developement experiment name' } }
-        ],
+        [{ configuration: { name: 'Developement experiment name' } }],
         function(val) {
           return val.configuration.name;
         }
@@ -485,13 +482,6 @@
     function checkButtonsVisibility(page, options) {
       checkButtonVisibility(page, 'Launch', options.launch);
       checkButtonVisibility(page, 'Clone', options.clone);
-    }
-
-    function checkNewExperimentButtonsVisibility(page, options) {
-      checkButtonVisibility(page, 'uploadEnvironment', options.environment);
-      checkButtonVisibility(page, 'uploadModelZip', options.robot);
-      checkButtonVisibility(page, 'uploadBrain', options.brain);
-      checkButtonVisibility(page, 'CloneNewExperiment', options.cloneNew);
     }
 
     it('should allow launching when available servers', function() {
@@ -1126,20 +1116,6 @@
             .last()
             .click();
           checkButtonsVisibility(page, { launch: 0, clone: 1 });
-        });
-
-        it('should only show the correct new experiment buttons', function() {
-          var page = renderEsvWebPage({ collab: true, dev: true });
-          page
-            .find('.experiment-box')
-            .first()
-            .click();
-          checkNewExperimentButtonsVisibility(page, {
-            environment: 1,
-            robot: 0,
-            brain: 1,
-            cloneNew: 1
-          });
         });
 
         it('should trigger PUT request on clone click', function() {

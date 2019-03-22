@@ -35,7 +35,8 @@
     },
     MY_EXPERIMENTS: {
       text:
-        'This is your personal experiment list. To launch a simulation select an experiment and press the "Launch" button.'
+        'This is your personal experiment list. To launch a simulation select an experiment and press the "Launch" button. <br>' +
+        'To create a new experiment from scratch open the "New experiment" tab'
     },
     MY_EXPERIMENTS_EMTPY: {
       text:
@@ -49,7 +50,7 @@
     },
     NEW_EXPERIMENT: {
       text:
-        'Create a new experiment here. Simply choose an environment and press next to add robots and configure a brain.'
+        'Create a new experiment here. Simply choose an environment and press launch to add robots and configure a brain.'
     },
     MODELS_LIBRARIES: {
       text:
@@ -66,15 +67,21 @@
         'For more information about these functionalities use the <b>mouse over tooltips</b> in the Object Inspector.',
       stackMode: true
     },
+    BRAIN_EDITOR: {
+      text:
+        'Define neural populations that you can use in your transfer functions.'
+    },
+    TRANSFER_FUNCTION_EDITOR: {
+      text:
+        'Create Transfer Functions to control your robots and connect them to the brain.'
+    },
     SIMULATIONS_TIPS: {
       tipList: [
         {
           text:
             'Welcome to the simulation! Press the "Play" button to run the simulation.<br/>' +
-            '<b>New</b>: You can now move the tool windows by dragging their title. ' +
-            'You can split windows horizontally or vertically. Stacks with tabs are also possible. ' +
-            'A shadow will preview the position the window will move to.',
-          image: ['img/tips/play.jpg']
+            'Open the Object Editor to add robots and a brain.',
+          image: ['img/tips/play.jpg', 'img/tips/env.png']
         },
         {
           text: `Use the "Options" button on the top right corner to interact with the camera,

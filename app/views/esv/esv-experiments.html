@@ -13,7 +13,7 @@
   </div>
 </div>
 
-<div class="container-with-navbar-margin cssloaded" style="visibility: hidden;display: flex; flex-direction: column;">
+<div class="container-with-navbar-margin cssloaded" style="visibility: hidden;display: flex; flex-direction: column; overflow-y: auto;">
 
   <div style="display: flex; justify-content: space-between; max-height: 65px;flex-shrink: 0;">
 
@@ -26,8 +26,8 @@
         <div ng-show="tabSelection=='MyExperiments'" class="underlined-box"></div>
       </div>
 
-      <div ng-class="{'underlined-tab':devMode,'underlined-tab-disabled':!devMode}" ng-click="(devMode)?tabChanged('NewExperiment'):null">
-        <div ng-class="{'underlined-tab-selected':tabSelection=='NewExperiment' && devMode}">
+      <div class="underlined-tab" ng-click="tabChanged('NewExperiment')">
+        <div ng-class="{'underlined-tab-selected':tabSelection=='NewExperiment'}">
           New experiment
         </div>
         <div ng-show="tabSelection=='NewExperiment'" class="underlined-box"></div>

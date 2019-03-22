@@ -69,7 +69,8 @@
                       <input ng-model="vm.experimentName" type="text" class="top-buttons form-control ng-pristine ng-untouched ng-valid ng-empty"
                         placeholder="Name of your experiment..." style=" width: 400px;">
 
-                        <button class="btn btn-default enable-tooltip" style="width:200px" ng-click="vm.cloneAndLaunch()" ng-disabled="vm.isCloneRequested || vm.experimentName.length===0 || !vm.environment || vm.launchingExperiment">Next</button>
+                        <button class="btn btn-default enable-tooltip" style="width:200px" ng-click="vm.cloneAndLaunch()" ng-disabled="vm.isCloneRequested || vm.experimentName.length===0 || !vm.environment || vm.launchingExperiment">
+                          <i class="fa fa-plus"></i> Launch</button>
 
                     </div>
 
@@ -89,7 +90,7 @@
               </div>
             </div>
 
-            <hr ng-if="!$last" class="list-separator">
+            <hr class="list-separator">
           </div>
 
         </div>
@@ -101,21 +102,6 @@
   </div>
 
   <div>
-
-    <hr style="margin-top: 0px;margin-bottom: 0px;">
-    <div style="display:flex;     align-items: center;">
-      <span class="btn btn-default" 
-            style="margin: 10px; font-size: 12px;" 
-            ng-click="!vm.uploadingModel && vm.uploadEnvironment()"
-            ng-disabled="vm.uploadingModel">{{vm.uploadingModel ? "Uploading...": "Upload an environment..."}}
-        <i ng-if="vm.uploadingModel" disable-animate class="fa fa-spinner fa-spin fa-1x fa-fw"></i>
-      </span>
-    
- 
-       
-    
-
-    </div>
   </div>
 
 </div>

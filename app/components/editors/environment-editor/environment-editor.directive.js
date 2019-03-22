@@ -88,7 +88,6 @@
         link: function(scope) {
           scope.stateService = stateService;
           scope.STATE = STATE;
-          scope.devMode = environmentService.isDevMode();
 
           document.addEventListener('contextmenu', event =>
             event.preventDefault()
@@ -322,38 +321,27 @@
           const modelLibrary = scope.assetsPath + '/' + gz3d.MODEL_LIBRARY;
           $http.get(modelLibrary).then(function(res) {
             scope.categories = res.data;
-            //if not dev mode we don't show the robots
-            var modelsPromise;
-            if (!scope.devMode) {
-              modelsPromise = $q.resolve();
-            } else {
-              // if the generate robots models fails, we open an error panel
-              // but still continue with the rest of the objects in the env editor
-              modelsPromise = $q
-                .all([
-                  scope.generateRobotsModels(),
-                  scope.generateBrainsModels()
-                ])
-                .then(([robots, brains]) => {
-                  let robotCategory = {
-                    thumbnail: 'robots.png',
-                    title: 'Robots',
-                    models: robots
-                  };
-                  scope.categories.push(robotCategory);
-                  GZ3D.modelList.push(robotCategory);
-                  let brainCategory = {
-                    thumbnail: 'brain.png',
-                    title: 'Brains',
-                    models: brains
-                  };
-                  scope.categories.push(brainCategory);
-                });
-            }
-            modelsPromise.finally(() => {
-              scope.createModelsCategories();
-              scope.updateVisibleModels();
-            });
+            $q
+              .all([scope.generateRobotsModels(), scope.generateBrainsModels()])
+              .then(([robots, brains]) => {
+                let robotCategory = {
+                  thumbnail: 'robots.png',
+                  title: 'Robots',
+                  models: robots
+                };
+                scope.categories.push(robotCategory);
+                GZ3D.modelList.push(robotCategory);
+                let brainCategory = {
+                  thumbnail: 'brain.png',
+                  title: 'Brains',
+                  models: brains
+                };
+                scope.categories.push(brainCategory);
+              })
+              .finally(() => {
+                scope.createModelsCategories();
+                scope.updateVisibleModels();
+              });
           });
 
           scope.createModelsCategories = function() {

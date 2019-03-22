@@ -20,7 +20,18 @@ describe('Directive: environment-designer', function() {
   let modelLibraryMock;
 
   let storageServerMock = {
-    getCustomModels: jasmine.createSpy('getCustomModels'),
+    getCustomModels: jasmine.createSpy('getCustomModels').and.returnValue(
+      Promise.resolve([
+        {
+          name: 'custom robot1 name',
+          description: 'custom robot1 description',
+          thumbnail: '<robot png data>',
+          id: 'robot1',
+          fileName: 'robots/robot1.zip',
+          path: 'robots%2Frobot1.zip'
+        }
+      ])
+    ),
     saveBrain: jasmine.createSpy('saveBrain'),
     getCurrentUser: jasmine
       .createSpy('getCurrentUser')
@@ -112,6 +123,32 @@ describe('Directive: environment-designer', function() {
       clbConfirm = _clbConfirm_;
       backendInterfaceService = _backendInterfaceService_;
 
+      spyOn(newExperimentProxyService, 'getTemplateModels').and.returnValue(
+        $q.resolve(
+          $q.resolve({
+            data: [
+              {
+                name: 'robot1 name',
+                sdf: 'model.sdf',
+                description: 'robot1 description',
+                thumbnail: '<robot png data>',
+                id: 'robot1',
+                configPath: 'robots/<robot folder>/model.config',
+                isRobot: true
+              },
+              {
+                name: 'robot2 name',
+                sdf: 'model.sdf',
+                thumbnail: '<robot png data>',
+                id: 'robot1',
+                configPath: 'robots/<robot folder>/model.config',
+                isRobot: true
+              }
+            ]
+          })
+        )
+      );
+
       modelLibraryMock = [
         {
           title: 'Shapes',
@@ -133,7 +170,8 @@ describe('Directive: environment-designer', function() {
               thumbnail: 'img/esv/objects/cylinder.png',
               physicsIgnore: 'opensim'
             }
-          ]
+          ],
+          color: { default: 'defaultColour' }
         },
         {
           title: 'Lights',
@@ -155,7 +193,8 @@ describe('Directive: environment-designer', function() {
               thumbnail: 'img/esv/objects/directionallight.png',
               physicsIgnore: 'bullet'
             }
-          ]
+          ],
+          color: { default: 'defaultColour' }
         }
       ];
       httpBackend.whenGET(/.*assets.*/).respond(modelLibraryMock);
@@ -163,7 +202,6 @@ describe('Directive: environment-designer', function() {
       spyOn(document, 'addEventListener');
       element = $compile('<environment-designer />')($scope);
       $scope.$digest();
-
       httpBackend.flush();
     })
   );
@@ -237,10 +275,11 @@ describe('Directive: environment-designer', function() {
 
   it('should call correctly addModel("box")', function() {
     spyOn($scope, 'addModel');
-
+    $scope.toggleVisibleCategory($scope.categories[0]);
+    $scope.updateVisibleModels();
+    $scope.$apply();
     var addBoxBtnDomElem = element.find('#insert-entity-box');
     var addBoxBtn = angular.element(addBoxBtnDomElem);
-
     addBoxBtn.triggerHandler('mousedown');
     expect($scope.addModel).toHaveBeenCalled();
     expect($scope.addModel.calls.mostRecent().args[0].modelPath).toBe('box');
@@ -255,29 +294,6 @@ describe('Directive: environment-designer', function() {
   });
 
   it('should generate the robots models from the proxy call', function() {
-    spyOn(newExperimentProxyService, 'getTemplateModels').and.returnValue(
-      $q.resolve({
-        data: [
-          {
-            name: 'robot1 name',
-            sdf: 'model.sdf',
-            description: 'robot1 description',
-            thumbnail: '<robot png data>',
-            id: 'robot1',
-            configPath: 'robots/<robot folder>/model.config',
-            isRobot: true
-          },
-          {
-            name: 'robot2 name',
-            sdf: 'model.sdf',
-            thumbnail: '<robot png data>',
-            id: 'robot1',
-            configPath: 'robots/<robot folder>/model.config',
-            isRobot: true
-          }
-        ]
-      })
-    );
     storageServer.getCustomModels.and.returnValue(
       $q.resolve([
         {
@@ -316,7 +332,7 @@ describe('Directive: environment-designer', function() {
   });
 
   it('should generate the brain models from the proxy call', function() {
-    spyOn(newExperimentProxyService, 'getTemplateModels').and.returnValue(
+    newExperimentProxyService.getTemplateModels.and.returnValue(
       $q.resolve({
         data: [
           {
@@ -508,9 +524,7 @@ describe('Directive: environment-designer', function() {
   });
 
   it('should fail to generate the robots models from the proxy call', function() {
-    spyOn(newExperimentProxyService, 'getTemplateModels').and.returnValue(
-      $q.reject()
-    );
+    newExperimentProxyService.getTemplateModels.and.returnValue($q.reject());
     storageServer.getCustomModels.and.returnValue($q.reject());
     spyOn(clbErrorDialog, 'open');
 
@@ -521,9 +535,7 @@ describe('Directive: environment-designer', function() {
   });
 
   it('should fail to generate the brains models from the proxy call', function() {
-    spyOn(newExperimentProxyService, 'getTemplateModels').and.returnValue(
-      $q.reject()
-    );
+    newExperimentProxyService.getTemplateModels.and.returnValue($q.reject());
     storageServer.getCustomModels.and.returnValue($q.reject());
     spyOn(clbErrorDialog, 'open');
 
@@ -651,6 +663,9 @@ describe('Directive: environment-designer', function() {
   it('should not spawn models when in INITIALIZED state', function() {
     spyOn($scope, 'addModel');
     spyOn(window.guiEvents, 'emit');
+    $scope.toggleVisibleCategory($scope.categories[0]);
+    $scope.updateVisibleModels();
+    $scope.$apply();
     $scope.stateService.currentState = $scope.STATE.INITIALIZED;
     var addBoxBtnDomElem = element.find('#insert-entity-box');
     var addBoxBtn = angular.element(addBoxBtnDomElem);
@@ -666,7 +681,9 @@ describe('Directive: environment-designer', function() {
 
   it('should execute correctly addModel("box")', function() {
     spyOn(window.guiEvents, 'emit');
-
+    $scope.toggleVisibleCategory($scope.categories[0]);
+    $scope.updateVisibleModels();
+    $scope.$apply();
     var addBoxBtnDomElem = element.find('#insert-entity-box');
     var addBoxBtn = angular.element(addBoxBtnDomElem);
 
@@ -921,10 +938,6 @@ describe('Directive: environment-designer robots models', function() {
       httpBackend.flush();
     })
   );
-
-  it('should check that dev mode is correctly set', function() {
-    expect($scope.devMode).toBe(true);
-  });
 
   it(' - addRobot()', function() {
     spyOn(backendInterfaceService, 'addRobot');

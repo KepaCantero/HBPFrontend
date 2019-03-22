@@ -136,6 +136,8 @@ def {0}(t):
       'baseEventHandler',
       'bbpConfig',
       'TF_CONFIG',
+      'tipTooltipService',
+      'TIP_CODES',
       function(
         backendInterfaceService,
         STATE,
@@ -164,7 +166,9 @@ def {0}(t):
         storageServer,
         baseEventHandler,
         bbpConfig,
-        TF_CONFIG
+        TF_CONFIG,
+        tipTooltipService,
+        TIP_CODES
       ) {
         return {
           templateUrl:
@@ -178,7 +182,7 @@ def {0}(t):
             var ScriptObject = pythonCodeHelper.ScriptObject;
 
             const DIRTY_TYPE = 'TF';
-
+            tipTooltipService.setCurrentTip(TIP_CODES.TRANSFER_FUNCTION_EDITOR);
             scope.populations = [];
             scope.topics = [];
             scope.transferFunctions = [];
