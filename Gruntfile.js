@@ -389,18 +389,21 @@ module.exports = function(grunt) {
     //     }
     //   }
     // },
-    // uglify: {
-    //   dist: {
-    //     files: {
-    //       '<%= yeoman.dist %>/scripts/scripts.js': [
-    //         '<%= yeoman.dist %>/scripts/scripts.js'
-    //       ]
-    //     }
-    //   }
-    // },
-    // concat: {
-    //   dist: {}
-    // },
+    uglify: {
+      options: {
+        sourceMap: {
+          includeSources: true
+        },
+        sourceMapIn: function(inputFile) {
+          return inputFile + '.map';
+        }
+      }
+    },
+    concat: {
+      options: {
+        sourceMap: true
+      }
+    },
 
     imagemin: {
       dist: {
