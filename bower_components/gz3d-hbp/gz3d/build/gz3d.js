@@ -6476,6 +6476,14 @@ GZ3D.GZIface.prototype.createLightFromMsg = function(light)
     range = null;
   }
 
+  // For now I ignore this kind of problematic lights, since they
+  // cause the scene to be completely gray. This kind
+  // of messages are happening only when a playback
+  // is occuring with a __default__ light name. 
+  // See NRRPLT-7234.
+
+  if (!light.attenuation_linear || !light.attenuation_quadratic) return;                                                        
+  
   // equation taken from
   // http://wiki.blender.org/index.php/Doc:2.6/Manual/Lighting/Lights/Light_Attenuation
   var E = 1;
