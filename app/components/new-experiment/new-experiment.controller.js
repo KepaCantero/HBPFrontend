@@ -212,12 +212,10 @@
     }
 
     cloneAndLaunch() {
-      var paths = {
-        environmentPath: {
-          path: this.environment.path,
-          custom: this.environment.custom ? this.environment.custom : false,
-          name: this.environment.name
-        }
+      var environmentMetadata = {
+        path: this.environment.path,
+        custom: this.environment.custom ? this.environment.custom : false,
+        name: this.environment.name
       };
 
       this.isCloneRequested = true;
@@ -228,7 +226,7 @@
       });
 
       this.storageServer
-        .cloneNew(paths, this.$stateParams.ctx, this.experimentName)
+        .cloneNew(environmentMetadata, this.$stateParams.ctx, this.experimentName)
         .then(exp => {
           this.isCloneRequested = false;
           this.launchExperiment(exp.newExperiment, false);
