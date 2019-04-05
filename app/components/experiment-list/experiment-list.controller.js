@@ -362,7 +362,9 @@
             }
             //filter out experiments that are not mature
             return (
-              $scope.devMode || exp.configuration.maturity === 'production'
+              $scope.devMode ||
+              $scope.showDev ||
+              exp.configuration.maturity === 'production'
             );
           });
         };

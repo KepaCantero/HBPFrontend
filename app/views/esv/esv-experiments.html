@@ -90,7 +90,7 @@
 
   <div ng-if="tabSelection!='NewExperiment'&& tabSelection!='ModelsLibraries'" style="flex-shrink: 1;flex-grow:1;overflow-y: auto; flex-basis: 0;">
     <experiment-list ng-if="tabSelection=='MyExperiments' && showMyExperiments" query="query" experiment-empty="experimentEmpty()"
-      reinit="reloadMyExperiments()" running="false" private="true" pizdaint="false">
+      reinit="reloadMyExperiments()" running="false" private="true" show-dev="true" pizdaint="false">
     </experiment-list>
 
     <div ng-if="tabSelection=='MyExperiments'" style="display: flex;justify-content: flex-end;margin-bottom:10px;padding-right: 20px;">

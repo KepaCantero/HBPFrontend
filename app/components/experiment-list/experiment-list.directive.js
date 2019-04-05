@@ -32,6 +32,7 @@
         private: '=',
         running: '=',
         pizdaint: '=',
+        showDev: '=',
         loadPrivateExperiments: '&',
         reinit: '&',
         experimentEmpty: '&',
