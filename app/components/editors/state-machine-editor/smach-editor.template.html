@@ -25,12 +25,12 @@
 
   <div style="margin-bottom: 20px;">
     <button type="button" owner-only class="btn btn-default btn-md small-icon-button" ng-click="delete(stateMachine)"
-            ng-disabled="(stateService.currentState === STATE.INITIALIZED) || stateService.statePending">
+            ng-disabled="(stateService.currentState === STATE.INITIALIZED) || stateService.statePending || simulationInfo.isPlayingBack">
       <i class="glyphicon glyphicon-trash"></i>
     </button>
 
     <button type="button" owner-only class="btn btn-default btn-md small-icon-button"
-            ng-disabled="(stateService.currentState === STATE.INITIALIZED) || stateService.statePending"
+            ng-disabled="(stateService.currentState === STATE.INITIALIZED) || stateService.statePending  || simulationInfo.isPlayingBack"
             ng-click="create();">
       <i class="glyphicon glyphicon-plus"></i>
     </button>
@@ -45,14 +45,14 @@
             owner-only
             type="file"
             ngf-select="loadStateMachine($file)" accept=".exd"
-            ng-disabled="stateService.statePending"
+            ng-disabled="stateService.statePending  || simulationInfo.isPlayingBack"
             title="Upload">
       <i class="glyphicon glyphicon-upload"></i>
     </button>
 
     <button type="button" ng-class="{'smach-apply-changes-dirty':nStateMachineDirty}" class="btn btn-default btn-md small-icon-button"
             ng-click="update(stateMachines)"
-            ng-disabled="!nStateMachineDirty || (stateService.currentState === STATE.INITIALIZED) || stateService.statePending"
+            ng-disabled="!nStateMachineDirty || (stateService.currentState === STATE.INITIALIZED) || stateService.statePending  || simulationInfo.isPlayingBack"
             v-busy="nStateMachineDirty && stateService.statePending" v-busy-label="Applying changes" v-pressable
             title=" Apply All">
       <i class="glyphicon glyphicon-ok-circle" ng-class="{'smach-apply-changes-dirty':nStateMachineDirty}"></i>
@@ -94,6 +94,7 @@
 
               <button owner-only style="cursor:pointer; margin-left: 2px; min-width: 21px; border:unset; background-color: rgba(0, 0, 0, 0);"
                       ng-class="{'smach-apply-changes-dirty':sm.dirty}" ng-click="update(sm)"
+                      ng-disable="simulationInfo.isPlayingBack"
                       v-busy="sm.dirty && stateService.statePending" v-busy-label="Applying changes" v-pressable
                       title="Apply Script"
                       ng-if="sm.dirty && (stateService.currentState !== STATE.INITIALIZED) && !stateService.statePending">

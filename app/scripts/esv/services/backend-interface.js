@@ -271,6 +271,12 @@
               url: backendBaseUrl + '/simulation/:sim_id/recorder/is-recording',
               interceptor: { responseError: serverError.displayHTTPError }
             },
+            getPlayingBack: {
+              method: 'GET',
+              url:
+                backendBaseUrl + '/simulation/:sim_id/recorder/is-playingback',
+              interceptor: { responseError: serverError.displayHTTPError }
+            },
             start: {
               method: 'POST',
               url: backendBaseUrl + '/simulation/:sim_id/recorder/start',
@@ -303,6 +309,13 @@
       return {
         getRecording: function() {
           return simulationRecorder(simulationInfo.serverBaseUrl).getRecording({
+            sim_id: simulationInfo.simulationID
+          }).$promise;
+        },
+        getPlayingBack: function() {
+          return simulationRecorder(
+            simulationInfo.serverBaseUrl
+          ).getPlayingBack({
             sim_id: simulationInfo.simulationID
           }).$promise;
         },

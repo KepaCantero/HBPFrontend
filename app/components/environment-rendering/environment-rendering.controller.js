@@ -21,7 +21,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  * ---LICENSE-END**/
-/* global console: false */
 /* global THREE: false */
 
 (function() {
@@ -38,7 +37,8 @@
       goldenLayoutService,
       gz3d,
       sceneInfo,
-      userNavigationService
+      userNavigationService,
+      simulationInfo
     ) {
       this.options = [
         // selection name
@@ -75,7 +75,8 @@
           displayed: () => {
             return (
               gz3d.scene.selectedEntity &&
-              gz3d.gui.canModelBeDuplicated(gz3d.scene.selectedEntity.name)
+              gz3d.gui.canModelBeDuplicated(gz3d.scene.selectedEntity.name) &&
+              !simulationInfo.isPlayingBack
             );
           },
           click: () => {
@@ -109,7 +110,10 @@
           enabled: () => Boolean(gz3d.scene.selectedEntity),
           text: 'Delete',
           displayed: () => {
-            return Boolean(gz3d.scene.selectedEntity);
+            return (
+              Boolean(gz3d.scene.selectedEntity) &&
+              !simulationInfo.isPlayingBack
+            );
           },
           click: () => {
             gz3d.gui.emitter.emit('deleteEntity', gz3d.scene.selectedEntity);
@@ -121,7 +125,8 @@
           displayed: () => {
             return (
               gz3d.scene.selectedEntity &&
-              sceneInfo.isRobot(gz3d.scene.selectedEntity)
+              sceneInfo.isRobot(gz3d.scene.selectedEntity) &&
+              !simulationInfo.isPlayingBack
             );
           },
           click: () => {
@@ -151,7 +156,8 @@
               gz3d.scene.selectedEntity &&
               colorableObjectService.isColorableEntity(
                 gz3d.scene.selectedEntity
-              )
+              ) &&
+              !simulationInfo.isPlayingBack
             );
           }
         }
@@ -178,7 +184,8 @@
       stateService,
       videoStreamService,
       tipTooltipService,
-      TIP_CODES
+      TIP_CODES,
+      simulationInfo
     ) {
       this.backendInterfaceService = backendInterfaceService;
       this.stateService = stateService;
@@ -213,7 +220,8 @@
         goldenLayoutService,
         gz3d,
         sceneInfo,
-        userNavigationService
+        userNavigationService,
+        simulationInfo
       );
 
       this.environmentRenderingService.sceneInitialized().then(() => {
@@ -314,7 +322,8 @@
     'stateService',
     'videoStreamService',
     'tipTooltipService',
-    'TIP_CODES'
+    'TIP_CODES',
+    'simulationInfo'
   ];
 
   /**

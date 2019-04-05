@@ -31,13 +31,14 @@
       </button>
 
       <button class="btn btn-default btn-md small-icon-button" owner-only type="file"
-              ngf-select="uploadFile($file)" accept=".py" title="Upload">
+              ngf-select="uploadFile($file)" accept=".py" title="Upload"
+              ng-disabled="simulationInfo.isPlayingBack">
         <i class="glyphicon glyphicon-upload"></i>
       </button>
 
       <button type="button" class="btn btn-default btn-md small-icon-button"
               ng-class="{'pynn-apply-changes-dirty':localBrainDirty}" owner-only ng-click="updateBrainBackend()"
-              ng-disabled="loading || stateService.statePending || (!localBrainDirty && !editingPopulation())"
+              ng-disabled="loading || stateService.statePending || (!localBrainDirty && !editingPopulation()) || simulationInfo.isPlayingBack"
               v-busy="loading || stateService.statePending" v-busy-label="Applying changes" v-pressable title="Apply">
         <i class="glyphicon glyphicon-ok-circle" aria-hidden="true"></i>
       </button>
@@ -82,14 +83,14 @@
 
                 <div style="display:flex">
 
-                  <button owner-only ng-disabled="pop.editing" type="button" class="btn btn-default btn-md pynn-small-icon-button-param" ng-click="addSlice()">
+                  <button ng-disabled="simulationInfo.isPlayingBack" owner-only ng-disabled="pop.editing" type="button" class="btn btn-default btn-md pynn-small-icon-button-param" ng-click="addSlice()">
                     <i class="glyphicon glyphicon-plus"></i>
                   </button>
 
                   <div ng-show="!localHelpVisible.populations" style="display:flex;">
 
                     <button owner-only type="button" class="btn btn-default btn-md pynn-small-icon-button-param" ng-click="showLocalHelp(true,'populations')"
-                      style="margin-left: 2px; min-width: 21px;">
+                      style="margin-left: 2px; min-width: 21px;" ng-disabled="simulationInfo.isPlayingBack">
                       <i class="fa fa-question" style="font-size: 12px;"></i>
                     </button>
 
@@ -109,7 +110,7 @@
                     <button owner-only type="button" class="btn btn-default btn-md pynn-small-icon-button-param" ng-click="showLocalHelp(false,'populations')"
                       style="margin-left: 2px;     height: 16px;
                         width: 16px; position:relative; border: none;
-                        background: none;">
+                        background: none;" ng-disabled="simulationInfo.isPlayingBack">
                       <i class="fa fa-close" style="font-size: 14px;
                             position: absolute;
                             left: 3px;
@@ -234,7 +235,7 @@
 
                       <div class="pynn-var-block-bottom-area">
 
-                        <button owner-only type="button" class="btn btn-default tf-small-icon-button" ng-click="deletePopulation($index);">
+                        <button owner-only type="button" ng-disabled="simulationInfo.isPlayingBack" class="btn btn-default tf-small-icon-button" ng-click="deletePopulation($index);">
                           <i class="glyphicon glyphicon-trash"></i>
                         </button>
 

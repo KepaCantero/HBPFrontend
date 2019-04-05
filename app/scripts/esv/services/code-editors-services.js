@@ -27,7 +27,8 @@
   angular.module('exdFrontendApp').service('codeEditorsServices', [
     '$timeout',
     'userContextService',
-    function($timeout, userContextService) {
+    'simulationInfo',
+    function($timeout, userContextService, simulationInfo) {
       return {
         getDefaultEditorOptions: getDefaultEditorOptions,
         getEditor: getEditor,
@@ -55,7 +56,7 @@
       }
 
       function ownerOnlyOptions(options) {
-        return userContextService.isOwner()
+        return userContextService.isOwner() && !simulationInfo.isPlayingBack
           ? options
           : _.assign(options, { readOnly: 'nocursor' });
       }

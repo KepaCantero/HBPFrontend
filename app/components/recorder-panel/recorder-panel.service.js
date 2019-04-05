@@ -40,11 +40,14 @@
       this.state = RecorderState.Stopped;
       this.descriptionText = '';
       this.storageServer = storageServer;
+    }
 
-      if (simulationInfo.simulationID)
+    updateState() {
+      if (this.simulationInfo.simulationID) {
         this.backendInterfaceService.getRecording().then(response => {
           if (response.state == 'True') this.state = RecorderState.Recording;
         });
+      }
     }
 
     isPaused() {

@@ -271,6 +271,21 @@
         resetType: this.RESET_TYPE.NO_RESET,
         contextId: this.simulationInfo.contextID
       };
+
+      if (this.simulationInfo.isPlayingBack) {
+        this.stateService.ensureStateBeforeExecuting(this.STATE.PAUSED, () => {
+          this.resetRequest.resetType = this.RESET_TYPE.RESET_FULL;
+
+          this.backendInterfaceService.resetCollab(
+            this.resetRequest,
+            null,
+            null
+          );
+        });
+
+        return;
+      }
+
       let resetMenuPopupScope = this.$rootScope.$new();
       resetMenuPopupScope.vm = this;
       this.clbConfirm

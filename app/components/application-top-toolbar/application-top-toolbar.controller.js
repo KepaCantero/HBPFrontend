@@ -134,7 +134,10 @@
     }
 
     allowRecording() {
-      return this.userContextService.isOwner();
+      return (
+        this.userContextService.isOwner() &&
+        (!this.simulationInfo || !this.simulationInfo.isPlayingBack)
+      );
     }
 
     allowPlayPause() {

@@ -12,7 +12,7 @@
          'simtools-sidebar-category-expanded': vm.expandedCategory === vm.SIMTOOLS_SIDEBAR_ID.GROUP_EDITORS,
          'simtools-sidebar-category-minimized': vm.expandedCategory !== null && vm.expandedCategory !== vm.SIMTOOLS_SIDEBAR_ID.GROUP_EDITORS}">
 
-      <md-button gl-tool-source="ENVIRONMENT_EDITOR"
+      <md-button ng-if="!vm.simulationInfo.isPlayingBack" gl-tool-source="ENVIRONMENT_EDITOR"
                  class="md-raised tool-button tool-editor" aria-label="Object Library"
                  help-tooltip="ENVIRONMENT_EDITOR"
                  ng-class="{'tool-help-highlight': vm.helpTooltipService.helpCode === 'ENVIRONMENT_EDITOR'}">
@@ -46,7 +46,7 @@
         <md-icon md-svg-src="img/esv/tools/state_machine_editor.svg"></md-icon>
       </md-button>
 
-      <md-button gl-tool-source="RESOURCES_EDITOR"
+      <md-button ng-if="!vm.simulationInfo.isPlayingBack" gl-tool-source="RESOURCES_EDITOR"
                  owner-only
                  class="md-raised tool-button tool-editor" aria-label="Resources Editor"
                  help-tooltip="RESOURCES_EDITOR"
@@ -55,7 +55,7 @@
         <i class="fa fa-file-import"></i>
       </md-button>
 
-      <md-button gl-tool-source="ROS_TERMINAL" class="md-raised tool-button tool-editor" aria-label="ROS Terminal"
+      <md-button ng-if="!vm.simulationInfo.isPlayingBack" gl-tool-source="ROS_TERMINAL" class="md-raised tool-button tool-editor" aria-label="ROS Terminal"
                  help-tooltip="ROS_TERMINAL"
                  ng-class="{'tool-help-highlight': vm.helpTooltipService.helpCode === 'ROS_TERMINAL'}">
         <md-tooltip md-direction="right">ROS Terminal</md-tooltip>
@@ -86,14 +86,14 @@
         <md-icon md-svg-src="img/esv/tools/spiketrain.svg"></md-icon>
       </md-button>
 
-      <md-button gl-tool-source="JOINT_PLOT" class="md-raised tool-button tool-monitor" aria-label="Joint Plot"
+      <md-button ng-if="!vm.simulationInfo.isPlayingBack" gl-tool-source="JOINT_PLOT" class="md-raised tool-button tool-monitor" aria-label="Joint Plot"
                  help-tooltip="JOINT_PLOT"
                  ng-class="{'tool-help-highlight': vm.helpTooltipService.helpCode === 'JOINT_PLOT'}">
         <md-tooltip md-direction="right">Joint Plot</md-tooltip>
         <md-icon md-svg-src="img/esv/tools/joint_plot.svg"></md-icon>
       </md-button>
 
-      <md-button gl-tool-source="BRAIN_VISUALIZER" class="md-raised tool-button tool-monitor"
+      <md-button ng-if="!vm.simulationInfo.isPlayingBack" gl-tool-source="BRAIN_VISUALIZER" class="md-raised tool-button tool-monitor"
                  aria-label="Brain Visualizer" help-tooltip="BRAIN_VISUALIZER"
                  ng-class="{'tool-help-highlight': vm.helpTooltipService.helpCode === 'BRAIN_VISUALIZER'}">
         <md-tooltip md-direction="right">Brain Visualizer</md-tooltip>
@@ -121,7 +121,7 @@
         <md-icon ng-bind="'ondemand_video'"></md-icon>
       </md-button>
 
-      <md-button gl-tool-source="PERFORMANCE_VIEW" class="md-raised tool-button tool-monitor"
+      <md-button ng-if="!vm.simulationInfo.isPlayingBack" gl-tool-source="PERFORMANCE_VIEW" class="md-raised tool-button tool-monitor"
                  aria-label="Performance Monitor" help-tooltip="PERFORMANCE_VIEW"
                  ng-class="{'tool-help-highlight': vm.helpTooltipService.helpCode === 'PERFORMANCE_VIEW'}">
         <md-tooltip md-direction="right">Performance Monitor</md-tooltip>

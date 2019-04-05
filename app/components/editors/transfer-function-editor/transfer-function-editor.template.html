@@ -39,19 +39,19 @@
 
     <button class="btn btn-default btn-md small-icon-button" type="file" owner-only ngf-select="upload($file)"
             accept=".py"
-            ng-disabled="(stateService.currentState === STATE.INITIALIZED) || stateService.statePending"
+            ng-disabled="(stateService.currentState === STATE.INITIALIZED) || stateService.statePending || simulationInfo.isPlayingBack"
             title="Upload">
       <i class="glyphicon glyphicon-upload"></i>
     </button>
 
     <button owner-only type="button" class="btn btn-default small-icon-button" ng-click="delete()"
-            ng-disabled="(stateService.currentState === STATE.INITIALIZED) || stateService.statePending"
+            ng-disabled="(stateService.currentState === STATE.INITIALIZED) || stateService.statePending  || simulationInfo.isPlayingBack"
             title="Delete">
       <i class="glyphicon glyphicon-trash"></i>
     </button>
 
     <button owner-only type="button" class="btn btn-default btn-md small-icon-button"
-            ng-disabled="(stateService.currentState === STATE.INITIALIZED) || stateService.statePending"
+            ng-disabled="(stateService.currentState === STATE.INITIALIZED) || stateService.statePending  || simulationInfo.isPlayingBack"
             ng-click="createNewTF();" title="Create new TF">
       <i class="glyphicon glyphicon-plus"></i>
     </button>
@@ -59,7 +59,7 @@
     <button owner-only type="button" ng-class="{'tf-apply-changes-dirty':nTransferFunctionDirty}"
             class="btn btn-default btn-md small-icon-button"
             ng-click="applyAllDirtyScripts()"
-            ng-disabled="!nTransferFunctionDirty || (stateService.currentState === STATE.INITIALIZED) || stateService.statePending"
+            ng-disabled="!nTransferFunctionDirty || (stateService.currentState === STATE.INITIALIZED) || stateService.statePending  || simulationInfo.isPlayingBack"
             v-busy="nTransferFunctionDirty && stateService.statePending" v-busy-label="Applying changes" v-pressable
             title="Apply All Scripts">
       <i class="glyphicon glyphicon-ok-circle" ng-class="{'tf-apply-changes-dirty':nTransferFunctionDirty}"></i>
@@ -104,17 +104,17 @@
                         ng-class="{'tf-apply-changes-dirty':tf.dirty}" ng-click="applyScript(tf)"
                         v-busy="tf.dirty && stateService.statePending" v-busy-label="Applying changes" v-pressable
                         title="Apply Script"
-                        ng-if="tf.dirty && (stateService.currentState !== STATE.INITIALIZED) && !stateService.statePending">
+                        ng-if="tf.dirty && (stateService.currentState !== STATE.INITIALIZED) && !stateService.statePending &&  !simulationInfo.isPlayingBack">
                   <i class="glyphicon glyphicon-ok" ng-class="{'tf-apply-changes-dirty':tf.dirty}"></i>
                 </button>
 
-                <div owner-only ng-click="tf.editName=!tf.editName"
+                <div ng-show="!simulationInfo.isPlayingBack" owner-only ng-click="tf.editName=!tf.editName"
                      style="cursor:pointer; margin-left: 2px; min-width: 21px; border:unset; background-color: rgba(0, 0, 0, 0);">
                   <i ng-hide="tf.editName" style="outline: none; border: 0; background: transparent;"
                      class="glyphicon glyphicon-pencil"></i>
                 </div>
 
-                <div owner-only title="Activate/Deactivate the transfer function" ng-click="toggleActive(tf)"
+                <div ng-show="!simulationInfo.isPlayingBack"  owner-only title="Activate/Deactivate the transfer function" ng-click="toggleActive(tf)"
                      style="cursor:pointer; margin-left: 2px; min-width: 21px; border:unset; background-color: rgba(0, 0, 0, 0);">
                   <i ng-show="tf.active" class="fa fa-toggle-on" style="font-size: 16px; color:rgb(135, 185, 167);"></i>
                   <i ng-show="!tf.active" class="fa fa-toggle-off" style="font-size: 16px;  color:#7d7d7d;"></i>
@@ -165,7 +165,8 @@
 
                     <div ng-show="!localHelpVisible.populations" style="display:flex">
 
-                      <button owner-only type="button" class="btn btn-default btn-md tf-small-icon-button-param"
+                      <button
+                      owner-only type="button" class="btn btn-default btn-md tf-small-icon-button-param"
                               ng-click="showLocalHelp(true,'populations')" style="margin-left: 2px; min-width: 21px;">
                         <i class="fa fa-question" style="font-size: 12px;"></i>
                       </button>
@@ -183,7 +184,7 @@
                         Examine the neuron populations as they have been defined in the <B>Brain Editor</B>:
                       </div>
                       <div>
-                        <button owner-only ng-disabled="transferFunction.decoratorDirty" type="button"
+                        <button owner-only ng-disabled="transferFunction.decoratorDirty || simulationInfo.isPlayingBack" type="button"
                                 class="btn btn-default btn-md tf-small-icon-button-param"
                                 ng-click="showLocalHelp(false,'populations')" style="margin-left: 2px;     height: 16px;
                         width: 16px; position:relative; border: none;
@@ -234,7 +235,7 @@
                     <div class="tf-parameter-section-title">Connect to brain</div>
 
                     <div style="display:flex">
-                      <button owner-only ng-disabled="transferFunction.decoratorDirty" type="button"
+                      <button owner-only ng-disabled="transferFunction.decoratorDirty || simulationInfo.isPlayingBack" type="button"
                               class="btn btn-default btn-md tf-small-icon-button-param" ng-click="addMode='addDevice'">
                         <i class="glyphicon glyphicon-plus"></i>
                       </button>
@@ -259,7 +260,7 @@
                         Select neurons from populations to read or write spikes from the brain.
                       </div>
                       <div>
-                        <button owner-only ng-disabled="transferFunction.decoratorDirty" type="button"
+                        <button owner-only ng-disabled="transferFunction.decoratorDirty || simulationInfo.isPlayingBack" type="button"
                                 class="btn btn-default btn-md tf-small-icon-button-param"
                                 ng-click="showLocalHelp(false,'connectToBrain')" style="margin-left: 2px;     height: 16px;
                             width: 16px; position:relative; border: none;
@@ -310,7 +311,7 @@
                           <div>
                             <div class="tf-param-varblock-label">Variable:</div>
                             <div>
-                              <input owner-only ng-disabled="transferFunction.decoratorDirty" class="normal" type="text"
+                              <input owner-only ng-disabled="transferFunction.decoratorDirty || simulationInfo.isPlayingBack" class="normal" type="text"
                                      name="input" ng-model="dev.name"
                                      ng-change="decoratorsChangedFromUI(transferFunction)" style="width:100%"
                                      ng-if="transferFunction.type !== TRANSFER_FUNCTION_TYPE.NEURONMONITOR || dev.name !== 'device'">
@@ -322,7 +323,7 @@
                           <div>
                             <div class="tf-param-varblock-label">Type:</div>
                             <div>
-                              <select owner-only ng-disabled="transferFunction.decoratorDirty" class="normal"
+                              <select owner-only ng-disabled="transferFunction.decoratorDirty || simulationInfo.isPlayingBack" class="normal"
                                       ng-model="dev.type" data-value="{{dev.type}}"
                                       ng-click="decoratorsChangedFromUI(transferFunction)" style="width:100%">
                                 <optgroup label="Neural Network Outputs">
@@ -342,7 +343,7 @@
                           <div>
                             <div class="tf-param-varblock-label">Parameters:</div>
                             <div>
-                              <input owner-only ng-disabled="transferFunction.decoratorDirty" class="normal"
+                              <input owner-only ng-disabled="transferFunction.decoratorDirty || simulationInfo.isPlayingBack" class="normal"
                                      id="parameter1" ng-change="decoratorsChangedFromUI(transferFunction)" type="text"
                                      ng-model="dev.parameters" style="width:100%">
                             </div>
@@ -360,7 +361,7 @@
 
                         <div class="tf-var-block-bottom-area">
 
-                          <button owner-only ng-disabled="transferFunction.decoratorDirty" type="button"
+                          <button owner-only ng-disabled="transferFunction.decoratorDirty || simulationInfo.isPlayingBack" type="button"
                                   class="btn btn-default tf-small-icon-button"
                                   ng-click="deleteDevice(dev); decoratorsChangedFromUI(transferFunction)"
                                   ng-if="transferFunction.type !== TRANSFER_FUNCTION_TYPE.NEURONMONITOR || dev.name !== 'device'">
@@ -385,7 +386,7 @@
                     <div class="tf-parameter-section-title">Connect to robot</div>
 
                     <div style="display:flex">
-                      <button owner-only ng-disabled="transferFunction.decoratorDirty" type="button"
+                      <button owner-only ng-disabled="transferFunction.decoratorDirty || simulationInfo.isPlayingBack" type="button"
                               class="btn btn-default btn-md tf-small-icon-button-param" ng-click="addMode='addTopic'">
                         <i class="glyphicon glyphicon-plus"></i>
                       </button>
@@ -409,7 +410,7 @@
                         Select topics from the robot sensors or actuators to read and write data.
                       </div>
                       <div>
-                        <button owner-only ng-disabled="transferFunction.decoratorDirty" type="button"
+                        <button owner-only ng-disabled="transferFunction.decoratorDirty || simulationInfo.isPlayingBack" type="button"
                                 class="btn btn-default btn-md tf-small-icon-button-param"
                                 ng-click="showLocalHelp(false,'connectToRobot')" style="margin-left: 2px;     height: 16px;
                             width: 16px; position:relative; border:none; background:none;">
@@ -455,13 +456,13 @@
                             <div
                               ng-if="transferFunction.type !== TRANSFER_FUNCTION_TYPE.NEURONMONITOR || top.name !== 'publisher'">
                               <div class="tf-param-varblock-label">Name</div>
-                              <input owner-only ng-disabled="transferFunction.decoratorDirty" ng-if="!top.isDefault"
+                              <input owner-only ng-disabled="transferFunction.decoratorDirty || simulationInfo.isPlayingBack" ng-if="!top.isDefault"
                                      class="normal" type="text" name="input" ng-model="top.name"
                                      ng-change="decoratorsChangedFromUI(transferFunction)" style="width:100%">
-                              <input owner-only ng-disabled="transferFunction.decoratorDirty" ng-if="top.isDefault"
+                              <input owner-only ng-disabled="transferFunction.decoratorDirty || simulationInfo.isPlayingBack" ng-if="top.isDefault"
                                      class="normal disabled" type="text" name="input" value="t" style="width:100%">
                               <div style="text-align:right;font-size:10px; margin:1px" ng-if="top.publishing">or
-                                <input owner-only ng-disabled="transferFunction.decoratorDirty" type="checkbox"
+                                <input owner-only ng-disabled="transferFunction.decoratorDirty || simulationInfo.isPlayingBack" type="checkbox"
                                        ng-model="top.isDefault"
                                        ng-change="setTopicName(top); decoratorsChangedFromUI(transferFunction)"/> use as
                                 default
@@ -476,7 +477,7 @@
                               ng-if="transferFunction.type !== TRANSFER_FUNCTION_TYPE.NEURONMONITOR || top.name !== 'publisher'">
                               <div class="tf-param-varblock-label">Topic</div>
                               <div>
-                                <input owner-only ng-disabled="transferFunction.decoratorDirty" class="normal"
+                                <input owner-only ng-disabled="transferFunction.decoratorDirty || simulationInfo.isPlayingBack" class="normal"
                                        type="text" name="input" ng-model="top.topic"
                                        ng-change="decoratorsChangedFromUI(transferFunction)" style="width:100%">
                               </div>
@@ -486,7 +487,7 @@
                               ng-if="transferFunction.type !== TRANSFER_FUNCTION_TYPE.NEURONMONITOR || top.name !== 'publisher'">
                               <div class="tf-param-varblock-label">Type</div>
                               <div>
-                                <input owner-only ng-disabled="transferFunction.decoratorDirty" class="normal"
+                                <input owner-only ng-disabled="transferFunction.decoratorDirty || simulationInfo.isPlayingBack" class="normal"
                                        type="text" ng-model="top.type"
                                        ng-change="decoratorsChangedFromUI(transferFunction)" style="width:100%"/>
                               </div>
@@ -496,7 +497,7 @@
                               ng-if="transferFunction.type !== TRANSFER_FUNCTION_TYPE.NEURONMONITOR || top.name !== 'publisher'">
 
                               <div class="tf-param-varblock-label" style="display:flex">
-                                <input owner-only ng-disabled="transferFunction.decoratorDirty" class="normal"
+                                <input owner-only ng-disabled="transferFunction.decoratorDirty || simulationInfo.isPlayingBack" class="normal"
                                        style="min-width:16px;max-width: 16px; margin-top: 3px;" type="checkbox"
                                        ng-model="top.publishing"
                                        ng-change="decoratorsChangedFromUI(transferFunction)"/>
@@ -511,7 +512,7 @@
 
                         <div class="tf-var-block-bottom-area">
 
-                          <button owner-only ng-disabled="transferFunction.decoratorDirty" type="button"
+                          <button owner-only ng-disabled="transferFunction.decoratorDirty || simulationInfo.isPlayingBack" type="button"
                                   class="btn btn-default tf-small-icon-button"
                                   ng-click="deleteTopic(top); decoratorsChangedFromUI(transferFunction)"
                                   ng-if="transferFunction.type !== TRANSFER_FUNCTION_TYPE.NEURONMONITOR || top.name !== 'publisher'">
@@ -536,7 +537,7 @@
                     <div class="tf-parameter-section-title">Global variables</div>
 
                     <div style="display:flex">
-                      <button owner-only ng-disabled="transferFunction.decoratorDirty" type="button"
+                      <button owner-only ng-disabled="transferFunction.decoratorDirty || simulationInfo.isPlayingBack" type="button"
                               class="btn btn-default btn-md tf-small-icon-button-param"
                               ng-click="addMode='addVariable'">
                         <i class="glyphicon glyphicon-plus"></i>
@@ -562,7 +563,7 @@
                         Declare global variables that can be used across all scripts.
                       </div>
                       <div>
-                        <button owner-only ng-disabled="transferFunction.decoratorDirty" type="button"
+                        <button owner-only ng-disabled="transferFunction.decoratorDirty || simulationInfo.isPlayingBack" type="button"
                                 class="btn btn-default btn-md tf-small-icon-button-param"
                                 ng-click="showLocalHelp(false,'globalVariables')" style="margin-left: 2px;     height: 16px;
                             width: 16px; position:relative; border:none; background:none;">
@@ -602,7 +603,7 @@
                           <div>
                             <div class="tf-param-varblock-label">Name:</div>
                             <div>
-                              <input owner-only ng-disabled="transferFunction.decoratorDirty" class="normal" type="text"
+                              <input owner-only ng-disabled="transferFunction.decoratorDirty || simulationInfo.isPlayingBack" class="normal" type="text"
                                      ng-model="var.name" ng-change="decoratorsChangedFromUI(transferFunction)"
                                      style="width:100%"/>
                             </div>
@@ -611,20 +612,20 @@
                           <div>
                             <div class="tf-param-varblock-label">Type:</div>
                             <div>
-                              <input owner-only ng-disabled="transferFunction.decoratorDirty" type="radio"
+                              <input owner-only ng-disabled="transferFunction.decoratorDirty || simulationInfo.isPlayingBack" type="radio"
                                      ng-model="var.type" value="int"
                                      ng-change="decoratorsChangedFromUI(transferFunction)"/> Integer
                               <br/>
-                              <input owner-only ng-disabled="transferFunction.decoratorDirty" type="radio"
+                              <input owner-only ng-disabled="transferFunction.decoratorDirty || simulationInfo.isPlayingBack" type="radio"
                                      ng-model="var.type" value="str"
                                      ng-change="decoratorsChangedFromUI(transferFunction)"/> String
                               <br/>
-                              <input owner-only ng-disabled="transferFunction.decoratorDirty" type="radio"
+                              <input owner-only ng-disabled="transferFunction.decoratorDirty || simulationInfo.isPlayingBack" type="radio"
                                      ng-model="var.type" value="csv"
                                      ng-change="parseFilenameAndHeaders(var);decoratorsChangedFromUI(transferFunction)"/>
                               CSV Recorder
                               <br/>
-                              <input owner-only ng-disabled="transferFunction.decoratorDirty" type="radio"
+                              <input owner-only ng-disabled="transferFunction.decoratorDirty || simulationInfo.isPlayingBack" type="radio"
                                      ng-model="var.type" value="retina"
                                      ng-change="decoratorsChangedFromUI(transferFunction)"/> Retina configuration
                             </div>
@@ -632,21 +633,21 @@
                           <div ng-if="var.type !== 'csv' && var.type !== 'retina'">
                             <div>Initial Value:</div>
                             <div>
-                              <input owner-only ng-disabled="transferFunction.decoratorDirty" class="normal" type="text"
+                              <input owner-only ng-disabled="transferFunction.decoratorDirty || simulationInfo.isPlayingBack" class="normal" type="text"
                                      ng-model="var.initial_value" ng-change="decoratorsChangedFromUI(transferFunction)">
                             </div>
                           </div>
                           <div ng-if="var.type === 'csv'">
                             <div class="tf-param-varblock-label">File name:</div>
                             <div>
-                              <input owner-only ng-disabled="transferFunction.decoratorDirty" class="normal" type="text"
+                              <input owner-only ng-disabled="transferFunction.decoratorDirty || simulationInfo.isPlayingBack" class="normal" type="text"
                                      ng-model="var.filename" ng-change="updateCSV(var)" style="width:100%"/>
                             </div>
                           </div>
                           <div ng-if="var.type === 'csv'">
                             <div class="tf-param-varblock-label">Header</div>
                             <div class="tf-param-tag-edit-block">
-                              <button owner-only ng-disabled="transferFunction.decoratorDirty"
+                              <button owner-only ng-disabled="transferFunction.decoratorDirty || simulationInfo.isPlayingBack"
                                       ng-repeat="head in var.headers" type="button"
                                       class="btn btn-default tf-param-remove-tag-button"
                                       ng-click="deleteHeader(var, head); decoratorsChangedFromUI(transferFunction)">
@@ -657,7 +658,7 @@
                               <div style="display:flex;max-height: 25px; margin-top: 16px; margin-left: 4px;">
                                 <input owner-only type="text" class="normal" ng-model="tmpHeader"
                                        style="width:100%; min-width: 140px;"/>
-                                <button owner-only ng-disabled="transferFunction.decoratorDirty" type="button"
+                                <button owner-only ng-disabled="transferFunction.decoratorDirty || simulationInfo.isPlayingBack" type="button"
                                         class="btn btn-default" style="font-size: 12px; margin-left: 2px;
                                   padding-top: 4px;"
                                         ng-click="addHeader(var, tmpHeader); tmpHeader = null; decoratorsChangedFromUI(transferFunction)">
@@ -670,7 +671,7 @@
                           <div ng-if="var.type === 'retina'">
                             <div class="tf-param-varblock-label">Configuration:</div>
                             <div>
-                              <input owner-only ng-disabled="transferFunction.decoratorDirty" class="normal" type="text"
+                              <input owner-only ng-disabled="transferFunction.decoratorDirty || simulationInfo.isPlayingBack" class="normal" type="text"
                                      ng-model="var.initial_value"
                                      ng-change="decoratorsChangedFromUI(transferFunction)"/>
                             </div>
@@ -680,7 +681,7 @@
 
                         <div class="tf-var-block-bottom-area">
 
-                          <button owner-only ng-disabled="transferFunction.decoratorDirty" type="button"
+                          <button owner-only ng-disabled="transferFunction.decoratorDirty || simulationInfo.isPlayingBack" type="button"
                                   class="btn btn-default tf-small-icon-button"
                                   ng-click="deleteVariable(var);decoratorsChangedFromUI(transferFunction)">
                             <i class="glyphicon glyphicon-trash"></i>
@@ -723,19 +724,19 @@
 
                     <div class="smallButtonBlock">
 
-                      <button owner-only ng-disabled="transferFunction.decoratorDirty" type="button"
+                      <button owner-only ng-disabled="transferFunction.decoratorDirty || simulationInfo.isPlayingBack" type="button"
                               class="btn btn-default" href ng-click='createTopicChannel(true)'
                               ng-class="{'disabled': selectedTF == null || !selectedTopic}">Add Publisher
                       </button>
 
-                      <button owner-only ng-disabled="transferFunction.decoratorDirty" type="button"
+                      <button owner-only ng-disabled="transferFunction.decoratorDirty || simulationInfo.isPlayingBack" type="button"
                               class="btn btn-default" href ng-click='createTopicChannel(false)'
                               ng-class="{'disabled': selectedTF == null || !selectedTopic}">Add Subscriber
                       </button>
                     </div>
 
                     <div class="smallButtonBlock">
-                      <button owner-only ng-disabled="transferFunction.decoratorDirty" type="button"
+                      <button owner-only ng-disabled="transferFunction.decoratorDirty || simulationInfo.isPlayingBack" type="button"
                               class="btn btn-default" style="display: flex;
                           justify-content: center;" href ng-click='addMode=null'>
 
@@ -791,13 +792,13 @@
                     <div class="smallButtonBlock">
 
 
-                      <button owner-only ng-disabled="transferFunction.decoratorDirty" href ng-click='createDevice()'
+                      <button owner-only ng-disabled="transferFunction.decoratorDirty || simulationInfo.isPlayingBack" href ng-click='createDevice()'
                               type="button" class="btn btn-default"
                               ng-class="{'disabled': !selectedTF || !isNeuronsSelected || !selectedPopulation}">Create
                         Device
                       </button>
 
-                      <button owner-only ng-disabled="transferFunction.decoratorDirty" type="button"
+                      <button owner-only ng-disabled="transferFunction.decoratorDirty || simulationInfo.isPlayingBack" type="button"
                               class="btn btn-default btn-md"
                               ng-disabled="(stateService.currentState === STATE.INITIALIZED) || stateService.statePending || !selectedPopulation || !isNeuronsSelected"
                               ng-click="createNewMonitor();">
@@ -807,7 +808,7 @@
                     </div>
 
                     <div class="smallButtonBlock">
-                      <button owner-only ng-disabled="transferFunction.decoratorDirty" type="button"
+                      <button owner-only ng-disabled="transferFunction.decoratorDirty || simulationInfo.isPlayingBack" type="button"
                               class="btn btn-default" style="display: flex;
                           justify-content: center;" href ng-click='addMode=null'>
 
@@ -837,7 +838,7 @@
 
                     <input owner-only class="normal" type="text" ng-model="newVariableName" style="min-width: 100px;"/>
 
-                    <button owner-only ng-disabled="transferFunction.decoratorDirty" type="button"
+                    <button owner-only ng-disabled="transferFunction.decoratorDirty || simulationInfo.isPlayingBack" type="button"
                             class="btn btn-default btn-md" ng-disabled="newVariableName.length===0"
                             ng-click="addNewVariable(newVariableName);"
                             style="min-width: 61px; margin-left: 8px;">

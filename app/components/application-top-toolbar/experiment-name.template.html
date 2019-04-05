@@ -8,7 +8,8 @@
     <input type="text" value="{{vm.experimentName}}" size="{{vm.experimentName.length}}" ng-model="vm.experimentName"
            ng-blur="vm.stopEditExperimentName();" ng-keydown="vm.onKeyDown($event)" ng-required/>
   </form>
-  <md-button owner-only class="md-icon-button" aria-label="Edit Name" ng-click="vm.onEditExperimentName();" ng-show="!vm.editing"
+  <md-button owner-only class="md-icon-button" aria-label="Edit Name" ng-click="vm.onEditExperimentName();" 
+             ng-show="!vm.editing && !vm.simulationInfo.isPlayingBack"
              help-tooltip="EDIT_EXPERIMENT_NAME">
     <md-icon ng-bind="'edit'"></md-icon>
   </md-button>

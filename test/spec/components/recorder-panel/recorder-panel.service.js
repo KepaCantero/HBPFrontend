@@ -21,6 +21,11 @@ describe('Service: recorder-panel', function() {
     expect(recorderPanelService.hidden).toBe(true);
   });
 
+  it('should properly update its recording state', function() {
+    recorderPanelService.updateState();
+    expect(recorderPanelService.state).toBe('recording');
+  });
+
   it('should update visibility ', function() {
     recorderPanelService.toggleShow();
     recorderPanelService.start();

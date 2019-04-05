@@ -172,6 +172,34 @@
               function(userContextService) {
                 return userContextService.initialized;
               }
+            ],
+            initRecorderState: [
+              'simulationInfo',
+              'backendInterfaceService',
+              '$q',
+              'userContextService',
+              'recorderPanelService',
+              function(
+                simulationInfo,
+                backendInterfaceService,
+                $q,
+                userContextService,
+                recorderPanelService
+              ) {
+                return $q
+                  .all([
+                    userContextService.initialized,
+                    simulationInfo.initialized
+                  ])
+                  .then(() => {
+                    backendInterfaceService.getPlayingBack().then(response => {
+                      if (response.state == 'True')
+                        simulationInfo.isPlayingBack = true;
+                    });
+
+                    recorderPanelService.updateState();
+                  });
+              }
             ]
           }
         };

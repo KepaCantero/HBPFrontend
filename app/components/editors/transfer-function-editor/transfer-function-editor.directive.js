@@ -191,6 +191,7 @@ def {0}(t):
 
             scope.transferFunction = null;
             scope.selectedTF = null;
+            scope.simulationInfo = simulationInfo;
 
             scope.dirtyTFNames = new Set();
 

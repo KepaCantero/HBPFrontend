@@ -91,6 +91,7 @@
           );
 
           scope.STATE = STATE;
+          scope.simulationInfo = simulationInfo;
           scope.ERROR = SIMULATION_FACTORY_CLE_ERROR;
           scope.SOURCE_TYPE = SOURCE_TYPE;
           scope.stateMachines = [];

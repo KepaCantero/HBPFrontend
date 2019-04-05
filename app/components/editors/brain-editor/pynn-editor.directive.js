@@ -105,6 +105,7 @@
             tipTooltipService.setCurrentTip(TIP_CODES.BRAIN_EDITOR);
             scope.isPrivateExperiment = environmentService.isPrivateExperiment();
             scope.loading = false;
+            scope.simulationInfo = simulationInfo;
             scope.localBrainDirty = false;
             scope.localHelpVisible = {
               populations: false

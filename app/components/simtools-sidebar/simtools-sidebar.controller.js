@@ -37,7 +37,8 @@
       videoStreamService,
       tipTooltipService,
       TIP_CODES,
-      clientLoggerService
+      clientLoggerService,
+      simulationInfo
     ) {
       this.SIMTOOLS_SIDEBAR_ID = SIMTOOLS_SIDEBAR_ID;
 
@@ -46,6 +47,7 @@
       this.helpTooltipService = helpTooltipService;
       this.simToolsSidebarService = simToolsSidebarService;
       this.videoStreamService = videoStreamService;
+      this.simulationInfo = simulationInfo;
 
       this.isSubmenuSceneNavigationOpen = false;
       this.isSubmenuLightingOpen = false;
@@ -96,6 +98,7 @@
       'tipTooltipService',
       'TIP_CODES',
       'clientLoggerService',
+      'simulationInfo',
       function(...args) {
         return new SimToolsSidebarController(...args);
       }

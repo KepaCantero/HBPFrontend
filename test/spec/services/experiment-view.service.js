@@ -418,6 +418,18 @@ describe('Service: ExperimentViewService', function() {
       expect(experimentViewService.resetGUI).toHaveBeenCalled();
     });
 
+    it('should handle a full reset in playback mode', function() {
+      mockResetRequest.resetType = RESET_TYPE.RESET_FULL;
+      simulationInfo.isPlayingBack = true;
+      experimentViewService.resetSimulation();
+      expect(stateService.ensureStateBeforeExecuting).toHaveBeenCalledWith(
+        STATE.PAUSED,
+        jasmine.any(Function)
+      );
+      expect(backendInterfaceService.resetCollab).toHaveBeenCalled();
+      simulationInfo.isPlayingBack = false;
+    });
+
     it('should pass the radio button value to resetCollabService when Storage is available', function() {
       spyOn(_, 'defer');
 
