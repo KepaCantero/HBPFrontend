@@ -226,7 +226,11 @@
       });
 
       this.storageServer
-        .cloneNew(environmentMetadata, this.$stateParams.ctx, this.experimentName)
+        .cloneNew(
+          environmentMetadata,
+          this.$stateParams.ctx,
+          this.experimentName
+        )
         .then(exp => {
           this.isCloneRequested = false;
           this.launchExperiment(exp.newExperiment, false);
