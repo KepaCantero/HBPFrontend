@@ -28,7 +28,7 @@
     .module('colorableObjectModule', ['simulationControlServices'])
     .constant('COLORABLE_VISUAL_REGEXP', {
       EMISSIVE: /::.+::screen_glass$/,
-      NORMAL: /(::.+::COLORABLE_VISUAL)|((cylinder|box|sphere)_[0-9]+::link::visual)$/
+      NORMAL: /(::.+::COLORABLE_VISUAL)|((cylinder|box|sphere)_[0-9]+::link::visual)$/i
     })
     .factory('colorableObjectService', [
       'objectControl',
