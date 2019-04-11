@@ -90,7 +90,6 @@
       'environmentRenderingModule',
       'storageServer',
       'clusterReservation',
-      'demoCarousel',
       'experimentExplorer',
       'newExperiment',
       'tipTooltipModule',
