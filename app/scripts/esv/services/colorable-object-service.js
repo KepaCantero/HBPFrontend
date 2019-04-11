@@ -28,7 +28,8 @@
     .module('colorableObjectModule', ['simulationControlServices'])
     .constant('COLORABLE_VISUAL_REGEXP', {
       EMISSIVE: /::.+::screen_glass$/,
-      NORMAL: /(::.+::COLORABLE_VISUAL)|((cylinder|box|sphere)_[0-9]+::link::visual)$/i
+      NORMAL: /(::.+::COLORABLE_VISUAL)|((cylinder|box|sphere)_[0-9]+::link::visual)$/i,
+      PLAIN_SHAPE: /((cylinder|box|sphere)_[0-9])$/i
     })
     .factory('colorableObjectService', [
       'objectControl',
@@ -50,13 +51,18 @@
 
         var setEntityMaterial = function(simulationInfo, entity, material) {
           var colorableNode = getNode(entity, COLORABLE_VISUAL_REGEXP.NORMAL);
-          if (!colorableNode) {
+          var shapeNode = getNode(entity, COLORABLE_VISUAL_REGEXP.PLAIN_SHAPE);
+          if (!colorableNode && !shapeNode) {
             colorableNode = getNode(entity, COLORABLE_VISUAL_REGEXP.EMISSIVE);
             material += EMISSIVE_COLOR_POSTFIX;
           }
           var materialChange = {
+            //NRRPLT-7270 the reason for this is that if a shape is just spawned the visual is not
+            //attached to it, and thus we have to generate it from the entity name
             //eslint-disable-next-line camelcase
-            visual_path: colorableNode.name,
+            visual_path: colorableNode
+              ? colorableNode.name
+              : shapeNode.name + '::link::visual',
             material: material
           };
           // Request color change through RESTful call
@@ -71,7 +77,8 @@
         var isColorableEntity = function(selectedEntity) {
           return !!(
             getNode(selectedEntity, COLORABLE_VISUAL_REGEXP.EMISSIVE) ||
-            getNode(selectedEntity, COLORABLE_VISUAL_REGEXP.NORMAL)
+            getNode(selectedEntity, COLORABLE_VISUAL_REGEXP.NORMAL) ||
+            getNode(selectedEntity, COLORABLE_VISUAL_REGEXP.PLAIN_SHAPE)
           );
         };
 
