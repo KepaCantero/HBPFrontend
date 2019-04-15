@@ -15,13 +15,14 @@ describe('Directive: transferFunctionEditor', function() {
     ScriptObject,
     $timeout,
     RESET_TYPE,
-    downloadFileService,
     codeEditorsServices,
     $httpBackend,
     clbConfirmMock,
     simulationInfo,
     storageServer,
-    whenConvertRawTfToStructured;
+    whenConvertRawTfToStructured,
+    nrpModalService,
+    downloadFileService;
 
   var shouldUseErrorCallback = false;
 
@@ -91,6 +92,7 @@ describe('Directive: transferFunctionEditor', function() {
   beforeEach(module('currentStateMockFactory'));
   beforeEach(module('simulationInfoMock'));
   beforeEach(module('storageServerMock'));
+  beforeEach(module('downloadFileServiceMock'));
   beforeEach(
     module(function($provide) {
       $provide.value('backendInterfaceService', backendInterfaceServiceMock);
@@ -140,22 +142,22 @@ describe('Directive: transferFunctionEditor', function() {
       _RESET_TYPE_,
       _downloadFileService_,
       _codeEditorsServices_,
-      _storageServer_
+      _storageServer_,
+      _nrpModalService_
     ) {
       $httpBackend = _$httpBackend_;
       codeEditorsServices = _codeEditorsServices_;
-      downloadFileService = _downloadFileService_;
       $rootScope = _$rootScope_;
       $compile = _$compile_;
       $timeout = _$timeout_;
       RESET_TYPE = _RESET_TYPE_;
       SOURCE_TYPE = _SOURCE_TYPE_;
       TRANSFER_FUNCTION_TYPE = _TRANSFER_FUNCTION_TYPE_;
-
+      nrpModalService = _nrpModalService_;
       simulationInfo = _simulationInfo_;
       simulationInfo.serverBaseUrl = 'http://bbpce016.epfl.ch:8080';
       simulationInfo.simulationID = 'mocked_simulation_id';
-
+      downloadFileService = _downloadFileService_;
       backendInterfaceService = _backendInterfaceService_;
       currentStateMock = _currentStateMockFactory_.get().stateService;
       editorMock.getLineHandle = jasmine
@@ -1223,7 +1225,6 @@ def tf2(t):
     });
 
     it('should save transfer functions to file', function() {
-      spyOn(downloadFileService, 'downloadFile');
       spyOn(window, 'Blob').and.returnValue({});
       var href = 'http://some/url';
       var URLMock = {
@@ -1232,12 +1233,24 @@ def tf2(t):
           .and.returnValue(href)
       };
       window.URL = URLMock;
-      isolateScope.download();
+      isolateScope.downloadTFFile();
       expect(URLMock.createObjectURL).toHaveBeenCalled();
       expect(downloadFileService.downloadFile).toHaveBeenCalledWith(
         href,
         'transferFunctions.py'
       );
+    });
+
+    it('should create a modal on download click', function() {
+      spyOn(nrpModalService, 'createModal');
+      isolateScope.download();
+      expect(nrpModalService.createModal).toHaveBeenCalled();
+    });
+
+    it('should destroy a modal on download click', function() {
+      spyOn(nrpModalService, 'destroyModal');
+      isolateScope.closeModal();
+      expect(nrpModalService.destroyModal).toHaveBeenCalled();
     });
 
     it('should be able to load tf from file', function() {

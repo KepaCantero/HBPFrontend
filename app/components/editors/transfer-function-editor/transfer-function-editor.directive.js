@@ -138,6 +138,7 @@ def {0}(t):
       'TF_CONFIG',
       'tipTooltipService',
       'TIP_CODES',
+      'nrpModalService',
       function(
         backendInterfaceService,
         STATE,
@@ -168,7 +169,8 @@ def {0}(t):
         bbpConfig,
         TF_CONFIG,
         tipTooltipService,
-        TIP_CODES
+        TIP_CODES,
+        nrpModalService
       ) {
         return {
           templateUrl:
@@ -1517,23 +1519,18 @@ def {0}(t):
             };
 
             scope.download = function() {
-              clbConfirm
-                .open({
-                  title: 'Downloading Transfer Functions',
-                  confirmLabel: 'All',
-                  cancelLabel: 'Selected Only',
-                  template:
-                    'Download all transfer functions or only the selected one ?',
-                  closable: false
-                })
-                .then(
-                  () => {
-                    scope.downloadTFFile(false);
-                  },
-                  () => {
-                    scope.downloadTFFile(true);
-                  }
-                );
+              nrpModalService.createModal({
+                templateUrl:
+                  'components/editors/transfer-function-editor/tf-upload-buttons.html',
+                closable: true,
+                scope: scope,
+                size: 'md',
+                windowClass: 'modal-window'
+              });
+            };
+
+            scope.closeModal = function() {
+              nrpModalService.destroyModal();
             };
 
             var insertIfTransferFunction = function(list, tfCode) {

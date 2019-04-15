@@ -1,0 +1,13 @@
+<div class="modal-header">
+    <button type="button" class="close" ng-click="closeModal()">x</button>
+    <h4 class="modal-title">Downloading Transfer Functions</h4>
+</div>
+<div class="modal-body">
+    <div>
+       Download all transfer functions or only the selected ones?
+    </div>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-danger" ng-click="downloadTFFile(false); closeModal()">All</button>
+    <button class="btn btn-default" ng-click="downloadTFFile(true);closeModal()">Selected only</button>
+</div>
