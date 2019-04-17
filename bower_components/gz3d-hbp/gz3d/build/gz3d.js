@@ -6482,7 +6482,8 @@ GZ3D.GZIface.prototype.createLightFromMsg = function(light)
   // is occuring with a __default__ light name. 
   // See NRRPLT-7234.
 
-  if (!light.attenuation_linear || !light.attenuation_quadratic) return;                                                        
+  if(light.name === '__default__' &&
+    (!light.attenuation_linear || !light.attenuation_quadratic)) return;
   
   // equation taken from
   // http://wiki.blender.org/index.php/Doc:2.6/Manual/Lighting/Lights/Light_Attenuation
