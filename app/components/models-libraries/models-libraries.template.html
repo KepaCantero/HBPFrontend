@@ -6,8 +6,8 @@
 <link rel="stylesheet" href="styles/esv/esv-web.css" />
 <!-- endbuild -->
 
-<!-- build:css(.tmp) /components/models-libraries/models-libraries.style.css-->
-<link rel="stylesheet" href="/components/models-libraries/models-libraries.style.css" />
+<!-- build:css(.tmp) components/models-libraries/models-libraries.style.css-->
+<link rel="stylesheet" href="components/models-libraries/models-libraries.style.css" />
 <!-- endbuild -->
 
 <div class="collapsible" ng-click="vm.toggleVisibility('environments');"ng-class="{'active':vm.findCategory('environments').visible }">
@@ -15,7 +15,7 @@
   <h2 class="title">Environments</h2>
   <i ng-if="!vm.findCategory('environments').visible" class="fa fa-chevron-down down-icon" aria-hidden="true"></i>
   <i ng-if="vm.findCategory('environments').visible" class="fa fa-chevron-up up-icon" aria-hidden="true"></i>
-  <button ng-if="vm.findCategory('environments').visible" class="btn btn-default enable-tooltip upload-button" title="Upload" 
+  <button ng-if="vm.findCategory('environments').visible" class="btn btn-default enable-tooltip upload-button" title="Upload"
   ng-click="vm.uploadModel('environments')"
   ng-disabled="vm.uploadingModel">
   <i disable-animate ng-class="vm.uploadingModel ? 'fa fa-spinner fa-spin' :'glyphicon glyphicon-upload'"></i> Upload
@@ -96,7 +96,7 @@
         <a class="robot-doc-link" href="#/robot-doc?config={{robot.configpath}}" target="_blank"><br>Documentation</a>
       </div>
       <div ng-if="!robot.isSelected">{{robot.description | limitTo: 200}}...</div>
-     
+
       <button ng-if="robot.isSelected && robot.private" class="btn btn-default delete-model-button" ng-click="vm.deleteModel(robot.path)">
           <i class="fa fa-times"></i> Delete
       </button>
@@ -113,7 +113,7 @@
     <h2 class="title">Brains</h2>
     <i ng-if="!vm.findCategory('brains').visible" class="fa fa-chevron-down down-icon" aria-hidden="true"></i>
     <i ng-if="vm.findCategory('brains').visible" class="fa fa-chevron-up up-icon" aria-hidden="true"></i>
-    <button ng-if="vm.findCategory('brains').visible" class="btn btn-default enable-tooltip upload-button" title="Upload" 
+    <button ng-if="vm.findCategory('brains').visible" class="btn btn-default enable-tooltip upload-button" title="Upload"
     ng-click="vm.uploadModel('brains');"
     ng-disabled="vm.uploadingModel">
     <i disable-animate ng-class="vm.uploadingModel ? 'fa fa-spinner fa-spin' :'glyphicon glyphicon-upload'"></i> Upload

@@ -21,8 +21,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  * ---LICENSE-END**/
- 
- .collapsible {
+
+.collapsible {
   width: 99.5%;
   text-align: left;
   outline: none;
@@ -44,7 +44,7 @@
   margin-left: 1%;
   order: 1;
   font-family: Gotham, sans-serif;
-  width:171px;
+  width: 171px;
 }
 
 .category-thumbnail {
@@ -62,13 +62,13 @@
 }
 
 .upload-button {
-  margin-left:33%;
+  margin-left: 33%;
   order: 3;
   align-self: flex-end;
   opacity: 0.85;
 }
 
-.delete-model-button{
+.delete-model-button {
   margin-left: 37.5%;
   width: 88px;
   margin-top: 4%;
