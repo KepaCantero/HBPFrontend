@@ -5532,8 +5532,10 @@ GZ3D.GZIface.prototype.onConnected = function()
     {
       var light = message.light[i];
       var lightObj = this.createLightFromMsg(light);
-      this.scene.add(lightObj);
-      this.gui.setLightStats(light, 'update');
+      if(lightObj) {
+        this.scene.add(lightObj);
+        this.gui.setLightStats(light, 'update');
+      }
     }
 
     var j, model;
@@ -5805,20 +5807,22 @@ GZ3D.GZIface.prototype.onConnected = function()
     if (!entity)
     {
       var lightObj = this.createLightFromMsg(message);
-      this.scene.add(lightObj);
+      if (lightObj) {
+        this.scene.add(lightObj);
 
-      // For the inserted light to have effect
-      var allObjects = [];
-      this.scene.scene.getDescendants(allObjects);
-      for (var l = 0; l < allObjects.length; ++l)
-      {
-        if (allObjects[l].material)
+        // For the inserted light to have effect
+        var allObjects = [];
+        this.scene.scene.getDescendants(allObjects);
+        for (var l = 0; l < allObjects.length; ++l)
         {
-          allObjects[l].material.needsUpdate = true;
+          if (allObjects[l].material)
+          {
+            allObjects[l].material.needsUpdate = true;
+          }
         }
-      }
 
-      guiEvents.emit('notification_popup', message.name+' inserted');
+        guiEvents.emit('notification_popup', message.name+' inserted');
+      }
     }
     this.gui.setLightStats(message, 'update');
   };
