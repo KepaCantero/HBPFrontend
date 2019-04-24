@@ -254,7 +254,7 @@
               method: 'GET',
               url:
                 backendBaseUrl +
-                '//simulation/:sim_id/files/:file_type/:file_path',
+                '/simulation/:sim_id/files/:file_type/:file_path',
               interceptor: { responseError: serverError.displayHTTPError }
             }
           }
