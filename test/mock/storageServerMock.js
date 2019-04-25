@@ -66,8 +66,15 @@
         this.getTransferFunctions = jasmine
           .createSpy('getTransferFunctions')
           .and.returnValue(
-            $q.resolve({ data: { tfname: 'def tf:\n\tbrain.index=0' } })
+            $q.resolve({
+              data: { tf1: 'pass', tf2: 'pass', faultyTf: 'invalidCode' },
+              active: { tf1: true, tf2: true, faultyTf: false }
+            })
           );
+
+        this.deleteFile = jasmine
+          .createSpy('storageServerMock.deleteFile')
+          .and.returnValue($q.resolve());
 
         this.saveTransferFunctions = jasmine
           .createSpy('saveTransferFunctions')
@@ -78,6 +85,19 @@
           .and.callFake(function() {
             return $q.when('robotpath');
           });
+
+        var data = {};
+        for (var i = 0; i < 3; ++i) {
+          var smId = 'SM' + i;
+          data[smId] = 'class ' + smId + '(DefaultStateMachine):\n';
+        }
+        this.getStateMachines = jasmine
+          .createSpy('storageServerMock.getStateMachines')
+          .and.callFake(() => window.$q.when({ data: data }));
+
+        this.saveStateMachines = jasmine
+          .createSpy('storageServerMock.saveStateMachines')
+          .and.callFake(() => window.$q.when());
 
         this.getFileContent = jasmine.createSpy('getFileContent');
         this.setFileContent = jasmine.createSpy('setFileContent');

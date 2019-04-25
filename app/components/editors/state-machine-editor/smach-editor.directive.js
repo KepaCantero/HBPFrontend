@@ -375,6 +375,19 @@
                   if (stateMachine.local) {
                     scope.stateMachines.splice(index, 1);
                   } else {
+                    // try to delete file from the storage
+                    storageServer
+                      .deleteFile(
+                        simulationInfo.experimentID,
+                        stateMachine.id + '.exd',
+                        true
+                      )
+                      .catch(() =>
+                        console.log(
+                          `Failed to delete state machine ${stateMachine.id +
+                            '.exd'} from the storage.`
+                        )
+                      );
                     return backendInterfaceService.deleteStateMachine(
                       stateMachine.id,
                       function() {

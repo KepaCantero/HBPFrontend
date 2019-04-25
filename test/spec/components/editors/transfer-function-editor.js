@@ -169,9 +169,6 @@ describe('Directive: transferFunctionEditor', function() {
       ScriptObject = pythonCodeHelper.ScriptObject;
       storageServer = _storageServer_;
 
-      storageServer.getTransferFunctions.and.returnValue(
-        window.$q.resolve(getTransferFunctionResponse)
-      );
       let debounced = jasmine.createSpy('saveTFs');
       debounced.cancel = angular.noop;
       spyOn(_, 'debounce').and.returnValue(debounced);
@@ -1206,8 +1203,10 @@ def tf2(t):
       expect(isolateScope.transferFunction).not.toBeNull();
 
       isolateScope.selectTransferFunction('tf1');
+      //test that if something goes wrong in the delete from the storage nothing happens
+      storageServer.deleteFile.and.returnValue(Promise.reject());
       isolateScope.delete();
-
+      isolateScope.$digest();
       expect(isolateScope.transferFunctions.length).toEqual(1);
       expect(backendInterfaceService.deleteTransferFunction).toHaveBeenCalled();
       expect(isolateScope.transferFunction).not.toBeNull();

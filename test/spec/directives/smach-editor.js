@@ -34,16 +34,6 @@ describe('Directive: smachEditor', function() {
     getServerBaseUrl: jasmine.createSpy('getServerBaseUrl')
   };
 
-  let getStateMachinesResponse = null;
-  let storageServerMock = {
-    getStateMachines: jasmine
-      .createSpy('setStateMachine')
-      .and.callFake(() => window.$q.when(getStateMachinesResponse)),
-    saveStateMachines: jasmine
-      .createSpy('saveStateMachines')
-      .and.callFake(() => window.$q.when())
-  };
-
   var saveErrorsServiceMock = {
     registerCallback: jasmine.createSpy('registerCallback'),
     saveDirtyData: jasmine.createSpy('saveDirtyData').and.callFake(function() {
@@ -79,6 +69,7 @@ describe('Directive: smachEditor', function() {
   beforeEach(module('simulationInfoMock'));
   beforeEach(module('userContextServiceMock'));
   beforeEach(module('pushForceServiceMock'));
+  beforeEach(module('storageServerMock'));
 
   beforeEach(
     module(function($provide) {
@@ -87,7 +78,6 @@ describe('Directive: smachEditor', function() {
       $provide.value('roslib', roslibMock);
       $provide.value('saveErrorsService', saveErrorsServiceMock);
       $provide.value('downloadFileService', downloadFileServiceMock);
-      $provide.value('storageServer', storageServerMock);
     })
   );
 
@@ -180,7 +170,6 @@ describe('Directive: smachEditor', function() {
       var smId = 'SM' + i;
       data[smId] = 'class ' + smId + '(DefaultStateMachine):\n';
     }
-    getStateMachinesResponse = { data: data };
     var expected = [];
 
     beforeEach(function() {
@@ -228,6 +217,28 @@ describe('Directive: smachEditor', function() {
       backendInterfaceService.setStateMachine.calls.mostRecent().args[2]();
       expect(sm.dirty).toEqual(false);
       expect(sm.local).toEqual(false);
+    });
+
+    it('should try to delete a state machine but not do anything if proxy does not save', function() {
+      storageServer.deleteFile.and.returnValue($q.reject());
+      var sm0 = stateMachines[0];
+      isolateScope.delete(sm0);
+      $scope.$digest();
+      expect(backendInterfaceService.deleteStateMachine).toHaveBeenCalledWith(
+        'SM0',
+        jasmine.any(Function)
+      );
+      backendInterfaceService.deleteStateMachine.calls.mostRecent().args[1]();
+      expect(stateMachines.indexOf(sm0)).toBe(-1);
+      var sm1 = stateMachines[0];
+      sm1.local = true;
+      isolateScope.delete(sm1);
+      $scope.$digest();
+      expect(stateMachines.indexOf(sm1)).toBe(-1);
+      // Since the state machine is local, we should not call back the server
+      expect(
+        backendInterfaceService.deleteStateMachine
+      ).not.toHaveBeenCalledWith('SM1', jasmine.any(Function));
     });
 
     it('should delete a state machine properly', function() {

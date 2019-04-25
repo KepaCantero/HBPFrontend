@@ -1473,6 +1473,20 @@ def {0}(t):
                     transferFunction.name,
                     angular.noop
                   );
+                  // attempt to delete the file from the storage, and if something goes wrong,
+                  // we just suppress the error
+                  storageServer
+                    .deleteFile(
+                      simulationInfo.experimentID,
+                      transferFunction.name + '.py',
+                      true
+                    )
+                    .catch(() =>
+                      console.log(
+                        `Failed to delete TF ${transferFunction.name +
+                          '.py'} file from the storage.`
+                      )
+                    );
                   deleteInternal(scope, index);
                 }
 
