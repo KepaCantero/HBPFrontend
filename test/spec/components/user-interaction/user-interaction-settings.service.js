@@ -4,7 +4,7 @@ describe('Services: userInteractionSettingsService', function() {
   let userInteractionSettingsService;
 
   let CAMERA_SENSITIVITY_RANGE, UIS_DEFAULTS;
-  let simulationConfigService;
+  let simulationConfigService, simulationInfo, storageServer;
 
   beforeEach(module('userInteractionModule'));
   beforeEach(module('userNavigationModule'));
@@ -12,6 +12,8 @@ describe('Services: userInteractionSettingsService', function() {
   beforeEach(module('autoSaveFactoryMock'));
   beforeEach(module('nrpUserMock'));
   beforeEach(module('simulationConfigServiceMock'));
+  beforeEach(module('simulationInfoMock'));
+  beforeEach(module('storageServerMock'));
   beforeEach(module('userContextServiceMock'));
 
   beforeEach(function() {});
@@ -23,13 +25,17 @@ describe('Services: userInteractionSettingsService', function() {
       _CAMERA_SENSITIVITY_RANGE_,
       _UIS_DEFAULTS_,
       _nrpUser_,
-      _simulationConfigService_
+      _simulationConfigService_,
+      _simulationInfo_,
+      _storageServer_
     ) {
       userInteractionSettingsService = _userInteractionSettingsService_;
 
       CAMERA_SENSITIVITY_RANGE = _CAMERA_SENSITIVITY_RANGE_;
       UIS_DEFAULTS = _UIS_DEFAULTS_;
       simulationConfigService = _simulationConfigService_;
+      simulationInfo = _simulationInfo_;
+      storageServer = _storageServer_;
     });
   });
 
@@ -39,6 +45,7 @@ describe('Services: userInteractionSettingsService', function() {
       'clampCameraSensitivity'
     ).and.callThrough();
 
+    // mock config file
     let mockConfig =
       '{"camera": {"sensitivity": {"translation": 0.1, "rotation": 1.2}}}';
     let mockConfigPromise = {
@@ -55,8 +62,31 @@ describe('Services: userInteractionSettingsService', function() {
       })
     };
     simulationConfigService.loadConfigFile = jasmine
-      .createSpy('test')
+      .createSpy('loadConfigFile')
       .and.returnValue(mockConfigPromise);
+
+    // mock config filename
+    /*eslint-disable camelcase*/
+    let mockFilename = {
+      file: 'mock-config.uis',
+      file_offset: 0
+    };
+    /*eslint-enable camelcase*/
+    simulationConfigService.getBackendConfigFileNames.and.returnValue({
+      then: jasmine.createSpy('then').and.callFake(cb => {
+        cb(mockFilename);
+      })
+    });
+
+    // mock exc file content
+    let mockExcContent = {
+      data: '<ExD></ExD>'
+    };
+    storageServer.getFileContent.and.returnValue({
+      then: jasmine.createSpy('then').and.callFake(cb => {
+        cb(mockExcContent);
+      })
+    });
 
     userInteractionSettingsService.loadSettings();
     expect(
@@ -106,17 +136,18 @@ describe('Services: userInteractionSettingsService', function() {
   });
 
   it(' - saveSettings()', function() {
-    let mockConfig =
-      '{"camera": {"sensitivity": {"translation": 0.1, "rotation": 1.2}}}';
-    simulationConfigService.saveConfigFile = jasmine
+    /*simulationConfigService.saveConfigFile = jasmine
       .createSpy('saveConfigFile')
-      .and.returnValue(window.$q.resolve(mockConfig));
+      .and.returnValue(window.$q.resolve(mockConfig));*/
+    userInteractionSettingsService.configFilename = 'testConfig.uis';
     userInteractionSettingsService.settingsData = UIS_DEFAULTS;
     userInteractionSettingsService.saveSettings();
 
-    expect(simulationConfigService.saveConfigFile).toHaveBeenCalledWith(
-      'user-interaction-settings',
-      jasmine.any(String)
+    expect(storageServer.setFileContent).toHaveBeenCalledWith(
+      simulationInfo.experimentID,
+      userInteractionSettingsService.configFilename,
+      jasmine.any(String),
+      false
     );
   });
 
@@ -310,5 +341,59 @@ describe('Services: userInteractionSettingsService', function() {
         done();
       });
     });
+  });
+
+  it('addUISConfigFileReference()', function() {
+    let mockExcContent = {
+      data: '<ExD><configuration type="3d-settings"/></ExD>'
+    };
+    storageServer.getFileContent.and.returnValue({
+      then: jasmine.createSpy('then').and.callFake(cb => {
+        cb(mockExcContent);
+      })
+    });
+    let filename = 'test-config.uis';
+    let expectedNewExcContent =
+      '<ExD><configuration type="3d-settings"/>\n  <configuration type="' +
+      userInteractionSettingsService.configType +
+      '" src="' +
+      filename +
+      '"/></ExD>';
+
+    userInteractionSettingsService.addUISConfigFileReference(filename);
+
+    expect(storageServer.setFileContent).toHaveBeenCalledWith(
+      jasmine.any(String),
+      jasmine.any(String),
+      expectedNewExcContent,
+      true
+    );
+  });
+
+  it('createUISConfigFile()', function() {
+    let fileExists = true;
+    simulationConfigService.doesConfigFileExist = jasmine
+      .createSpy('doesConfigFileExist')
+      .and.returnValue({
+        then: jasmine.createSpy('then').and.callFake(cb => {
+          cb(fileExists);
+        })
+      });
+    let filename = 'test-config.uis';
+
+    // test for already existing file
+    userInteractionSettingsService.createUISConfigFile(filename);
+    expect(storageServer.setFileContent).not.toHaveBeenCalled();
+
+    // test for non-existing file
+    fileExists = false;
+    userInteractionSettingsService.settingsData = UIS_DEFAULTS;
+    userInteractionSettingsService.createUISConfigFile(filename);
+    expect(storageServer.setFileContent).toHaveBeenCalledWith(
+      jasmine.any(String),
+      filename,
+      jasmine.any(String),
+      false
+    );
   });
 });

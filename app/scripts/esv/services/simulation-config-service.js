@@ -47,7 +47,8 @@
           initConfigFiles: initConfigFiles,
           doesConfigFileExist: doesConfigFileExist,
           loadConfigFile: loadConfigFile,
-          saveConfigFile: saveConfigFile
+          saveConfigFile: saveConfigFile,
+          getBackendConfigFileNames: getBackendConfigFileNames
         };
 
         //-------------------------------------------------------

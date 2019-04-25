@@ -34,6 +34,8 @@
       autoSaveFactory,
       nrpUser,
       simulationConfigService,
+      simulationInfo,
+      storageServer,
       userContextService
     ) {
       this.$q = $q;
@@ -41,11 +43,13 @@
       this.UIS_DEFAULTS = UIS_DEFAULTS;
       this.nrpUser = nrpUser;
       this.simulationConfigService = simulationConfigService;
+      this.simulationInfo = simulationInfo;
+      this.storageServer = storageServer;
       this.userContextService = userContextService;
 
-      this.autoSaveService = autoSaveFactory.createService(
-        'user-interaction-settings'
-      );
+      this.configType = 'user-interaction-settings';
+
+      this.autoSaveService = autoSaveFactory.createService(this.configType);
       this.autoSaveService.onsave(() => {
         return this.saveSettings();
       });
@@ -56,10 +60,86 @@
       $rootScope.$on('EXIT_SIMULATION', () => {});
     }
 
+    addUISConfigFileReference(filename) {
+      // add reference in .exc file
+      let excFilename = 'experiment_configuration.exc';
+      return this.storageServer
+        .getFileContent(this.simulationInfo.experimentID, excFilename, true)
+        .then(fileResource => {
+          let parser = new DOMParser();
+          let xmlDoc = parser.parseFromString(fileResource.data, 'text/xml');
+          let configs = Array.from(
+            xmlDoc.getElementsByTagName('configuration')
+          );
+
+          // if no reference to .uis file inside .exc, add one
+          let config = configs.find(config => {
+            return config.attributes.type.value === this.configType;
+          });
+          if (!config) {
+            let configNode = xmlDoc.createElement('configuration');
+            configNode.setAttribute('type', this.configType);
+            configNode.setAttribute('src', filename);
+            if (configs.length > 0) {
+              configs[configs.length - 1].after(configNode);
+            } else {
+              xmlDoc.documentElement.appendChild(configNode);
+            }
+
+            let xmlSerialized = xmlDoc.documentElement.outerHTML;
+            // get rid of automatically added but invalid attribute xmlns
+            let illegalAttributeXMLNS = ' xmlns=""';
+            xmlSerialized = xmlSerialized.replace(illegalAttributeXMLNS, '');
+            // format with indentation
+            let beforeConfigTag = xmlSerialized.indexOf(configNode.outerHTML);
+            if (beforeConfigTag !== -1) {
+              xmlSerialized =
+                xmlSerialized.substring(0, beforeConfigTag) +
+                '\n  ' +
+                xmlSerialized.substring(beforeConfigTag);
+            }
+            // write .exc
+            this.storageServer.setFileContent(
+              this.simulationInfo.experimentID,
+              excFilename,
+              xmlSerialized,
+              true
+            );
+          }
+        });
+    }
+
+    createUISConfigFile(filename) {
+      return this.simulationConfigService
+        .doesConfigFileExist(this.configType)
+        .then(exists => {
+          if (!exists) {
+            this.settingsData = JSON.parse(JSON.stringify(this.UIS_DEFAULTS));
+            this.storageServer.setFileContent(
+              this.simulationInfo.experimentID,
+              filename,
+              JSON.stringify(this.settingsData, null, 2),
+              false
+            );
+            this.autoSaveService.setDirty();
+          }
+        });
+    }
+
     loadSettings() {
       return this.simulationConfigService
         .loadConfigFile('user-interaction-settings')
         .then(fileContent => {
+          this.simulationConfigService
+            .getBackendConfigFileNames(this.configType)
+            .then(response => {
+              /*eslint-disable camelcase*/
+              this.configFilename = response.file.substring(
+                response.file_offset
+              );
+              /*eslint-enable camelcase*/
+            });
+
           this.settingsData = JSON.parse(fileContent);
           this.clampCameraSensitivity();
 
@@ -81,12 +161,16 @@
             }
           });
         })
-        .catch(() => {
+        .catch(error => {
           // error, set all defaults
-          console.info(
-            'UserInteractionSettingsService.loadSettings() - error during loadConfigFile()'
-          );
+          if (error) console.info(error.toString());
+
           this.settingsData = JSON.parse(JSON.stringify(this.UIS_DEFAULTS));
+
+          // create config file and add to .exc
+          this.configFilename = 'user-settings.uis';
+          this.createUISConfigFile(this.configFilename);
+          this.addUISConfigFileReference(this.configFilename);
         })
         .finally(() => {
           this.lastSavedSettingsData = JSON.parse(
@@ -98,9 +182,14 @@
     _persistToFile(data) {
       let stringifiedData = JSON.stringify(data, null, 2);
 
-      return this.simulationConfigService
-        .saveConfigFile('user-interaction-settings', stringifiedData)
-        .then(() => (this.lastSavedSettingsData = JSON.parse(stringifiedData)));
+      this.lastSavedSettingsData = JSON.parse(stringifiedData);
+
+      return this.storageServer.setFileContent(
+        this.simulationInfo.experimentID,
+        this.configFilename,
+        stringifiedData,
+        false
+      );
     }
 
     saveSettings() {
@@ -244,6 +333,8 @@
     'autoSaveFactory',
     'nrpUser',
     'simulationConfigService',
+    'simulationInfo',
+    'storageServer',
     'userContextService'
   ];
 

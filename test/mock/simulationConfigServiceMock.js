@@ -38,5 +38,9 @@
         });
 
       this.saveConfigFile = jasmine.createSpy('saveConfigFile');
+
+      this.getBackendConfigFileNames = jasmine.createSpy(
+        'getBackendConfigFileNames'
+      );
     });
 })();
