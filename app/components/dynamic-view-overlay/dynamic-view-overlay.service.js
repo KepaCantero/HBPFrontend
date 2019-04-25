@@ -27,8 +27,6 @@
   /**
    * @ngdoc service
    * @namespace exdFrontendApp.services
-   * @module jointPlotModule
-   * @name jointPlotModule.jointService
    * @description Service that subscribes to the joint ros-topic
    */
   class DynamicViewOverlayService {

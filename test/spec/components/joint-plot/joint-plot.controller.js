@@ -15,35 +15,28 @@
     var messageMockFar = _.cloneDeep(messageMock);
     messageMockFar.header.stamp.secs += 1;
 
-    var jointServiceMockUnsubscribe = jasmine.createSpy(
-      'jointServiceMockUnsubscribe'
-    );
-
-    var jointServiceMock = {
-      subscribe: jasmine
-        .createSpy('subscribe')
-        .and.returnValue(jointServiceMockUnsubscribe),
-      unsubscribe: jasmine.createSpy('unsubscribe')
-    };
-
     beforeEach(module('exdFrontendApp'));
+    beforeEach(module('jointPlotServiceModuleMock'));
     beforeEach(module('jointPlotModule'));
     beforeEach(module('exd.templates')); // import html template
 
-    beforeEach(
-      module(function($provide) {
-        $provide.value('jointService', jointServiceMock);
-        jointServiceMock.subscribe.calls.reset();
-        jointServiceMockUnsubscribe.calls.reset();
-      })
-    );
+    var robotJointService = null;
 
     beforeEach(
-      inject(function($rootScope, $compile, _RESET_TYPE_) {
+      inject(function(
+        $rootScope,
+        $compile,
+        _RESET_TYPE_,
+        sceneInfo,
+        jointService
+      ) {
         RESET_TYPE = _RESET_TYPE_;
 
+        robotJointService = jointService.robotJointService;
+        robotJointService.subscribe.calls.reset();
         parentscope = $rootScope.$new();
         parentscope.showJointPlot = true;
+        sceneInfo.robots = [{ robotId: 'robotId' }];
         element = $compile('<joint-plot ng-show="showJointPlot"></joint-plot>')(
           parentscope
         );
@@ -65,7 +58,7 @@
     }
 
     function triggerMessage(msg) {
-      jointServiceMock.subscribe.calls.first().args[0](msg);
+      robotJointService.subscribe.calls.first().args[0](msg);
     }
 
     it('should register selected curves properly', function() {
@@ -97,7 +90,7 @@
       parentscope.$digest();
       scope.$digest();
 
-      expect(jointServiceMock.unsubscribe).toHaveBeenCalled();
+      expect(robotJointService.unsubscribe).toHaveBeenCalled();
     });
 
     it('should make new joint visible', function() {
@@ -169,6 +162,14 @@
       _.forOwn(controller.plot.curves, function(values) {
         expect(values.length).toBe(1);
       });
+    });
+
+    it('should when ROBOT_LIST_UPDATED is triggered, robots should be reload while keeping the selected robot', function() {
+      const previouslySelectedRobotId = controller.selectedRobot.robotId;
+      scope.$broadcast('ROBOT_LIST_UPDATED');
+      scope.$digest();
+
+      expect(controller.selectedRobot.robotId).toBe(previouslySelectedRobotId);
     });
   });
 })();

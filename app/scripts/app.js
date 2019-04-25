@@ -74,6 +74,7 @@
       'vButton',
       'nrpUser',
       'experimentModule',
+      'jointPlotServiceModule',
       'jointPlotModule',
       'simulationConfigModule',
       'spikeTrainModule',

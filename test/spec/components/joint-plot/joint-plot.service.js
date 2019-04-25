@@ -32,7 +32,7 @@ describe('Service: joint-service', function() {
     })
   );
 
-  beforeEach(module('jointPlotModule'));
+  beforeEach(module('jointPlotServiceModule'));
 
   let jointService;
   beforeEach(
@@ -46,47 +46,53 @@ describe('Service: joint-service', function() {
     rosLibConnectionObject.unsubscribe.calls.reset();
   });
 
-  it('should create a connection on start', function() {
+  it('should create a connection when instanciating a RobotJointService', function() {
+    const robotJointService = jointService.getRobotJointService('robotid');
     expect(roslibMock.getOrCreateConnectionTo).toHaveBeenCalled();
     expect(roslibMock.createTopic).toHaveBeenCalled();
-    expect(jointService.callbacks.length).toBe(0);
+    expect(robotJointService.callbacks.length).toBe(0);
   });
 
   it('should unsubscribe on close', function() {
+    const robotJointService = jointService.getRobotJointService('robotid');
     expect(rosLibConnectionObject.unsubscribe).not.toHaveBeenCalled();
-    jointService.topicCallback = {};
-    jointService.close();
+    robotJointService.topicCallback = {};
+    robotJointService.close();
     expect(rosLibConnectionObject.unsubscribe).toHaveBeenCalled();
   });
 
   it('should subscribe to joint topic once callbacks are registered', function() {
-    expect(rosLibConnectionObject.subscribe).not.toHaveBeenCalled();
-    expect(jointService.callbacks.length).toBe(0);
-    jointService.subscribe(function() {});
-    expect(jointService.callbacks.length).toBe(1);
-    expect(rosLibConnectionObject.subscribe).toHaveBeenCalled();
+    const robotJointService = jointService.getRobotJointService('robotid');
+    spyOn(robotJointService, 'subscribe').and.callThrough();
+    expect(robotJointService.subscribe).not.toHaveBeenCalled();
+    expect(robotJointService.callbacks.length).toBe(0);
+    robotJointService.subscribe(function() {});
+    expect(robotJointService.callbacks.length).toBe(1);
+    expect(robotJointService.subscribe).toHaveBeenCalled();
   });
 
   it('should unsubscribe from joint topic once no more callbacks are registered', function() {
+    const robotJointService = jointService.getRobotJointService('robotid');
     expect(rosLibConnectionObject.subscribe).not.toHaveBeenCalled();
     let testCallback = function() {};
-    jointService.subscribe(testCallback);
-    expect(jointService.callbacks.length).toBe(1);
+    robotJointService.subscribe(testCallback);
+    expect(robotJointService.callbacks.length).toBe(1);
     expect(rosLibConnectionObject.subscribe).toHaveBeenCalled();
-    jointService.unsubscribe(testCallback);
-    expect(jointService.callbacks.length).toBe(0);
+    robotJointService.unsubscribe(testCallback);
+    expect(robotJointService.callbacks.length).toBe(0);
     expect(rosLibConnectionObject.unsubscribe).toHaveBeenCalled();
   });
 
   it('should add callbacks to a list', function() {
-    expect(jointService.callbacks.length).toBe(0);
+    const robotJointService = jointService.getRobotJointService('robotid');
+    expect(robotJointService.callbacks.length).toBe(0);
     let jointMessageCallback = jasmine.createSpy('jointMessageCallback');
-    jointService.subscribe(jointMessageCallback);
-    expect(jointService.callbacks.length).toBe(1);
+    robotJointService.subscribe(jointMessageCallback);
+    expect(robotJointService.callbacks.length).toBe(1);
 
     expect(jointMessageCallback).not.toHaveBeenCalled();
-    jointService.jointsType['jointName'] = 0;
-    jointService.parseMessages({
+    robotJointService.jointsType['jointName'] = 0;
+    robotJointService.parseMessages({
       header: { stamp: { secs: 5000, nsecs: 0 } },
       name: 'jointName'
     });
@@ -94,8 +100,8 @@ describe('Service: joint-service', function() {
 
     // no jointsType
     jointMessageCallback.calls.reset();
-    jointService.jointsType = {};
-    jointService.parseMessages({
+    robotJointService.jointsType = {};
+    robotJointService.parseMessages({
       header: { stamp: { secs: 5000, nsecs: 0 } },
       name: 'jointName'
     });
@@ -103,9 +109,9 @@ describe('Service: joint-service', function() {
 
     // no callbacks
     jointMessageCallback.calls.reset();
-    jointService.jointsType['jointName'] = 0;
-    jointService.callbacks = [];
-    jointService.parseMessages({
+    robotJointService.jointsType['jointName'] = 0;
+    robotJointService.callbacks = [];
+    robotJointService.parseMessages({
       header: { stamp: { secs: 5000, nsecs: 0 } },
       name: 'jointName'
     });

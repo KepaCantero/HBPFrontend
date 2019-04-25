@@ -35,7 +35,8 @@
       let refreshRobotsList = function() {
         return backendInterfaceService
           .getRobots()
-          .then(res => (thisService.robots = res.robots));
+          .then(res => (thisService.robots = res.robots))
+          .then(() => $rootScope.$broadcast('ROBOT_LIST_UPDATED'));
       };
 
       let isRobot = entity =>

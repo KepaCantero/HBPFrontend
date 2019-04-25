@@ -2,7 +2,15 @@
 <link rel="stylesheet" href="components/joint-plot/joint-plot.style.css" />
 <!-- endbuild -->
 
-<div class="jointplot-wrapper" style="display:flex;" class="ng-hide">
+<div class="jointplot-wrapper" style="display:flex;flex-direction: column" class="ng-hide">
+    <div>
+        <label>Robot: </label>
+        <select ng-model="vm.selectedRobot" style="background-color: white; margin: 5px;"
+                ng-options='robot.robotId for robot in vm.robots'
+                ng-change="vm.selectRobot()"">
+        </select>
+    </div>
+
   <div class="jointplot" ng-show="vm.allJoints.length > 0">
     <div class="property-selector">
       <div ng-repeat="prop in vm.properties">

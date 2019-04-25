@@ -40,8 +40,56 @@
       scope,
       RESET_TYPE,
       jointService,
-      dynamicViewOverlayService
+      dynamicViewOverlayService,
+      sceneInfo
     ) {
+      this.jointService = jointService;
+      this.sceneInfo = sceneInfo;
+
+      this.initializePlot();
+
+      scope.$on('RESET', (event, resetType) => {
+        if (resetType !== RESET_TYPE.RESET_CAMERA_VIEW) this.clearPlot();
+      });
+
+      scope.$on('ROBOT_LIST_UPDATED', () => {
+        this.refreshRobotList();
+      });
+
+      this.refreshRobotList();
+
+      // if we are inside an overlay, set size at start
+      // linechart keeps increasing in size with every draw if container doesn't have a set size
+      let overlayWrapper = dynamicViewOverlayService.getParentOverlayWrapper(
+        $element
+      );
+      if (overlayWrapper) {
+        overlayWrapper.style.height = '300px';
+      }
+
+      scope.$on('$destroy', () => this.stopWatchingRobot());
+    }
+
+    refreshRobotList() {
+      this.robots = this.sceneInfo.robots;
+      const previousSelected = this.selectedRobot;
+      this.selectedRobot = null;
+      if (this.robots && this.robots.length > 0) {
+        let selectionIdx = -1;
+        if (previousSelected)
+          selectionIdx = this.robots.findIndex(
+            robot => robot.robotId == previousSelected.robotId
+          );
+        if (selectionIdx != -1) {
+          this.selectedRobot = this.robots[selectionIdx];
+        } else {
+          this.selectedRobot = this.robots[0];
+          this.selectRobot();
+        }
+      } else this.selectRobot();
+    }
+
+    initializePlot() {
       this.plot = {
         curves: {},
         options: {
@@ -63,24 +111,29 @@
       };
 
       this.selectedProperty = { name: this.properties[0] };
+      this.allJoints = null;
+    }
 
-      scope.$on('RESET', (event, resetType) => {
-        if (resetType !== RESET_TYPE.RESET_CAMERA_VIEW) this.clearPlot();
-      });
+    watchRobot(robotId) {
+      this.messageCallback = msg => this.onNewJointMessage(msg);
 
-      let messageCallback = msg => this.onNewJointMessage(msg);
-      jointService.subscribe(messageCallback);
+      this.robotJointService = this.jointService.getRobotJointService(robotId);
 
-      scope.$on('$destroy', () => jointService.unsubscribe(messageCallback));
+      this.robotJointService.subscribe(this.messageCallback);
+    }
 
-      // if we are inside an overlay, set size at start
-      // linechart keeps increasing in size with every draw if container doesn't have a set size
-      let overlayWrapper = dynamicViewOverlayService.getParentOverlayWrapper(
-        $element
-      );
-      if (overlayWrapper) {
-        overlayWrapper.style.height = '300px';
-      }
+    stopWatchingRobot() {
+      if (!this.robotJointService) return;
+
+      this.robotJointService.unsubscribe(this.messageCallback);
+      this.robotJointService = null;
+      this.initializePlot();
+    }
+
+    selectRobot() {
+      this.stopWatchingRobot();
+
+      if (this.selectedRobot) this.watchRobot(this.selectedRobot.robotId);
     }
 
     onNewJointMessage(message) {
@@ -155,7 +208,8 @@
     '$scope',
     'RESET_TYPE',
     'jointService',
-    'dynamicViewOverlayService'
+    'dynamicViewOverlayService',
+    'sceneInfo'
   ];
 
   angular

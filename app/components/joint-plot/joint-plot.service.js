@@ -24,20 +24,14 @@
 (function() {
   'use strict';
 
-  /**
-   * @ngdoc service
-   * @namespace exdFrontendApp.services
-   * @module jointPlotModule
-   * @name jointPlotModule.jointService
-   * @description Service that subscribes to the joint ros-topic
-   */
-  class JointPlotService {
+  class RobotJointService {
     // number of points per second
     static get POINT_FREQUENCY() {
       return 2;
     }
 
-    constructor(roslib, simulationInfo, sceneInfo, bbpConfig) {
+    constructor(roslib, simulationInfo, bbpConfig, robotId) {
+      this.robotId = robotId;
       this.roslib = roslib;
       this.server = simulationInfo.serverConfig.rosbridge.websocket;
       this.jointTopic = bbpConfig.get('ros-topics').joint;
@@ -65,13 +59,13 @@
       let modelreq = {};
       let jointreq = {};
       // TODO: add multirobots support
-      modelreq[this.modelProp.param] = sceneInfo.robots[0].robotId;
+      modelreq[this.modelProp.param] = robotId;
       this.jointTopicSubscriber = this.roslib.createTopic(
         this.rosConnection,
-        '/' + sceneInfo.robots[0].robotId + this.jointTopic,
+        '/' + robotId + this.jointTopic,
         'sensor_msgs/JointState',
         // eslint-disable-next-line camelcase
-        { throttle_rate: 1.0 / JointPlotService.POINT_FREQUENCY * 1000.0 }
+        { throttle_rate: 1.0 / RobotJointService.POINT_FREQUENCY * 1000.0 }
       );
 
       this.getModelPropertiesService.callService(
@@ -135,7 +129,7 @@
 
       if (
         Math.abs(currentTime - this.lastMessageTime) * tolerance >=
-        1 / JointPlotService.POINT_FREQUENCY
+        1 / RobotJointService.POINT_FREQUENCY
       ) {
         this.lastMessageTime = currentTime;
         for (let i = 0; i < this.callbacks.length; i = i + 1) {
@@ -178,13 +172,37 @@
     }
   }
 
-  JointPlotService.$$ngIsClass = true;
-  JointPlotService.$inject = [
-    'roslib',
-    'simulationInfo',
-    'sceneInfo',
-    'bbpConfig'
-  ];
+  /**
+   * @ngdoc service
+   * @namespace exdFrontendApp.services
+   * @module jointPlotServiceModule
+   * @name jointPlotServiceModule.jointService
+   * @description Service that subscribes to the joint ros-topic
+   */
+  class JointPlotService {
+    constructor(roslib, simulationInfo, bbpConfig) {
+      this.roslib = roslib;
+      this.simulationInfo = simulationInfo;
+      this.bbpConfig = bbpConfig;
 
-  angular.module('jointPlotModule').service('jointService', JointPlotService);
+      this.robotJointServices = {};
+    }
+
+    getRobotJointService(robotId) {
+      if (!this.robotJointServices[robotId])
+        this.robotJointServices[robotId] = new RobotJointService(
+          this.roslib,
+          this.simulationInfo,
+          this.bbpConfig,
+          robotId
+        );
+      return this.robotJointServices[robotId];
+    }
+  }
+
+  JointPlotService.$inject = ['roslib', 'simulationInfo', 'bbpConfig'];
+
+  angular
+    .module('jointPlotServiceModule', ['bbpConfig'])
+    .service('jointService', JointPlotService);
 })();
