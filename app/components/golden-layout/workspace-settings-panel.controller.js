@@ -84,6 +84,7 @@
         this.goldenLayoutService.layout.destroy();
         this.goldenLayoutService.createLayout(workspace.layout);
       }
+      this.workspaceService.closeConfigPanel();
     }
 
     deleteCustomWorkspace(event, id) {
