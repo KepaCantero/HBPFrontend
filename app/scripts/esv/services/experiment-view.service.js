@@ -38,6 +38,7 @@
       backendInterfaceService,
       bbpConfig,
       clbConfirm,
+      clbErrorDialog,
       dynamicViewOverlayService,
       environmentRenderingService,
       environmentService,
@@ -65,6 +66,7 @@
       this.backendInterfaceService = backendInterfaceService;
       this.bbpConfig = bbpConfig;
       this.clbConfirm = clbConfirm;
+      this.clbErrorDialog = clbErrorDialog;
       this.dynamicViewOverlayService = dynamicViewOverlayService;
       this.environmentRenderingService = environmentRenderingService;
       this.environmentService = environmentService;
@@ -360,7 +362,13 @@
                   this.backendInterfaceService.resetCollab(
                     this.resetRequest,
                     this.splash.closeSplash,
-                    this.splash.closeSplash
+                    result => {
+                      this.clbErrorDialog.open({
+                        type: 'Error occurred while resetting simulation',
+                        message: result.data.message
+                      });
+                      this.splash.closeSplash();
+                    }
                   );
                 }
               }, 150);
@@ -461,6 +469,7 @@
     'backendInterfaceService',
     'bbpConfig',
     'clbConfirm',
+    'clbErrorDialog',
     'dynamicViewOverlayService',
     'environmentRenderingService',
     'environmentService',

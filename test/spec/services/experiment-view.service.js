@@ -482,7 +482,9 @@ describe('Service: ExperimentViewService', function() {
         splash.close.calls.reset();
         splash.splashScreen = 'isDefined';
 
-        backendInterfaceService.resetCollab.calls.mostRecent().args[2](); //2 is the failure callback
+        backendInterfaceService.resetCollab.calls
+          .mostRecent()
+          .args[2]({ data: { message: 'Error occured in the CLE' } }); //2 is the failure callback
         $timeout.flush(100);
       }
     });
