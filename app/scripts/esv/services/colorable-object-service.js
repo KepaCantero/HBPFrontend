@@ -29,7 +29,7 @@
     .constant('COLORABLE_VISUAL_REGEXP', {
       EMISSIVE: /::.+::screen_glass$/,
       NORMAL: /(::.+::COLORABLE_VISUAL)|((cylinder|box|sphere)_[0-9]+::link::visual)$/i,
-      PLAIN_SHAPE: /((cylinder|box|sphere)_[0-9])$/i
+      PLAIN_SHAPE: /((cylinder|box|sphere)(_[0-9])*)$/i
     })
     .factory('colorableObjectService', [
       'objectControl',
