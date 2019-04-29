@@ -33,8 +33,8 @@
         <div ng-show="tabSelection=='NewExperiment'" class="underlined-box"></div>
       </div>
 
-      <div ng-class="{'underlined-tab':devMode,'underlined-tab-disabled':!devMode}" ng-click="(devMode)?tabChanged('ModelsLibraries'):null">
-        <div ng-class="{'underlined-tab-selected':tabSelection=='ModelsLibraries' && devMode}">
+      <div class="underlined-tab" ng-click="tabChanged('ModelsLibraries')">
+        <div ng-class="{'underlined-tab-selected':tabSelection=='ModelsLibraries'}">
           Models libraries
         </div>
         <div ng-show="tabSelection=='ModelsLibraries'" class="underlined-box"></div>

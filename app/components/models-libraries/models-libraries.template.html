@@ -16,7 +16,7 @@
   <i ng-if="!vm.findCategory('environments').visible" class="fa fa-chevron-down down-icon" aria-hidden="true"></i>
   <i ng-if="vm.findCategory('environments').visible" class="fa fa-chevron-up up-icon" aria-hidden="true"></i>
   <button ng-if="vm.findCategory('environments').visible" class="btn btn-default enable-tooltip upload-button" title="Upload"
-  ng-click="vm.uploadModel('environments')"
+  ng-click="vm.uploadModel('environments'); $event.stopPropagation();"
   ng-disabled="vm.uploadingModel">
   <i disable-animate ng-class="vm.uploadingModel ? 'fa fa-spinner fa-spin' :'glyphicon glyphicon-upload'"></i> Upload
 </button>
@@ -63,7 +63,7 @@
   <i ng-if="!vm.findCategory('robots').visible" class="fa fa-chevron-down down-icon" aria-hidden="true"></i>
   <i ng-if="vm.findCategory('robots').visible" class="fa fa-chevron-up up-icon" aria-hidden="true"></i>
   <button ng-if="vm.findCategory('robots').visible" class="btn btn-default enable-tooltip upload-button" title="Upload"
-   ng-click="vm.uploadModel('robots');"
+   ng-click="vm.uploadModel('robots'); $event.stopPropagation();"
    ng-disabled="vm.uploadingModel">
    <i disable-animate ng-class="vm.uploadingModel ? 'fa fa-spinner fa-spin' :'glyphicon glyphicon-upload'"></i> Upload
 </button>
@@ -114,7 +114,7 @@
     <i ng-if="!vm.findCategory('brains').visible" class="fa fa-chevron-down down-icon" aria-hidden="true"></i>
     <i ng-if="vm.findCategory('brains').visible" class="fa fa-chevron-up up-icon" aria-hidden="true"></i>
     <button ng-if="vm.findCategory('brains').visible" class="btn btn-default enable-tooltip upload-button" title="Upload"
-    ng-click="vm.uploadModel('brains');"
+    ng-click="vm.uploadModel('brains'); $event.stopPropagation();"
     ng-disabled="vm.uploadingModel">
     <i disable-animate ng-class="vm.uploadingModel ? 'fa fa-spinner fa-spin' :'glyphicon glyphicon-upload'"></i> Upload
 </button>
