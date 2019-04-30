@@ -4886,7 +4886,7 @@ GZ3D.Gui.findBaseModelName = function (modelName)
   {
     if (k > 0)
     {
-      var idx = modelName.lastIndexOf('_');
+      let idx = modelName.search('(_[0-9]+)+');
       if (idx > 0)
       {
         modelName = modelName.substring(0, idx);
@@ -4899,9 +4899,9 @@ GZ3D.Gui.findBaseModelName = function (modelName)
       {
         for (j = 0; j < GZ3D.modelList[i].models.length; ++j)
         {
-          if (modelName === GZ3D.modelList[i].models[j].modelPath)
+          if (modelName === GZ3D.modelList[i].models[j].modelTitle.toLowerCase().replace(' ', '_'))
           {
-            return modelName;
+            return GZ3D.modelList[i].models[j].modelPath;
           }
         }
       }
@@ -4909,8 +4909,7 @@ GZ3D.Gui.findBaseModelName = function (modelName)
 
     for (j = 0; j < basicObjects.length; ++j)
     {
-      if (modelName === basicObjects[j])
-      {
+      if (modelName === basicObjects[j]) {
         return modelName;
       }
     }
@@ -6483,12 +6482,12 @@ GZ3D.GZIface.prototype.createLightFromMsg = function(light)
   // For now I ignore this kind of problematic lights, since they
   // cause the scene to be completely gray. This kind
   // of messages are happening only when a playback
-  // is occuring with a __default__ light name. 
+  // is occuring with a __default__ light name.
   // See NRRPLT-7234.
 
   if(light.name === '__default__' &&
     (!light.attenuation_linear || !light.attenuation_quadratic)) return;
-  
+
   // equation taken from
   // http://wiki.blender.org/index.php/Doc:2.6/Manual/Lighting/Lights/Light_Attenuation
   var E = 1;
