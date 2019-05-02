@@ -47,6 +47,15 @@
                     a complete new work flow to create an experiment from scratch, by dragging robots and brain direclty into the 3D scene and full support for recording
                     and replaying a simulation (try it!).
                 </p>
+                <h3><span style="color:red">Compatibility breaks (reminder from 2.1.3)</span></h3>
+                <ul>
+                    <li>ROS topic names for (almost) all previsously cloned experiments are not valid anymore and your transfer functions are most probably not working.
+                      Starting from CLE v2.1.3, robots are added into the scene under their own 'robot id' namespaces.
+                      Gazebo therefore prepends this robot id to the topic names.
+                      <span style="color:red;">Please check your transfer functions and make sure they are using proper topic names.</span></br>
+                      Follow the detailed migration plan to fix your experiments <a target="_blank" href="https://bitbucket.org/hbpneurorobotics/neurorobotics-platform/src/15e48b048f9d38979b725e7448e21e2d317c427b/changelogs/2-1-3.md?at=master&fileviewer=file-view-default">here</a>.
+                    </li>
+                </ul>
                 <h3>Features</h3>
                 <ul>
                     <li>Joint plot now handles multiple robots</li>
